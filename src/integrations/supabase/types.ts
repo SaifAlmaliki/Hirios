@@ -95,43 +95,12 @@ export type Database = {
         }
         Relationships: []
       }
-      settings: {
-        Row: {
-          created_at: string
-          id: string
-          key: string
-          updated_at: string
-          value: string | null
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          key: string
-          updated_at?: string
-          value?: string | null
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          key?: string
-          updated_at?: string
-          value?: string | null
-        }
-        Relationships: []
-      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      get_setting: {
-        Args: { setting_key: string }
-        Returns: string
-      }
-      upsert_setting: {
-        Args: { setting_key: string; setting_value: string }
-        Returns: undefined
-      }
+      [_ in never]: never
     }
     Enums: {
       [_ in never]: never

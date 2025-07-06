@@ -12,7 +12,6 @@ import { useToast } from '@/hooks/use-toast';
 import { Job, useCreateJob } from '../hooks/useJobs';
 import { useApplications } from '../hooks/useApplications';
 import JobApplicationsView from './JobApplicationsView';
-import WebhookSettings from './WebhookSettings';
 
 interface CompanyViewProps {
   jobs: Job[];
@@ -103,161 +102,158 @@ const CompanyView: React.FC<CompanyViewProps> = ({ jobs }) => {
 
   return (
     <div className="space-y-6">
-      {/* Header with Webhook Settings */}
+      {/* Header */}
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold text-blue-900">Company Dashboard</h2>
           <p className="text-gray-600 mt-1">Manage your job postings and applications</p>
         </div>
         
-        <div className="flex gap-3">
-          <WebhookSettings />
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                <Plus className="h-4 w-4 mr-2" />
-                Post New Job
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle className="text-xl text-blue-900">Post a New Job</DialogTitle>
-                <DialogDescription>
-                  Fill in the details below to post a new job opening.
-                </DialogDescription>
-              </DialogHeader>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogTrigger asChild>
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+              <Plus className="h-4 w-4 mr-2" />
+              Post New Job
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="text-xl text-blue-900">Post a New Job</DialogTitle>
+              <DialogDescription>
+                Fill in the details below to post a new job opening.
+              </DialogDescription>
+            </DialogHeader>
+            
+            <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="title" className="text-sm font-medium text-gray-700">Job Title *</Label>
+                  <Input
+                    id="title"
+                    name="title"
+                    value={jobData.title}
+                    onChange={handleInputChange}
+                    placeholder="Enter job title"
+                    className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="company" className="text-sm font-medium text-gray-700">Company Name *</Label>
+                  <Input
+                    id="company"
+                    name="company"
+                    value={jobData.company}
+                    onChange={handleInputChange}
+                    placeholder="Enter company name"
+                    className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
               
-              <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="title" className="text-sm font-medium text-gray-700">Job Title *</Label>
-                    <Input
-                      id="title"
-                      name="title"
-                      value={jobData.title}
-                      onChange={handleInputChange}
-                      placeholder="Enter job title"
-                      className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="company" className="text-sm font-medium text-gray-700">Company Name *</Label>
-                    <Input
-                      id="company"
-                      name="company"
-                      value={jobData.company}
-                      onChange={handleInputChange}
-                      placeholder="Enter company name"
-                      className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                    />
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="department" className="text-sm font-medium text-gray-700">Department *</Label>
-                    <Input
-                      id="department"
-                      name="department"
-                      value={jobData.department}
-                      onChange={handleInputChange}
-                      placeholder="Enter department"
-                      className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="location" className="text-sm font-medium text-gray-700">Location *</Label>
-                    <Input
-                      id="location"
-                      name="location"
-                      value={jobData.location}
-                      onChange={handleInputChange}
-                      placeholder="Enter location"
-                      className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                    />
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="employment_type" className="text-sm font-medium text-gray-700">Employment Type *</Label>
-                    <Select onValueChange={handleSelectChange}>
-                      <SelectTrigger className="border-gray-300 focus:border-blue-500 focus:ring-blue-500">
-                        <SelectValue placeholder="Select employment type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="full-time">Full-time</SelectItem>
-                        <SelectItem value="part-time">Part-time</SelectItem>
-                        <SelectItem value="contract">Contract</SelectItem>
-                        <SelectItem value="temporary">Temporary</SelectItem>
-                        <SelectItem value="internship">Internship</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="salary" className="text-sm font-medium text-gray-700">Salary (Optional)</Label>
-                    <Input
-                      id="salary"
-                      name="salary"
-                      value={jobData.salary}
-                      onChange={handleInputChange}
-                      placeholder="Enter salary"
-                      className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                    />
-                  </div>
-                </div>
-                
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="description" className="text-sm font-medium text-gray-700">Job Description *</Label>
-                  <Textarea
-                    id="description"
-                    name="description"
-                    value={jobData.description}
+                  <Label htmlFor="department" className="text-sm font-medium text-gray-700">Department *</Label>
+                  <Input
+                    id="department"
+                    name="department"
+                    value={jobData.department}
                     onChange={handleInputChange}
-                    placeholder="Enter job description"
-                    className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 resize-none"
+                    placeholder="Enter department"
+                    className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                   />
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="requirements" className="text-sm font-medium text-gray-700">Requirements (Optional)</Label>
-                  <Textarea
-                    id="requirements"
-                    name="requirements"
-                    value={jobData.requirements}
+                  <Label htmlFor="location" className="text-sm font-medium text-gray-700">Location *</Label>
+                  <Input
+                    id="location"
+                    name="location"
+                    value={jobData.location}
                     onChange={handleInputChange}
-                    placeholder="Enter requirements"
-                    className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 resize-none"
+                    placeholder="Enter location"
+                    className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                   />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="employment_type" className="text-sm font-medium text-gray-700">Employment Type *</Label>
+                  <Select onValueChange={handleSelectChange}>
+                    <SelectTrigger className="border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+                      <SelectValue placeholder="Select employment type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="full-time">Full-time</SelectItem>
+                      <SelectItem value="part-time">Part-time</SelectItem>
+                      <SelectItem value="contract">Contract</SelectItem>
+                      <SelectItem value="temporary">Temporary</SelectItem>
+                      <SelectItem value="internship">Internship</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="benefits" className="text-sm font-medium text-gray-700">Benefits (Optional)</Label>
-                  <Textarea
-                    id="benefits"
-                    name="benefits"
-                    value={jobData.benefits}
+                  <Label htmlFor="salary" className="text-sm font-medium text-gray-700">Salary (Optional)</Label>
+                  <Input
+                    id="salary"
+                    name="salary"
+                    value={jobData.salary}
                     onChange={handleInputChange}
-                    placeholder="Enter benefits"
-                    className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 resize-none"
+                    placeholder="Enter salary"
+                    className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                   />
                 </div>
-                
-                <div className="flex justify-end space-x-2">
-                  <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-                    Cancel
-                  </Button>
-                  <Button type="submit" disabled={createJobMutation.isPending} className="bg-blue-600 hover:bg-blue-700 text-white">
-                    {createJobMutation.isPending ? 'Posting...' : 'Post Job'}
-                  </Button>
-                </div>
-              </form>
-            </DialogContent>
-          </Dialog>
-        </div>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="description" className="text-sm font-medium text-gray-700">Job Description *</Label>
+                <Textarea
+                  id="description"
+                  name="description"
+                  value={jobData.description}
+                  onChange={handleInputChange}
+                  placeholder="Enter job description"
+                  className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 resize-none"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="requirements" className="text-sm font-medium text-gray-700">Requirements (Optional)</Label>
+                <Textarea
+                  id="requirements"
+                  name="requirements"
+                  value={jobData.requirements}
+                  onChange={handleInputChange}
+                  placeholder="Enter requirements"
+                  className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 resize-none"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="benefits" className="text-sm font-medium text-gray-700">Benefits (Optional)</Label>
+                <Textarea
+                  id="benefits"
+                  name="benefits"
+                  value={jobData.benefits}
+                  onChange={handleInputChange}
+                  placeholder="Enter benefits"
+                  className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 resize-none"
+                />
+              </div>
+              
+              <div className="flex justify-end space-x-2">
+                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={createJobMutation.isPending} className="bg-blue-600 hover:bg-blue-700 text-white">
+                  {createJobMutation.isPending ? 'Posting...' : 'Post Job'}
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* Dashboard Metrics */}
