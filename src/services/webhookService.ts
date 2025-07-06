@@ -52,17 +52,14 @@ export const sendApplicationToWebhook = async (
 const getWebhookUrl = async (): Promise<string | null> => {
   try {
     const { data, error } = await supabase
-      .from('settings')
-      .select('value')
-      .eq('key', 'webhook_url')
-      .maybeSingle();
+      .rpc('get_setting', { setting_key: 'webhook_url' });
 
     if (error) {
       console.error('Error fetching webhook URL:', error);
       return null;
     }
 
-    return data?.value || null;
+    return data || null;
   } catch (error) {
     console.error('Error getting webhook URL:', error);
     return null;
@@ -72,8 +69,10 @@ const getWebhookUrl = async (): Promise<string | null> => {
 export const updateWebhookUrl = async (url: string): Promise<boolean> => {
   try {
     const { error } = await supabase
-      .from('settings')
-      .upsert({ key: 'webhook_url', value: url });
+      .rpc('upsert_setting', { 
+        setting_key: 'webhook_url', 
+        setting_value: url 
+      });
 
     if (error) {
       console.error('Error updating webhook URL:', error);

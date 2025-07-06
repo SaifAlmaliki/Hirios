@@ -22,17 +22,14 @@ const WebhookSettings: React.FC = () => {
   const loadWebhookUrl = async () => {
     try {
       const { data, error } = await supabase
-        .from('settings')
-        .select('value')
-        .eq('key', 'webhook_url')
-        .maybeSingle();
+        .rpc('get_setting', { setting_key: 'webhook_url' });
 
       if (error) {
         console.error('Error loading webhook URL:', error);
         return;
       }
 
-      setWebhookUrl(data?.value || 'https://n8n.cognitechx.com/webhook-test/application');
+      setWebhookUrl(data || 'https://n8n.cognitechx.com/webhook-test/application');
     } catch (error) {
       console.error('Error loading webhook URL:', error);
     }

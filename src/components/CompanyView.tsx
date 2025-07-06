@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Building, Users, UserCheck, TrendingUp, Eye } from 'lucide-react';
+import { Plus, Building, Users, UserCheck, TrendingUp, Eye, FileText } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Job, useCreateJob } from '../hooks/useJobs';
 import { useApplications } from '../hooks/useApplications';
