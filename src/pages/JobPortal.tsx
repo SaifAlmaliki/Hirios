@@ -16,7 +16,7 @@ const JobPortal = () => {
   const { user, userType, signOut } = useAuth();
   const navigate = useNavigate();
 
-  // If user is logged in and is a company, default to company view
+  // If user is logged in, set view based on their user type
   React.useEffect(() => {
     if (userType === 'company') {
       setIsCompanyView(true);
@@ -59,8 +59,8 @@ const JobPortal = () => {
             </div>
             
             <div className="flex items-center space-x-4">
-              {/* View Toggle - only show if not authenticated or can switch views */}
-              {(!user || userType === 'job_seeker') && (
+              {/* View Toggle - only show if user is not authenticated */}
+              {!user && (
                 <div className="flex items-center space-x-3 bg-gray-100 p-2 rounded-lg">
                   <div className={`flex items-center space-x-2 px-3 py-1 rounded-md transition-colors ${!isCompanyView ? 'bg-blue-600 text-white' : 'text-gray-600'}`}>
                     <Users className="h-4 w-4" />
@@ -73,7 +73,6 @@ const JobPortal = () => {
                     checked={isCompanyView}
                     onCheckedChange={setIsCompanyView}
                     className="data-[state=checked]:bg-blue-600"
-                    disabled={userType === 'company'}
                   />
                   <div className={`flex items-center space-x-2 px-3 py-1 rounded-md transition-colors ${isCompanyView ? 'bg-blue-600 text-white' : 'text-gray-600'}`}>
                     <Building2 className="h-4 w-4" />
