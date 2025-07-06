@@ -104,7 +104,7 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
       </div>
 
       {/* Job Listings */}
-      <div className="space-y-6">
+      <div>
         {jobs.length === 0 ? (
           <Card className="text-center py-16 bg-gray-50">
             <CardContent>
@@ -116,218 +116,220 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
             </CardContent>
           </Card>
         ) : (
-          jobs.map((job) => {
-            const isExpanded = expandedJobs.has(job.id);
-            return (
-              <Card key={job.id} className="hover:shadow-lg transition-all duration-300 border-2 border-gray-100 hover:border-blue-200 bg-white">
-                <CardHeader className="pb-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-t-lg">
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1 space-y-3">
-                      <div>
-                        <CardTitle className="text-2xl font-bold text-gray-900 mb-2">{job.title}</CardTitle>
-                        <CardDescription className="text-lg font-semibold text-blue-700 mb-3 flex items-center">
-                          <Building className="h-5 w-5 mr-2" />
-                          {job.company}
-                        </CardDescription>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {jobs.map((job) => {
+              const isExpanded = expandedJobs.has(job.id);
+              return (
+                <Card key={job.id} className="hover:shadow-lg transition-all duration-300 border-2 border-gray-100 hover:border-blue-200 bg-white h-fit">
+                  <CardHeader className="pb-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-t-lg">
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <CardTitle className="text-xl font-bold text-gray-900 mb-2">{job.title}</CardTitle>
+                          <CardDescription className="text-base font-semibold text-blue-700 mb-3 flex items-center">
+                            <Building className="h-4 w-4 mr-2" />
+                            {job.company}
+                          </CardDescription>
+                        </div>
+                        
+                        <div className="flex flex-col items-end space-y-2">
+                          <div className="flex items-center text-xs text-gray-500 bg-white px-2 py-1 rounded-full shadow-sm">
+                            <Calendar className="h-3 w-3 mr-1" />
+                            Posted {new Date(job.created_at).toLocaleDateString()}
+                          </div>
+                          <Button 
+                            onClick={() => handleApply(job)}
+                            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-sm font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
+                            size="sm"
+                          >
+                            Apply Now
+                          </Button>
+                        </div>
                       </div>
                       
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                        <div className="flex items-center text-gray-700 bg-white px-3 py-2 rounded-lg shadow-sm">
-                          <Users className="h-4 w-4 mr-2 text-blue-600" />
-                          <span className="font-medium">{job.department}</span>
+                      <div className="grid grid-cols-1 xl:grid-cols-3 gap-2 text-xs">
+                        <div className="flex items-center text-gray-700 bg-white px-2 py-1 rounded-lg shadow-sm">
+                          <Users className="h-3 w-3 mr-2 text-blue-600" />
+                          <span className="font-medium truncate">{job.department}</span>
                         </div>
-                        <div className="flex items-center text-gray-700 bg-white px-3 py-2 rounded-lg shadow-sm">
-                          <MapPin className="h-4 w-4 mr-2 text-green-600" />
-                          <span className="font-medium">{job.location}</span>
+                        <div className="flex items-center text-gray-700 bg-white px-2 py-1 rounded-lg shadow-sm">
+                          <MapPin className="h-3 w-3 mr-2 text-green-600" />
+                          <span className="font-medium truncate">{job.location}</span>
                         </div>
-                        <div className="flex items-center text-gray-700 bg-white px-3 py-2 rounded-lg shadow-sm">
-                          <Clock className="h-4 w-4 mr-2 text-purple-600" />
-                          <span className="font-medium">{job.employment_type}</span>
+                        <div className="flex items-center text-gray-700 bg-white px-2 py-1 rounded-lg shadow-sm">
+                          <Clock className="h-3 w-3 mr-2 text-purple-600" />
+                          <span className="font-medium truncate">{job.employment_type}</span>
                         </div>
                       </div>
 
                       {job.salary && (
-                        <div className="flex items-center text-lg font-bold text-green-700 bg-green-50 px-4 py-2 rounded-lg inline-flex w-fit">
-                          <DollarSign className="h-5 w-5 mr-2" />
+                        <div className="flex items-center text-sm font-bold text-green-700 bg-green-50 px-3 py-2 rounded-lg inline-flex w-fit">
+                          <DollarSign className="h-4 w-4 mr-2" />
                           {job.salary}
                         </div>
                       )}
                     </div>
-                    
-                    <div className="flex flex-col items-end space-y-3 ml-6">
-                      <div className="flex items-center text-sm text-gray-500 bg-white px-3 py-1 rounded-full shadow-sm">
-                        <Calendar className="h-4 w-4 mr-2" />
-                        Posted {new Date(job.created_at).toLocaleDateString()}
-                      </div>
-                      <Button 
-                        onClick={() => handleApply(job)}
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 text-lg font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
-                        size="lg"
-                      >
-                        Apply Now
-                      </Button>
-                    </div>
-                  </div>
-                </CardHeader>
-                
-                <CardContent className="pt-6 pb-6 space-y-6">
-                  {/* Job Description */}
-                  <div>
-                    <h4 className="font-semibold text-gray-900 mb-3 text-lg">Job Description</h4>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="text-gray-700 leading-relaxed">
-                        {isExpanded ? job.description : `${job.description.substring(0, 300)}${job.description.length > 300 ? '...' : ''}`}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Requirements */}
-                  {job.requirements && (isExpanded || job.requirements.length < 200) && (
+                  </CardHeader>
+                  
+                  <CardContent className="pt-4 pb-4 space-y-4">
+                    {/* Job Description */}
                     <div>
-                      <h4 className="font-semibold text-gray-900 mb-3 text-lg">Requirements</h4>
-                      <div className="bg-blue-50 p-4 rounded-lg">
-                        <div className="text-gray-700 space-y-2">
-                          {job.requirements.split('\n').filter(req => req.trim()).map((req, index) => (
-                            <div key={index} className="flex items-start">
-                              <span className="text-blue-600 mr-3 mt-1">•</span>
-                              <span>{req.trim()}</span>
-                            </div>
-                          ))}
-                        </div>
+                      <h4 className="font-semibold text-gray-900 mb-2 text-base">Job Description</h4>
+                      <div className="bg-gray-50 p-3 rounded-lg">
+                        <p className="text-gray-700 leading-relaxed text-sm">
+                          {isExpanded ? job.description : `${job.description.substring(0, 200)}${job.description.length > 200 ? '...' : ''}`}
+                        </p>
                       </div>
                     </div>
-                  )}
 
-                  {/* Benefits */}
-                  {job.benefits && (isExpanded || job.benefits.length < 200) && (
-                    <div>
-                      <h4 className="font-semibold text-gray-900 mb-3 text-lg">Benefits</h4>
-                      <div className="bg-green-50 p-4 rounded-lg">
-                        <p className="text-gray-700 leading-relaxed">{job.benefits}</p>
+                    {/* Requirements */}
+                    {job.requirements && (isExpanded || job.requirements.length < 150) && (
+                      <div>
+                        <h4 className="font-semibold text-gray-900 mb-2 text-base">Requirements</h4>
+                        <div className="bg-blue-50 p-3 rounded-lg">
+                          <div className="text-gray-700 space-y-1 text-sm">
+                            {job.requirements.split('\n').filter(req => req.trim()).map((req, index) => (
+                              <div key={index} className="flex items-start">
+                                <span className="text-blue-600 mr-2 mt-1">•</span>
+                                <span>{req.trim()}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
 
-                  {/* Show More/Less Button */}
-                  {(job.description.length > 300 || (job.requirements && job.requirements.length > 200) || (job.benefits && job.benefits.length > 200)) && (
-                    <div className="flex justify-center pt-4 border-t border-gray-200">
-                      <Button
-                        variant="ghost"
-                        onClick={() => toggleJobExpansion(job.id)}
-                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 px-6 py-2 rounded-lg font-medium"
-                      >
-                        {isExpanded ? (
-                          <>
-                            Show Less <ChevronUp className="h-4 w-4 ml-2" />
-                          </>
-                        ) : (
-                          <>
-                            Show More Details <ChevronDown className="h-4 w-4 ml-2" />
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                  )}
+                    {/* Benefits */}
+                    {job.benefits && (isExpanded || job.benefits.length < 150) && (
+                      <div>
+                        <h4 className="font-semibold text-gray-900 mb-2 text-base">Benefits</h4>
+                        <div className="bg-green-50 p-3 rounded-lg">
+                          <p className="text-gray-700 leading-relaxed text-sm">{job.benefits}</p>
+                        </div>
+                      </div>
+                    )}
 
-                  {/* Application Dialog */}
-                  <Dialog open={isDialogOpen && selectedJob?.id === job.id} onOpenChange={(open) => {
-                    setIsDialogOpen(open);
-                    if (!open) {
-                      setSelectedJob(null);
-                      setApplicationData({
-                        full_name: '',
-                        email: '',
-                        phone: '',
-                        resume: null
-                      });
-                    }
-                  }}>
-                    <DialogContent className="sm:max-w-md">
-                      <DialogHeader>
-                        <DialogTitle className="text-xl text-blue-900">Apply for {job.title}</DialogTitle>
-                        <DialogDescription>
-                          Please fill in your information to apply for this position at {job.company}.
-                        </DialogDescription>
-                      </DialogHeader>
-                      
-                      <form onSubmit={handleSubmitApplication} className="space-y-4 mt-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="full_name" className="text-sm font-medium text-gray-700">Full Name *</Label>
-                          <Input
-                            id="full_name"
-                            value={applicationData.full_name}
-                            onChange={(e) => setApplicationData(prev => ({ ...prev, full_name: e.target.value }))}
-                            placeholder="Enter your full name"
-                            className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                          />
-                        </div>
+                    {/* Show More/Less Button */}
+                    {(job.description.length > 200 || (job.requirements && job.requirements.length > 150) || (job.benefits && job.benefits.length > 150)) && (
+                      <div className="flex justify-center pt-3 border-t border-gray-200">
+                        <Button
+                          variant="ghost"
+                          onClick={() => toggleJobExpansion(job.id)}
+                          className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 px-4 py-2 rounded-lg text-sm font-medium"
+                        >
+                          {isExpanded ? (
+                            <>
+                              Show Less <ChevronUp className="h-3 w-3 ml-2" />
+                            </>
+                          ) : (
+                            <>
+                              Show More <ChevronDown className="h-3 w-3 ml-2" />
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    )}
+
+                    {/* Application Dialog */}
+                    <Dialog open={isDialogOpen && selectedJob?.id === job.id} onOpenChange={(open) => {
+                      setIsDialogOpen(open);
+                      if (!open) {
+                        setSelectedJob(null);
+                        setApplicationData({
+                          full_name: '',
+                          email: '',
+                          phone: '',
+                          resume: null
+                        });
+                      }
+                    }}>
+                      <DialogContent className="sm:max-w-md">
+                        <DialogHeader>
+                          <DialogTitle className="text-xl text-blue-900">Apply for {job.title}</DialogTitle>
+                          <DialogDescription>
+                            Please fill in your information to apply for this position at {job.company}.
+                          </DialogDescription>
+                        </DialogHeader>
                         
-                        <div className="space-y-2">
-                          <Label htmlFor="email" className="text-sm font-medium text-gray-700">Email Address *</Label>
-                          <Input
-                            id="email"
-                            type="email"
-                            value={applicationData.email}
-                            onChange={(e) => setApplicationData(prev => ({ ...prev, email: e.target.value }))}
-                            placeholder="Enter your email address"
-                            className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                          />
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label htmlFor="phone" className="text-sm font-medium text-gray-700">Phone Number *</Label>
-                          <Input
-                            id="phone"
-                            value={applicationData.phone}
-                            onChange={(e) => setApplicationData(prev => ({ ...prev, phone: e.target.value }))}
-                            placeholder="Enter your phone number"
-                            className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                          />
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label htmlFor="resume" className="text-sm font-medium text-gray-700">Resume (PDF only)</Label>
-                          <div className="flex items-center space-x-2">
+                        <form onSubmit={handleSubmitApplication} className="space-y-4 mt-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="full_name" className="text-sm font-medium text-gray-700">Full Name *</Label>
                             <Input
-                              id="resume"
-                              type="file"
-                              accept=".pdf"
-                              onChange={handleFileChange}
+                              id="full_name"
+                              value={applicationData.full_name}
+                              onChange={(e) => setApplicationData(prev => ({ ...prev, full_name: e.target.value }))}
+                              placeholder="Enter your full name"
                               className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                             />
-                            <Upload className="h-4 w-4 text-gray-400" />
                           </div>
-                          {applicationData.resume && (
-                            <p className="text-sm text-green-600 flex items-center">
-                              <FileText className="h-4 w-4 mr-1" />
-                              {applicationData.resume.name}
-                            </p>
-                          )}
-                        </div>
-                        
-                        <div className="flex justify-end space-x-3 pt-4">
-                          <Button 
-                            type="button" 
-                            variant="outline" 
-                            onClick={() => setIsDialogOpen(false)}
-                          >
-                            Cancel
-                          </Button>
-                          <Button 
-                            type="submit"
-                            disabled={createApplicationMutation.isPending}
-                            className="bg-blue-600 hover:bg-blue-700 text-white"
-                          >
-                            {createApplicationMutation.isPending ? 'Submitting...' : 'Submit Application'}
-                          </Button>
-                        </div>
-                      </form>
-                    </DialogContent>
-                  </Dialog>
-                </CardContent>
-              </Card>
-            );
-          })
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor="email" className="text-sm font-medium text-gray-700">Email Address *</Label>
+                            <Input
+                              id="email"
+                              type="email"
+                              value={applicationData.email}
+                              onChange={(e) => setApplicationData(prev => ({ ...prev, email: e.target.value }))}
+                              placeholder="Enter your email address"
+                              className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                            />
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor="phone" className="text-sm font-medium text-gray-700">Phone Number *</Label>
+                            <Input
+                              id="phone"
+                              value={applicationData.phone}
+                              onChange={(e) => setApplicationData(prev => ({ ...prev, phone: e.target.value }))}
+                              placeholder="Enter your phone number"
+                              className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                            />
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor="resume" className="text-sm font-medium text-gray-700">Resume (PDF only)</Label>
+                            <div className="flex items-center space-x-2">
+                              <Input
+                                id="resume"
+                                type="file"
+                                accept=".pdf"
+                                onChange={handleFileChange}
+                                className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                              />
+                              <Upload className="h-4 w-4 text-gray-400" />
+                            </div>
+                            {applicationData.resume && (
+                              <p className="text-sm text-green-600 flex items-center">
+                                <FileText className="h-4 w-4 mr-1" />
+                                {applicationData.resume.name}
+                              </p>
+                            )}
+                          </div>
+                          
+                          <div className="flex justify-end space-x-3 pt-4">
+                            <Button 
+                              type="button" 
+                              variant="outline" 
+                              onClick={() => setIsDialogOpen(false)}
+                            >
+                              Cancel
+                            </Button>
+                            <Button 
+                              type="submit"
+                              disabled={createApplicationMutation.isPending}
+                              className="bg-blue-600 hover:bg-blue-700 text-white"
+                            >
+                              {createApplicationMutation.isPending ? 'Submitting...' : 'Submit Application'}
+                            </Button>
+                          </div>
+                        </form>
+                      </DialogContent>
+                    </Dialog>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
         )}
       </div>
     </div>
