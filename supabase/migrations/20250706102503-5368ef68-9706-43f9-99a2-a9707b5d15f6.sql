@@ -1,4 +1,5 @@
 
+
 -- Create function to get a setting value by key
 CREATE OR REPLACE FUNCTION public.get_setting(setting_key TEXT)
 RETURNS TEXT AS $$
@@ -15,7 +16,8 @@ BEGIN
   VALUES (setting_key, setting_value, now())
   ON CONFLICT (key) 
   DO UPDATE SET 
-    value = setting_value,
+    value = EXCLUDED.value,
     updated_at = now();
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
+
