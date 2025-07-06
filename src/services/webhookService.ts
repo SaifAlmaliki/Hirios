@@ -68,15 +68,47 @@ const getWebhookUrl = async (): Promise<string | null> => {
 
 export const updateWebhookUrl = async (url: string): Promise<boolean> => {
   try {
-    const { error } = await supabase
-      .rpc('upsert_setting', { 
-        setting_key: 'webhook_url', 
-        setting_value: url 
-      });
+    console.log('Attempting to update webhook URL:', url);
+    
+    // First, try to get the existing setting to see if it exists
+    const { data: existingSetting, error: getError } = await supabase
+      .from('settings')
+      .select('*')
+      .eq('key', 'webhook_url')
+      .single();
 
-    if (error) {
-      console.error('Error updating webhook URL:', error);
+    if (getError && getError.code !== 'PGRST116') {
+      console.error('Error checking existing webhook URL:', getError);
       return false;
+    }
+
+    if (existingSetting) {
+      // Update existing record
+      const { error: updateError } = await supabase
+        .from('settings')
+        .update({ 
+          value: url,
+          updated_at: new Date().toISOString()
+        })
+        .eq('key', 'webhook_url');
+
+      if (updateError) {
+        console.error('Error updating webhook URL:', updateError);
+        return false;
+      }
+    } else {
+      // Insert new record
+      const { error: insertError } = await supabase
+        .from('settings')
+        .insert({
+          key: 'webhook_url',
+          value: url
+        });
+
+      if (insertError) {
+        console.error('Error inserting webhook URL:', insertError);
+        return false;
+      }
     }
 
     console.log('Webhook URL updated successfully');
