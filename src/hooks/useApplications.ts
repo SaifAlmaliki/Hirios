@@ -2,7 +2,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { sendApplicationToWebhook } from '../services/webhookService';
+import { sendApplicationToWebhook, fileToBase64 } from '../services/webhookService';
+import { Job } from './useJobs';
 
 export interface Application {
   id: string;
@@ -41,7 +42,12 @@ export const useCreateApplication = () => {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async (applicationData: Omit<Application, 'id' | 'created_at'> & { job_title?: string; company?: string }) => {
+    mutationFn: async (applicationData: Omit<Application, 'id' | 'created_at'> & { 
+      job_title?: string; 
+      company?: string;
+      resume_file?: File;
+      job_details?: Job;
+    }) => {
       console.log('Creating application:', applicationData);
       const { data, error } = await supabase
         .from('applications')
@@ -65,14 +71,37 @@ export const useCreateApplication = () => {
 
       // Send to webhook after successful database insert
       try {
+        let resume_base64: string | undefined;
+        let resume_filename: string | undefined;
+
+        if (applicationData.resume_file) {
+          console.log('Encoding resume file to base64...');
+          resume_base64 = await fileToBase64(applicationData.resume_file);
+          resume_filename = applicationData.resume_file.name;
+          console.log('Resume encoded successfully');
+        }
+
         await sendApplicationToWebhook({
           full_name: applicationData.full_name,
           email: applicationData.email,
           phone: applicationData.phone,
-          resume_url: applicationData.resume_url,
+          resume_base64,
+          resume_filename,
           job_title: applicationData.job_title || 'Unknown Position',
           company: applicationData.company || 'Unknown Company',
           applied_at: data.created_at,
+          job_details: {
+            job_id: applicationData.job_id,
+            title: applicationData.job_details?.title || applicationData.job_title || 'Unknown Position',
+            company: applicationData.job_details?.company || applicationData.company || 'Unknown Company',
+            department: applicationData.job_details?.department || 'Unknown Department',
+            location: applicationData.job_details?.location || 'Unknown Location',
+            employment_type: applicationData.job_details?.employment_type || 'Unknown',
+            salary: applicationData.job_details?.salary,
+            description: applicationData.job_details?.description || 'No description available',
+            requirements: applicationData.job_details?.requirements,
+            benefits: applicationData.job_details?.benefits,
+          }
         });
       } catch (webhookError) {
         console.warn('Failed to send to webhook, but application was saved:', webhookError);
