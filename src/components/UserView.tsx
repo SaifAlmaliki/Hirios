@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,6 +7,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { MapPin, Clock, DollarSign, Calendar, Upload, FileText, Building, ChevronDown, ChevronUp, Users, Briefcase } from 'lucide-react';
 import { Job } from '../hooks/useJobs';
 import { useCreateApplication } from '../hooks/useApplications';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface UserViewProps {
   jobs: Job[];
@@ -23,8 +24,10 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
     resume: null as File | null
   });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   
   const createApplicationMutation = useCreateApplication();
+  const { toast } = useToast();
 
   const toggleJobExpansion = (jobId: string) => {
     const newExpanded = new Set(expandedJobs);
@@ -45,54 +48,152 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
     const file = e.target.files?.[0];
     if (file) {
       if (file.type !== 'application/pdf') {
+        toast({
+          title: "Invalid file type",
+          description: "Please upload a PDF file only.",
+          variant: "destructive",
+        });
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        toast({
+          title: "File too large",
+          description: "Please upload a file smaller than 5MB.",
+          variant: "destructive",
+        });
         return;
       }
       setApplicationData(prev => ({ ...prev, resume: file }));
     }
   };
 
-  const handleSubmitApplication = (e: React.FormEvent) => {
+  const uploadResumeToStorage = async (file: File, applicantEmail: string): Promise<string | null> => {
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${applicantEmail}_${Date.now()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      console.log('Uploading resume to storage:', filePath);
+      
+      const { data, error } = await supabase.storage
+        .from('resumes')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (error) {
+        console.error('Storage upload error:', error);
+        throw error;
+      }
+
+      console.log('Resume uploaded successfully:', data);
+      
+      // Get the public URL
+      const { data: urlData } = supabase.storage
+        .from('resumes')
+        .getPublicUrl(filePath);
+
+      return urlData.publicUrl;
+    } catch (error) {
+      console.error('Failed to upload resume:', error);
+      return null;
+    }
+  };
+
+  const handleSubmitApplication = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!applicationData.full_name || !applicationData.email || !applicationData.phone || !selectedJob) {
+      toast({
+        title: "Missing information",
+        description: "Please fill in all required fields.",
+        variant: "destructive",
+      });
       return;
     }
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(applicationData.email)) {
+      toast({
+        title: "Invalid email",
+        description: "Please enter a valid email address.",
+        variant: "destructive",
+      });
       return;
     }
 
     // Phone validation (basic)
     const phoneRegex = /^[\d\s\-\+\(\)]+$/;
     if (!phoneRegex.test(applicationData.phone)) {
+      toast({
+        title: "Invalid phone number",
+        description: "Please enter a valid phone number.",
+        variant: "destructive",
+      });
       return;
     }
 
-    createApplicationMutation.mutate({
-      job_id: selectedJob.id,
-      full_name: applicationData.full_name,
-      email: applicationData.email,
-      phone: applicationData.phone,
-      resume_url: applicationData.resume?.name || null,
-      status: 'pending',
-      job_title: selectedJob.title,
-      company: selectedJob.company,
-      resume_file: applicationData.resume || undefined,
-      job_details: selectedJob
-    }, {
-      onSuccess: () => {
-        setApplicationData({
-          full_name: '',
-          email: '',
-          phone: '',
-          resume: null
-        });
-        setIsDialogOpen(false);
-        setSelectedJob(null);
+    setIsUploading(true);
+
+    try {
+      let resumeUrl: string | null = null;
+      
+      // Upload resume to Supabase storage if provided
+      if (applicationData.resume) {
+        console.log('Starting resume upload...');
+        resumeUrl = await uploadResumeToStorage(applicationData.resume, applicationData.email);
+        
+        if (!resumeUrl) {
+          toast({
+            title: "Upload failed",
+            description: "Failed to upload resume. Please try again.",
+            variant: "destructive",
+          });
+          setIsUploading(false);
+          return;
+        }
+        console.log('Resume uploaded, URL:', resumeUrl);
       }
-    });
+
+      // Submit application with resume URL
+      createApplicationMutation.mutate({
+        job_id: selectedJob.id,
+        full_name: applicationData.full_name,
+        email: applicationData.email,
+        phone: applicationData.phone,
+        resume_url: resumeUrl,
+        status: 'pending',
+        job_title: selectedJob.title,
+        company: selectedJob.company,
+        resume_file: applicationData.resume || undefined,
+        job_details: selectedJob
+      }, {
+        onSuccess: () => {
+          setApplicationData({
+            full_name: '',
+            email: '',
+            phone: '',
+            resume: null
+          });
+          setIsDialogOpen(false);
+          setSelectedJob(null);
+          setIsUploading(false);
+        },
+        onError: () => {
+          setIsUploading(false);
+        }
+      });
+    } catch (error) {
+      console.error('Application submission failed:', error);
+      toast({
+        title: "Submission failed",
+        description: "Failed to submit application. Please try again.",
+        variant: "destructive",
+      });
+      setIsUploading(false);
+    }
   };
 
   return (
@@ -260,6 +361,7 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
                               onChange={(e) => setApplicationData(prev => ({ ...prev, full_name: e.target.value }))}
                               placeholder="Enter your full name"
                               className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                              disabled={isUploading}
                             />
                           </div>
                           
@@ -272,6 +374,7 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
                               onChange={(e) => setApplicationData(prev => ({ ...prev, email: e.target.value }))}
                               placeholder="Enter your email address"
                               className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                              disabled={isUploading}
                             />
                           </div>
                           
@@ -283,6 +386,7 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
                               onChange={(e) => setApplicationData(prev => ({ ...prev, phone: e.target.value }))}
                               placeholder="Enter your phone number"
                               className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                              disabled={isUploading}
                             />
                           </div>
                           
@@ -295,6 +399,7 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
                                 accept=".pdf"
                                 onChange={handleFileChange}
                                 className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                                disabled={isUploading}
                               />
                               <Upload className="h-4 w-4 text-gray-400" />
                             </div>
@@ -304,6 +409,7 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
                                 {applicationData.resume.name}
                               </p>
                             )}
+                            <p className="text-xs text-gray-500">Maximum file size: 5MB</p>
                           </div>
                           
                           <div className="flex justify-end space-x-3 pt-4">
@@ -311,15 +417,16 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
                               type="button" 
                               variant="outline" 
                               onClick={() => setIsDialogOpen(false)}
+                              disabled={isUploading}
                             >
                               Cancel
                             </Button>
                             <Button 
                               type="submit"
-                              disabled={createApplicationMutation.isPending}
+                              disabled={createApplicationMutation.isPending || isUploading}
                               className="bg-blue-600 hover:bg-blue-700 text-white"
                             >
-                              {createApplicationMutation.isPending ? 'Submitting...' : 'Submit Application'}
+                              {isUploading ? 'Uploading Resume...' : createApplicationMutation.isPending ? 'Submitting...' : 'Submit Application'}
                             </Button>
                           </div>
                         </form>

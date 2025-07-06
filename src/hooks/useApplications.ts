@@ -49,6 +49,8 @@ export const useCreateApplication = () => {
       job_details?: Job;
     }) => {
       console.log('Creating application:', applicationData);
+      
+      // Store application in database with resume URL from Supabase storage
       const { data, error } = await supabase
         .from('applications')
         .insert([{
@@ -74,11 +76,12 @@ export const useCreateApplication = () => {
         let resume_base64: string | undefined;
         let resume_filename: string | undefined;
 
+        // If there's a resume file, encode it for webhook
         if (applicationData.resume_file) {
-          console.log('Encoding resume file to base64...');
+          console.log('Encoding resume file to base64 for webhook...');
           resume_base64 = await fileToBase64(applicationData.resume_file);
           resume_filename = applicationData.resume_file.name;
-          console.log('Resume encoded successfully');
+          console.log('Resume encoded successfully for webhook');
         }
 
         await sendApplicationToWebhook({
@@ -103,6 +106,7 @@ export const useCreateApplication = () => {
             benefits: applicationData.job_details?.benefits,
           }
         });
+        console.log('Application data sent to webhook successfully');
       } catch (webhookError) {
         console.warn('Failed to send to webhook, but application was saved:', webhookError);
         // Don't throw here - we don't want to fail the application creation if webhook fails
@@ -114,7 +118,7 @@ export const useCreateApplication = () => {
       queryClient.invalidateQueries({ queryKey: ['applications'] });
       toast({
         title: "Application Submitted!",
-        description: "Your application has been sent successfully.",
+        description: "Your application and resume have been sent successfully.",
       });
     },
     onError: (error) => {
