@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Plus, MapPin, Clock, DollarSign, Calendar, Users, UserPlus, TrendingUp, Briefcase, Eye, Building } from 'lucide-react';
 import { Job, useCreateJob } from '../hooks/useJobs';
 import { useApplications } from '../hooks/useApplications';
+import JobApplicationsView from './JobApplicationsView';
 
 interface CompanyViewProps {
   jobs: Job[];
@@ -17,6 +17,8 @@ interface CompanyViewProps {
 
 const CompanyView: React.FC<CompanyViewProps> = ({ jobs }) => {
   const [showAddForm, setShowAddForm] = useState(false);
+  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
+  const [showApplicationsView, setShowApplicationsView] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     company: '',
@@ -75,6 +77,11 @@ const CompanyView: React.FC<CompanyViewProps> = ({ jobs }) => {
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleViewApplications = (job: Job) => {
+    setSelectedJob(job);
+    setShowApplicationsView(true);
   };
 
   return (
@@ -298,7 +305,12 @@ const CompanyView: React.FC<CompanyViewProps> = ({ jobs }) => {
                           <Badge variant="outline" className="text-blue-600 border-blue-600">
                             {jobApplications.total} Applications
                           </Badge>
-                          <Button variant="outline" size="sm" className="text-blue-600 border-blue-600 hover:bg-blue-50">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="text-blue-600 border-blue-600 hover:bg-blue-50"
+                            onClick={() => handleViewApplications(job)}
+                          >
                             <Eye className="h-4 w-4 mr-1" />
                             View
                           </Button>
@@ -379,6 +391,13 @@ const CompanyView: React.FC<CompanyViewProps> = ({ jobs }) => {
           })}
         </div>
       </div>
+
+      {/* Applications View Modal */}
+      <JobApplicationsView 
+        job={selectedJob}
+        isOpen={showApplicationsView}
+        onClose={() => setShowApplicationsView(false)}
+      />
     </div>
   );
 };
