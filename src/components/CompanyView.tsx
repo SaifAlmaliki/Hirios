@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Building, Users, UserCheck, TrendingUp, Eye, FileText } from 'lucide-react';
+import { Plus, Building, Users, UserCheck, TrendingUp, Eye, FileText, MapPin, Clock, DollarSign, Briefcase } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Job, useCreateJob } from '../hooks/useJobs';
 import { useApplications } from '../hooks/useApplications';
@@ -99,6 +99,18 @@ const CompanyView: React.FC<CompanyViewProps> = ({ jobs }) => {
   const shortlistedCount = allApplications.filter(app => app.status === 'shortlisted').length;
   const hiredCount = allApplications.filter(app => app.status === 'hired').length;
   const hireRate = totalApplications > 0 ? Math.round((hiredCount / totalApplications) * 100) : 0;
+
+  const formatEmploymentType = (type: string) => {
+    return type.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
+    });
+  };
 
   return (
     <div className="space-y-6">
@@ -317,16 +329,68 @@ const CompanyView: React.FC<CompanyViewProps> = ({ jobs }) => {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {jobs.map((job) => (
-              <Card key={job.id} className="hover:shadow-md transition-shadow duration-200">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">{job.title}</CardTitle>
-                  <Eye className="h-4 w-4 text-gray-500 cursor-pointer" onClick={() => handleViewApplications(job)} />
+              <Card key={job.id} className="hover:shadow-lg transition-shadow duration-200 border-l-4 border-l-blue-500">
+                <CardHeader className="pb-3">
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1">
+                      <CardTitle className="text-lg font-bold text-gray-900 mb-1">{job.title}</CardTitle>
+                      <div className="flex items-center text-blue-600 font-semibold mb-2">
+                        <Building className="h-4 w-4 mr-1" />
+                        {job.company}
+                      </div>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleViewApplications(job)}
+                      className="text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+                    >
+                      <Eye className="h-4 w-4 mr-1" />
+                      View Apps
+                    </Button>
+                  </div>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{job.company}</div>
-                  <p className="text-sm text-gray-500">{job.location}</p>
+                <CardContent className="pt-0">
+                  <div className="space-y-3">
+                    <div className="flex items-center text-gray-600">
+                      <MapPin className="h-4 w-4 mr-2 text-gray-400" />
+                      <span className="text-sm">{job.location}</span>
+                    </div>
+                    
+                    <div className="flex items-center text-gray-600">
+                      <Briefcase className="h-4 w-4 mr-2 text-gray-400" />
+                      <span className="text-sm">{job.department}</span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center text-gray-600">
+                        <Clock className="h-4 w-4 mr-2 text-gray-400" />
+                        <span className="text-sm">{formatEmploymentType(job.employment_type)}</span>
+                      </div>
+                      
+                      {job.salary && (
+                        <div className="flex items-center text-green-600 font-medium">
+                          <DollarSign className="h-4 w-4 mr-1" />
+                          <span className="text-sm">{job.salary}</span>
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="border-t pt-3">
+                      <p className="text-sm text-gray-600 line-clamp-2">
+                        {job.description}
+                      </p>
+                    </div>
+                    
+                    <div className="flex justify-between items-center text-xs text-gray-500 pt-2">
+                      <span>Posted: {formatDate(job.created_at)}</span>
+                      <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                        Active
+                      </span>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             ))}
