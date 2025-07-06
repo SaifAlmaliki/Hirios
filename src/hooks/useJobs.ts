@@ -46,71 +46,86 @@ export const useCreateJob = () => {
 
   return useMutation({
     mutationFn: async (jobData: Omit<Job, 'id' | 'created_at' | 'updated_at' | 'company_profile_id'>) => {
-      console.log('Creating job:', jobData);
+      console.log('🚀 Starting job creation process with data:', jobData);
       
-      // First, get the current user
+      // Step 1: Check user authentication
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       if (userError || !user) {
-        console.error('User authentication error:', userError);
-        throw new Error('User not authenticated');
+        console.error('❌ User authentication failed:', userError);
+        throw new Error('You must be logged in to post jobs. Please sign in and try again.');
       }
 
-      console.log('Current user:', user.id, user.email);
+      console.log('✅ User authenticated:', user.id, user.email);
 
-      // Check if company profile exists
+      // Step 2: Find company profile
       const { data: profile, error: profileError } = await supabase
         .from('company_profiles')
         .select('id, subscription_status, subscription_end_date, company_name')
         .eq('user_id', user.id)
         .maybeSingle();
 
-      console.log('Company profile query result:', { profile, profileError });
+      console.log('🏢 Company profile query result:', { profile, profileError });
 
       if (profileError) {
-        console.error('Error fetching company profile:', profileError);
-        throw new Error(`Error checking company profile: ${profileError.message}`);
+        console.error('❌ Database error when fetching company profile:', profileError);
+        throw new Error(`Database error: ${profileError.message}. Please try again or contact support.`);
       }
 
       if (!profile) {
-        console.error('Company profile not found for user:', user.id);
+        console.error('❌ No company profile found for user:', user.id);
         throw new Error('Company profile not found. Please complete your company setup first by clicking the "Setup" button.');
       }
 
-      console.log('Found company profile:', profile);
+      console.log('✅ Company profile found:', profile.company_name, profile.id);
 
-      // BYPASSED: Subscription check removed for development
-      console.log('Subscription check bypassed - allowing job creation without active subscription');
+      // Step 3: Create the job (subscription check bypassed)
+      console.log('⏭️ Subscription check bypassed - proceeding with job creation');
+
+      const jobDataWithProfile = {
+        ...jobData,
+        company_profile_id: profile.id
+      };
+
+      console.log('📝 Creating job with data:', jobDataWithProfile);
 
       const { data, error } = await supabase
         .from('jobs')
-        .insert([{
-          ...jobData,
-          company_profile_id: profile.id
-        }])
+        .insert([jobDataWithProfile])
         .select()
         .single();
 
       if (error) {
-        console.error('Error creating job:', error);
-        throw new Error(`Failed to create job: ${error.message}`);
+        console.error('❌ Job creation failed:', error);
+        
+        // Provide specific error messages based on error type
+        if (error.code === '42501') {
+          throw new Error('Permission denied. Please make sure you have completed your company setup and try again.');
+        } else if (error.code === '23505') {
+          throw new Error('A job with this information already exists. Please modify your job details.');
+        } else if (error.message.includes('row-level security')) {
+          throw new Error('Security policy violation. Please contact support for assistance.');
+        } else {
+          throw new Error(`Failed to create job: ${error.message}`);
+        }
       }
 
-      console.log('Job created successfully:', data);
+      console.log('✅ Job created successfully:', data);
       return data as Job;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('🎉 Job creation successful, invalidating queries');
       queryClient.invalidateQueries({ queryKey: ['jobs'] });
       queryClient.invalidateQueries({ queryKey: ['company-jobs'] });
       toast({
-        title: "Job Posted Successfully!",
-        description: "Your job listing has been added to the portal.",
+        title: "Job Posted Successfully! 🎉",
+        description: `"${data.title}" has been added to the job portal.`,
       });
     },
     onError: (error) => {
-      console.error('Failed to create job:', error);
+      console.error('💥 Job creation failed with error:', error);
       toast({
-        title: "Error",
-        description: error.message || "Failed to create job posting. Please try again.",
+        title: "Failed to Post Job",
+        description: error.message || "An unexpected error occurred. Please try again.",
         variant: "destructive",
       });
     },
