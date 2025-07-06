@@ -124,7 +124,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_setting: {
+        Args: { setting_key: string }
+        Returns: string
+      }
+      upsert_setting: {
+        Args: { setting_key: string; setting_value: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
