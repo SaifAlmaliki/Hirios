@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { MapPin, Clock, DollarSign, Calendar, Upload, FileText, Building, ChevronDown, ChevronUp } from 'lucide-react';
+import { MapPin, Clock, DollarSign, Calendar, Upload, FileText, Building, ChevronDown, ChevronUp, Users, Briefcase } from 'lucide-react';
 import { Job } from '../hooks/useJobs';
 import { useCreateApplication } from '../hooks/useApplications';
 
@@ -94,22 +94,22 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900">Available Positions</h2>
-        <p className="text-gray-600 mt-1">Find your next career opportunity</p>
+      <div className="text-center">
+        <h2 className="text-3xl font-bold text-gray-900 mb-2">Current Job Postings</h2>
+        <p className="text-lg text-gray-600">Discover your next career opportunity</p>
       </div>
 
       {/* Job Listings */}
-      <div className="grid gap-4">
+      <div className="space-y-6">
         {jobs.length === 0 ? (
-          <Card className="text-center py-12">
+          <Card className="text-center py-16 bg-gray-50">
             <CardContent>
               <div className="text-gray-500">
-                <FileText className="h-12 w-12 mx-auto mb-4" />
-                <h3 className="text-lg font-medium mb-2">No Jobs Available</h3>
-                <p>Check back later for new opportunities!</p>
+                <Briefcase className="h-16 w-16 mx-auto mb-6 text-gray-400" />
+                <h3 className="text-xl font-semibold mb-3">No Jobs Available</h3>
+                <p className="text-lg">Check back later for new opportunities!</p>
               </div>
             </CardContent>
           </Card>
@@ -117,37 +117,50 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
           jobs.map((job) => {
             const isExpanded = expandedJobs.has(job.id);
             return (
-              <Card key={job.id} className="hover:shadow-md transition-shadow duration-200 border border-gray-200">
-                <CardHeader className="pb-3">
+              <Card key={job.id} className="hover:shadow-lg transition-all duration-300 border-2 border-gray-100 hover:border-blue-200 bg-white">
+                <CardHeader className="pb-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-t-lg">
                   <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <CardTitle className="text-xl font-semibold text-gray-900 mb-1">{job.title}</CardTitle>
-                      <CardDescription className="text-base font-medium text-blue-600 mb-2">{job.company}</CardDescription>
-                      <div className="flex items-center text-sm text-gray-600 mb-2">
-                        <Building className="h-4 w-4 mr-1" />
-                        <span>{job.department}</span>
-                        <span className="mx-2">•</span>
-                        <MapPin className="h-4 w-4 mr-1" />
-                        <span>{job.location}</span>
-                        <span className="mx-2">•</span>
-                        <Clock className="h-4 w-4 mr-1" />
-                        <span>{job.employment_type}</span>
+                    <div className="flex-1 space-y-3">
+                      <div>
+                        <CardTitle className="text-2xl font-bold text-gray-900 mb-2">{job.title}</CardTitle>
+                        <CardDescription className="text-lg font-semibold text-blue-700 mb-3 flex items-center">
+                          <Building className="h-5 w-5 mr-2" />
+                          {job.company}
+                        </CardDescription>
                       </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                        <div className="flex items-center text-gray-700 bg-white px-3 py-2 rounded-lg shadow-sm">
+                          <Users className="h-4 w-4 mr-2 text-blue-600" />
+                          <span className="font-medium">{job.department}</span>
+                        </div>
+                        <div className="flex items-center text-gray-700 bg-white px-3 py-2 rounded-lg shadow-sm">
+                          <MapPin className="h-4 w-4 mr-2 text-green-600" />
+                          <span className="font-medium">{job.location}</span>
+                        </div>
+                        <div className="flex items-center text-gray-700 bg-white px-3 py-2 rounded-lg shadow-sm">
+                          <Clock className="h-4 w-4 mr-2 text-purple-600" />
+                          <span className="font-medium">{job.employment_type}</span>
+                        </div>
+                      </div>
+
                       {job.salary && (
-                        <div className="flex items-center text-sm font-medium text-green-600 mb-2">
-                          <DollarSign className="h-4 w-4 mr-1" />
+                        <div className="flex items-center text-lg font-bold text-green-700 bg-green-50 px-4 py-2 rounded-lg inline-flex w-fit">
+                          <DollarSign className="h-5 w-5 mr-2" />
                           {job.salary}
                         </div>
                       )}
                     </div>
-                    <div className="flex flex-col items-end space-y-2">
-                      <div className="flex items-center text-xs text-gray-500">
-                        <Calendar className="h-3 w-3 mr-1" />
+                    
+                    <div className="flex flex-col items-end space-y-3 ml-6">
+                      <div className="flex items-center text-sm text-gray-500 bg-white px-3 py-1 rounded-full shadow-sm">
+                        <Calendar className="h-4 w-4 mr-2" />
                         Posted {new Date(job.created_at).toLocaleDateString()}
                       </div>
                       <Button 
                         onClick={() => handleApply(job)}
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2"
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 text-lg font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
+                        size="lg"
                       >
                         Apply Now
                       </Button>
@@ -155,55 +168,63 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
                   </div>
                 </CardHeader>
                 
-                <CardContent className="pt-0">
-                  {/* Job Description Preview */}
-                  <div className="mb-3">
-                    <p className="text-gray-700 text-sm leading-relaxed">
-                      {isExpanded ? job.description : `${job.description.substring(0, 200)}${job.description.length > 200 ? '...' : ''}`}
-                    </p>
+                <CardContent className="pt-6 pb-6 space-y-6">
+                  {/* Job Description */}
+                  <div>
+                    <h4 className="font-semibold text-gray-900 mb-3 text-lg">Job Description</h4>
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <p className="text-gray-700 leading-relaxed">
+                        {isExpanded ? job.description : `${job.description.substring(0, 300)}${job.description.length > 300 ? '...' : ''}`}
+                      </p>
+                    </div>
                   </div>
 
-                  {/* Requirements Preview */}
-                  {job.requirements && (
-                    <div className={`mb-3 ${!isExpanded ? 'hidden' : ''}`}>
-                      <h4 className="font-medium text-gray-900 mb-2 text-sm">Requirements:</h4>
-                      <div className="text-gray-700 text-sm">
-                        {job.requirements.split('\n').slice(0, 4).map((req, index) => (
-                          <div key={index} className="flex items-start mb-1">
-                            <span className="text-blue-600 mr-2">•</span>
-                            <span>{req.trim()}</span>
-                          </div>
-                        ))}
+                  {/* Requirements */}
+                  {job.requirements && (isExpanded || job.requirements.length < 200) && (
+                    <div>
+                      <h4 className="font-semibold text-gray-900 mb-3 text-lg">Requirements</h4>
+                      <div className="bg-blue-50 p-4 rounded-lg">
+                        <div className="text-gray-700 space-y-2">
+                          {job.requirements.split('\n').filter(req => req.trim()).map((req, index) => (
+                            <div key={index} className="flex items-start">
+                              <span className="text-blue-600 mr-3 mt-1">•</span>
+                              <span>{req.trim()}</span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   )}
 
-                  {/* Benefits Preview */}
-                  {job.benefits && isExpanded && (
-                    <div className="mb-3">
-                      <h4 className="font-medium text-gray-900 mb-2 text-sm">Benefits:</h4>
-                      <p className="text-gray-700 text-sm">{job.benefits}</p>
+                  {/* Benefits */}
+                  {job.benefits && (isExpanded || job.benefits.length < 200) && (
+                    <div>
+                      <h4 className="font-semibold text-gray-900 mb-3 text-lg">Benefits</h4>
+                      <div className="bg-green-50 p-4 rounded-lg">
+                        <p className="text-gray-700 leading-relaxed">{job.benefits}</p>
+                      </div>
                     </div>
                   )}
 
                   {/* Show More/Less Button */}
-                  {(job.description.length > 200 || job.requirements || job.benefits) && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => toggleJobExpansion(job.id)}
-                      className="text-blue-600 hover:text-blue-700 p-0 h-auto font-normal"
-                    >
-                      {isExpanded ? (
-                        <>
-                          Show less <ChevronUp className="h-4 w-4 ml-1" />
-                        </>
-                      ) : (
-                        <>
-                          Show more <ChevronDown className="h-4 w-4 ml-1" />
-                        </>
-                      )}
-                    </Button>
+                  {(job.description.length > 300 || (job.requirements && job.requirements.length > 200) || (job.benefits && job.benefits.length > 200)) && (
+                    <div className="flex justify-center pt-4 border-t border-gray-200">
+                      <Button
+                        variant="ghost"
+                        onClick={() => toggleJobExpansion(job.id)}
+                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 px-6 py-2 rounded-lg font-medium"
+                      >
+                        {isExpanded ? (
+                          <>
+                            Show Less <ChevronUp className="h-4 w-4 ml-2" />
+                          </>
+                        ) : (
+                          <>
+                            Show More Details <ChevronDown className="h-4 w-4 ml-2" />
+                          </>
+                        )}
+                      </Button>
+                    </div>
                   )}
 
                   {/* Application Dialog */}
