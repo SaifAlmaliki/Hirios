@@ -2,398 +2,313 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Building2, Users, ArrowRight, Settings, Briefcase, TrendingUp } from 'lucide-react';
+import { Building2, Users, ArrowRight, Star, CheckCircle, TrendingUp, Globe, Award } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 
 const Index = () => {
   const navigate = useNavigate();
-  const { user, userType, signOut } = useAuth();
+  const { user, userType, signOut, loading } = useAuth();
 
-  const handleJobSeekerRoute = () => {
-    navigate('/job-portal');
-  };
-
-  const handleCompanyRoute = () => {
-    if (user && userType === 'company') {
-      navigate('/job-portal');
-    } else {
-      navigate('/auth');
+  // Redirect authenticated users directly to their dashboards
+  React.useEffect(() => {
+    if (!loading && user) {
+      if (userType === 'job_seeker') {
+        navigate('/job-portal');
+      } else if (userType === 'company') {
+        navigate('/job-portal');
+      }
     }
-  };
+  }, [user, userType, loading, navigate]);
 
-  const handleSignOut = async () => {
-    await signOut();
-  };
-
-  // Authenticated Job Seeker Landing Page
-  if (user && userType === 'job_seeker') {
+  // Show loading state while checking authentication
+  if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-        {/* Header */}
-        <div className="bg-white shadow-sm border-b">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16">
-              <div className="flex items-center space-x-3">
-                <div className="bg-blue-600 p-2 rounded-lg">
-                  <Building2 className="h-6 w-6 text-white" />
-                </div>
-                <h1 className="text-xl font-bold text-gray-900">Professional Job Portal</h1>
-              </div>
-              
-              <div className="flex items-center space-x-4">
-                <span className="text-sm text-gray-600">
-                  Welcome, {user.email}
-                </span>
-                <Button variant="outline" onClick={handleSignOut} size="sm">
-                  Sign Out
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Job Seeker Dashboard */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="text-center mb-16">
-            <div className="mx-auto bg-blue-100 p-4 rounded-full w-fit mb-6">
-              <Users className="h-12 w-12 text-blue-600" />
-            </div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">
-              Welcome to Your Career Journey
-            </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Discover amazing job opportunities from top companies. Your next career move is just a click away.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-            <Card className="text-center">
-              <CardHeader>
-                <div className="mx-auto bg-green-100 p-3 rounded-full w-fit mb-4">
-                  <Briefcase className="h-6 w-6 text-green-600" />
-                </div>
-                <CardTitle>Browse Jobs</CardTitle>
-                <CardDescription>
-                  Explore hundreds of job opportunities
-                </CardDescription>
-              </CardHeader>
-            </Card>
-
-            <Card className="text-center">
-              <CardHeader>
-                <div className="mx-auto bg-purple-100 p-3 rounded-full w-fit mb-4">
-                  <TrendingUp className="h-6 w-6 text-purple-600" />
-                </div>
-                <CardTitle>Apply Instantly</CardTitle>
-                <CardDescription>
-                  One-click applications to your dream jobs
-                </CardDescription>
-              </CardHeader>
-            </Card>
-
-            <Card className="text-center">
-              <CardHeader>
-                <div className="mx-auto bg-yellow-100 p-3 rounded-full w-fit mb-4">
-                  <ArrowRight className="h-6 w-6 text-yellow-600" />
-                </div>
-                <CardTitle>Get Hired</CardTitle>
-                <CardDescription>
-                  Connect directly with hiring managers
-                </CardDescription>
-              </CardHeader>
-            </Card>
-          </div>
-
-          <div className="text-center">
-            <Button 
-              onClick={handleJobSeekerRoute}
-              className="bg-blue-600 hover:bg-blue-700 text-white py-6 px-12 text-lg font-semibold"
-              size="lg"
-            >
-              Start Job Search
-              <ArrowRight className="h-5 w-5 ml-2" />
-            </Button>
-          </div>
-        </div>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-lg text-gray-600">Loading...</div>
       </div>
     );
   }
 
-  // Authenticated Company Landing Page
-  if (user && userType === 'company') {
+  // Only show landing page for non-authenticated users
+  if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100">
-        {/* Header */}
-        <div className="bg-white shadow-sm border-b">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16">
-              <div className="flex items-center space-x-3">
-                <div className="bg-green-600 p-2 rounded-lg">
-                  <Building2 className="h-6 w-6 text-white" />
-                </div>
-                <h1 className="text-xl font-bold text-gray-900">Professional Job Portal</h1>
-              </div>
-              
-              <div className="flex items-center space-x-4">
-                <span className="text-sm text-gray-600">
-                  Welcome, {user.email}
-                </span>
-                <Button variant="outline" onClick={handleSignOut} size="sm">
-                  Sign Out
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Company Dashboard */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="text-center mb-16">
-            <div className="mx-auto bg-green-100 p-4 rounded-full w-fit mb-6">
-              <Building2 className="h-12 w-12 text-green-600" />
-            </div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">
-              Your Hiring Headquarters
-            </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Post jobs, manage applications, and find the perfect candidates for your team.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="bg-blue-100 p-2 rounded-lg">
-                    <Briefcase className="h-6 w-6 text-blue-600" />
-                  </div>
-                  <CardTitle>Manage Jobs</CardTitle>
-                </div>
-                <CardDescription className="text-left">
-                  Post new job openings, edit existing listings, and track applications all in one place.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button 
-                  onClick={handleCompanyRoute}
-                  className="w-full bg-blue-600 hover:bg-blue-700"
-                >
-                  Go to Job Portal
-                  <ArrowRight className="h-4 w-4 ml-2" />
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="bg-purple-100 p-2 rounded-lg">
-                    <Settings className="h-6 w-6 text-purple-600" />
-                  </div>
-                  <CardTitle>Company Setup</CardTitle>
-                </div>
-                <CardDescription className="text-left">
-                  Complete your company profile and configure your hiring preferences.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button 
-                  onClick={() => navigate('/company-setup')}
-                  variant="outline"
-                  className="w-full"
-                >
-                  Setup Profile
-                  <Settings className="h-4 w-4 ml-2" />
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="bg-white rounded-lg p-8 shadow-sm border">
-            <div className="text-center">
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                Ready to Find Top Talent?
-              </h3>
-              <p className="text-gray-600 mb-6">
-                Start posting jobs and connect with qualified candidates today.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button 
-                  onClick={handleCompanyRoute}
-                  className="bg-green-600 hover:bg-green-700 text-white px-8 py-3"
-                >
-                  Post Your First Job
-                  <ArrowRight className="h-4 w-4 ml-2" />
-                </Button>
-                <Button 
-                  onClick={() => navigate('/subscription')}
-                  variant="outline"
-                  className="px-8 py-3"
-                >
-                  View Subscription Plans
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Default landing page for non-authenticated users
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+      <div className="min-h-screen bg-white">
+        {/* Floating Header */}
+        <header className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-white/80 backdrop-blur-md rounded-full px-6 py-3 shadow-lg border border-gray-200/50">
+          <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="bg-blue-600 p-2 rounded-lg">
-                <Building2 className="h-6 w-6 text-white" />
+              <div className="bg-blue-600 p-2 rounded-full">
+                <Building2 className="h-5 w-5 text-white" />
               </div>
-              <h1 className="text-xl font-bold text-gray-900">Professional Job Portal</h1>
+              <span className="font-bold text-gray-900">JobPortal Pro</span>
             </div>
-            
-            <Button onClick={() => navigate('/auth')} size="sm">
-              Sign In
+            <Button 
+              onClick={() => navigate('/auth')} 
+              size="sm"
+              className="ml-8 bg-blue-600 hover:bg-blue-700"
+            >
+              Get Started
             </Button>
           </div>
-        </div>
-      </div>
+        </header>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="text-center mb-16">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Find Your Perfect Match
-          </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Whether you're seeking your next career opportunity or looking to hire top talent, 
-            our platform connects the right people at the right time.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          {/* Job Seeker Card */}
-          <Card className="hover:shadow-xl transition-all duration-300 border-2 border-transparent hover:border-blue-200">
-            <CardHeader className="text-center pb-6">
-              <div className="mx-auto bg-blue-100 p-4 rounded-full w-fit mb-4">
-                <Users className="h-8 w-8 text-blue-600" />
-              </div>
-              <CardTitle className="text-2xl font-bold text-gray-900 mb-2">
-                Job Seeker
-              </CardTitle>
-              <CardDescription className="text-lg">
-                Discover exciting career opportunities from top companies
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <ul className="space-y-3 text-gray-600">
-                <li className="flex items-center">
-                  <ArrowRight className="h-4 w-4 text-blue-600 mr-3" />
-                  Browse hundreds of job listings
-                </li>
-                <li className="flex items-center">
-                  <ArrowRight className="h-4 w-4 text-blue-600 mr-3" />
-                  Apply directly to companies
-                </li>
-                <li className="flex items-center">
-                  <ArrowRight className="h-4 w-4 text-blue-600 mr-3" />
-                  No registration required
-                </li>
-                <li className="flex items-center">
-                  <ArrowRight className="h-4 w-4 text-blue-600 mr-3" />
-                  Free to use
-                </li>
-              </ul>
+        {/* Hero Section */}
+        <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+          <div className="max-w-6xl mx-auto text-center">
+            <div className="animate-fade-in">
+              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 mb-6 leading-tight">
+                Your Dream Job
+                <br />
+                <span className="text-blue-600">Awaits Here</span>
+              </h1>
+              <p className="text-xl sm:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
+                Connect top talent with exceptional opportunities. Whether you're seeking your next career move or building your dream team.
+              </p>
               
-              <Button 
-                onClick={handleJobSeekerRoute}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6 text-lg font-semibold"
-                size="lg"
-              >
-                Browse Jobs
-                <ArrowRight className="h-5 w-5 ml-2" />
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Company Card */}
-          <Card className="hover:shadow-xl transition-all duration-300 border-2 border-transparent hover:border-green-200">
-            <CardHeader className="text-center pb-6">
-              <div className="mx-auto bg-green-100 p-4 rounded-full w-fit mb-4">
-                <Building2 className="h-8 w-8 text-green-600" />
+              <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+                <Button 
+                  onClick={() => navigate('/auth')}
+                  size="lg"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 text-lg font-semibold hover-scale"
+                >
+                  Find Jobs
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+                <Button 
+                  onClick={() => navigate('/auth')}
+                  variant="outline"
+                  size="lg"
+                  className="border-2 border-blue-600 text-blue-600 hover:bg-blue-50 px-8 py-6 text-lg font-semibold hover-scale"
+                >
+                  Post Jobs
+                  <Building2 className="ml-2 h-5 w-5" />
+                </Button>
               </div>
-              <CardTitle className="text-2xl font-bold text-gray-900 mb-2">
-                Company
-              </CardTitle>
-              <CardDescription className="text-lg">
-                Post job openings and find qualified candidates
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <ul className="space-y-3 text-gray-600">
-                <li className="flex items-center">
-                  <ArrowRight className="h-4 w-4 text-green-600 mr-3" />
-                  Post unlimited job listings
-                </li>
-                <li className="flex items-center">
-                  <ArrowRight className="h-4 w-4 text-green-600 mr-3" />
-                  Manage applications easily
-                </li>
-                <li className="flex items-center">
-                  <ArrowRight className="h-4 w-4 text-green-600 mr-3" />
-                  Subscription: €25/month
-                </li>
-                <li className="flex items-center">
-                  <ArrowRight className="h-4 w-4 text-green-600 mr-3" />
-                  Professional features
-                </li>
-              </ul>
-              
-              <Button 
-                onClick={handleCompanyRoute}
-                className="w-full bg-green-600 hover:bg-green-700 text-white py-6 text-lg font-semibold"
-                size="lg"
-              >
-                {user && userType === 'company' ? 'Go to Portal' : 'Get Started'}
-                <ArrowRight className="h-5 w-5 ml-2" />
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
+            </div>
+
+            {/* Stats */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mt-20">
+              <div className="text-center animate-fade-in" style={{ animationDelay: '0.2s' }}>
+                <div className="text-4xl font-bold text-blue-600 mb-2">10K+</div>
+                <div className="text-gray-600">Jobs Posted</div>
+              </div>
+              <div className="text-center animate-fade-in" style={{ animationDelay: '0.4s' }}>
+                <div className="text-4xl font-bold text-blue-600 mb-2">5K+</div>
+                <div className="text-gray-600">Companies</div>
+              </div>
+              <div className="text-center animate-fade-in" style={{ animationDelay: '0.6s' }}>
+                <div className="text-4xl font-bold text-blue-600 mb-2">50K+</div>
+                <div className="text-gray-600">Success Stories</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Success Stories */}
+        <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-bold text-gray-900 mb-4">Success Stories</h2>
+              <p className="text-xl text-gray-600">Real people, real achievements, real impact</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <Card className="hover:shadow-xl transition-all duration-300 hover-scale border-0 shadow-lg">
+                <CardHeader className="text-center pb-4">
+                  <div className="w-16 h-16 bg-blue-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                    <TrendingUp className="h-8 w-8 text-blue-600" />
+                  </div>
+                  <CardTitle className="text-xl">Sarah Chen</CardTitle>
+                  <CardDescription>Software Engineer at Google</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-600 text-center">
+                    "Found my dream job in just 2 weeks! The platform made it so easy to connect with top tech companies."
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="hover:shadow-xl transition-all duration-300 hover-scale border-0 shadow-lg">
+                <CardHeader className="text-center pb-4">
+                  <div className="w-16 h-16 bg-green-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                    <Award className="h-8 w-8 text-green-600" />
+                  </div>
+                  <CardTitle className="text-xl">Tech Innovations Inc.</CardTitle>
+                  <CardDescription>Startup Company</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-600 text-center">
+                    "Hired 15 amazing developers in 3 months. The quality of candidates is exceptional!"
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="hover:shadow-xl transition-all duration-300 hover-scale border-0 shadow-lg">
+                <CardHeader className="text-center pb-4">
+                  <div className="w-16 h-16 bg-purple-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                    <Globe className="h-8 w-8 text-purple-600" />
+                  </div>
+                  <CardTitle className="text-xl">Marcus Johnson</CardTitle>
+                  <CardDescription>Marketing Director</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-600 text-center">
+                    "Transitioned from finance to marketing seamlessly. The platform opened doors I never knew existed."
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+
+        {/* Testimonials */}
+        <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-bold text-gray-900 mb-4">What Our Users Say</h2>
+              <p className="text-xl text-gray-600">Trusted by thousands of professionals worldwide</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
+                <CardContent className="p-8">
+                  <div className="flex mb-4">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star key={star} className="h-5 w-5 text-yellow-400 fill-current" />
+                    ))}
+                  </div>
+                  <p className="text-gray-700 mb-6 text-lg leading-relaxed">
+                    "The best job platform I've ever used. Clean interface, relevant matches, and amazing support team."
+                  </p>
+                  <div className="flex items-center">
+                    <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold mr-4">
+                      A
+                    </div>
+                    <div>
+                      <div className="font-semibold">Alex Rodriguez</div>
+                      <div className="text-gray-500 text-sm">Product Manager</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
+                <CardContent className="p-8">
+                  <div className="flex mb-4">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star key={star} className="h-5 w-5 text-yellow-400 fill-current" />
+                    ))}
+                  </div>
+                  <p className="text-gray-700 mb-6 text-lg leading-relaxed">
+                    "Incredible ROI for our hiring budget. We've built our entire engineering team through this platform."
+                  </p>
+                  <div className="flex items-center">
+                    <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white font-bold mr-4">
+                      L
+                    </div>
+                    <div>
+                      <div className="font-semibold">Lisa Park</div>
+                      <div className="text-gray-500 text-sm">HR Director</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
 
         {/* Features Section */}
-        <div className="mt-20 text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8">Why Choose Our Platform?</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="bg-purple-100 p-3 rounded-full w-fit mx-auto mb-4">
-                <Users className="h-6 w-6 text-purple-600" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Easy to Use</h3>
-              <p className="text-gray-600">Intuitive interface for both job seekers and employers</p>
+        <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-bold text-gray-900 mb-4">Why Choose JobPortal Pro?</h2>
+              <p className="text-xl text-gray-600">Everything you need for your career journey</p>
             </div>
-            <div className="text-center">
-              <div className="bg-yellow-100 p-3 rounded-full w-fit mx-auto mb-4">
-                <Building2 className="h-6 w-6 text-yellow-600" />
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="text-center group">
+                <div className="bg-blue-100 p-4 rounded-full w-fit mx-auto mb-6 group-hover:bg-blue-200 transition-colors duration-300">
+                  <CheckCircle className="h-8 w-8 text-blue-600" />
+                </div>
+                <h3 className="text-xl font-semibold mb-4">Instant Matching</h3>
+                <p className="text-gray-600 leading-relaxed">
+                  AI-powered matching connects you with the most relevant opportunities based on your skills and preferences.
+                </p>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Professional</h3>
-              <p className="text-gray-600">Designed for serious career connections</p>
-            </div>
-            <div className="text-center">
-              <div className="bg-red-100 p-3 rounded-full w-fit mx-auto mb-4">
-                <ArrowRight className="h-6 w-6 text-red-600" />
+
+              <div className="text-center group">
+                <div className="bg-green-100 p-4 rounded-full w-fit mx-auto mb-6 group-hover:bg-green-200 transition-colors duration-300">
+                  <Users className="h-8 w-8 text-green-600" />
+                </div>
+                <h3 className="text-xl font-semibold mb-4">Global Network</h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Access to thousands of companies worldwide, from startups to Fortune 500 enterprises.
+                </p>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Fast Results</h3>
-              <p className="text-gray-600">Quick application process and immediate responses</p>
+
+              <div className="text-center group">
+                <div className="bg-purple-100 p-4 rounded-full w-fit mx-auto mb-6 group-hover:bg-purple-200 transition-colors duration-300">
+                  <Award className="h-8 w-8 text-purple-600" />
+                </div>
+                <h3 className="text-xl font-semibold mb-4">Verified Quality</h3>
+                <p className="text-gray-600 leading-relaxed">
+                  All companies and job postings are verified to ensure authentic, high-quality opportunities.
+                </p>
+              </div>
             </div>
           </div>
-        </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="py-20 px-4 sm:px-6 lg:px-8 bg-blue-600">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-4xl font-bold text-white mb-6">
+              Ready to Transform Your Career?
+            </h2>
+            <p className="text-xl text-blue-100 mb-8 leading-relaxed">
+              Join thousands of professionals who've found their perfect match
+            </p>
+            <Button 
+              onClick={() => navigate('/auth')}
+              size="lg"
+              className="bg-white text-blue-600 hover:bg-gray-100 px-12 py-6 text-lg font-semibold hover-scale"
+            >
+              Start Your Journey Today
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+          </div>
+        </section>
+
+        {/* Narrow Footer */}
+        <footer className="bg-gray-900 text-white py-8">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col md:flex-row justify-between items-center">
+              <div className="flex items-center space-x-3 mb-4 md:mb-0">
+                <div className="bg-blue-600 p-2 rounded-full">
+                  <Building2 className="h-5 w-5 text-white" />
+                </div>
+                <span className="font-bold text-lg">JobPortal Pro</span>
+              </div>
+              
+              <div className="flex space-x-6 text-sm text-gray-400">
+                <span className="hover:text-white cursor-pointer transition-colors">Privacy Policy</span>
+                <span className="hover:text-white cursor-pointer transition-colors">Terms of Service</span>
+                <span className="hover:text-white cursor-pointer transition-colors">Contact Us</span>
+              </div>
+            </div>
+            
+            <div className="border-t border-gray-800 mt-6 pt-6 text-center text-sm text-gray-400">
+              © 2024 JobPortal Pro. All rights reserved.
+            </div>
+          </div>
+        </footer>
       </div>
-    </div>
-  );
+    );
+  }
+
+  // This return should never be reached due to the redirect effect above
+  return null;
 };
 
 export default Index;
