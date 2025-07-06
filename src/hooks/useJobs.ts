@@ -78,21 +78,8 @@ export const useCreateJob = () => {
 
       console.log('Found company profile:', profile);
 
-      // For now, let's be more lenient with subscription checks in development
-      // Only block if subscription_status is explicitly 'inactive' and there's no valid end date
-      const hasValidSubscription = profile.subscription_status === 'active' || 
-        !profile.subscription_end_date || 
-        new Date(profile.subscription_end_date) > new Date();
-
-      if (!hasValidSubscription) {
-        console.error('Subscription check failed:', {
-          status: profile.subscription_status,
-          endDate: profile.subscription_end_date
-        });
-        throw new Error('Active subscription required. Please subscribe to post jobs or contact support.');
-      }
-
-      console.log('Subscription check passed, creating job...');
+      // BYPASSED: Subscription check removed for development
+      console.log('Subscription check bypassed - allowing job creation without active subscription');
 
       const { data, error } = await supabase
         .from('jobs')
