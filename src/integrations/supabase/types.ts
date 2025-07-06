@@ -50,10 +50,65 @@ export type Database = {
           },
         ]
       }
+      company_profiles: {
+        Row: {
+          address: string | null
+          company_description: string | null
+          company_name: string
+          company_size: string | null
+          company_website: string | null
+          created_at: string
+          id: string
+          industry: string | null
+          logo_url: string | null
+          phone: string | null
+          stripe_customer_id: string | null
+          subscription_end_date: string | null
+          subscription_status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          address?: string | null
+          company_description?: string | null
+          company_name: string
+          company_size?: string | null
+          company_website?: string | null
+          created_at?: string
+          id?: string
+          industry?: string | null
+          logo_url?: string | null
+          phone?: string | null
+          stripe_customer_id?: string | null
+          subscription_end_date?: string | null
+          subscription_status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          address?: string | null
+          company_description?: string | null
+          company_name?: string
+          company_size?: string | null
+          company_website?: string | null
+          created_at?: string
+          id?: string
+          industry?: string | null
+          logo_url?: string | null
+          phone?: string | null
+          stripe_customer_id?: string | null
+          subscription_end_date?: string | null
+          subscription_status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       jobs: {
         Row: {
           benefits: string | null
           company: string
+          company_profile_id: string | null
           created_at: string
           department: string
           description: string
@@ -68,6 +123,7 @@ export type Database = {
         Insert: {
           benefits?: string | null
           company: string
+          company_profile_id?: string | null
           created_at?: string
           department: string
           description: string
@@ -82,6 +138,7 @@ export type Database = {
         Update: {
           benefits?: string | null
           company?: string
+          company_profile_id?: string | null
           created_at?: string
           department?: string
           description?: string
@@ -92,6 +149,38 @@ export type Database = {
           salary?: string | null
           title?: string
           updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "jobs_company_profile_id_fkey"
+            columns: ["company_profile_id"]
+            isOneToOne: false
+            referencedRelation: "company_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          updated_at: string
+          user_type: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id: string
+          updated_at?: string
+          user_type: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          updated_at?: string
+          user_type?: string
         }
         Relationships: []
       }
