@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Building2, Users, ArrowRight } from 'lucide-react';
+import { Building2, Users, ArrowRight, Settings, Briefcase, TrendingUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -26,6 +26,222 @@ const Index = () => {
     await signOut();
   };
 
+  // Authenticated Job Seeker Landing Page
+  if (user && userType === 'job_seeker') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+        {/* Header */}
+        <div className="bg-white shadow-sm border-b">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-16">
+              <div className="flex items-center space-x-3">
+                <div className="bg-blue-600 p-2 rounded-lg">
+                  <Building2 className="h-6 w-6 text-white" />
+                </div>
+                <h1 className="text-xl font-bold text-gray-900">Professional Job Portal</h1>
+              </div>
+              
+              <div className="flex items-center space-x-4">
+                <span className="text-sm text-gray-600">
+                  Welcome, {user.email}
+                </span>
+                <Button variant="outline" onClick={handleSignOut} size="sm">
+                  Sign Out
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Job Seeker Dashboard */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="text-center mb-16">
+            <div className="mx-auto bg-blue-100 p-4 rounded-full w-fit mb-6">
+              <Users className="h-12 w-12 text-blue-600" />
+            </div>
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">
+              Welcome to Your Career Journey
+            </h1>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Discover amazing job opportunities from top companies. Your next career move is just a click away.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+            <Card className="text-center">
+              <CardHeader>
+                <div className="mx-auto bg-green-100 p-3 rounded-full w-fit mb-4">
+                  <Briefcase className="h-6 w-6 text-green-600" />
+                </div>
+                <CardTitle>Browse Jobs</CardTitle>
+                <CardDescription>
+                  Explore hundreds of job opportunities
+                </CardDescription>
+              </CardHeader>
+            </Card>
+
+            <Card className="text-center">
+              <CardHeader>
+                <div className="mx-auto bg-purple-100 p-3 rounded-full w-fit mb-4">
+                  <TrendingUp className="h-6 w-6 text-purple-600" />
+                </div>
+                <CardTitle>Apply Instantly</CardTitle>
+                <CardDescription>
+                  One-click applications to your dream jobs
+                </CardDescription>
+              </CardHeader>
+            </Card>
+
+            <Card className="text-center">
+              <CardHeader>
+                <div className="mx-auto bg-yellow-100 p-3 rounded-full w-fit mb-4">
+                  <ArrowRight className="h-6 w-6 text-yellow-600" />
+                </div>
+                <CardTitle>Get Hired</CardTitle>
+                <CardDescription>
+                  Connect directly with hiring managers
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          </div>
+
+          <div className="text-center">
+            <Button 
+              onClick={handleJobSeekerRoute}
+              className="bg-blue-600 hover:bg-blue-700 text-white py-6 px-12 text-lg font-semibold"
+              size="lg"
+            >
+              Start Job Search
+              <ArrowRight className="h-5 w-5 ml-2" />
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Authenticated Company Landing Page
+  if (user && userType === 'company') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100">
+        {/* Header */}
+        <div className="bg-white shadow-sm border-b">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-16">
+              <div className="flex items-center space-x-3">
+                <div className="bg-green-600 p-2 rounded-lg">
+                  <Building2 className="h-6 w-6 text-white" />
+                </div>
+                <h1 className="text-xl font-bold text-gray-900">Professional Job Portal</h1>
+              </div>
+              
+              <div className="flex items-center space-x-4">
+                <span className="text-sm text-gray-600">
+                  Welcome, {user.email}
+                </span>
+                <Button variant="outline" onClick={handleSignOut} size="sm">
+                  Sign Out
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Company Dashboard */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="text-center mb-16">
+            <div className="mx-auto bg-green-100 p-4 rounded-full w-fit mb-6">
+              <Building2 className="h-12 w-12 text-green-600" />
+            </div>
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">
+              Your Hiring Headquarters
+            </h1>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Post jobs, manage applications, and find the perfect candidates for your team.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="bg-blue-100 p-2 rounded-lg">
+                    <Briefcase className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <CardTitle>Manage Jobs</CardTitle>
+                </div>
+                <CardDescription className="text-left">
+                  Post new job openings, edit existing listings, and track applications all in one place.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button 
+                  onClick={handleCompanyRoute}
+                  className="w-full bg-blue-600 hover:bg-blue-700"
+                >
+                  Go to Job Portal
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="bg-purple-100 p-2 rounded-lg">
+                    <Settings className="h-6 w-6 text-purple-600" />
+                  </div>
+                  <CardTitle>Company Setup</CardTitle>
+                </div>
+                <CardDescription className="text-left">
+                  Complete your company profile and configure your hiring preferences.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button 
+                  onClick={() => navigate('/company-setup')}
+                  variant="outline"
+                  className="w-full"
+                >
+                  Setup Profile
+                  <Settings className="h-4 w-4 ml-2" />
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="bg-white rounded-lg p-8 shadow-sm border">
+            <div className="text-center">
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                Ready to Find Top Talent?
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Start posting jobs and connect with qualified candidates today.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button 
+                  onClick={handleCompanyRoute}
+                  className="bg-green-600 hover:bg-green-700 text-white px-8 py-3"
+                >
+                  Post Your First Job
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
+                <Button 
+                  onClick={() => navigate('/subscription')}
+                  variant="outline"
+                  className="px-8 py-3"
+                >
+                  View Subscription Plans
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Default landing page for non-authenticated users
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Header */}
@@ -39,16 +255,9 @@ const Index = () => {
               <h1 className="text-xl font-bold text-gray-900">Professional Job Portal</h1>
             </div>
             
-            {user && (
-              <div className="flex items-center space-x-4">
-                <span className="text-sm text-gray-600">
-                  Welcome, {user.email} ({userType})
-                </span>
-                <Button variant="outline" onClick={handleSignOut} size="sm">
-                  Sign Out
-                </Button>
-              </div>
-            )}
+            <Button onClick={() => navigate('/auth')} size="sm">
+              Sign In
+            </Button>
           </div>
         </div>
       </div>
