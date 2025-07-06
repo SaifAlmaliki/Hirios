@@ -131,3 +131,87 @@ export const useCreateJob = () => {
     },
   });
 };
+
+export const useUpdateJob = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async ({ jobId, jobData }: { jobId: string; jobData: Partial<Omit<Job, 'id' | 'created_at' | 'updated_at' | 'company_profile_id'>> }) => {
+      console.log('🔄 Starting job update process for job:', jobId, 'with data:', jobData);
+      
+      const { data, error } = await supabase
+        .from('jobs')
+        .update(jobData)
+        .eq('id', jobId)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('❌ Job update failed:', error);
+        throw new Error(`Failed to update job: ${error.message}`);
+      }
+
+      console.log('✅ Job updated successfully:', data);
+      return data as Job;
+    },
+    onSuccess: (data) => {
+      console.log('🎉 Job update successful, invalidating queries');
+      queryClient.invalidateQueries({ queryKey: ['jobs'] });
+      queryClient.invalidateQueries({ queryKey: ['company-jobs'] });
+      toast({
+        title: "Job Updated Successfully! ✅",
+        description: `"${data.title}" has been updated.`,
+      });
+    },
+    onError: (error) => {
+      console.error('💥 Job update failed with error:', error);
+      toast({
+        title: "Failed to Update Job",
+        description: error.message || "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+};
+
+export const useDeleteJob = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (jobId: string) => {
+      console.log('🗑️ Starting job deletion process for job:', jobId);
+      
+      const { error } = await supabase
+        .from('jobs')
+        .delete()
+        .eq('id', jobId);
+
+      if (error) {
+        console.error('❌ Job deletion failed:', error);
+        throw new Error(`Failed to delete job: ${error.message}`);
+      }
+
+      console.log('✅ Job deleted successfully');
+      return jobId;
+    },
+    onSuccess: () => {
+      console.log('🎉 Job deletion successful, invalidating queries');
+      queryClient.invalidateQueries({ queryKey: ['jobs'] });
+      queryClient.invalidateQueries({ queryKey: ['company-jobs'] });
+      toast({
+        title: "Job Deleted Successfully! 🗑️",
+        description: "The job posting has been removed from the portal.",
+      });
+    },
+    onError: (error) => {
+      console.error('💥 Job deletion failed with error:', error);
+      toast({
+        title: "Failed to Delete Job",
+        description: error.message || "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+};

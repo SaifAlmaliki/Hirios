@@ -6,17 +6,19 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Building, Users, UserCheck, TrendingUp, Eye, FileText, MapPin, Clock, DollarSign, Briefcase } from 'lucide-react';
+import { Plus, Building, Users, UserCheck, TrendingUp, Eye, FileText, MapPin, Clock, DollarSign, Briefcase, Edit, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useCreateJob } from '../hooks/useJobs';
+import { useCreateJob, useUpdateJob, useDeleteJob } from '../hooks/useJobs';
 import { useCompanyJobs } from '../hooks/useCompanyJobs';
 import { useApplications } from '../hooks/useApplications';
 import JobApplicationsView from './JobApplicationsView';
 
 const CompanyView: React.FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [isApplicationsViewOpen, setIsApplicationsViewOpen] = useState(false);
+  const [editingJob, setEditingJob] = useState<any>(null);
   
   // Use company-specific jobs hook instead of all jobs
   const { data: jobs = [], isLoading: jobsLoading } = useCompanyJobs();
@@ -36,6 +38,8 @@ const CompanyView: React.FC = () => {
 
   const { toast } = useToast();
   const createJobMutation = useCreateJob();
+  const updateJobMutation = useUpdateJob();
+  const deleteJobMutation = useDeleteJob();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -58,34 +62,69 @@ const CompanyView: React.FC = () => {
       return;
     }
 
-    createJobMutation.mutate(jobData, {
-      onSuccess: () => {
-        toast({
-          title: "Job Posted!",
-          description: "Your job has been posted successfully.",
-        });
-        setJobData({
-          title: '',
-          company: '',
-          department: '',
-          location: '',
-          employment_type: 'full-time',
-          salary: '',
-          description: '',
-          requirements: '',
-          benefits: '',
-        });
-        setIsDialogOpen(false);
-      },
-      onError: (error) => {
-        console.error('Failed to create job:', error);
-        toast({
-          title: "Error",
-          description: "Failed to post job. Please try again.",
-          variant: "destructive",
-        });
-      },
+    if (editingJob) {
+      // Update existing job
+      updateJobMutation.mutate({
+        jobId: editingJob.id,
+        jobData: jobData
+      }, {
+        onSuccess: () => {
+          setJobData({
+            title: '',
+            company: '',
+            department: '',
+            location: '',
+            employment_type: 'full-time',
+            salary: '',
+            description: '',
+            requirements: '',
+            benefits: '',
+          });
+          setIsEditDialogOpen(false);
+          setEditingJob(null);
+        }
+      });
+    } else {
+      // Create new job
+      createJobMutation.mutate(jobData, {
+        onSuccess: () => {
+          setJobData({
+            title: '',
+            company: '',
+            department: '',
+            location: '',
+            employment_type: 'full-time',
+            salary: '',
+            description: '',
+            requirements: '',
+            benefits: '',
+          });
+          setIsDialogOpen(false);
+        }
+      });
+    }
+  };
+
+  const handleEditJob = (job: any) => {
+    setEditingJob(job);
+    setJobData({
+      title: job.title,
+      company: job.company,
+      department: job.department,
+      location: job.location,
+      employment_type: job.employment_type,
+      salary: job.salary || '',
+      description: job.description,
+      requirements: job.requirements || '',
+      benefits: job.benefits || '',
     });
+    setIsEditDialogOpen(true);
+  };
+
+  const handleDeleteJob = (jobId: string) => {
+    if (window.confirm('Are you sure you want to delete this job posting? This action cannot be undone.')) {
+      deleteJobMutation.mutate(jobId);
+    }
   };
 
   const handleViewApplications = (jobId: string) => {
@@ -125,6 +164,151 @@ const CompanyView: React.FC = () => {
     );
   }
 
+  const JobForm = ({ isEdit = false }: { isEdit?: boolean }) => (
+    <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="title" className="text-sm font-medium text-gray-700">Job Title *</Label>
+          <Input
+            id="title"
+            name="title"
+            value={jobData.title}
+            onChange={handleInputChange}
+            placeholder="Enter job title"
+            className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+          />
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="company" className="text-sm font-medium text-gray-700">Company Name *</Label>
+          <Input
+            id="company"
+            name="company"
+            value={jobData.company}
+            onChange={handleInputChange}
+            placeholder="Enter company name"
+            className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+          />
+        </div>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="department" className="text-sm font-medium text-gray-700">Department *</Label>
+          <Input
+            id="department"
+            name="department"
+            value={jobData.department}
+            onChange={handleInputChange}
+            placeholder="Enter department"
+            className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+          />
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="location" className="text-sm font-medium text-gray-700">Location *</Label>
+          <Input
+            id="location"
+            name="location"
+            value={jobData.location}
+            onChange={handleInputChange}
+            placeholder="Enter location"
+            className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+          />
+        </div>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="employment_type" className="text-sm font-medium text-gray-700">Employment Type *</Label>
+          <Select onValueChange={handleSelectChange}>
+            <SelectTrigger className="border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+              <SelectValue placeholder="Select employment type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="full-time">Full-time</SelectItem>
+              <SelectItem value="part-time">Part-time</SelectItem>
+              <SelectItem value="contract">Contract</SelectItem>
+              <SelectItem value="temporary">Temporary</SelectItem>
+              <SelectItem value="internship">Internship</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="salary" className="text-sm font-medium text-gray-700">Salary (Optional)</Label>
+          <Input
+            id="salary"
+            name="salary"
+            value={jobData.salary}
+            onChange={handleInputChange}
+            placeholder="Enter salary"
+            className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+          />
+        </div>
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="description" className="text-sm font-medium text-gray-700">Job Description *</Label>
+        <Textarea
+          id="description"
+          name="description"
+          value={jobData.description}
+          onChange={handleInputChange}
+          placeholder="Enter job description"
+          className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 resize-none"
+        />
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="requirements" className="text-sm font-medium text-gray-700">Requirements (Optional)</Label>
+        <Textarea
+          id="requirements"
+          name="requirements"
+          value={jobData.requirements}
+          onChange={handleInputChange}
+          placeholder="Enter requirements"
+          className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 resize-none"
+        />
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="benefits" className="text-sm font-medium text-gray-700">Benefits (Optional)</Label>
+        <Textarea
+          id="benefits"
+          name="benefits"
+          value={jobData.benefits}
+          onChange={handleInputChange}
+          placeholder="Enter benefits"
+          className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 resize-none"
+        />
+      </div>
+      
+      <div className="flex justify-end space-x-2">
+        <Button variant="outline" onClick={() => {
+          if (isEdit) {
+            setIsEditDialogOpen(false);
+            setEditingJob(null);
+          } else {
+            setIsDialogOpen(false);
+          }
+        }}>
+          Cancel
+        </Button>
+        <Button 
+          type="submit" 
+          disabled={createJobMutation.isPending || updateJobMutation.isPending} 
+          className="bg-blue-600 hover:bg-blue-700 text-white"
+        >
+          {(createJobMutation.isPending || updateJobMutation.isPending) 
+            ? (isEdit ? 'Updating...' : 'Posting...') 
+            : (isEdit ? 'Update Job' : 'Post Job')
+          }
+        </Button>
+      </div>
+    </form>
+  );
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -148,135 +332,7 @@ const CompanyView: React.FC = () => {
                 Fill in the details below to post a new job opening.
               </DialogDescription>
             </DialogHeader>
-            
-            <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="title" className="text-sm font-medium text-gray-700">Job Title *</Label>
-                  <Input
-                    id="title"
-                    name="title"
-                    value={jobData.title}
-                    onChange={handleInputChange}
-                    placeholder="Enter job title"
-                    className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="company" className="text-sm font-medium text-gray-700">Company Name *</Label>
-                  <Input
-                    id="company"
-                    name="company"
-                    value={jobData.company}
-                    onChange={handleInputChange}
-                    placeholder="Enter company name"
-                    className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                  />
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="department" className="text-sm font-medium text-gray-700">Department *</Label>
-                  <Input
-                    id="department"
-                    name="department"
-                    value={jobData.department}
-                    onChange={handleInputChange}
-                    placeholder="Enter department"
-                    className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="location" className="text-sm font-medium text-gray-700">Location *</Label>
-                  <Input
-                    id="location"
-                    name="location"
-                    value={jobData.location}
-                    onChange={handleInputChange}
-                    placeholder="Enter location"
-                    className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                  />
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="employment_type" className="text-sm font-medium text-gray-700">Employment Type *</Label>
-                  <Select onValueChange={handleSelectChange}>
-                    <SelectTrigger className="border-gray-300 focus:border-blue-500 focus:ring-blue-500">
-                      <SelectValue placeholder="Select employment type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="full-time">Full-time</SelectItem>
-                      <SelectItem value="part-time">Part-time</SelectItem>
-                      <SelectItem value="contract">Contract</SelectItem>
-                      <SelectItem value="temporary">Temporary</SelectItem>
-                      <SelectItem value="internship">Internship</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="salary" className="text-sm font-medium text-gray-700">Salary (Optional)</Label>
-                  <Input
-                    id="salary"
-                    name="salary"
-                    value={jobData.salary}
-                    onChange={handleInputChange}
-                    placeholder="Enter salary"
-                    className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                  />
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="description" className="text-sm font-medium text-gray-700">Job Description *</Label>
-                <Textarea
-                  id="description"
-                  name="description"
-                  value={jobData.description}
-                  onChange={handleInputChange}
-                  placeholder="Enter job description"
-                  className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 resize-none"
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="requirements" className="text-sm font-medium text-gray-700">Requirements (Optional)</Label>
-                <Textarea
-                  id="requirements"
-                  name="requirements"
-                  value={jobData.requirements}
-                  onChange={handleInputChange}
-                  placeholder="Enter requirements"
-                  className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 resize-none"
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="benefits" className="text-sm font-medium text-gray-700">Benefits (Optional)</Label>
-                <Textarea
-                  id="benefits"
-                  name="benefits"
-                  value={jobData.benefits}
-                  onChange={handleInputChange}
-                  placeholder="Enter benefits"
-                  className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 resize-none"
-                />
-              </div>
-              
-              <div className="flex justify-end space-x-2">
-                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={createJobMutation.isPending} className="bg-blue-600 hover:bg-blue-700 text-white">
-                  {createJobMutation.isPending ? 'Posting...' : 'Post Job'}
-                </Button>
-              </div>
-            </form>
+            <JobForm />
           </DialogContent>
         </Dialog>
       </div>
@@ -354,15 +410,33 @@ const CompanyView: React.FC = () => {
                         {job.company}
                       </div>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleViewApplications(job.id)}
-                      className="text-blue-600 hover:text-blue-800 hover:bg-blue-50"
-                    >
-                      <Eye className="h-4 w-4 mr-1" />
-                      View Apps
-                    </Button>
+                    <div className="flex space-x-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleEditJob(job)}
+                        className="text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteJob(job.id)}
+                        className="text-red-600 hover:text-red-800 hover:bg-red-50"
+                        disabled={deleteJobMutation.isPending}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleViewApplications(job.id)}
+                        className="text-green-600 hover:text-green-800 hover:bg-green-50"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent className="pt-0">
@@ -410,6 +484,19 @@ const CompanyView: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Edit Job Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-xl text-blue-900">Edit Job</DialogTitle>
+            <DialogDescription>
+              Update the job details below.
+            </DialogDescription>
+          </DialogHeader>
+          <JobForm isEdit={true} />
+        </DialogContent>
+      </Dialog>
 
       {/* Job Applications View */}
       <JobApplicationsView 
