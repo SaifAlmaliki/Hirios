@@ -48,16 +48,37 @@ export const useCreateJob = () => {
     mutationFn: async (jobData: Omit<Job, 'id' | 'created_at' | 'updated_at' | 'company_profile_id'>) => {
       console.log('Creating job:', jobData);
       
-      // First, get the current user's company profile
+      // First, get the current user
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) {
+        throw new Error('User not authenticated');
+      }
+
+      // Check if company profile exists
       const { data: profile, error: profileError } = await supabase
         .from('company_profiles')
-        .select('id')
-        .eq('user_id', (await supabase.auth.getUser()).data.user?.id)
-        .single();
+        .select('id, subscription_status, subscription_end_date')
+        .eq('user_id', user.id)
+        .maybeSingle();
 
-      if (profileError || !profile) {
+      if (profileError) {
         console.error('Error fetching company profile:', profileError);
-        throw new Error('Company profile not found. Please complete your company setup first.');
+        throw new Error('Error checking company profile. Please try again.');
+      }
+
+      if (!profile) {
+        console.error('Company profile not found for user:', user.id);
+        throw new Error('Company profile not found. Please complete your company setup first by clicking the "Setup" button.');
+      }
+
+      // Check subscription status
+      if (profile.subscription_status !== 'active') {
+        throw new Error('Active subscription required. Please subscribe to post jobs.');
+      }
+
+      // Check if subscription has expired
+      if (profile.subscription_end_date && new Date(profile.subscription_end_date) <= new Date()) {
+        throw new Error('Your subscription has expired. Please renew to continue posting jobs.');
       }
 
       const { data, error } = await supabase
@@ -79,6 +100,7 @@ export const useCreateJob = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['jobs'] });
+      queryClient.invalidateQueries({ queryKey: ['company-jobs'] });
       toast({
         title: "Job Posted Successfully!",
         description: "Your job listing has been added to the portal.",
