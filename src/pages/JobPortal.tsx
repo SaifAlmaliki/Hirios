@@ -12,7 +12,7 @@ import { useAuth } from '@/contexts/AuthContext';
 
 const JobPortal = () => {
   const [isCompanyView, setIsCompanyView] = useState(true);
-  const { data: jobs = [], isLoading } = useJobs();
+  const { data: jobs = [], isLoading } = useJobs(); // This fetches all public jobs for UserView
   const { user, userType, signOut } = useAuth();
   const navigate = useNavigate();
 
@@ -121,7 +121,7 @@ const JobPortal = () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {isCompanyView ? (
-          <CompanyView jobs={jobs} />
+          <CompanyView />
         ) : (
           <UserView jobs={jobs} />
         )}

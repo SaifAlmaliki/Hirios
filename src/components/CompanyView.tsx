@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,18 +8,19 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus, Building, Users, UserCheck, TrendingUp, Eye, FileText, MapPin, Clock, DollarSign, Briefcase } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { Job, useCreateJob } from '../hooks/useJobs';
+import { useCreateJob } from '../hooks/useJobs';
+import { useCompanyJobs } from '../hooks/useCompanyJobs';
 import { useApplications } from '../hooks/useApplications';
 import JobApplicationsView from './JobApplicationsView';
 
-interface CompanyViewProps {
-  jobs: Job[];
-}
-
-const CompanyView: React.FC<CompanyViewProps> = ({ jobs }) => {
+const CompanyView: React.FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
+  const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [isApplicationsViewOpen, setIsApplicationsViewOpen] = useState(false);
+  
+  // Use company-specific jobs hook instead of all jobs
+  const { data: jobs = [], isLoading: jobsLoading } = useCompanyJobs();
+  const selectedJob = jobs.find(job => job.id === selectedJobId) || null;
   
   const [jobData, setJobData] = useState({
     title: '',
@@ -88,8 +88,8 @@ const CompanyView: React.FC<CompanyViewProps> = ({ jobs }) => {
     });
   };
 
-  const handleViewApplications = (job: Job) => {
-    setSelectedJob(job);
+  const handleViewApplications = (jobId: string) => {
+    setSelectedJobId(jobId);
     setIsApplicationsViewOpen(true);
   };
 
@@ -111,6 +111,19 @@ const CompanyView: React.FC<CompanyViewProps> = ({ jobs }) => {
       day: 'numeric' 
     });
   };
+
+  if (jobsLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <div>
+            <h2 className="text-2xl font-bold text-blue-900">Company Dashboard</h2>
+            <p className="text-gray-600 mt-1">Loading your job postings...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -317,7 +330,7 @@ const CompanyView: React.FC<CompanyViewProps> = ({ jobs }) => {
 
       {/* Job Listings */}
       <div className="space-y-4">
-        <h3 className="text-xl font-semibold text-gray-900">Current Job Postings</h3>
+        <h3 className="text-xl font-semibold text-gray-900">Your Job Postings</h3>
         {jobs.length === 0 ? (
           <Card className="text-center py-8">
             <CardContent>
@@ -344,7 +357,7 @@ const CompanyView: React.FC<CompanyViewProps> = ({ jobs }) => {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => handleViewApplications(job)}
+                      onClick={() => handleViewApplications(job.id)}
                       className="text-blue-600 hover:text-blue-800 hover:bg-blue-50"
                     >
                       <Eye className="h-4 w-4 mr-1" />
@@ -404,7 +417,7 @@ const CompanyView: React.FC<CompanyViewProps> = ({ jobs }) => {
         isOpen={isApplicationsViewOpen}
         onClose={() => {
           setIsApplicationsViewOpen(false);
-          setSelectedJob(null);
+          setSelectedJobId(null);
         }}
       />
     </div>

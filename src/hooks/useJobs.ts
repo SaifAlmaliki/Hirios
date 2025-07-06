@@ -16,6 +16,7 @@ export interface Job {
   benefits?: string;
   created_at: string;
   updated_at: string;
+  company_profile_id: string;
 }
 
 export const useJobs = () => {
@@ -44,11 +45,27 @@ export const useCreateJob = () => {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async (jobData: Omit<Job, 'id' | 'created_at' | 'updated_at'>) => {
+    mutationFn: async (jobData: Omit<Job, 'id' | 'created_at' | 'updated_at' | 'company_profile_id'>) => {
       console.log('Creating job:', jobData);
+      
+      // First, get the current user's company profile
+      const { data: profile, error: profileError } = await supabase
+        .from('company_profiles')
+        .select('id')
+        .eq('user_id', (await supabase.auth.getUser()).data.user?.id)
+        .single();
+
+      if (profileError || !profile) {
+        console.error('Error fetching company profile:', profileError);
+        throw new Error('Company profile not found. Please complete your company setup first.');
+      }
+
       const { data, error } = await supabase
         .from('jobs')
-        .insert([jobData])
+        .insert([{
+          ...jobData,
+          company_profile_id: profile.id
+        }])
         .select()
         .single();
 
@@ -71,7 +88,7 @@ export const useCreateJob = () => {
       console.error('Failed to create job:', error);
       toast({
         title: "Error",
-        description: "Failed to create job posting. Please try again.",
+        description: error.message || "Failed to create job posting. Please try again.",
         variant: "destructive",
       });
     },
