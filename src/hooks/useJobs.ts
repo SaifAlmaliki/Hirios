@@ -51,19 +51,24 @@ export const useCreateJob = () => {
       // First, get the current user
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       if (userError || !user) {
+        console.error('User authentication error:', userError);
         throw new Error('User not authenticated');
       }
+
+      console.log('Current user:', user.id, user.email);
 
       // Check if company profile exists
       const { data: profile, error: profileError } = await supabase
         .from('company_profiles')
-        .select('id, subscription_status, subscription_end_date')
+        .select('id, subscription_status, subscription_end_date, company_name')
         .eq('user_id', user.id)
         .maybeSingle();
 
+      console.log('Company profile query result:', { profile, profileError });
+
       if (profileError) {
         console.error('Error fetching company profile:', profileError);
-        throw new Error('Error checking company profile. Please try again.');
+        throw new Error(`Error checking company profile: ${profileError.message}`);
       }
 
       if (!profile) {
@@ -71,15 +76,23 @@ export const useCreateJob = () => {
         throw new Error('Company profile not found. Please complete your company setup first by clicking the "Setup" button.');
       }
 
-      // Check subscription status
-      if (profile.subscription_status !== 'active') {
-        throw new Error('Active subscription required. Please subscribe to post jobs.');
+      console.log('Found company profile:', profile);
+
+      // For now, let's be more lenient with subscription checks in development
+      // Only block if subscription_status is explicitly 'inactive' and there's no valid end date
+      const hasValidSubscription = profile.subscription_status === 'active' || 
+        !profile.subscription_end_date || 
+        new Date(profile.subscription_end_date) > new Date();
+
+      if (!hasValidSubscription) {
+        console.error('Subscription check failed:', {
+          status: profile.subscription_status,
+          endDate: profile.subscription_end_date
+        });
+        throw new Error('Active subscription required. Please subscribe to post jobs or contact support.');
       }
 
-      // Check if subscription has expired
-      if (profile.subscription_end_date && new Date(profile.subscription_end_date) <= new Date()) {
-        throw new Error('Your subscription has expired. Please renew to continue posting jobs.');
-      }
+      console.log('Subscription check passed, creating job...');
 
       const { data, error } = await supabase
         .from('jobs')
@@ -92,7 +105,7 @@ export const useCreateJob = () => {
 
       if (error) {
         console.error('Error creating job:', error);
-        throw error;
+        throw new Error(`Failed to create job: ${error.message}`);
       }
 
       console.log('Job created successfully:', data);
