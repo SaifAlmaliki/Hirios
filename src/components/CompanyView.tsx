@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,65 +7,69 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Plus, MapPin, Clock, DollarSign, Calendar, Users, UserPlus, TrendingUp, Briefcase, Eye } from 'lucide-react';
-import { Job } from '../pages/JobPortal';
-import { useToast } from '@/hooks/use-toast';
+import { Plus, MapPin, Clock, DollarSign, Calendar, Users, UserPlus, TrendingUp, Briefcase, Eye, Building } from 'lucide-react';
+import { Job, useCreateJob } from '../hooks/useJobs';
+import { useApplications } from '../hooks/useApplications';
 
 interface CompanyViewProps {
   jobs: Job[];
-  onAddJob: (job: Omit<Job, 'id' | 'postedDate'>) => void;
 }
 
-const CompanyView: React.FC<CompanyViewProps> = ({ jobs, onAddJob }) => {
+const CompanyView: React.FC<CompanyViewProps> = ({ jobs }) => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     company: '',
+    department: '',
     location: '',
-    type: '',
+    employment_type: '',
     salary: '',
     description: '',
     requirements: '',
     benefits: ''
   });
-  const { toast } = useToast();
 
-  // Mock data for dashboard metrics
-  const totalApplications = 12;
-  const shortlistedCandidates = 3;
-  const hireRate = 24;
-  const applicationsByJob = {
-    '1': { total: 8, pending: 3, shortlisted: 2, hired: 1 }
-  };
+  const createJobMutation = useCreateJob();
+  const { data: applications = [] } = useApplications();
+
+  // Calculate metrics
+  const totalApplications = applications.length;
+  const shortlistedCandidates = applications.filter(app => app.status === 'shortlisted').length;
+  const hiredCandidates = applications.filter(app => app.status === 'hired').length;
+  const hireRate = totalApplications > 0 ? Math.round((hiredCandidates / totalApplications) * 100) : 0;
+
+  // Group applications by job
+  const applicationsByJob = applications.reduce((acc, app) => {
+    if (!acc[app.job_id]) {
+      acc[app.job_id] = { total: 0, pending: 0, shortlisted: 0, hired: 0 };
+    }
+    acc[app.job_id].total++;
+    acc[app.job_id][app.status as keyof typeof acc[string]]++;
+    return acc;
+  }, {} as Record<string, { total: number; pending: number; shortlisted: number; hired: number }>);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.title || !formData.company || !formData.location || !formData.type || !formData.description) {
-      toast({
-        title: "Missing Information",
-        description: "Please fill in all required fields.",
-        variant: "destructive"
-      });
+    if (!formData.title || !formData.company || !formData.department || !formData.location || !formData.employment_type || !formData.description) {
       return;
     }
 
-    onAddJob(formData);
-    setFormData({
-      title: '',
-      company: '',
-      location: '',
-      type: '',
-      salary: '',
-      description: '',
-      requirements: '',
-      benefits: ''
-    });
-    setShowAddForm(false);
-    
-    toast({
-      title: "Job Posted Successfully!",
-      description: "Your job listing has been added to the portal.",
+    createJobMutation.mutate(formData, {
+      onSuccess: () => {
+        setFormData({
+          title: '',
+          company: '',
+          department: '',
+          location: '',
+          employment_type: '',
+          salary: '',
+          description: '',
+          requirements: '',
+          benefits: ''
+        });
+        setShowAddForm(false);
+      }
     });
   };
 
@@ -120,7 +125,7 @@ const CompanyView: React.FC<CompanyViewProps> = ({ jobs, onAddJob }) => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-purple-900">{shortlistedCandidates}</div>
-            <p className="text-xs text-gray-500 mt-1">3 pending review</p>
+            <p className="text-xs text-gray-500 mt-1">{applications.filter(app => app.status === 'pending').length} pending review</p>
           </CardContent>
         </Card>
 
@@ -169,6 +174,17 @@ const CompanyView: React.FC<CompanyViewProps> = ({ jobs, onAddJob }) => {
                 </div>
                 
                 <div className="space-y-2">
+                  <Label htmlFor="department" className="text-sm font-medium text-gray-700">Department *</Label>
+                  <Input
+                    id="department"
+                    value={formData.department}
+                    onChange={(e) => handleInputChange('department', e.target.value)}
+                    placeholder="e.g. Engineering"
+                    className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                  />
+                </div>
+                
+                <div className="space-y-2">
                   <Label htmlFor="location" className="text-sm font-medium text-gray-700">Location *</Label>
                   <Input
                     id="location"
@@ -180,10 +196,10 @@ const CompanyView: React.FC<CompanyViewProps> = ({ jobs, onAddJob }) => {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="type" className="text-sm font-medium text-gray-700">Job Type *</Label>
-                  <Select value={formData.type} onValueChange={(value) => handleInputChange('type', value)}>
+                  <Label htmlFor="employment_type" className="text-sm font-medium text-gray-700">Employment Type *</Label>
+                  <Select value={formData.employment_type} onValueChange={(value) => handleInputChange('employment_type', value)}>
                     <SelectTrigger className="border-gray-300 focus:border-blue-500 focus:ring-blue-500">
-                      <SelectValue placeholder="Select job type" />
+                      <SelectValue placeholder="Select employment type" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="Full-time">Full-time</SelectItem>
@@ -194,7 +210,7 @@ const CompanyView: React.FC<CompanyViewProps> = ({ jobs, onAddJob }) => {
                   </Select>
                 </div>
                 
-                <div className="space-y-2 md:col-span-2">
+                <div className="space-y-2">
                   <Label htmlFor="salary" className="text-sm font-medium text-gray-700">Salary Range</Label>
                   <Input
                     id="salary"
@@ -253,9 +269,10 @@ const CompanyView: React.FC<CompanyViewProps> = ({ jobs, onAddJob }) => {
                 </Button>
                 <Button 
                   type="submit"
+                  disabled={createJobMutation.isPending}
                   className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2"
                 >
-                  Post Job
+                  {createJobMutation.isPending ? 'Posting...' : 'Post Job'}
                 </Button>
               </div>
             </form>
@@ -293,12 +310,16 @@ const CompanyView: React.FC<CompanyViewProps> = ({ jobs, onAddJob }) => {
                   
                   <div className="flex flex-wrap gap-4 mt-3">
                     <div className="flex items-center text-sm text-gray-600">
+                      <Building className="h-4 w-4 mr-1" />
+                      {job.department}
+                    </div>
+                    <div className="flex items-center text-sm text-gray-600">
                       <MapPin className="h-4 w-4 mr-1" />
                       {job.location}
                     </div>
                     <div className="flex items-center text-sm text-gray-600">
                       <Clock className="h-4 w-4 mr-1" />
-                      {job.type}
+                      {job.employment_type}
                     </div>
                     {job.salary && (
                       <div className="flex items-center text-sm text-gray-600">
@@ -308,7 +329,7 @@ const CompanyView: React.FC<CompanyViewProps> = ({ jobs, onAddJob }) => {
                     )}
                     <div className="flex items-center text-sm text-gray-500">
                       <Calendar className="h-4 w-4 mr-1" />
-                      {new Date(job.postedDate).toLocaleDateString()}
+                      {new Date(job.created_at).toLocaleDateString()}
                     </div>
                   </div>
 
@@ -334,18 +355,6 @@ const CompanyView: React.FC<CompanyViewProps> = ({ jobs, onAddJob }) => {
                           <div className="text-gray-600">Hired</div>
                         </div>
                       </div>
-                      
-                      {job.id === '1' && (
-                        <div className="mt-4 border-t pt-4">
-                          <div className="flex items-center justify-between bg-white p-3 rounded border">
-                            <div>
-                              <div className="font-medium text-gray-900">John Doe</div>
-                              <div className="text-sm text-gray-600">john.doe@example.com</div>
-                            </div>
-                            <Badge className="bg-orange-100 text-orange-800">pending</Badge>
-                          </div>
-                        </div>
-                      )}
                     </div>
                   )}
                 </CardHeader>

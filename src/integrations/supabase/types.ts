@@ -9,7 +9,92 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      applications: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          job_id: string
+          phone: string
+          resume_url: string | null
+          status: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          job_id: string
+          phone: string
+          resume_url?: string | null
+          status?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          job_id?: string
+          phone?: string
+          resume_url?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "applications_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      jobs: {
+        Row: {
+          benefits: string | null
+          company: string
+          created_at: string
+          department: string
+          description: string
+          employment_type: string
+          id: string
+          location: string
+          requirements: string | null
+          salary: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          benefits?: string | null
+          company: string
+          created_at?: string
+          department: string
+          description: string
+          employment_type: string
+          id?: string
+          location: string
+          requirements?: string | null
+          salary?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          benefits?: string | null
+          company?: string
+          created_at?: string
+          department?: string
+          description?: string
+          employment_type?: string
+          id?: string
+          location?: string
+          requirements?: string | null
+          salary?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

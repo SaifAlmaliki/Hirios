@@ -5,9 +5,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { MapPin, Clock, DollarSign, Calendar, Upload, FileText } from 'lucide-react';
-import { Job } from '../pages/JobPortal';
-import { useToast } from '@/hooks/use-toast';
+import { MapPin, Clock, DollarSign, Calendar, Upload, FileText, Building } from 'lucide-react';
+import { Job } from '../hooks/useJobs';
+import { useCreateApplication } from '../hooks/useApplications';
 
 interface UserViewProps {
   jobs: Job[];
@@ -16,13 +16,14 @@ interface UserViewProps {
 const UserView: React.FC<UserViewProps> = ({ jobs }) => {
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [applicationData, setApplicationData] = useState({
-    fullName: '',
+    full_name: '',
     email: '',
-    phoneNumber: '',
+    phone: '',
     resume: null as File | null
   });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const { toast } = useToast();
+  
+  const createApplicationMutation = useCreateApplication();
 
   const handleApply = (job: Job) => {
     setSelectedJob(job);
@@ -33,11 +34,6 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
     const file = e.target.files?.[0];
     if (file) {
       if (file.type !== 'application/pdf') {
-        toast({
-          title: "Invalid File Type",
-          description: "Please upload a PDF file only.",
-          variant: "destructive"
-        });
         return;
       }
       setApplicationData(prev => ({ ...prev, resume: file }));
@@ -47,57 +43,41 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
   const handleSubmitApplication = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!applicationData.fullName || !applicationData.email || !applicationData.phoneNumber || !applicationData.resume) {
-      toast({
-        title: "Missing Information",
-        description: "Please fill in all fields and upload your resume.",
-        variant: "destructive"
-      });
+    if (!applicationData.full_name || !applicationData.email || !applicationData.phone || !selectedJob) {
       return;
     }
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(applicationData.email)) {
-      toast({
-        title: "Invalid Email",
-        description: "Please enter a valid email address.",
-        variant: "destructive"
-      });
       return;
     }
 
     // Phone validation (basic)
     const phoneRegex = /^[\d\s\-\+\(\)]+$/;
-    if (!phoneRegex.test(applicationData.phoneNumber)) {
-      toast({
-        title: "Invalid Phone Number",
-        description: "Please enter a valid phone number.",
-        variant: "destructive"
-      });
+    if (!phoneRegex.test(applicationData.phone)) {
       return;
     }
 
-    // Simulate application submission
-    console.log('Application submitted:', {
-      job: selectedJob?.title,
-      applicant: applicationData
+    createApplicationMutation.mutate({
+      job_id: selectedJob.id,
+      full_name: applicationData.full_name,
+      email: applicationData.email,
+      phone: applicationData.phone,
+      resume_url: applicationData.resume?.name || null,
+      status: 'pending'
+    }, {
+      onSuccess: () => {
+        setApplicationData({
+          full_name: '',
+          email: '',
+          phone: '',
+          resume: null
+        });
+        setIsDialogOpen(false);
+        setSelectedJob(null);
+      }
     });
-
-    toast({
-      title: "Application Submitted!",
-      description: `Your application for ${selectedJob?.title} has been sent successfully.`,
-    });
-
-    // Reset form
-    setApplicationData({
-      fullName: '',
-      email: '',
-      phoneNumber: '',
-      resume: null
-    });
-    setIsDialogOpen(false);
-    setSelectedJob(null);
   };
 
   return (
@@ -131,17 +111,21 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
                   </div>
                   <div className="flex items-center text-sm text-gray-500">
                     <Calendar className="h-4 w-4 mr-1" />
-                    {new Date(job.postedDate).toLocaleDateString()}
+                    {new Date(job.created_at).toLocaleDateString()}
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-4 mt-3">
+                  <div className="flex items-center text-sm text-gray-600">
+                    <Building className="h-4 w-4 mr-1" />
+                    {job.department}
+                  </div>
                   <div className="flex items-center text-sm text-gray-600">
                     <MapPin className="h-4 w-4 mr-1" />
                     {job.location}
                   </div>
                   <div className="flex items-center text-sm text-gray-600">
                     <Clock className="h-4 w-4 mr-1" />
-                    {job.type}
+                    {job.employment_type}
                   </div>
                   {job.salary && (
                     <div className="flex items-center text-sm text-gray-600">
@@ -173,9 +157,9 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
                   if (!open) {
                     setSelectedJob(null);
                     setApplicationData({
-                      fullName: '',
+                      full_name: '',
                       email: '',
-                      phoneNumber: '',
+                      phone: '',
                       resume: null
                     });
                   }
@@ -198,11 +182,11 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
                     
                     <form onSubmit={handleSubmitApplication} className="space-y-4 mt-4">
                       <div className="space-y-2">
-                        <Label htmlFor="fullName" className="text-sm font-medium text-gray-700">Full Name *</Label>
+                        <Label htmlFor="full_name" className="text-sm font-medium text-gray-700">Full Name *</Label>
                         <Input
-                          id="fullName"
-                          value={applicationData.fullName}
-                          onChange={(e) => setApplicationData(prev => ({ ...prev, fullName: e.target.value }))}
+                          id="full_name"
+                          value={applicationData.full_name}
+                          onChange={(e) => setApplicationData(prev => ({ ...prev, full_name: e.target.value }))}
                           placeholder="Enter your full name"
                           className="border-gray-300 focus:border-green-500 focus:ring-green-500"
                         />
@@ -221,18 +205,18 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
                       </div>
                       
                       <div className="space-y-2">
-                        <Label htmlFor="phoneNumber" className="text-sm font-medium text-gray-700">Phone Number *</Label>
+                        <Label htmlFor="phone" className="text-sm font-medium text-gray-700">Phone Number *</Label>
                         <Input
-                          id="phoneNumber"
-                          value={applicationData.phoneNumber}
-                          onChange={(e) => setApplicationData(prev => ({ ...prev, phoneNumber: e.target.value }))}
+                          id="phone"
+                          value={applicationData.phone}
+                          onChange={(e) => setApplicationData(prev => ({ ...prev, phone: e.target.value }))}
                           placeholder="Enter your phone number"
                           className="border-gray-300 focus:border-green-500 focus:ring-green-500"
                         />
                       </div>
                       
                       <div className="space-y-2">
-                        <Label htmlFor="resume" className="text-sm font-medium text-gray-700">Resume (PDF only) *</Label>
+                        <Label htmlFor="resume" className="text-sm font-medium text-gray-700">Resume (PDF only)</Label>
                         <div className="flex items-center space-x-2">
                           <Input
                             id="resume"
@@ -261,9 +245,10 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
                         </Button>
                         <Button 
                           type="submit"
+                          disabled={createApplicationMutation.isPending}
                           className="bg-green-600 hover:bg-green-700 text-white"
                         >
-                          Submit Application
+                          {createApplicationMutation.isPending ? 'Submitting...' : 'Submit Application'}
                         </Button>
                       </div>
                     </form>
