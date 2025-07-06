@@ -65,7 +65,9 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
       email: applicationData.email,
       phone: applicationData.phone,
       resume_url: applicationData.resume?.name || null,
-      status: 'pending'
+      status: 'pending',
+      job_title: selectedJob.title,
+      company: selectedJob.company
     }, {
       onSuccess: () => {
         setApplicationData({

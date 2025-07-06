@@ -1,402 +1,350 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Plus, MapPin, Clock, DollarSign, Calendar, Users, UserPlus, TrendingUp, Briefcase, Eye, Building } from 'lucide-react';
+import { Plus, Building, Users, UserCheck, TrendingUp, Eye } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 import { Job, useCreateJob } from '../hooks/useJobs';
 import { useApplications } from '../hooks/useApplications';
 import JobApplicationsView from './JobApplicationsView';
+import WebhookSettings from './WebhookSettings';
 
 interface CompanyViewProps {
   jobs: Job[];
 }
 
 const CompanyView: React.FC<CompanyViewProps> = ({ jobs }) => {
-  const [showAddForm, setShowAddForm] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
-  const [showApplicationsView, setShowApplicationsView] = useState(false);
-  const [formData, setFormData] = useState({
+  const [isApplicationsViewOpen, setIsApplicationsViewOpen] = useState(false);
+  
+  const [jobData, setJobData] = useState({
     title: '',
     company: '',
     department: '',
     location: '',
-    employment_type: '',
+    employment_type: 'full-time',
     salary: '',
     description: '',
     requirements: '',
-    benefits: ''
+    benefits: '',
   });
 
+  const { toast } = useToast();
   const createJobMutation = useCreateJob();
-  const { data: applications = [] } = useApplications();
 
-  // Calculate metrics
-  const totalApplications = applications.length;
-  const shortlistedCandidates = applications.filter(app => app.status === 'shortlisted').length;
-  const hiredCandidates = applications.filter(app => app.status === 'hired').length;
-  const hireRate = totalApplications > 0 ? Math.round((hiredCandidates / totalApplications) * 100) : 0;
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setJobData(prev => ({ ...prev, [name]: value }));
+  };
 
-  // Group applications by job
-  const applicationsByJob = applications.reduce((acc, app) => {
-    if (!acc[app.job_id]) {
-      acc[app.job_id] = { total: 0, pending: 0, shortlisted: 0, hired: 0 };
-    }
-    acc[app.job_id].total++;
-    acc[app.job_id][app.status as keyof typeof acc[string]]++;
-    return acc;
-  }, {} as Record<string, { total: number; pending: number; shortlisted: number; hired: number }>);
+  const handleSelectChange = (value: string) => {
+    setJobData(prev => ({ ...prev, employment_type: value }));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!formData.title || !formData.company || !formData.department || !formData.location || !formData.employment_type || !formData.description) {
+
+    if (!jobData.title || !jobData.company || !jobData.department || !jobData.location || !jobData.employment_type || !jobData.description) {
+      toast({
+        title: "Error",
+        description: "Please fill in all required fields.",
+        variant: "destructive",
+      });
       return;
     }
 
-    createJobMutation.mutate(formData, {
+    createJobMutation.mutate(jobData, {
       onSuccess: () => {
-        setFormData({
+        toast({
+          title: "Job Posted!",
+          description: "Your job has been posted successfully.",
+        });
+        setJobData({
           title: '',
           company: '',
           department: '',
           location: '',
-          employment_type: '',
+          employment_type: 'full-time',
           salary: '',
           description: '',
           requirements: '',
-          benefits: ''
+          benefits: '',
         });
-        setShowAddForm(false);
-      }
+        setIsDialogOpen(false);
+      },
+      onError: (error) => {
+        console.error('Failed to create job:', error);
+        toast({
+          title: "Error",
+          description: "Failed to post job. Please try again.",
+          variant: "destructive",
+        });
+      },
     });
-  };
-
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   const handleViewApplications = (job: Job) => {
     setSelectedJob(job);
-    setShowApplicationsView(true);
+    setIsApplicationsViewOpen(true);
   };
+
+  // Dashboard metrics calculations
+  const { data: allApplications = [] } = useApplications();
+  const totalApplications = allApplications.length;
+  const shortlistedCount = allApplications.filter(app => app.status === 'shortlisted').length;
+  const hiredCount = allApplications.filter(app => app.status === 'hired').length;
+  const hireRate = totalApplications > 0 ? Math.round((hiredCount / totalApplications) * 100) : 0;
 
   return (
     <div className="space-y-6">
-      {/* Header with Add Job Button */}
-      <div className="flex items-center justify-between">
+      {/* Header with Webhook Settings */}
+      <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Company Dashboard</h2>
-          <p className="text-gray-600 mt-1">Manage your job postings and track hiring metrics</p>
+          <h2 className="text-2xl font-bold text-blue-900">Company Dashboard</h2>
+          <p className="text-gray-600 mt-1">Manage your job postings and applications</p>
         </div>
-        <Button 
-          onClick={() => setShowAddForm(!showAddForm)}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Post New Job
-        </Button>
+        
+        <div className="flex gap-3">
+          <WebhookSettings />
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                <Plus className="h-4 w-4 mr-2" />
+                Post New Job
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="text-xl text-blue-900">Post a New Job</DialogTitle>
+                <DialogDescription>
+                  Fill in the details below to post a new job opening.
+                </DialogDescription>
+              </DialogHeader>
+              
+              <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="title" className="text-sm font-medium text-gray-700">Job Title *</Label>
+                    <Input
+                      id="title"
+                      name="title"
+                      value={jobData.title}
+                      onChange={handleInputChange}
+                      placeholder="Enter job title"
+                      className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="company" className="text-sm font-medium text-gray-700">Company Name *</Label>
+                    <Input
+                      id="company"
+                      name="company"
+                      value={jobData.company}
+                      onChange={handleInputChange}
+                      placeholder="Enter company name"
+                      className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="department" className="text-sm font-medium text-gray-700">Department *</Label>
+                    <Input
+                      id="department"
+                      name="department"
+                      value={jobData.department}
+                      onChange={handleInputChange}
+                      placeholder="Enter department"
+                      className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="location" className="text-sm font-medium text-gray-700">Location *</Label>
+                    <Input
+                      id="location"
+                      name="location"
+                      value={jobData.location}
+                      onChange={handleInputChange}
+                      placeholder="Enter location"
+                      className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="employment_type" className="text-sm font-medium text-gray-700">Employment Type *</Label>
+                    <Select onValueChange={handleSelectChange}>
+                      <SelectTrigger className="border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+                        <SelectValue placeholder="Select employment type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="full-time">Full-time</SelectItem>
+                        <SelectItem value="part-time">Part-time</SelectItem>
+                        <SelectItem value="contract">Contract</SelectItem>
+                        <SelectItem value="temporary">Temporary</SelectItem>
+                        <SelectItem value="internship">Internship</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="salary" className="text-sm font-medium text-gray-700">Salary (Optional)</Label>
+                    <Input
+                      id="salary"
+                      name="salary"
+                      value={jobData.salary}
+                      onChange={handleInputChange}
+                      placeholder="Enter salary"
+                      className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="description" className="text-sm font-medium text-gray-700">Job Description *</Label>
+                  <Textarea
+                    id="description"
+                    name="description"
+                    value={jobData.description}
+                    onChange={handleInputChange}
+                    placeholder="Enter job description"
+                    className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 resize-none"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="requirements" className="text-sm font-medium text-gray-700">Requirements (Optional)</Label>
+                  <Textarea
+                    id="requirements"
+                    name="requirements"
+                    value={jobData.requirements}
+                    onChange={handleInputChange}
+                    placeholder="Enter requirements"
+                    className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 resize-none"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="benefits" className="text-sm font-medium text-gray-700">Benefits (Optional)</Label>
+                  <Textarea
+                    id="benefits"
+                    name="benefits"
+                    value={jobData.benefits}
+                    onChange={handleInputChange}
+                    placeholder="Enter benefits"
+                    className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 resize-none"
+                  />
+                </div>
+                
+                <div className="flex justify-end space-x-2">
+                  <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button type="submit" disabled={createJobMutation.isPending} className="bg-blue-600 hover:bg-blue-700 text-white">
+                    {createJobMutation.isPending ? 'Posting...' : 'Post Job'}
+                  </Button>
+                </div>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       {/* Dashboard Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="border-l-4 border-l-blue-500">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <Card className="bg-blue-50 border-blue-100">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Active Jobs</CardTitle>
-            <Briefcase className="h-4 w-4 text-blue-500" />
+            <CardTitle className="text-sm font-medium">Total Applications</CardTitle>
+            <Users className="h-4 w-4 text-gray-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-900">{jobs.length}</div>
-            <p className="text-xs text-green-600 mt-1">+2 from last month</p>
+            <div className="text-2xl font-bold">{totalApplications}</div>
+            <p className="text-sm text-gray-500">+20% from last month</p>
           </CardContent>
         </Card>
-
-        <Card className="border-l-4 border-l-green-500">
+        
+        <Card className="bg-green-50 border-green-100">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Total Applications</CardTitle>
-            <Users className="h-4 w-4 text-green-500" />
+            <CardTitle className="text-sm font-medium">Shortlisted</CardTitle>
+            <UserCheck className="h-4 w-4 text-gray-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-900">{totalApplications}</div>
-            <p className="text-xs text-green-600 mt-1">+12% from last week</p>
+            <div className="text-2xl font-bold">{shortlistedCount}</div>
+            <p className="text-sm text-gray-500">+10% from last month</p>
           </CardContent>
         </Card>
-
-        <Card className="border-l-4 border-l-purple-500">
+        
+        <Card className="bg-purple-50 border-purple-100">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Shortlisted</CardTitle>
-            <UserPlus className="h-4 w-4 text-purple-500" />
+            <CardTitle className="text-sm font-medium">Hired</CardTitle>
+            <Building className="h-4 w-4 text-gray-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-purple-900">{shortlistedCandidates}</div>
-            <p className="text-xs text-gray-500 mt-1">{applications.filter(app => app.status === 'pending').length} pending review</p>
+            <div className="text-2xl font-bold">{hiredCount}</div>
+            <p className="text-sm text-gray-500">+5% from last month</p>
           </CardContent>
         </Card>
-
-        <Card className="border-l-4 border-l-orange-500">
+        
+        <Card className="bg-yellow-50 border-yellow-100">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Hire Rate</CardTitle>
-            <TrendingUp className="h-4 w-4 text-orange-500" />
+            <CardTitle className="text-sm font-medium">Hire Rate</CardTitle>
+            <TrendingUp className="h-4 w-4 text-gray-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-orange-900">{hireRate}%</div>
-            <p className="text-xs text-green-600 mt-1">+5% from last quarter</p>
+            <div className="text-2xl font-bold">{hireRate}%</div>
+            <p className="text-sm text-gray-500">Steady growth</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Add Job Form */}
-      {showAddForm && (
-        <Card className="border-l-4 border-l-blue-600 shadow-lg">
-          <CardHeader>
-            <CardTitle className="text-blue-900">Post New Job</CardTitle>
-            <CardDescription>Fill in the details to create a new job listing</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="title" className="text-sm font-medium text-gray-700">Job Title *</Label>
-                  <Input
-                    id="title"
-                    value={formData.title}
-                    onChange={(e) => handleInputChange('title', e.target.value)}
-                    placeholder="e.g. Senior Frontend Developer"
-                    className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="company" className="text-sm font-medium text-gray-700">Company Name *</Label>
-                  <Input
-                    id="company"
-                    value={formData.company}
-                    onChange={(e) => handleInputChange('company', e.target.value)}
-                    placeholder="e.g. TechCorp Inc."
-                    className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="department" className="text-sm font-medium text-gray-700">Department *</Label>
-                  <Input
-                    id="department"
-                    value={formData.department}
-                    onChange={(e) => handleInputChange('department', e.target.value)}
-                    placeholder="e.g. Engineering"
-                    className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="location" className="text-sm font-medium text-gray-700">Location *</Label>
-                  <Input
-                    id="location"
-                    value={formData.location}
-                    onChange={(e) => handleInputChange('location', e.target.value)}
-                    placeholder="e.g. San Francisco, CA"
-                    className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="employment_type" className="text-sm font-medium text-gray-700">Employment Type *</Label>
-                  <Select value={formData.employment_type} onValueChange={(value) => handleInputChange('employment_type', value)}>
-                    <SelectTrigger className="border-gray-300 focus:border-blue-500 focus:ring-blue-500">
-                      <SelectValue placeholder="Select employment type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Full-time">Full-time</SelectItem>
-                      <SelectItem value="Part-time">Part-time</SelectItem>
-                      <SelectItem value="Contract">Contract</SelectItem>
-                      <SelectItem value="Internship">Internship</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="salary" className="text-sm font-medium text-gray-700">Salary Range</Label>
-                  <Input
-                    id="salary"
-                    value={formData.salary}
-                    onChange={(e) => handleInputChange('salary', e.target.value)}
-                    placeholder="e.g. $80,000 - $120,000"
-                    className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                  />
-                </div>
+      {/* Job Listings */}
+      <div className="space-y-4">
+        <h3 className="text-xl font-semibold text-gray-900">Current Job Postings</h3>
+        {jobs.length === 0 ? (
+          <Card className="text-center py-8">
+            <CardContent>
+              <div className="text-gray-500">
+                <FileText className="h-12 w-12 mx-auto mb-4" />
+                <h3 className="text-lg font-medium mb-2">No Jobs Posted</h3>
+                <p>Post a new job to start receiving applications!</p>
               </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="description" className="text-sm font-medium text-gray-700">Job Description *</Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => handleInputChange('description', e.target.value)}
-                  placeholder="Describe the role, responsibilities, and what you're looking for..."
-                  rows={4}
-                  className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="requirements" className="text-sm font-medium text-gray-700">Requirements</Label>
-                <Textarea
-                  id="requirements"
-                  value={formData.requirements}
-                  onChange={(e) => handleInputChange('requirements', e.target.value)}
-                  placeholder="List the required skills, experience, and qualifications..."
-                  rows={3}
-                  className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="benefits" className="text-sm font-medium text-gray-700">Benefits</Label>
-                <Textarea
-                  id="benefits"
-                  value={formData.benefits}
-                  onChange={(e) => handleInputChange('benefits', e.target.value)}
-                  placeholder="Describe the benefits and perks offered..."
-                  rows={3}
-                  className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                />
-              </div>
-              
-              <div className="flex justify-end space-x-3 pt-4">
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={() => setShowAddForm(false)}
-                  className="px-6 py-2"
-                >
-                  Cancel
-                </Button>
-                <Button 
-                  type="submit"
-                  disabled={createJobMutation.isPending}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2"
-                >
-                  {createJobMutation.isPending ? 'Posting...' : 'Post Job'}
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Job Listings & Applications Section */}
-      <div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Job Listings & Applications</h3>
-        <div className="grid gap-6">
-          {jobs.map((job) => {
-            const jobApplications = applicationsByJob[job.id] || { total: 0, pending: 0, shortlisted: 0, hired: 0 };
-            
-            return (
-              <Card key={job.id} className="hover:shadow-lg transition-shadow duration-200 border-l-4 border-l-blue-500">
-                <CardHeader className="pb-4">
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between mb-2">
-                        <CardTitle className="text-xl text-blue-900">{job.title}</CardTitle>
-                        <div className="flex items-center space-x-2">
-                          <Badge variant="outline" className="text-blue-600 border-blue-600">
-                            {jobApplications.total} Applications
-                          </Badge>
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            className="text-blue-600 border-blue-600 hover:bg-blue-50"
-                            onClick={() => handleViewApplications(job)}
-                          >
-                            <Eye className="h-4 w-4 mr-1" />
-                            View
-                          </Button>
-                        </div>
-                      </div>
-                      <CardDescription className="text-lg font-medium text-gray-700">{job.company}</CardDescription>
-                    </div>
-                  </div>
-                  
-                  <div className="flex flex-wrap gap-4 mt-3">
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Building className="h-4 w-4 mr-1" />
-                      {job.department}
-                    </div>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <MapPin className="h-4 w-4 mr-1" />
-                      {job.location}
-                    </div>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Clock className="h-4 w-4 mr-1" />
-                      {job.employment_type}
-                    </div>
-                    {job.salary && (
-                      <div className="flex items-center text-sm text-gray-600">
-                        <DollarSign className="h-4 w-4 mr-1" />
-                        {job.salary}
-                      </div>
-                    )}
-                    <div className="flex items-center text-sm text-gray-500">
-                      <Calendar className="h-4 w-4 mr-1" />
-                      {new Date(job.created_at).toLocaleDateString()}
-                    </div>
-                  </div>
-
-                  {/* Application Stats */}
-                  {jobApplications.total > 0 && (
-                    <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-                      <h4 className="text-sm font-medium text-gray-900 mb-3">Recent Applications</h4>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                        <div className="text-center">
-                          <div className="text-lg font-semibold text-blue-600">{jobApplications.total}</div>
-                          <div className="text-gray-600">Total</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-lg font-semibold text-orange-600">{jobApplications.pending}</div>
-                          <div className="text-gray-600">Pending</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-lg font-semibold text-purple-600">{jobApplications.shortlisted}</div>
-                          <div className="text-gray-600">Shortlisted</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-lg font-semibold text-green-600">{jobApplications.hired}</div>
-                          <div className="text-gray-600">Hired</div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {jobs.map((job) => (
+              <Card key={job.id} className="hover:shadow-md transition-shadow duration-200">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">{job.title}</CardTitle>
+                  <Eye className="h-4 w-4 text-gray-500 cursor-pointer" onClick={() => handleViewApplications(job)} />
                 </CardHeader>
-                
                 <CardContent>
-                  <p className="text-gray-700 mb-4">{job.description}</p>
-                  {job.requirements && (
-                    <div className="mb-4">
-                      <h4 className="font-medium text-gray-900 mb-2">Requirements:</h4>
-                      <p className="text-gray-700 text-sm">{job.requirements}</p>
-                    </div>
-                  )}
-                  {job.benefits && (
-                    <div>
-                      <h4 className="font-medium text-gray-900 mb-2">Benefits:</h4>
-                      <p className="text-gray-700 text-sm">{job.benefits}</p>
-                    </div>
-                  )}
+                  <div className="text-2xl font-bold">{job.company}</div>
+                  <p className="text-sm text-gray-500">{job.location}</p>
                 </CardContent>
               </Card>
-            );
-          })}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Applications View Modal */}
+      {/* Job Applications View */}
       <JobApplicationsView 
         job={selectedJob}
-        isOpen={showApplicationsView}
-        onClose={() => setShowApplicationsView(false)}
+        isOpen={isApplicationsViewOpen}
+        onClose={() => {
+          setIsApplicationsViewOpen(false);
+          setSelectedJob(null);
+        }}
       />
     </div>
   );

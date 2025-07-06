@@ -2,6 +2,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { sendApplicationToWebhook } from '../services/webhookService';
 
 export interface Application {
   id: string;
@@ -40,11 +41,18 @@ export const useCreateApplication = () => {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async (applicationData: Omit<Application, 'id' | 'created_at'>) => {
+    mutationFn: async (applicationData: Omit<Application, 'id' | 'created_at'> & { job_title?: string; company?: string }) => {
       console.log('Creating application:', applicationData);
       const { data, error } = await supabase
         .from('applications')
-        .insert([applicationData])
+        .insert([{
+          job_id: applicationData.job_id,
+          full_name: applicationData.full_name,
+          email: applicationData.email,
+          phone: applicationData.phone,
+          resume_url: applicationData.resume_url,
+          status: applicationData.status
+        }])
         .select()
         .single();
 
@@ -54,6 +62,23 @@ export const useCreateApplication = () => {
       }
 
       console.log('Application created successfully:', data);
+
+      // Send to webhook after successful database insert
+      try {
+        await sendApplicationToWebhook({
+          full_name: applicationData.full_name,
+          email: applicationData.email,
+          phone: applicationData.phone,
+          resume_url: applicationData.resume_url,
+          job_title: applicationData.job_title || 'Unknown Position',
+          company: applicationData.company || 'Unknown Company',
+          applied_at: data.created_at,
+        });
+      } catch (webhookError) {
+        console.warn('Failed to send to webhook, but application was saved:', webhookError);
+        // Don't throw here - we don't want to fail the application creation if webhook fails
+      }
+
       return data as Application;
     },
     onSuccess: () => {
