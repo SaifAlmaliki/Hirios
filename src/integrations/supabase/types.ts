@@ -95,6 +95,45 @@ export type Database = {
         }
         Relationships: []
       }
+      screening_results: {
+        Row: {
+          created_at: string
+          email: string
+          fit_score: number | null
+          id: string
+          job_role: string
+          name: string
+          phone_number: string
+          resume: string
+          screening_result: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          fit_score?: number | null
+          id?: string
+          job_role: string
+          name: string
+          phone_number: string
+          resume: string
+          screening_result?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          fit_score?: number | null
+          id?: string
+          job_role?: string
+          name?: string
+          phone_number?: string
+          resume?: string
+          screening_result?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
