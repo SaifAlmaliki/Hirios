@@ -65,6 +65,9 @@ export type Database = {
           stripe_customer_id: string | null
           subscription_end_date: string | null
           subscription_status: string
+          subscription_plan: string
+          jobs_posted_this_month: number
+          last_job_count_reset: string | null
           updated_at: string
           user_id: string | null
         }
@@ -82,6 +85,9 @@ export type Database = {
           stripe_customer_id?: string | null
           subscription_end_date?: string | null
           subscription_status?: string
+          subscription_plan?: string
+          jobs_posted_this_month?: number
+          last_job_count_reset?: string | null
           updated_at?: string
           user_id?: string | null
         }
@@ -99,6 +105,9 @@ export type Database = {
           stripe_customer_id?: string | null
           subscription_end_date?: string | null
           subscription_status?: string
+          subscription_plan?: string
+          jobs_posted_this_month?: number
+          last_job_count_reset?: string | null
           updated_at?: string
           user_id?: string | null
         }

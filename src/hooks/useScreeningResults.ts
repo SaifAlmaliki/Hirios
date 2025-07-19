@@ -2,6 +2,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { StripeService } from '@/services/stripeService';
 
 export interface ScreeningResult {
   id: string;
@@ -17,9 +19,22 @@ export interface ScreeningResult {
 }
 
 export const useScreeningResults = () => {
+  const { user } = useAuth();
+  const stripeService = StripeService.getInstance();
+
   return useQuery({
-    queryKey: ['screening_results'],
+    queryKey: ['screening_results', user?.id],
     queryFn: async () => {
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
+
+      // Check if user has AI access (premium subscription)
+      const hasAccess = await stripeService.hasAIAccess(user.id);
+      if (!hasAccess) {
+        throw new Error('AI screening is only available for Premium subscribers. Please upgrade your plan to access this feature.');
+      }
+
       console.log('Fetching screening results from database...');
       const { data, error } = await supabase
         .from('screening_results')
@@ -34,15 +49,28 @@ export const useScreeningResults = () => {
       console.log('Screening results fetched successfully:', data);
       return data as ScreeningResult[];
     },
+    enabled: !!user,
   });
 };
 
 export const useCreateScreeningResult = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { user } = useAuth();
+  const stripeService = StripeService.getInstance();
 
   return useMutation({
     mutationFn: async (screeningData: Omit<ScreeningResult, 'id' | 'created_at' | 'updated_at'>) => {
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
+
+      // Check if user has AI access (premium subscription)
+      const hasAccess = await stripeService.hasAIAccess(user.id);
+      if (!hasAccess) {
+        throw new Error('AI screening is only available for Premium subscribers. Please upgrade your plan to access this feature.');
+      }
+
       console.log('Creating screening result:', screeningData);
       const { data, error } = await supabase
         .from('screening_results')
