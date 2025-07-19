@@ -7,13 +7,16 @@ import { StripeService } from '@/services/stripeService';
 
 export interface ScreeningResult {
   id: string;
-  name: string;
+  first_name: string;
+  last_name: string;
   email: string;
-  phone_number: string;
-  job_role: string;
-  resume: string;
-  fit_score?: number;
-  screening_result?: string;
+  strengths?: string;
+  weaknesses?: string;
+  risk_factor?: string;
+  reward_factor?: string;
+  overall_fit?: number;
+  justification?: string;
+  date: string;
   created_at: string;
   updated_at: string;
 }

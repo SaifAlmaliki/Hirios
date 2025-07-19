@@ -195,39 +195,48 @@ export type Database = {
       }
       screening_results: {
         Row: {
-          created_at: string
-          email: string
-          fit_score: number | null
           id: string
-          job_role: string
-          name: string
-          phone_number: string
-          resume: string
-          screening_result: string | null
+          first_name: string
+          last_name: string
+          email: string
+          strengths: string | null
+          weaknesses: string | null
+          risk_factor: string | null
+          reward_factor: string | null
+          overall_fit: number | null
+          justification: string | null
+          date: string
+          created_at: string
           updated_at: string
         }
         Insert: {
-          created_at?: string
-          email: string
-          fit_score?: number | null
           id?: string
-          job_role: string
-          name: string
-          phone_number: string
-          resume: string
-          screening_result?: string | null
+          first_name: string
+          last_name: string
+          email: string
+          strengths?: string | null
+          weaknesses?: string | null
+          risk_factor?: string | null
+          reward_factor?: string | null
+          overall_fit?: number | null
+          justification?: string | null
+          date?: string
+          created_at?: string
           updated_at?: string
         }
         Update: {
-          created_at?: string
-          email?: string
-          fit_score?: number | null
           id?: string
-          job_role?: string
-          name?: string
-          phone_number?: string
-          resume?: string
-          screening_result?: string | null
+          first_name?: string
+          last_name?: string
+          email?: string
+          strengths?: string | null
+          weaknesses?: string | null
+          risk_factor?: string | null
+          reward_factor?: string | null
+          overall_fit?: number | null
+          justification?: string | null
+          date?: string
+          created_at?: string
           updated_at?: string
         }
         Relationships: []

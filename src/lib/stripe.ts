@@ -9,7 +9,7 @@ if (!stripePublishableKey) {
 export const stripePromise = loadStripe(stripePublishableKey);
 
 export const STRIPE_PRICE_IDS = {
-  PREMIUM_MONTHLY: 'prod_Si1yZqWJ02Whni',
+  PREMIUM_MONTHLY: 'price_1Rmbu84bAoALXJ2qSvvYprSG',
 } as const;
 
 export const SUBSCRIPTION_PLANS = {
