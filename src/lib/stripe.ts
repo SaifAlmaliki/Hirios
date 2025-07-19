@@ -9,7 +9,7 @@ if (!stripePublishableKey) {
 export const stripePromise = loadStripe(stripePublishableKey);
 
 export const STRIPE_PRICE_IDS = {
-  PREMIUM_MONTHLY: 'price_premium_monthly', // You'll need to create this in Stripe Dashboard
+  PREMIUM_MONTHLY: 'prod_Si1yZqWJ02Whni',
 } as const;
 
 export const SUBSCRIPTION_PLANS = {
@@ -29,7 +29,7 @@ export const SUBSCRIPTION_PLANS = {
   },
   PREMIUM: {
     name: 'Premium',
-    price: 25,
+    price: 24.99,
     jobPostingLimit: null, // unlimited
     features: [
       'Everything in Free',
