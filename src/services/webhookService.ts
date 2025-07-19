@@ -22,7 +22,14 @@ interface ApplicationWebhookData {
   };
 }
 
-const HARDCODED_WEBHOOK_URL = 'https://n8n.cognitechx.com/webhook-test/easyhire';
+const WEBHOOK_URL = import.meta.env.VITE_WEBHOOK_URL;
+
+// Validate environment variable
+if (!WEBHOOK_URL) {
+  throw new Error(
+    'Missing webhook URL environment variable. Please check your .env.local file and ensure VITE_WEBHOOK_URL is set.'
+  );
+}
 
 const fileToBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -42,9 +49,9 @@ export const sendApplicationToWebhook = async (
   applicationData: ApplicationWebhookData
 ) => {
   try {
-    console.log('Sending application data to webhook:', HARDCODED_WEBHOOK_URL);
+    console.log('Sending application data to webhook:', WEBHOOK_URL);
     
-    const response = await fetch(HARDCODED_WEBHOOK_URL, {
+    const response = await fetch(WEBHOOK_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
