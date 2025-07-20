@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
+import HiriosLanding from "./pages/HiriosLanding";
 import JobPortal from "./pages/JobPortal";
 import Auth from "./pages/Auth";
 import CompanySetup from "./pages/CompanySetup";
@@ -22,7 +23,8 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Index />} />
+            <Route path="/" element={<HiriosLanding />} />
+            <Route path="/job-portal-old" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/job-portal" element={<JobPortal />} />
             <Route path="/company-setup" element={<CompanySetup />} />
