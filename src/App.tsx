@@ -11,6 +11,7 @@ import JobPortal from "./pages/JobPortal";
 import Auth from "./pages/Auth";
 import CompanySetup from "./pages/CompanySetup";
 import Subscription from "./pages/Subscription";
+import ScreeningResults from "./pages/ScreeningResults";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,6 +30,7 @@ const App = () => (
             <Route path="/job-portal" element={<JobPortal />} />
             <Route path="/company-setup" element={<CompanySetup />} />
             <Route path="/subscription" element={<Subscription />} />
+            <Route path="/screening-results" element={<ScreeningResults />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
