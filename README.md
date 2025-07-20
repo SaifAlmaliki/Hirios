@@ -1,8 +1,8 @@
-# EasyHire - Job Portal Application
+# Hirios - Job Portal Application
 
 ## Overview
 
-EasyHire is a comprehensive job portal application that connects job seekers with companies. It provides a dual-interface platform where companies can post jobs and manage applications, while job seekers can browse opportunities and apply for positions. The application features modern UI components, real-time data management, and integrated file handling for resume uploads.
+Hirios is a comprehensive job portal application that connects job seekers with companies. It provides a dual-interface platform where companies can post jobs and manage applications, while job seekers can browse opportunities and apply for positions. The application features modern UI components, real-time data management, and integrated file handling for resume uploads.
 
 ## 🚀 Features
 
@@ -162,10 +162,10 @@ VITE_SUPABASE_URL=https://bwuomwyodoyyrqgdlwrp.supabase.co
 VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 # Webhook Configuration  
-VITE_WEBHOOK_URL=https://n8n.cognitechx.com/webhook-test/easyhire
+VITE_WEBHOOK_URL=https://n8n.cognitechx.com/webhook-test/Hirios
 
 # Application Configuration
-VITE_APP_NAME=EasyHire
+VITE_APP_NAME=Hirios
 VITE_APP_DESCRIPTION=Job Portal Application
 ```
 
@@ -192,7 +192,7 @@ VITE_APP_DESCRIPTION=Job Portal Application
 ## 🗂️ Project Structure
 
 ```
-EasyHire/
+Hirios/
 ├── src/
 │   ├── components/           # React components
 │   │   ├── ui/              # shadcn/ui components
@@ -260,7 +260,7 @@ EasyHire/
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd EasyHire
+   cd Hirios
    ```
 
 2. **Install dependencies**
@@ -347,7 +347,7 @@ This project is part of the Lovable platform ecosystem.
 
 ### Webhook Service
 - **Purpose**: Send application data to external processing systems
-- **URL**: `https://n8n.cognitechx.com/webhook-test/easyhire`
+- **URL**: `https://n8n.cognitechx.com/webhook-test/Hirios`
 - **Data**: Application details with base64-encoded resume
 
 ### Supabase Services Used

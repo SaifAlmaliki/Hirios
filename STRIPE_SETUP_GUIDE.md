@@ -1,6 +1,6 @@
-# Stripe Integration Setup Guide for EasyHire
+# Stripe Integration Setup Guide for Hirios
 
-This guide will help you complete the Stripe integration setup for your EasyHire application.
+This guide will help you complete the Stripe integration setup for your Hirios application.
 
 ## 🔧 Required Stripe Configuration
 
@@ -10,7 +10,7 @@ In your Stripe Dashboard, you need to create:
 
 1. **Navigate to Products** in your Stripe Dashboard
 2. **Create a new product**:
-   - Name: `EasyHire Premium`
+   - Name: `Hirios Premium`
    - Description: `Premium subscription for unlimited job postings and AI screening`
 
 3. **Add a price**:
