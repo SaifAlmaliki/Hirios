@@ -60,21 +60,24 @@ export const useScreeningResults = () => {
       }
 
       console.log('Fetching screening results from database...');
+      console.log('Company profile ID:', profile.id);
       
-      // Fetch screening results with job information
+      // Fetch screening results with job information for this company
       const { data, error } = await supabase
         .from('screening_results')
         .select(`
           *,
-          job:jobs!screening_results_job_id_fkey (
+          job:jobs (
             id,
             title,
             company,
-            department
+            department,
+            company_profile_id
           )
         `)
-        .eq('jobs.company_profile_id', profile.id)
         .order('created_at', { ascending: false });
+      
+      console.log('Screening results for company:', data);
       
       if (error) {
         console.error('Error fetching screening results:', error);
@@ -117,17 +120,12 @@ export const useScreeningResultsStats = () => {
         return null;
       }
 
-      // Fetch screening results for stats
+      // Fetch screening results for stats - now filtered by company via RLS
       const { data, error } = await supabase
         .from('screening_results')
-        .select(`
-          overall_fit,
-          created_at,
-          jobs!screening_results_job_id_fkey (
-            company_profile_id
-          )
-        `)
-        .eq('jobs.company_profile_id', profile.id);
+        .select('overall_fit, created_at');
+      
+      console.log('Stats data for company:', data);
       
       if (error) {
         console.error('Error fetching screening stats:', error);

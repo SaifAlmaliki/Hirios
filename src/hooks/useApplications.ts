@@ -90,6 +90,7 @@ export const useCreateApplication = () => {
           phone: applicationData.phone,
           resume_base64,
           resume_filename,
+          job_id: applicationData.job_id,  // Added job_id as top-level field
           job_title: applicationData.job_title || 'Unknown Position',
           company: applicationData.company || 'Unknown Company',
           applied_at: data.created_at,

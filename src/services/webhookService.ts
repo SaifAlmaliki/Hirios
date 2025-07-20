@@ -5,6 +5,7 @@ interface ApplicationWebhookData {
   phone: string;
   resume_base64?: string;
   resume_filename?: string;
+  job_id: string;  // Added job_id as top-level field for easier access
   job_title: string;
   company: string;
   applied_at: string;
