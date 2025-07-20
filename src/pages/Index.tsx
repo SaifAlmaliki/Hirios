@@ -299,7 +299,7 @@ const Index = () => {
             </div>
             
             <div className="border-t border-gray-800 mt-6 pt-6 text-center text-sm text-gray-400">
-              © 2024 JobPortal Pro. All rights reserved.
+              © 2025 JobPortal Pro. All rights reserved.
             </div>
           </div>
         </footer>
