@@ -24,13 +24,16 @@ import {
   Calendar,
   Briefcase,
   Mail,
-  User
+  User,
+  Mic,
+  MicOff
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useScreeningResults, useScreeningResultsStats, useAddNoteToScreeningResult, ScreeningResult } from '@/hooks/useScreeningResults';
 import { useHasAIAccess } from '@/hooks/useSubscription';
+import { VoiceAgentService, VoiceAgentData } from '@/services/voiceAgentService';
 
 const ScreeningResults = () => {
   const navigate = useNavigate();
@@ -54,6 +57,10 @@ const ScreeningResults = () => {
   const [noteDialogOpen, setNoteDialogOpen] = useState(false);
   const [selectedResult, setSelectedResult] = useState<ScreeningResult | null>(null);
   const [noteText, setNoteText] = useState('');
+  
+  // State for voice agent
+  const [activeVoiceAgent, setActiveVoiceAgent] = useState<string | null>(null);
+  const [voiceAgentService] = useState(() => VoiceAgentService.getInstance());
 
   // Redirect if not company user
   React.useEffect(() => {
@@ -105,6 +112,66 @@ const ScreeningResults = () => {
         setNoteText('');
       }
     });
+  };
+
+  const handleStartVoiceAgent = async (result: ScreeningResult) => {
+    try {
+      setActiveVoiceAgent(result.id);
+      
+      // Fetch job details
+      const jobDetails = await VoiceAgentService.fetchJobDetails(result.job_id || null);
+      
+      // Get resume summary
+      const resumeSummary = await VoiceAgentService.getApplicationResume(result.email);
+      
+      // Prepare data for voice agent
+      const voiceAgentData: VoiceAgentData = {
+        job_title: jobDetails.title,
+        full_name: `${result.first_name} ${result.last_name}`,
+        job_requirements: jobDetails.requirements,
+        job_description: `${jobDetails.description}\n\nKey Responsibilities:\n${jobDetails.responsibilities}`,
+        resume: resumeSummary
+      };
+
+      console.log('Starting voice agent with data:', voiceAgentData);
+      
+      await voiceAgentService.startConversation(voiceAgentData);
+      
+      toast({
+        title: "Voice Interview Started",
+        description: `AI voice agent is now interviewing ${result.first_name} ${result.last_name}`,
+      });
+    } catch (error) {
+      console.error('Failed to start voice agent:', error);
+      setActiveVoiceAgent(null);
+      
+      toast({
+        title: "Failed to Start Voice Interview",
+        description: error instanceof Error ? error.message : "Please ensure microphone access is granted and try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleEndVoiceAgent = async () => {
+    try {
+      await voiceAgentService.endConversation();
+      setActiveVoiceAgent(null);
+      
+      toast({
+        title: "Voice Interview Ended",
+        description: "The AI voice interview has been completed.",
+      });
+    } catch (error) {
+      console.error('Failed to end voice agent:', error);
+      setActiveVoiceAgent(null);
+      
+      toast({
+        title: "Error",
+        description: "There was an issue ending the voice interview.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleExportPDF = () => {
@@ -512,6 +579,31 @@ const ScreeningResults = () => {
                             <StickyNote className="h-4 w-4" />
                             {result.notes ? 'Edit Note' : 'Add Note'}
                           </Button>
+                          
+                          {/* Voice Agent Button */}
+                          {activeVoiceAgent === result.id ? (
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={handleEndVoiceAgent}
+                              className="flex items-center gap-1 animate-pulse"
+                            >
+                              <MicOff className="h-4 w-4" />
+                              End Interview
+                            </Button>
+                          ) : (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleStartVoiceAgent(result)}
+                              disabled={activeVoiceAgent !== null}
+                              className="flex items-center gap-1 border-blue-300 text-blue-600 hover:bg-blue-50"
+                            >
+                              <Mic className="h-4 w-4" />
+                              Voice Interview
+                            </Button>
+                          )}
+                          
                           <Button
                             variant="ghost"
                             size="sm"
