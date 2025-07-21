@@ -90,6 +90,7 @@ export const useCreateApplication = () => {
           phone: applicationData.phone,
           resume_base64,
           resume_filename,
+          job_id: applicationData.job_id,  // Added job_id as top-level field
           job_title: applicationData.job_title || 'Unknown Position',
           company: applicationData.company || 'Unknown Company',
           applied_at: data.created_at,
@@ -100,8 +101,8 @@ export const useCreateApplication = () => {
             department: applicationData.job_details?.department || 'Unknown Department',
             location: applicationData.job_details?.location || 'Unknown Location',
             employment_type: applicationData.job_details?.employment_type || 'Unknown',
-            salary: applicationData.job_details?.salary,
             description: applicationData.job_details?.description || 'No description available',
+            responsibilities: applicationData.job_details?.responsibilities || 'No responsibilities specified',
             requirements: applicationData.job_details?.requirements,
             benefits: applicationData.job_details?.benefits,
           }

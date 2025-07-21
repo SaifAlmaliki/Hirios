@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Building2, Users, LogOut, Settings } from 'lucide-react';
+import { Building2, Users, LogOut, Settings, Brain } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import CompanyView from '../components/CompanyView';
 import UserView from '../components/UserView';
@@ -35,6 +35,10 @@ const JobPortal = () => {
 
   const handleSubscription = () => {
     navigate('/subscription');
+  };
+
+  const handleScreeningResults = () => {
+    navigate('/screening-results');
   };
 
   if (isLoading) {
@@ -98,6 +102,10 @@ const JobPortal = () => {
                       </Button>
                       <Button variant="outline" size="sm" onClick={handleSubscription}>
                         Subscription
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={handleScreeningResults}>
+                        <Brain className="h-4 w-4 mr-1" />
+                        AI Screening
                       </Button>
                     </>
                   )}

@@ -125,7 +125,7 @@ export type Database = {
           id: string
           location: string
           requirements: string | null
-          salary: string | null
+          responsibilities: string
           title: string
           updated_at: string
         }
@@ -140,7 +140,7 @@ export type Database = {
           id?: string
           location: string
           requirements?: string | null
-          salary?: string | null
+          responsibilities: string
           title: string
           updated_at?: string
         }
@@ -155,7 +155,7 @@ export type Database = {
           id?: string
           location?: string
           requirements?: string | null
-          salary?: string | null
+          responsibilities?: string
           title?: string
           updated_at?: string
         }

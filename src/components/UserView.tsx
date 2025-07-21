@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { MapPin, Clock, DollarSign, Calendar, Upload, FileText, Building, ChevronDown, ChevronUp, Users, Briefcase } from 'lucide-react';
+import { MapPin, Clock, DollarSign, Calendar, Upload, FileText, Building, ChevronDown, ChevronUp, Users, Briefcase, CheckCircle } from 'lucide-react';
 import { Job } from '../hooks/useJobs';
 import { useCreateApplication } from '../hooks/useApplications';
 import { supabase } from '@/integrations/supabase/client';
@@ -263,10 +263,10 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
                         </div>
                       </div>
 
-                      {job.salary && (
-                        <div className="flex items-center text-sm font-bold text-green-700 bg-green-50 px-3 py-2 rounded-lg inline-flex w-fit">
-                          <DollarSign className="h-4 w-4 mr-2" />
-                          {job.salary}
+                      {job.responsibilities && (
+                        <div className="flex items-center text-sm font-semibold text-blue-700 bg-blue-50 px-3 py-2 rounded-lg inline-flex w-fit">
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                          Key Responsibilities
                         </div>
                       )}
                     </div>
@@ -282,6 +282,23 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
                         </p>
                       </div>
                     </div>
+
+                    {/* Responsibilities */}
+                    {job.responsibilities && (isExpanded || job.responsibilities.length < 150) && (
+                      <div>
+                        <h4 className="font-semibold text-gray-900 mb-2 text-base">Key Responsibilities</h4>
+                        <div className="bg-blue-50 p-3 rounded-lg">
+                          <div className="text-gray-700 space-y-1 text-sm">
+                            {job.responsibilities.split('\n').filter(resp => resp.trim()).map((resp, index) => (
+                              <div key={index} className="flex items-start">
+                                <span className="text-blue-600 mr-2 mt-1">•</span>
+                                <span>{resp.trim()}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
                     {/* Requirements */}
                     {job.requirements && (isExpanded || job.requirements.length < 150) && (
@@ -311,7 +328,7 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
                     )}
 
                     {/* Show More/Less Button */}
-                    {(job.description.length > 200 || (job.requirements && job.requirements.length > 150) || (job.benefits && job.benefits.length > 150)) && (
+                    {(job.description.length > 200 || (job.responsibilities && job.responsibilities.length > 150) || (job.requirements && job.requirements.length > 150) || (job.benefits && job.benefits.length > 150)) && (
                       <div className="flex justify-center pt-3 border-t border-gray-200">
                         <Button
                           variant="ghost"
