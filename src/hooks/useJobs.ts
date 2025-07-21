@@ -11,8 +11,8 @@ export interface Job {
   department: string;
   location: string;
   employment_type: string;
-  salary?: string;
   description: string;
+  responsibilities: string;
   requirements?: string;
   benefits?: string;
   created_at: string;

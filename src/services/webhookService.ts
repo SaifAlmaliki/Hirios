@@ -16,8 +16,8 @@ interface ApplicationWebhookData {
     department: string;
     location: string;
     employment_type: string;
-    salary?: string;
     description: string;
+    responsibilities: string;
     requirements?: string;
     benefits?: string;
   };
