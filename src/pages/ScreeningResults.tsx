@@ -576,16 +576,6 @@ const ScreeningResults = () => {
                         </div>
 
                         <div className="flex items-center gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleAddNote(result)}
-                            className="flex items-center gap-1"
-                          >
-                            <StickyNote className="h-4 w-4" />
-                            {result.notes ? 'Edit Note' : 'Add Note'}
-                          </Button>
-                          
                           {result.resume_url && (
                             <Button
                               variant="outline"
@@ -598,59 +588,26 @@ const ScreeningResults = () => {
                             </Button>
                           )}
                           
-                          {/* Outbound Call Button */}
-                          {result.call_status === 'initiated' || result.call_status === 'in_progress' ? (
-                            <Button
-                              variant="secondary"
-                              size="sm"
-                              disabled
-                              className="flex items-center gap-1"
-                            >
-                              <Mic className="h-4 w-4 animate-pulse" />
-                              {result.call_status === 'initiated' ? 'Call Initiated' : 'In Progress'}
-                            </Button>
-                          ) : result.call_status === 'completed' ? (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              disabled
-                              className="flex items-center gap-1 border-green-300 text-green-600"
-                            >
-                              <Mic className="h-4 w-4" />
-                              Call Completed
-                            </Button>
-                          ) : result.call_status === 'failed' ? (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleInitiateCall(result)}
-                              disabled={initiatingCall !== null}
-                              className="flex items-center gap-1 border-red-300 text-red-600 hover:bg-red-50"
-                            >
-                              <MicOff className="h-4 w-4" />
-                              Retry Call
-                            </Button>
-                          ) : (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleInitiateCall(result)}
-                              disabled={initiatingCall !== null}
-                              className="flex items-center gap-1 border-blue-300 text-blue-600 hover:bg-blue-50"
-                            >
-                              {initiatingCall === result.id ? (
-                                <>
-                                  <Mic className="h-4 w-4 animate-spin" />
-                                  Initiating...
-                                </>
-                              ) : (
-                                <>
-                                  <Mic className="h-4 w-4" />
-                                  Initiate Screening Call
-                                </>
-                              )}
-                            </Button>
-                          )}
+                          {/* Voice Agent Button */}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleInitiateCall(result)}
+                            disabled={initiatingCall !== null}
+                            className="flex items-center gap-1 border-blue-300 text-blue-600 hover:bg-blue-50"
+                          >
+                            {initiatingCall === result.id ? (
+                              <>
+                                <Mic className="h-4 w-4 animate-spin" />
+                                Starting...
+                              </>
+                            ) : (
+                              <>
+                                <Mic className="h-4 w-4" />
+                                Voice Agent
+                              </>
+                            )}
+                          </Button>
                           
                           <Button
                             variant="ghost"
