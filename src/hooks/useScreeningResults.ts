@@ -10,6 +10,7 @@ export interface ScreeningResult {
   first_name: string;
   last_name: string;
   email: string;
+  phone?: string;
   strengths?: string;
   weaknesses?: string;
   risk_factor?: string;
@@ -21,6 +22,11 @@ export interface ScreeningResult {
   updated_at: string;
   job_id?: string;
   notes?: string;
+  call_status?: 'not_initiated' | 'initiated' | 'in_progress' | 'completed' | 'failed';
+  call_initiated_at?: string;
+  call_completed_at?: string;
+  call_summary?: string;
+  call_error_message?: string;
   // Job details from join
   job?: {
     id: string;
@@ -288,6 +294,64 @@ export const useAddNoteToScreeningResult = () => {
       toast({
         title: "Error",
         description: "Failed to save note. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+};
+
+export const useUpdateCallStatus = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async ({ 
+      id, 
+      call_status, 
+      call_summary, 
+      call_error_message 
+    }: { 
+      id: string; 
+      call_status: 'initiated' | 'in_progress' | 'completed' | 'failed';
+      call_summary?: string;
+      call_error_message?: string;
+    }) => {
+      console.log('Updating call status:', id, call_status);
+      
+      const updateData: any = { call_status };
+      
+      if (call_status === 'initiated') {
+        updateData.call_initiated_at = new Date().toISOString();
+      } else if (call_status === 'completed') {
+        updateData.call_completed_at = new Date().toISOString();
+        if (call_summary) updateData.call_summary = call_summary;
+      } else if (call_status === 'failed' && call_error_message) {
+        updateData.call_error_message = call_error_message;
+      }
+
+      const { data, error } = await supabase
+        .from('screening_results')
+        .update(updateData)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error updating call status:', error);
+        throw error;
+      }
+
+      console.log('Call status updated successfully:', data);
+      return data as ScreeningResult;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['screening_results'] });
+    },
+    onError: (error) => {
+      console.error('Failed to update call status:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update call status. Please try again.",
         variant: "destructive",
       });
     },

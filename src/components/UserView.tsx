@@ -124,12 +124,12 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
       return;
     }
 
-    // Phone validation (basic)
-    const phoneRegex = /^[\d\s\-\+\(\)]+$/;
-    if (!phoneRegex.test(applicationData.phone)) {
+    // Phone validation (must include country code with + prefix)
+    const phoneRegex = /^\+[1-9]\d{1,14}$/;
+    if (!phoneRegex.test(applicationData.phone.replace(/[\s\-\(\)]/g, ''))) {
       toast({
-        title: "Invalid phone number",
-        description: "Please enter a valid phone number.",
+        title: "Invalid phone number format",
+        description: "Please enter a valid phone number with country code (e.g., +49151234567).",
         variant: "destructive",
       });
       return;
@@ -401,10 +401,13 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
                               id="phone"
                               value={applicationData.phone}
                               onChange={(e) => setApplicationData(prev => ({ ...prev, phone: e.target.value }))}
-                              placeholder="Enter your phone number"
+                              placeholder="Enter your phone number with country code (e.g., +49151234567)"
                               className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                               disabled={isUploading}
                             />
+                            <p className="text-xs text-gray-500">
+                              Please include country code (e.g., +49 for Germany, +1 for US/Canada)
+                            </p>
                           </div>
                           
                           <div className="space-y-2">

@@ -24,13 +24,17 @@ import {
   Calendar,
   Briefcase,
   Mail,
-  User
+  User,
+  Mic,
+  MicOff
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useScreeningResults, useScreeningResultsStats, useAddNoteToScreeningResult, ScreeningResult } from '@/hooks/useScreeningResults';
 import { useHasAIAccess } from '@/hooks/useSubscription';
+import { VoiceAgentService, VoiceAgentData } from '@/services/voiceAgentService';
+import { OutboundCallService } from '@/services/outboundCallService';
 
 const ScreeningResults = () => {
   const navigate = useNavigate();
@@ -54,6 +58,10 @@ const ScreeningResults = () => {
   const [noteDialogOpen, setNoteDialogOpen] = useState(false);
   const [selectedResult, setSelectedResult] = useState<ScreeningResult | null>(null);
   const [noteText, setNoteText] = useState('');
+  
+  // State for outbound calls
+  const [initiatingCall, setInitiatingCall] = useState<string | null>(null);
+  const [voiceAgentService] = useState(() => VoiceAgentService.getInstance());
 
   // Redirect if not company user
   React.useEffect(() => {
@@ -105,6 +113,63 @@ const ScreeningResults = () => {
         setNoteText('');
       }
     });
+  };
+
+  const handleInitiateCall = async (result: ScreeningResult) => {
+    try {
+      setInitiatingCall(result.id);
+      
+      // Check if candidate has phone number
+      if (!result.phone) {
+        toast({
+          title: "Phone Number Required",
+          description: "This candidate doesn't have a phone number on file. Please add one to initiate the call.",
+          variant: "destructive",
+        });
+        setInitiatingCall(null);
+        return;
+      }
+      
+      // Fetch job details
+      const jobDetails = await OutboundCallService.fetchJobDetails(result.job_id || null);
+      
+      // Get resume summary
+      const resumeSummary = await OutboundCallService.getApplicationResume(result.email);
+      
+      // Prepare data for outbound call
+      const callData: VoiceAgentData = {
+        job_title: jobDetails.title,
+        full_name: `${result.first_name} ${result.last_name}`,
+        job_requirements: jobDetails.requirements,
+        job_description: `${jobDetails.description}\n\nKey Responsibilities:\n${jobDetails.responsibilities}`,
+        resume: resumeSummary,
+        candidate_phone: result.phone,
+        screening_result_id: result.id
+      };
+
+      console.log('Initiating outbound call with data:', callData);
+      
+      const callResult = await voiceAgentService.initiateOutboundCall(callData);
+      
+      if (callResult.success) {
+        toast({
+          title: "Call Initiated",
+          description: `AI agent is now calling ${result.first_name} ${result.last_name} at ${result.phone}`,
+        });
+      } else {
+        throw new Error(callResult.error || 'Failed to initiate call');
+      }
+    } catch (error) {
+      console.error('Failed to initiate call:', error);
+      
+      toast({
+        title: "Failed to Initiate Call",
+        description: error instanceof Error ? error.message : "Unable to initiate the outbound call. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setInitiatingCall(null);
+    }
   };
 
   const handleExportPDF = () => {
@@ -486,7 +551,7 @@ const ScreeningResults = () => {
                             </Badge>
                           </div>
                           
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm text-gray-600">
                             <div className="flex items-center">
                               <Mail className="h-4 w-4 mr-2" />
                               {result.email}
@@ -499,6 +564,12 @@ const ScreeningResults = () => {
                               <Calendar className="h-4 w-4 mr-2" />
                               {new Date(result.created_at).toLocaleDateString()}
                             </div>
+                            {result.phone && (
+                              <div className="flex items-center">
+                                <Mic className="h-4 w-4 mr-2" />
+                                {result.phone}
+                              </div>
+                            )}
                           </div>
                         </div>
 
@@ -512,6 +583,61 @@ const ScreeningResults = () => {
                             <StickyNote className="h-4 w-4" />
                             {result.notes ? 'Edit Note' : 'Add Note'}
                           </Button>
+                          
+                          {/* Outbound Call Button */}
+                          {result.call_status === 'initiated' || result.call_status === 'in_progress' ? (
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              disabled
+                              className="flex items-center gap-1"
+                            >
+                              <Mic className="h-4 w-4 animate-pulse" />
+                              {result.call_status === 'initiated' ? 'Call Initiated' : 'In Progress'}
+                            </Button>
+                          ) : result.call_status === 'completed' ? (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              disabled
+                              className="flex items-center gap-1 border-green-300 text-green-600"
+                            >
+                              <Mic className="h-4 w-4" />
+                              Call Completed
+                            </Button>
+                          ) : result.call_status === 'failed' ? (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleInitiateCall(result)}
+                              disabled={initiatingCall !== null}
+                              className="flex items-center gap-1 border-red-300 text-red-600 hover:bg-red-50"
+                            >
+                              <MicOff className="h-4 w-4" />
+                              Retry Call
+                            </Button>
+                          ) : (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleInitiateCall(result)}
+                              disabled={initiatingCall !== null}
+                              className="flex items-center gap-1 border-blue-300 text-blue-600 hover:bg-blue-50"
+                            >
+                              {initiatingCall === result.id ? (
+                                <>
+                                  <Mic className="h-4 w-4 animate-spin" />
+                                  Initiating...
+                                </>
+                              ) : (
+                                <>
+                                  <Mic className="h-4 w-4" />
+                                  Initiate Screening Call
+                                </>
+                              )}
+                            </Button>
+                          )}
+                          
                           <Button
                             variant="ghost"
                             size="sm"
@@ -606,6 +732,37 @@ const ScreeningResults = () => {
                               </h4>
                               <div className="bg-gray-50 p-4 rounded-lg border">
                                 <p className="text-sm text-gray-700">{result.justification}</p>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Call Summary */}
+                          {result.call_summary && (
+                            <div className="mt-6 space-y-2">
+                              <h4 className="font-semibold text-blue-700 flex items-center">
+                                <Mic className="h-4 w-4 mr-2" />
+                                Voice Interview Summary
+                              </h4>
+                              <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                                <p className="text-sm text-gray-700">{result.call_summary}</p>
+                                {result.call_completed_at && (
+                                  <p className="text-xs text-gray-500 mt-2">
+                                    Completed: {new Date(result.call_completed_at).toLocaleString()}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Call Error */}
+                          {result.call_error_message && (
+                            <div className="mt-6 space-y-2">
+                              <h4 className="font-semibold text-red-700 flex items-center">
+                                <MicOff className="h-4 w-4 mr-2" />
+                                Call Error
+                              </h4>
+                              <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+                                <p className="text-sm text-gray-700">{result.call_error_message}</p>
                               </div>
                             </div>
                           )}
