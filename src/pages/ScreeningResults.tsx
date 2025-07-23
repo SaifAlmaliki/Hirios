@@ -26,7 +26,9 @@ import {
   Mail,
   User,
   Mic,
-  MicOff
+  MicOff,
+  FileText,
+  ExternalLink
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -583,6 +585,18 @@ const ScreeningResults = () => {
                             <StickyNote className="h-4 w-4" />
                             {result.notes ? 'Edit Note' : 'Add Note'}
                           </Button>
+                          
+                          {result.resume_url && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => window.open(result.resume_url, '_blank')}
+                              className="flex items-center gap-1 border-green-300 text-green-600 hover:bg-green-50"
+                            >
+                              <FileText className="h-4 w-4" />
+                              Resume
+                            </Button>
+                          )}
                           
                           {/* Outbound Call Button */}
                           {result.call_status === 'initiated' || result.call_status === 'in_progress' ? (

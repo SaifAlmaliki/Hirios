@@ -34,6 +34,8 @@ export interface ScreeningResult {
     company: string;
     department: string;
   };
+  // Resume URL from applications table
+  resume_url?: string;
 }
 
 export const useScreeningResults = () => {
@@ -91,7 +93,34 @@ export const useScreeningResults = () => {
       }
       
       console.log('Screening results fetched successfully:', data);
-      return data as unknown as ScreeningResult[];
+      
+      // Fetch resume URLs for each candidate
+      const resultsWithResumes = await Promise.all(
+        (data || []).map(async (result: any) => {
+          try {
+            const { data: application, error: appError } = await supabase
+              .from('applications')
+              .select('resume_url')
+              .eq('email', result.email)
+              .order('created_at', { ascending: false })
+              .limit(1)
+              .single();
+            
+            return {
+              ...result,
+              resume_url: application?.resume_url || null
+            };
+          } catch (error) {
+            console.log(`No application found for ${result.email}`);
+            return {
+              ...result,
+              resume_url: null
+            };
+          }
+        })
+      );
+      
+      return resultsWithResumes as unknown as ScreeningResult[];
     },
     enabled: !!user,
   });
