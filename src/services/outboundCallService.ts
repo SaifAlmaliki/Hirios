@@ -64,7 +64,7 @@ export class OutboundCallService {
             full_name: data.full_name,
             job_requirements: data.job_requirements,
             job_description: data.job_description,
-            resume: data.resume
+            candidate_resume: data.resume
           }
         }),
       });
@@ -193,7 +193,7 @@ export class OutboundCallService {
     try {
       const { data: application, error } = await supabase
         .from('applications')
-        .select('resume_url')
+        .select('resume_text')
         .eq('email', candidateEmail)
         .order('created_at', { ascending: false })
         .limit(1)
@@ -204,7 +204,14 @@ export class OutboundCallService {
         return 'No resume available for this candidate';
       }
 
-      return await OutboundCallService.generateResumeSummary(application.resume_url);
+      // Use extracted resume text if available
+      if ((application as any).resume_text && (application as any).resume_text.trim()) {
+        console.log('Using extracted resume text for candidate:', candidateEmail);
+        return (application as any).resume_text;
+      } else {
+        console.log('No resume text available for candidate:', candidateEmail);
+        return 'No resume information available for this candidate';
+      }
     } catch (error) {
       console.error('Error fetching application resume:', error);
       return 'Unable to retrieve resume information';
