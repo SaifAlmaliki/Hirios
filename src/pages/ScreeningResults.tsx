@@ -34,6 +34,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useScreeningResults, useScreeningResultsStats, useAddNoteToScreeningResult, ScreeningResult } from '@/hooks/useScreeningResults';
 import { useHasAIAccess } from '@/hooks/useSubscription';
 import { VoiceAgentService, VoiceAgentData } from '@/services/voiceAgentService';
+import { OutboundCallService } from '@/services/outboundCallService';
 
 const ScreeningResults = () => {
   const navigate = useNavigate();
@@ -58,8 +59,8 @@ const ScreeningResults = () => {
   const [selectedResult, setSelectedResult] = useState<ScreeningResult | null>(null);
   const [noteText, setNoteText] = useState('');
   
-  // State for voice agent
-  const [activeVoiceAgent, setActiveVoiceAgent] = useState<string | null>(null);
+  // State for outbound calls
+  const [initiatingCall, setInitiatingCall] = useState<string | null>(null);
   const [voiceAgentService] = useState(() => VoiceAgentService.getInstance());
 
   // Redirect if not company user
@@ -114,63 +115,60 @@ const ScreeningResults = () => {
     });
   };
 
-  const handleStartVoiceAgent = async (result: ScreeningResult) => {
+  const handleInitiateCall = async (result: ScreeningResult) => {
     try {
-      setActiveVoiceAgent(result.id);
+      setInitiatingCall(result.id);
+      
+      // Check if candidate has phone number
+      if (!result.phone) {
+        toast({
+          title: "Phone Number Required",
+          description: "This candidate doesn't have a phone number on file. Please add one to initiate the call.",
+          variant: "destructive",
+        });
+        setInitiatingCall(null);
+        return;
+      }
       
       // Fetch job details
-      const jobDetails = await VoiceAgentService.fetchJobDetails(result.job_id || null);
+      const jobDetails = await OutboundCallService.fetchJobDetails(result.job_id || null);
       
       // Get resume summary
-      const resumeSummary = await VoiceAgentService.getApplicationResume(result.email);
+      const resumeSummary = await OutboundCallService.getApplicationResume(result.email);
       
-      // Prepare data for voice agent
-      const voiceAgentData: VoiceAgentData = {
+      // Prepare data for outbound call
+      const callData: VoiceAgentData = {
         job_title: jobDetails.title,
         full_name: `${result.first_name} ${result.last_name}`,
         job_requirements: jobDetails.requirements,
         job_description: `${jobDetails.description}\n\nKey Responsibilities:\n${jobDetails.responsibilities}`,
-        resume: resumeSummary
+        resume: resumeSummary,
+        candidate_phone: result.phone,
+        screening_result_id: result.id
       };
 
-      console.log('Starting voice agent with data:', voiceAgentData);
+      console.log('Initiating outbound call with data:', callData);
       
-      await voiceAgentService.startConversation(voiceAgentData);
+      const callResult = await voiceAgentService.initiateOutboundCall(callData);
       
-      toast({
-        title: "Voice Interview Started",
-        description: `AI voice agent is now interviewing ${result.first_name} ${result.last_name}`,
-      });
+      if (callResult.success) {
+        toast({
+          title: "Call Initiated",
+          description: `AI agent is now calling ${result.first_name} ${result.last_name} at ${result.phone}`,
+        });
+      } else {
+        throw new Error(callResult.error || 'Failed to initiate call');
+      }
     } catch (error) {
-      console.error('Failed to start voice agent:', error);
-      setActiveVoiceAgent(null);
+      console.error('Failed to initiate call:', error);
       
       toast({
-        title: "Failed to Start Voice Interview",
-        description: error instanceof Error ? error.message : "Please ensure microphone access is granted and try again.",
+        title: "Failed to Initiate Call",
+        description: error instanceof Error ? error.message : "Unable to initiate the outbound call. Please try again.",
         variant: "destructive",
       });
-    }
-  };
-
-  const handleEndVoiceAgent = async () => {
-    try {
-      await voiceAgentService.endConversation();
-      setActiveVoiceAgent(null);
-      
-      toast({
-        title: "Voice Interview Ended",
-        description: "The AI voice interview has been completed.",
-      });
-    } catch (error) {
-      console.error('Failed to end voice agent:', error);
-      setActiveVoiceAgent(null);
-      
-      toast({
-        title: "Error",
-        description: "There was an issue ending the voice interview.",
-        variant: "destructive",
-      });
+    } finally {
+      setInitiatingCall(null);
     }
   };
 
@@ -553,7 +551,7 @@ const ScreeningResults = () => {
                             </Badge>
                           </div>
                           
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm text-gray-600">
                             <div className="flex items-center">
                               <Mail className="h-4 w-4 mr-2" />
                               {result.email}
@@ -566,6 +564,12 @@ const ScreeningResults = () => {
                               <Calendar className="h-4 w-4 mr-2" />
                               {new Date(result.created_at).toLocaleDateString()}
                             </div>
+                            {result.phone && (
+                              <div className="flex items-center">
+                                <Mic className="h-4 w-4 mr-2" />
+                                {result.phone}
+                              </div>
+                            )}
                           </div>
                         </div>
 
@@ -580,27 +584,57 @@ const ScreeningResults = () => {
                             {result.notes ? 'Edit Note' : 'Add Note'}
                           </Button>
                           
-                          {/* Voice Agent Button */}
-                          {activeVoiceAgent === result.id ? (
+                          {/* Outbound Call Button */}
+                          {result.call_status === 'initiated' || result.call_status === 'in_progress' ? (
                             <Button
-                              variant="destructive"
+                              variant="secondary"
                               size="sm"
-                              onClick={handleEndVoiceAgent}
-                              className="flex items-center gap-1 animate-pulse"
+                              disabled
+                              className="flex items-center gap-1"
+                            >
+                              <Mic className="h-4 w-4 animate-pulse" />
+                              {result.call_status === 'initiated' ? 'Call Initiated' : 'In Progress'}
+                            </Button>
+                          ) : result.call_status === 'completed' ? (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              disabled
+                              className="flex items-center gap-1 border-green-300 text-green-600"
+                            >
+                              <Mic className="h-4 w-4" />
+                              Call Completed
+                            </Button>
+                          ) : result.call_status === 'failed' ? (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleInitiateCall(result)}
+                              disabled={initiatingCall !== null}
+                              className="flex items-center gap-1 border-red-300 text-red-600 hover:bg-red-50"
                             >
                               <MicOff className="h-4 w-4" />
-                              End Interview
+                              Retry Call
                             </Button>
                           ) : (
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => handleStartVoiceAgent(result)}
-                              disabled={activeVoiceAgent !== null}
+                              onClick={() => handleInitiateCall(result)}
+                              disabled={initiatingCall !== null}
                               className="flex items-center gap-1 border-blue-300 text-blue-600 hover:bg-blue-50"
                             >
-                              <Mic className="h-4 w-4" />
-                              Voice Interview
+                              {initiatingCall === result.id ? (
+                                <>
+                                  <Mic className="h-4 w-4 animate-spin" />
+                                  Initiating...
+                                </>
+                              ) : (
+                                <>
+                                  <Mic className="h-4 w-4" />
+                                  Initiate Screening Call
+                                </>
+                              )}
                             </Button>
                           )}
                           
@@ -698,6 +732,37 @@ const ScreeningResults = () => {
                               </h4>
                               <div className="bg-gray-50 p-4 rounded-lg border">
                                 <p className="text-sm text-gray-700">{result.justification}</p>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Call Summary */}
+                          {result.call_summary && (
+                            <div className="mt-6 space-y-2">
+                              <h4 className="font-semibold text-blue-700 flex items-center">
+                                <Mic className="h-4 w-4 mr-2" />
+                                Voice Interview Summary
+                              </h4>
+                              <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                                <p className="text-sm text-gray-700">{result.call_summary}</p>
+                                {result.call_completed_at && (
+                                  <p className="text-xs text-gray-500 mt-2">
+                                    Completed: {new Date(result.call_completed_at).toLocaleString()}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Call Error */}
+                          {result.call_error_message && (
+                            <div className="mt-6 space-y-2">
+                              <h4 className="font-semibold text-red-700 flex items-center">
+                                <MicOff className="h-4 w-4 mr-2" />
+                                Call Error
+                              </h4>
+                              <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+                                <p className="text-sm text-gray-700">{result.call_error_message}</p>
                               </div>
                             </div>
                           )}

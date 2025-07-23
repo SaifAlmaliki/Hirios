@@ -1,5 +1,5 @@
-import { Conversation } from '@elevenlabs/client';
 import { supabase } from '@/integrations/supabase/client';
+import { OutboundCallService, OutboundCallData, CallResponse } from './outboundCallService';
 
 export interface VoiceAgentData {
   job_title: string;
@@ -7,14 +7,17 @@ export interface VoiceAgentData {
   job_requirements: string;
   job_description: string;
   resume: string;
+  candidate_phone: string;
+  screening_result_id: string;
 }
 
 export class VoiceAgentService {
   private static instance: VoiceAgentService;
-  private conversation: any = null;
-  private readonly agentId = 'agent_01jzg15d26fnqawdzq75wyn187';
+  private outboundCallService: OutboundCallService;
 
-  private constructor() {}
+  private constructor() {
+    this.outboundCallService = OutboundCallService.getInstance();
+  }
 
   static getInstance(): VoiceAgentService {
     if (!VoiceAgentService.instance) {
@@ -23,58 +26,45 @@ export class VoiceAgentService {
     return VoiceAgentService.instance;
   }
 
-  async startConversation(data: VoiceAgentData): Promise<boolean> {
+  async initiateOutboundCall(data: VoiceAgentData): Promise<CallResponse> {
     try {
-      // Request microphone access
-      await navigator.mediaDevices.getUserMedia({ audio: true });
+      console.log('Initiating outbound call with data:', data);
 
-      console.log('Starting voice conversation with data:', data);
+      const callData: OutboundCallData = {
+        job_title: data.job_title,
+        full_name: data.full_name,
+        job_requirements: data.job_requirements,
+        job_description: data.job_description,
+        resume: data.resume,
+        candidate_phone: data.candidate_phone,
+        screening_result_id: data.screening_result_id
+      };
 
-      this.conversation = await Conversation.startSession({
-        agentId: this.agentId,
-        dynamicVariables: {
-          job_title: data.job_title,
-          full_name: data.full_name,
-          job_requirements: data.job_requirements,
-          job_description: data.job_description,
-          resume: data.resume
-        },
-        onConnect: () => {
-          console.log('Voice agent connected successfully');
-        },
-        onDisconnect: () => {
-          console.log('Voice agent disconnected');
-          this.conversation = null;
-        },
-        onError: (error: any) => {
-          console.error('Voice agent error:', error);
-        },
-        onMessage: (message: any) => {
-          console.log('Voice agent message:', message);
-        }
-      });
-
-      return true;
-    } catch (error) {
-      console.error('Failed to start conversation:', error);
-      throw error;
-    }
-  }
-
-  async endConversation(): Promise<void> {
-    if (this.conversation) {
-      try {
-        await this.conversation.endSession();
-        this.conversation = null;
-        console.log('Voice conversation ended');
-      } catch (error) {
-        console.error('Error ending conversation:', error);
+      const result = await this.outboundCallService.initiateCall(callData);
+      
+      if (result.success) {
+        console.log('Outbound call initiated successfully');
+      } else {
+        console.error('Failed to initiate outbound call:', result.error);
       }
+
+      return result;
+    } catch (error) {
+      console.error('Failed to initiate outbound call:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error occurred'
+      };
     }
   }
 
-  isActive(): boolean {
-    return this.conversation !== null;
+  async completeCall(screeningResultId: string, callSummary?: string): Promise<void> {
+    try {
+      await this.outboundCallService.completeCall(screeningResultId, callSummary);
+      console.log('Call marked as completed');
+    } catch (error) {
+      console.error('Error completing call:', error);
+    }
   }
 
   // Helper method to generate resume summary
