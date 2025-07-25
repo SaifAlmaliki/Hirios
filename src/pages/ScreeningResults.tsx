@@ -66,10 +66,7 @@ const ScreeningResults = () => {
 
   // Redirect if not company user
   React.useEffect(() => {
-    console.log('🔍 Auth check - User:', user?.id, 'UserType:', userType);
     if (!user || userType !== 'company') {
-      console.log('⚠️ Authentication failed, redirecting to /auth');
-      console.log('User exists:', !!user, 'User type:', userType);
       navigate('/auth');
       return;
     }
@@ -123,40 +120,23 @@ const ScreeningResults = () => {
     try {
       setRequestingInterview(result.id);
       
-      console.log('🎯 Starting voice screening request for:', result.id);
-      console.log('🔐 Current user:', user?.id);
-      console.log('👤 User type:', userType);
-      
       const response = await voiceInterviewService.requestVoiceScreening(result.id);
-      
-      console.log('📝 Voice screening response:', response);
       
       if (response.success) {
         toast({
           title: "Voice Screening Requested",
           description: `Voice screening interview has been requested for ${result.first_name} ${result.last_name}. They will receive an email with the interview link.`,
         });
-        
-        console.log('✅ Voice screening request successful');
-        
-        // Instead of reloading, just update the local state
-        // The button will show as disabled due to the requestingInterview state
-        // and the database has been updated
-        
       } else {
-        console.error('❌ Voice screening request failed:', response.error);
         throw new Error(response.error || 'Failed to request voice screening');
       }
     } catch (error) {
-      console.error('💥 Exception in handleRequestVoiceScreening:', error);
-      
       toast({
         title: "Failed to Request Voice Screening",
         description: error instanceof Error ? error.message : "Unable to request voice screening. Please try again.",
         variant: "destructive",
       });
     } finally {
-      console.log('🏁 Cleaning up voice screening request state');
       setRequestingInterview(null);
     }
   };

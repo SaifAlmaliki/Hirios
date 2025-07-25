@@ -22,8 +22,10 @@ export class VoiceInterviewService {
   private conversation: Conversation | null = null;
 
   private constructor() {
-    // Expose for debugging
-    (window as any).VoiceInterviewService = VoiceInterviewService;
+    // Expose for debugging in development
+    if (process.env.NODE_ENV === 'development') {
+      (window as any).VoiceInterviewService = VoiceInterviewService;
+    }
   }
 
   public static getInstance(): VoiceInterviewService {
@@ -35,37 +37,12 @@ export class VoiceInterviewService {
 
   async requestVoiceScreening(screeningResultId: string): Promise<InterviewResponse> {
     try {
-      console.log('Requesting voice screening for:', screeningResultId);
-
-      // First, let's check the current user's authentication and subscription status
-      console.log('🔐 Checking authentication...');
+      // Check authentication
       const { data: { user }, error: authError } = await supabase.auth.getUser();
       
-      if (authError) {
-        console.error('🚨 Auth error:', authError);
-        throw new Error(`Authentication error: ${authError.message}`);
-      }
-      
-      if (!user) {
-        console.error('🚨 No user found');
+      if (authError || !user) {
         throw new Error('User not authenticated');
       }
-
-      console.log('✅ User authenticated:', user.id, user.email);
-
-      // Check user's company profile and subscription status
-      const { data: companyProfile, error: profileError } = await supabase
-        .from('company_profiles')
-        .select('subscription_plan, subscription_status')
-        .eq('user_id', user.id)
-        .single();
-
-      if (profileError) {
-        console.error('Failed to fetch company profile:', profileError);
-        throw new Error(`Company profile error: ${profileError.message}`);
-      }
-
-      console.log('Company profile:', companyProfile);
 
       // Get screening result details for the webhook
       const { data: screeningResult, error: fetchError } = await supabase
@@ -84,13 +61,11 @@ export class VoiceInterviewService {
         .single();
 
       if (fetchError || !screeningResult) {
-        console.error('Failed to fetch screening result:', fetchError);
         throw new Error('Failed to fetch screening result details');
       }
 
       // Generate interview link
       const interviewLink = VoiceInterviewService.generateInterviewLink(screeningResultId, true);
-      console.log('📋 Generated interview link:', interviewLink);
 
       // Prepare webhook data
       const job = screeningResult.jobs as any;
@@ -103,56 +78,41 @@ export class VoiceInterviewService {
         timestamp: new Date().toISOString()
       };
 
-      console.log('📤 Sending webhook data:', webhookData);
-
       // Send webhook to n8n
       const webhookUrl = import.meta.env.VITE_SCREENING_WEBHOOK_URL;
-      if (!webhookUrl) {
-        console.warn('⚠️ VITE_SCREENING_WEBHOOK_URL not configured, skipping webhook');
-      } else {
+      if (webhookUrl) {
         try {
-          const webhookResponse = await fetch(webhookUrl, {
+          await fetch(webhookUrl, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify(webhookData)
           });
-
-          if (webhookResponse.ok) {
-            console.log('✅ Webhook sent successfully to n8n');
-          } else {
-            console.error('❌ Webhook failed:', webhookResponse.status, webhookResponse.statusText);
-          }
         } catch (webhookError) {
-          console.error('❌ Webhook error:', webhookError);
+          console.error('Webhook error:', webhookError);
           // Don't fail the whole process if webhook fails
         }
       }
 
       // Update voice_screening_requested to true
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('screening_results')
         .update({ 
           voice_screening_requested: true,
           updated_at: new Date().toISOString()
         })
-        .eq('id', screeningResultId)
-        .select();
+        .eq('id', screeningResultId);
 
       if (error) {
-        console.error('Supabase update error:', error);
         throw new Error(`Failed to update screening result: ${error.message}`);
       }
-
-      console.log('Voice screening requested successfully:', data);
 
       return {
         success: true
       };
 
     } catch (error) {
-      console.error('Failed to request voice screening:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error occurred'
@@ -174,48 +134,32 @@ export class VoiceInterviewService {
         candidate_resume: interviewData.resume
       };
 
-      // Enhanced logging for debugging
-      console.group('🎤 Starting ElevenLabs Voice Interview');
-      console.log('Agent ID:', this.agentId);
-      console.log('Screening Result ID:', interviewData.screening_result_id);
-      console.log('Dynamic Variables Being Passed:');
-      console.table(dynamicVariables);
-      console.groupEnd();
-
-      // Store variables for debugging access
-      (window as any).lastInterviewVariables = dynamicVariables;
-      (window as any).lastInterviewData = interviewData;
-
-      console.log('🔑 Using API Key:', this.apiKey.substring(0, 10) + '...');
-      console.log('🤖 Agent ID:', this.agentId);
+      // Store variables for debugging access (development only)
+      if (process.env.NODE_ENV === 'development') {
+        (window as any).lastInterviewVariables = dynamicVariables;
+        (window as any).lastInterviewData = interviewData;
+      }
       
       this.conversation = await Conversation.startSession({
         agentId: this.agentId,
         dynamicVariables,
         onConnect: () => {
-          console.log('✅ Connected to ElevenLabs agent');
-          console.log('🔍 To debug variables, use: window.lastInterviewVariables');
-          console.log('🎤 Try speaking now - the agent should respond');
+          console.log('Connected to ElevenLabs agent');
         },
         onDisconnect: (reason) => {
-          console.log('❌ Disconnected from ElevenLabs agent');
-          console.log('🔍 Disconnect reason:', reason);
+          console.log('Disconnected from ElevenLabs agent:', reason);
         },
         onError: (error) => {
-          console.error('🚨 ElevenLabs conversation error:', error);
-          console.error('🔍 Error details:', JSON.stringify(error, null, 2));
+          console.error('ElevenLabs conversation error:', error);
         },
         onModeChange: (mode) => {
-          console.log('🔄 Mode changed to:', mode);
+          console.log('Mode changed to:', mode);
         },
         onMessage: (message) => {
-          console.log('💬 Agent message:', message);
+          console.log('Agent message:', message);
         },
         onStatusChange: (status) => {
-          console.log('📊 Status changed to:', status);
-          if (status.status === 'connected') {
-            console.log('🎉 Connection established! Agent should be listening...');
-          }
+          console.log('Status changed to:', status);
         }
       });
 
@@ -224,7 +168,7 @@ export class VoiceInterviewService {
       };
 
     } catch (error) {
-      console.error('❌ Failed to start conversation:', error);
+      console.error('Failed to start conversation:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to start conversation. Please ensure microphone access is granted.'
@@ -234,28 +178,28 @@ export class VoiceInterviewService {
 
   async endConversation(): Promise<void> {
     if (this.conversation) {
-      await this.conversation.endSession();
-      this.conversation = null;
+      try {
+        await this.conversation.endSession();
+      } catch (error) {
+        console.error('Error ending conversation:', error);
+      } finally {
+        this.conversation = null;
+      }
     }
   }
 
-  // Debugging methods
+  // Method to check if conversation is active
+  isConversationActive(): boolean {
+    return !!this.conversation;
+  }
+
+  // Development debugging methods
   getCurrentVariables(): any {
-    return (window as any).lastInterviewVariables || null;
+    return process.env.NODE_ENV === 'development' ? (window as any).lastInterviewVariables || null : null;
   }
 
   getCurrentInterviewData(): VoiceInterviewData | null {
-    return (window as any).lastInterviewData || null;
-  }
-
-  logCurrentState(): void {
-    console.group('🔍 Current Voice Interview State');
-    console.log('Agent ID:', this.agentId);
-    console.log('API Key:', this.apiKey ? 'Set ✅' : 'Missing ❌');
-    console.log('Conversation Active:', !!this.conversation);
-    console.log('Last Variables:', this.getCurrentVariables());
-    console.log('Last Interview Data:', this.getCurrentInterviewData());
-    console.groupEnd();
+    return process.env.NODE_ENV === 'development' ? (window as any).lastInterviewData || null : null;
   }
 
   // Generate direct interview link
@@ -271,7 +215,6 @@ export class VoiceInterviewService {
     try {
       const link = this.generateInterviewLink(screeningResultId, autoStart);
       await navigator.clipboard.writeText(link);
-      console.log('📋 Interview link copied to clipboard:', link);
       return true;
     } catch (error) {
       console.error('Failed to copy link to clipboard:', error);

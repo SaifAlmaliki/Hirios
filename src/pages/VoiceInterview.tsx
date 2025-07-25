@@ -55,7 +55,6 @@ const VoiceInterview = () => {
   // Auto-start interview if requested
   useEffect(() => {
     if (autoStart && interviewData && !isConnected && !isConnecting && !error) {
-      console.log('🚀 Auto-starting voice interview...');
       handleStartInterview();
     }
   }, [autoStart, interviewData, isConnected, isConnecting, error]);
