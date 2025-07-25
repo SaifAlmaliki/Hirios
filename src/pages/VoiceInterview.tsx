@@ -54,10 +54,20 @@ const VoiceInterview = () => {
 
   // Auto-start interview if requested
   useEffect(() => {
-    if (autoStart && interviewData && !isConnected && !isConnecting && !error) {
+    if (autoStart && interviewData && !isConnected && !isConnecting && !error && !voiceInterviewService.isConversationActive()) {
       handleStartInterview();
     }
-  }, [autoStart, interviewData, isConnected, isConnecting, error]);
+  }, [autoStart, interviewData, isConnected, isConnecting, error, voiceInterviewService]);
+
+  // Cleanup on component unmount
+  useEffect(() => {
+    return () => {
+      // Clean up any active conversation when leaving the page
+      if (voiceInterviewService.isConversationActive()) {
+        voiceInterviewService.endConversation();
+      }
+    };
+  }, [voiceInterviewService]);
 
   const handleStartInterview = async () => {
     if (!interviewData) return;
@@ -92,18 +102,22 @@ const VoiceInterview = () => {
 
   const handleEndInterview = async () => {
     try {
-      await voiceInterviewService.endConversation();
+      // Set states to prevent auto-restart
       setIsConnected(false);
+      setIsConnecting(false);
+      setAutoStart(false);
+      
+      // End the conversation
+      await voiceInterviewService.endConversation();
       
       toast({
         title: "Interview Completed",
         description: "Thank you for completing the voice interview. Your responses have been recorded.",
       });
 
-      // Redirect to a thank you page or back to application
-      setTimeout(() => {
-        navigate('/');
-      }, 2000);
+      // Redirect immediately to prevent any reconnection attempts
+      navigate('/', { replace: true });
+      
     } catch (err) {
       console.error('Failed to end interview:', err);
       toast({
@@ -111,6 +125,9 @@ const VoiceInterview = () => {
         description: "There was an issue ending the interview, but your responses have been recorded.",
         variant: "destructive",
       });
+      
+      // Still redirect even if there was an error
+      navigate('/', { replace: true });
     }
   };
 

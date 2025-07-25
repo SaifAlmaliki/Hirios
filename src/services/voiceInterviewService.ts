@@ -193,6 +193,20 @@ export class VoiceInterviewService {
     return !!this.conversation;
   }
 
+  // Global cleanup method to force end any active conversation
+  static async forceEndAllConversations(): Promise<void> {
+    const instance = VoiceInterviewService.getInstance();
+    if (instance.conversation) {
+      try {
+        await instance.conversation.endSession();
+      } catch (error) {
+        console.error('Error force ending conversation:', error);
+      } finally {
+        instance.conversation = null;
+      }
+    }
+  }
+
   // Development debugging methods
   getCurrentVariables(): any {
     return process.env.NODE_ENV === 'development' ? (window as any).lastInterviewVariables || null : null;

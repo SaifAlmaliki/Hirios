@@ -1,9 +1,10 @@
 
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
+import React from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import HiriosLanding from "./pages/HiriosLanding";
@@ -14,8 +15,23 @@ import Subscription from "./pages/Subscription";
 import ScreeningResults from "./pages/ScreeningResults";
 import VoiceInterview from "./pages/VoiceInterview";
 import NotFound from "./pages/NotFound";
+import { VoiceInterviewService } from "./services/voiceInterviewService";
 
 const queryClient = new QueryClient();
+
+// Component to handle route changes and cleanup
+const RouteCleanup = () => {
+  const location = useLocation();
+  
+  React.useEffect(() => {
+    // If we're not on an interview page, clean up any active conversations
+    if (!location.pathname.startsWith('/interview/')) {
+      VoiceInterviewService.forceEndAllConversations();
+    }
+  }, [location.pathname]);
+
+  return null;
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -24,6 +40,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <RouteCleanup />
           <Routes>
             <Route path="/" element={<HiriosLanding />} />
             <Route path="/job-portal-old" element={<Index />} />
