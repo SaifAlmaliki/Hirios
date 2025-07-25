@@ -12,6 +12,8 @@ import { useCreateJob, useUpdateJob, useDeleteJob } from '../hooks/useJobs';
 import { useCompanyJobs } from '../hooks/useCompanyJobs';
 import { useApplications } from '../hooks/useApplications';
 import JobApplicationsView from './JobApplicationsView';
+import { DashboardHeader } from '@/components/DashboardHeader';
+import { JobCard } from '@/components/JobCard';
 
 // Separate JobForm component to prevent re-rendering issues
 const JobForm = React.memo(({ 
@@ -338,41 +340,37 @@ const CompanyView: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-2xl font-bold text-blue-900">Company Dashboard</h2>
-          <p className="text-gray-600 mt-1">Manage your job postings and applications</p>
-        </div>
-        
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-              <Plus className="h-4 w-4 mr-2" />
-              Post New Job
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle className="text-xl text-blue-900">Post a New Job</DialogTitle>
-              <DialogDescription>
-                Fill in the details below to post a new job opening.
-              </DialogDescription>
-            </DialogHeader>
-            <JobForm
-              jobData={jobData}
-              onInputChange={handleInputChange}
-              onSelectChange={handleSelectChange}
-              onSubmit={handleSubmit}
-              isEdit={false}
-              isLoading={createJobMutation.isPending}
-              onCancel={handleCancelCreate}
-            />
-          </DialogContent>
-        </Dialog>
-      </div>
+      <DashboardHeader
+        title="Company Dashboard"
+        subtitle="Manage your job postings and applications"
+        actionLabel="Post New Job"
+        onAction={() => setIsDialogOpen(true)}
+        actionIcon={Plus}
+      />
+
+      {/* Job Form Dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-xl text-blue-900">Post a New Job</DialogTitle>
+            <DialogDescription>
+              Fill in the details below to post a new job opening.
+            </DialogDescription>
+          </DialogHeader>
+          <JobForm
+            jobData={jobData}
+            onInputChange={handleInputChange}
+            onSelectChange={handleSelectChange}
+            onSubmit={handleSubmit}
+            isEdit={false}
+            isLoading={createJobMutation.isPending}
+            onCancel={handleCancelCreate}
+          />
+        </DialogContent>
+      </Dialog>
 
       {/* Dashboard Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         <Card className="bg-blue-50 border-blue-100">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Applications</CardTitle>
@@ -432,92 +430,16 @@ const CompanyView: React.FC = () => {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             {jobs.map((job) => (
-              <Card key={job.id} className="hover:shadow-lg transition-shadow duration-200 border-l-4 border-l-blue-500 cursor-pointer" onClick={() => handleViewJobDetail(job)}>
-                <CardHeader className="pb-3">
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <CardTitle className="text-lg font-bold text-gray-900 mb-1">{job.title}</CardTitle>
-                      <div className="flex items-center text-blue-600 font-semibold mb-2">
-                        <Building className="h-4 w-4 mr-1" />
-                        {job.company}
-                      </div>
-                    </div>
-                    <div className="flex space-x-1">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleEditJob(job);
-                        }}
-                        className="text-blue-600 hover:text-blue-800 hover:bg-blue-50"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteJob(job.id);
-                        }}
-                        className="text-red-600 hover:text-red-800 hover:bg-red-50"
-                        disabled={deleteJobMutation.isPending}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleViewApplications(job.id);
-                        }}
-                        className="text-green-600 hover:text-green-800 hover:bg-green-50"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <div className="space-y-3">
-                    <div className="flex items-center text-gray-600">
-                      <MapPin className="h-4 w-4 mr-2 text-gray-400" />
-                      <span className="text-sm">{job.location}</span>
-                    </div>
-                    
-                    <div className="flex items-center text-gray-600">
-                      <Briefcase className="h-4 w-4 mr-2 text-gray-400" />
-                      <span className="text-sm">{job.department}</span>
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center text-gray-600">
-                        <Clock className="h-4 w-4 mr-2 text-gray-400" />
-                        <span className="text-sm">{formatEmploymentType(job.employment_type)}</span>
-                      </div>
-                      
-
-                    </div>
-                    
-                    <div className="border-t pt-3">
-                      <p className="text-sm text-gray-600 line-clamp-2">
-                        {job.description}
-                      </p>
-                    </div>
-                    
-                    <div className="flex justify-between items-center text-xs text-gray-500 pt-2">
-                      <span>Posted: {formatDate(job.created_at)}</span>
-                      <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-                        Active
-                      </span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              <JobCard
+                key={job.id}
+                job={job}
+                onViewDetail={handleViewJobDetail}
+                onEdit={handleEditJob}
+                onDelete={handleDeleteJob}
+                onViewApplications={handleViewApplications}
+              />
             ))}
           </div>
         )}

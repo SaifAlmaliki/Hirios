@@ -168,8 +168,8 @@ const VoiceInterview = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-2xl">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-3 sm:p-4">
+      <Card className="w-full max-w-2xl mx-auto">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-gray-900">
             Voice Interview

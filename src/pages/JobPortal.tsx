@@ -1,14 +1,11 @@
 
 import React, { useState } from 'react';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { Building2, Users, LogOut, Settings, Brain } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import CompanyView from '../components/CompanyView';
 import UserView from '../components/UserView';
 import { useJobs } from '../hooks/useJobs';
 import { useAuth } from '@/contexts/AuthContext';
+import { ResponsiveHeader } from '@/components/ResponsiveHeader';
 
 const JobPortal = () => {
   const [isCompanyView, setIsCompanyView] = useState(true);
@@ -51,79 +48,18 @@ const JobPortal = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-3">
-              <div className="bg-blue-600 p-2 rounded-lg">
-                <Building2 className="h-6 w-6 text-white" />
-              </div>
-              <h1 className="text-xl font-bold text-gray-900">Job Portal</h1>
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              {/* View Toggle - only show if user is not authenticated */}
-              {!user && (
-                <div className="flex items-center space-x-3 bg-gray-100 p-2 rounded-lg">
-                  <div className={`flex items-center space-x-2 px-3 py-1 rounded-md transition-colors ${!isCompanyView ? 'bg-blue-600 text-white' : 'text-gray-600'}`}>
-                    <Users className="h-4 w-4" />
-                    <Label htmlFor="view-toggle" className="text-sm font-medium cursor-pointer">
-                      Job Seeker
-                    </Label>
-                  </div>
-                  <Switch
-                    id="view-toggle"
-                    checked={isCompanyView}
-                    onCheckedChange={setIsCompanyView}
-                    className="data-[state=checked]:bg-blue-600"
-                  />
-                  <div className={`flex items-center space-x-2 px-3 py-1 rounded-md transition-colors ${isCompanyView ? 'bg-blue-600 text-white' : 'text-gray-600'}`}>
-                    <Building2 className="h-4 w-4" />
-                    <Label htmlFor="view-toggle" className="text-sm font-medium cursor-pointer">
-                      Company
-                    </Label>
-                  </div>
-                </div>
-              )}
-
-              {/* User Actions */}
-              {user ? (
-                <div className="flex items-center space-x-3">
-                  <span className="text-sm text-gray-600">
-                    {user.email} ({userType})
-                  </span>
-                  
-                  {userType === 'company' && (
-                    <>
-                      <Button variant="outline" size="sm" onClick={handleCompanySetup}>
-                        <Settings className="h-4 w-4 mr-1" />
-                        Setup
-                      </Button>
-                      <Button variant="outline" size="sm" onClick={handleSubscription}>
-                        Subscription
-                      </Button>
-                      <Button variant="outline" size="sm" onClick={handleScreeningResults}>
-                        <Brain className="h-4 w-4 mr-1" />
-                        AI Screening
-                      </Button>
-                    </>
-                  )}
-                  
-                  <Button variant="outline" size="sm" onClick={handleSignOut}>
-                    <LogOut className="h-4 w-4 mr-1" />
-                    Sign Out
-                  </Button>
-                </div>
-              ) : (
-                <Button onClick={() => navigate('/auth')} size="sm">
-                  Sign In
-                </Button>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
+      <ResponsiveHeader
+        user={user}
+        userType={userType}
+        onSignOut={handleSignOut}
+        onCompanySetup={handleCompanySetup}
+        onSubscription={handleSubscription}
+        onScreeningResults={handleScreeningResults}
+        onSignIn={() => navigate('/auth')}
+        isCompanyView={isCompanyView}
+        onToggleView={setIsCompanyView}
+        showViewToggle={!user}
+      />
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

@@ -1,41 +1,21 @@
 import React, { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Textarea } from '@/components/ui/textarea';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { 
-  Brain, 
-  TrendingUp, 
-  Users, 
-  Award, 
-  ChevronDown, 
-  ChevronUp, 
-  Filter, 
-  Download, 
-  StickyNote,
-  Search,
-  Calendar,
-  Briefcase,
-  Mail,
-  User,
-  Mic,
-  MicOff,
-  FileText,
-  ExternalLink
-} from 'lucide-react';
+import { Brain, Users, Award, TrendingUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useScreeningResults, useScreeningResultsStats, useAddNoteToScreeningResult, ScreeningResult } from '@/hooks/useScreeningResults';
 import { useHasAIAccess } from '@/hooks/useSubscription';
 import { VoiceInterviewService } from '@/services/voiceInterviewService';
+
+// Import modular components
+import { StatsCard } from '@/components/StatsCard';
+import { FiltersSection } from '@/components/FiltersSection';
+import { ExportButtons } from '@/components/ExportButtons';
+import { ResultCard } from '@/components/ResultCard';
+import { NoteDialog } from '@/components/NoteDialog';
+import { EmptyState } from '@/components/EmptyState';
 
 const ScreeningResults = () => {
   const navigate = useNavigate();
@@ -72,13 +52,7 @@ const ScreeningResults = () => {
     }
   }, [user, userType, navigate]);
 
-  // Helper functions (moved before conditional returns)
-  const getScoreColor = (score: number) => {
-    if (score > 70) return 'text-green-600 bg-green-100';
-    if (score >= 40) return 'text-yellow-600 bg-yellow-100';
-    return 'text-red-600 bg-red-100';
-  };
-
+  // Helper function for PDF export
   const getScoreLabel = (score: number) => {
     if (score > 70) return 'Excellent';
     if (score >= 40) return 'Good';
@@ -345,148 +319,77 @@ const ScreeningResults = () => {
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-              <Brain className="h-8 w-8 mr-3 text-blue-600" />
-              AI Screening Results
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center">
+              <Brain className="h-6 w-6 sm:h-8 sm:w-8 mr-2 sm:mr-3 text-blue-600 flex-shrink-0" />
+              <span className="truncate">AI Screening Results</span>
             </h1>
-            <p className="text-gray-600 mt-1">Comprehensive candidate analysis and insights</p>
+            <p className="text-gray-600 mt-1 text-sm sm:text-base">Comprehensive candidate analysis and insights</p>
           </div>
-          <div className="flex gap-3">
-            <Button
-              onClick={handleExportPDF}
-              variant="outline"
-              className="flex items-center gap-2"
-            >
-              <Download className="h-4 w-4" />
-              Export PDF
-            </Button>
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+            <ExportButtons
+              data={filteredAndSortedResults}
+              stats={stats}
+              onPDFExport={handleExportPDF}
+            />
             <Button
               onClick={() => navigate('/job-portal')}
               variant="outline"
+              className="flex items-center gap-2 justify-center text-sm"
+              size="sm"
             >
-              Back to Dashboard
+              <span className="hidden xs:inline">Back to Dashboard</span>
+              <span className="xs:hidden">Dashboard</span>
             </Button>
           </div>
         </div>
 
         {/* Stats Cards */}
         {stats && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card className="bg-blue-50 border-blue-100">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Screened</CardTitle>
-                <Users className="h-4 w-4 text-blue-600" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-blue-600">{stats.total}</div>
-                <p className="text-xs text-gray-600">+{stats.recentCount} this week</p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-green-50 border-green-100">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Excellent Fits</CardTitle>
-                <Award className="h-4 w-4 text-green-600" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-green-600">{stats.excellent}</div>
-                <p className="text-xs text-gray-600">{stats.total > 0 ? Math.round((stats.excellent / stats.total) * 100) : 0}% of total</p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-yellow-50 border-yellow-100">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Good Fits</CardTitle>
-                <TrendingUp className="h-4 w-4 text-yellow-600" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-yellow-600">{stats.good}</div>
-                <p className="text-xs text-gray-600">{stats.total > 0 ? Math.round((stats.good / stats.total) * 100) : 0}% of total</p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-purple-50 border-purple-100">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Average Score</CardTitle>
-                <Brain className="h-4 w-4 text-purple-600" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-purple-600">{stats.averageScore}%</div>
-                <Progress value={stats.averageScore} className="mt-2" />
-              </CardContent>
-            </Card>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+            <StatsCard
+              title="Total Screened"
+              value={stats.total}
+              subtitle={`+${stats.recentCount} this week`}
+              icon={Users}
+              color="blue"
+            />
+            <StatsCard
+              title="Excellent Fits"
+              value={stats.excellent}
+              subtitle={`${stats.total > 0 ? Math.round((stats.excellent / stats.total) * 100) : 0}% of total`}
+              icon={Award}
+              color="green"
+            />
+            <StatsCard
+              title="Good Fits"
+              value={stats.good}
+              subtitle={`${stats.total > 0 ? Math.round((stats.good / stats.total) * 100) : 0}% of total`}
+              icon={TrendingUp}
+              color="yellow"
+            />
+            <StatsCard
+              title="Average Score"
+              value={`${stats.averageScore}%`}
+              icon={Brain}
+              color="purple"
+              showProgress={true}
+              progressValue={stats.averageScore}
+            />
           </div>
         )}
 
         {/* Filters */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center">
-              <Filter className="h-5 w-5 mr-2" />
-              Filters & Search
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="search">Search Candidates</Label>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <Input
-                    id="search"
-                    placeholder="Name, email, or job title..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="score-filter">Filter by Score</Label>
-                <Select value={scoreFilter} onValueChange={setScoreFilter}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="All scores" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Scores</SelectItem>
-                    <SelectItem value="excellent">Excellent (&gt;70%)</SelectItem>
-                    <SelectItem value="good">Good (40-70%)</SelectItem>
-                    <SelectItem value="poor">Poor (&lt;40%)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="sort-by">Sort By</Label>
-                <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sort by..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="date">Date Screened</SelectItem>
-                    <SelectItem value="score">Overall Fit Score</SelectItem>
-                    <SelectItem value="name">Candidate Name</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="sort-order">Order</Label>
-                <Select value={sortOrder} onValueChange={setSortOrder}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Order..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="desc">Descending</SelectItem>
-                    <SelectItem value="asc">Ascending</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <FiltersSection
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          scoreFilter={scoreFilter}
+          onScoreFilterChange={setScoreFilter}
+          sortBy={sortBy}
+          onSortByChange={setSortBy}
+          sortOrder={sortOrder}
+          onSortOrderChange={setSortOrder}
+        />
 
         {/* Results Table */}
         <Card>
@@ -499,257 +402,28 @@ const ScreeningResults = () => {
           </CardHeader>
           <CardContent>
             {filteredAndSortedResults.length === 0 ? (
-              <div className="text-center py-8">
-                <Brain className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600">No screening results found matching your criteria.</p>
-              </div>
+              <EmptyState />
             ) : (
               <div className="space-y-4">
                 {filteredAndSortedResults.map((result) => (
-                  <Card key={result.id} className="border-l-4 border-l-blue-500">
-                    <CardHeader className="pb-3">
-                      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                              <User className="h-5 w-5 mr-2 text-blue-600" />
-                              {result.first_name} {result.last_name}
-                            </h3>
-                            <Badge className={`${getScoreColor(result.overall_fit || 0)} border-0`}>
-                              {result.overall_fit || 0}% - {getScoreLabel(result.overall_fit || 0)}
-                            </Badge>
-                          </div>
-                          
-                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm text-gray-600">
-                            <div className="flex items-center">
-                              <Mail className="h-4 w-4 mr-2" />
-                              {result.email}
-                            </div>
-                            <div className="flex items-center">
-                              <Briefcase className="h-4 w-4 mr-2" />
-                              {result.job?.title || 'No job linked'}
-                            </div>
-                            <div className="flex items-center">
-                              <Calendar className="h-4 w-4 mr-2" />
-                              {new Date(result.created_at).toLocaleDateString()}
-                            </div>
-                            {result.phone && (
-                              <div className="flex items-center">
-                                <Mic className="h-4 w-4 mr-2" />
-                                {result.phone}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          {result.resume_url && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => window.open(result.resume_url, '_blank')}
-                              className="flex items-center gap-1 border-green-300 text-green-600 hover:bg-green-50"
-                            >
-                              <FileText className="h-4 w-4" />
-                              Resume
-                            </Button>
-                          )}
-                          
-                          {/* Voice Agent Button */}
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleRequestVoiceScreening(result)}
-                            disabled={requestingInterview !== null || result.voice_screening_requested}
-                            className={`flex items-center gap-1 ${
-                              result.voice_screening_requested 
-                                ? 'border-green-300 text-green-600 hover:bg-green-50' 
-                                : 'border-blue-300 text-blue-600 hover:bg-blue-50'
-                            }`}
-                          >
-                            {requestingInterview === result.id ? (
-                              <>
-                                <Mic className="h-4 w-4 animate-spin" />
-                                Requesting...
-                              </>
-                            ) : result.voice_screening_requested ? (
-                              <>
-                                <Mic className="h-4 w-4" />
-                                Interview Requested
-                              </>
-                            ) : (
-                              <>
-                                <Mic className="h-4 w-4" />
-                                Voice Agent
-                              </>
-                            )}
-                          </Button>
-
-                          {/* Development: Direct Interview Link */}
-                          {process.env.NODE_ENV === 'development' && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => {
-                                const link = VoiceInterviewService.generateInterviewLink(result.id, true);
-                                VoiceInterviewService.copyInterviewLink(result.id, true);
-                                toast({
-                                  title: "Interview Link Copied",
-                                  description: "Direct interview link copied to clipboard (auto-start enabled)",
-                                });
-                              }}
-                              className="flex items-center gap-1 border-purple-300 text-purple-600 hover:bg-purple-50"
-                            >
-                              <ExternalLink className="h-4 w-4" />
-                              Copy Link
-                            </Button>
-                          )}
-                          
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => toggleRowExpansion(result.id)}
-                            className="flex items-center gap-1"
-                          >
-                            {expandedRows.has(result.id) ? (
-                              <>
-                                Less <ChevronUp className="h-4 w-4" />
-                              </>
-                            ) : (
-                              <>
-                                Details <ChevronDown className="h-4 w-4" />
-                              </>
-                            )}
-                          </Button>
-                        </div>
-                      </div>
-
-                      {/* Progress Bar for Score */}
-                      <div className="mt-3">
-                        <div className="flex justify-between text-sm text-gray-600 mb-1">
-                          <span>Overall Fit Score</span>
-                          <span>{result.overall_fit || 0}%</span>
-                        </div>
-                        <Progress 
-                          value={result.overall_fit || 0} 
-                          className="h-2"
-                        />
-                      </div>
-                    </CardHeader>
-
-                    <Collapsible open={expandedRows.has(result.id)}>
-                      <CollapsibleContent>
-                        <CardContent className="pt-0">
-                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            {/* Strengths */}
-                            {result.strengths && (
-                              <div className="space-y-2">
-                                <h4 className="font-semibold text-green-700 flex items-center">
-                                  <TrendingUp className="h-4 w-4 mr-2" />
-                                  Strengths
-                                </h4>
-                                <div className="bg-green-50 p-3 rounded-lg border border-green-200">
-                                  <p className="text-sm text-gray-700">{result.strengths}</p>
-                                </div>
-                              </div>
-                            )}
-
-                            {/* Weaknesses */}
-                            {result.weaknesses && (
-                              <div className="space-y-2">
-                                <h4 className="font-semibold text-red-700">
-                                  Areas for Development
-                                </h4>
-                                <div className="bg-red-50 p-3 rounded-lg border border-red-200">
-                                  <p className="text-sm text-gray-700">{result.weaknesses}</p>
-                                </div>
-                              </div>
-                            )}
-
-                            {/* Risk Factor */}
-                            {result.risk_factor && (
-                              <div className="space-y-2">
-                                <h4 className="font-semibold text-orange-700">
-                                  Risk Factors
-                                </h4>
-                                <div className="bg-orange-50 p-3 rounded-lg border border-orange-200">
-                                  <p className="text-sm text-gray-700">{result.risk_factor}</p>
-                                </div>
-                              </div>
-                            )}
-
-                            {/* Reward Factor */}
-                            {result.reward_factor && (
-                              <div className="space-y-2">
-                                <h4 className="font-semibold text-blue-700">
-                                  Potential Rewards
-                                </h4>
-                                <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
-                                  <p className="text-sm text-gray-700">{result.reward_factor}</p>
-                                </div>
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Justification */}
-                          {result.justification && (
-                            <div className="mt-6 space-y-2">
-                              <h4 className="font-semibold text-gray-900">
-                                AI Analysis Justification
-                              </h4>
-                              <div className="bg-gray-50 p-4 rounded-lg border">
-                                <p className="text-sm text-gray-700">{result.justification}</p>
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Interview Summary */}
-                          {result.interview_summary && (
-                            <div className="mt-6 space-y-2">
-                              <h4 className="font-semibold text-blue-700 flex items-center">
-                                <Mic className="h-4 w-4 mr-2" />
-                                Voice Interview Summary
-                              </h4>
-                              <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                                <p className="text-sm text-gray-700">{result.interview_summary}</p>
-                                {result.interview_completed_at && (
-                                  <p className="text-xs text-gray-500 mt-2">
-                                    Completed: {new Date(result.interview_completed_at).toLocaleString()}
-                                  </p>
-                                )}
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Voice Screening Status */}
-                          {result.voice_screening_requested && !result.interview_summary && (
-                            <div className="mt-6 space-y-2">
-                              <h4 className="font-semibold text-orange-700 flex items-center">
-                                <Mic className="h-4 w-4 mr-2" />
-                                Voice Screening Status
-                              </h4>
-                              <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
-                                <p className="text-sm text-gray-700">Voice screening interview has been requested. Candidate will receive an email with the interview link.</p>
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Company Notes */}
-                          {result.notes && (
-                            <div className="mt-6 space-y-2">
-                              <h4 className="font-semibold text-purple-700 flex items-center">
-                                <StickyNote className="h-4 w-4 mr-2" />
-                                Company Notes
-                              </h4>
-                              <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
-                                <p className="text-sm text-gray-700">{result.notes}</p>
-                              </div>
-                            </div>
-                          )}
-                        </CardContent>
-                      </CollapsibleContent>
-                    </Collapsible>
-                  </Card>
+                  <ResultCard
+                    key={result.id}
+                    result={result}
+                    isExpanded={expandedRows.has(result.id)}
+                    onToggleExpansion={() => toggleRowExpansion(result.id)}
+                    onRequestVoiceScreening={() => handleRequestVoiceScreening(result)}
+                    onAddNote={() => handleAddNote(result)}
+                    onCopyInterviewLink={process.env.NODE_ENV === 'development' ? () => {
+                      const link = VoiceInterviewService.generateInterviewLink(result.id, true);
+                      VoiceInterviewService.copyInterviewLink(result.id, true);
+                      toast({
+                        title: "Interview Link Copied",
+                        description: "Direct interview link copied to clipboard (auto-start enabled)",
+                      });
+                    } : undefined}
+                    requestingInterview={requestingInterview === result.id}
+                    isDevelopment={process.env.NODE_ENV === 'development'}
+                  />
                 ))}
               </div>
             )}
@@ -757,44 +431,15 @@ const ScreeningResults = () => {
         </Card>
 
         {/* Add Note Dialog */}
-        <Dialog open={noteDialogOpen} onOpenChange={setNoteDialogOpen}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>
-                {selectedResult?.notes ? 'Edit Note' : 'Add Note'}
-              </DialogTitle>
-              <DialogDescription>
-                Add your notes about {selectedResult?.first_name} {selectedResult?.last_name}
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="note-text">Note</Label>
-                <Textarea
-                  id="note-text"
-                  placeholder="Enter your notes about this candidate..."
-                  value={noteText}
-                  onChange={(e) => setNoteText(e.target.value)}
-                  rows={4}
-                />
-              </div>
-              <div className="flex justify-end gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => setNoteDialogOpen(false)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  onClick={handleSaveNote}
-                  disabled={addNoteMutation.isPending}
-                >
-                  {addNoteMutation.isPending ? 'Saving...' : 'Save Note'}
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
+        <NoteDialog
+          open={noteDialogOpen}
+          onOpenChange={setNoteDialogOpen}
+          selectedResult={selectedResult}
+          noteText={noteText}
+          onNoteTextChange={setNoteText}
+          onSave={handleSaveNote}
+          isSaving={addNoteMutation.isPending}
+        />
       </div>
     </div>
   );
