@@ -18,6 +18,7 @@ export type Database = {
           job_id: string
           phone: string
           resume_url: string | null
+          resume_text: string | null
           status: string | null
         }
         Insert: {
@@ -28,6 +29,7 @@ export type Database = {
           job_id: string
           phone: string
           resume_url?: string | null
+          resume_text?: string | null
           status?: string | null
         }
         Update: {
@@ -38,6 +40,7 @@ export type Database = {
           job_id?: string
           phone?: string
           resume_url?: string | null
+          resume_text?: string | null
           status?: string | null
         }
         Relationships: [
@@ -199,6 +202,7 @@ export type Database = {
           first_name: string
           last_name: string
           email: string
+          phone: string | null
           strengths: string | null
           weaknesses: string | null
           risk_factor: string | null
@@ -208,12 +212,18 @@ export type Database = {
           date: string
           created_at: string
           updated_at: string
+          job_id: string | null
+          notes: string | null
+          voice_screening_requested: boolean
+          interview_summary: string | null
+          interview_completed_at: string | null
         }
         Insert: {
           id?: string
           first_name: string
           last_name: string
           email: string
+          phone?: string | null
           strengths?: string | null
           weaknesses?: string | null
           risk_factor?: string | null
@@ -223,12 +233,18 @@ export type Database = {
           date?: string
           created_at?: string
           updated_at?: string
+          job_id?: string | null
+          notes?: string | null
+          voice_screening_requested?: boolean
+          interview_summary?: string | null
+          interview_completed_at?: string | null
         }
         Update: {
           id?: string
           first_name?: string
           last_name?: string
           email?: string
+          phone?: string | null
           strengths?: string | null
           weaknesses?: string | null
           risk_factor?: string | null
@@ -238,8 +254,21 @@ export type Database = {
           date?: string
           created_at?: string
           updated_at?: string
+          job_id?: string | null
+          notes?: string | null
+          voice_screening_requested?: boolean
+          interview_summary?: string | null
+          interview_completed_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "screening_results_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          }
+        ]
       }
     }
     Views: {

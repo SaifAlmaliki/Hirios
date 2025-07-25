@@ -12,6 +12,7 @@ import Auth from "./pages/Auth";
 import CompanySetup from "./pages/CompanySetup";
 import Subscription from "./pages/Subscription";
 import ScreeningResults from "./pages/ScreeningResults";
+import VoiceInterview from "./pages/VoiceInterview";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,6 +32,7 @@ const App = () => (
             <Route path="/company-setup" element={<CompanySetup />} />
             <Route path="/subscription" element={<Subscription />} />
             <Route path="/screening-results" element={<ScreeningResults />} />
+            <Route path="/interview/:screeningResultId" element={<VoiceInterview />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

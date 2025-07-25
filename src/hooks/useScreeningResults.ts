@@ -22,11 +22,9 @@ export interface ScreeningResult {
   updated_at: string;
   job_id?: string;
   notes?: string;
-  call_status?: 'not_initiated' | 'initiated' | 'in_progress' | 'completed' | 'failed';
-  call_initiated_at?: string;
-  call_completed_at?: string;
-  call_summary?: string;
-  call_error_message?: string;
+  voice_screening_requested?: boolean;
+  interview_summary?: string;
+  interview_completed_at?: string;
   // Job details from join
   job?: {
     id: string;

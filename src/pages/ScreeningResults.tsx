@@ -35,8 +35,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useScreeningResults, useScreeningResultsStats, useAddNoteToScreeningResult, ScreeningResult } from '@/hooks/useScreeningResults';
 import { useHasAIAccess } from '@/hooks/useSubscription';
-import { VoiceAgentService, VoiceAgentData } from '@/services/voiceAgentService';
-import { OutboundCallService } from '@/services/outboundCallService';
+import { VoiceInterviewService } from '@/services/voiceInterviewService';
 
 const ScreeningResults = () => {
   const navigate = useNavigate();
@@ -61,13 +60,16 @@ const ScreeningResults = () => {
   const [selectedResult, setSelectedResult] = useState<ScreeningResult | null>(null);
   const [noteText, setNoteText] = useState('');
   
-  // State for outbound calls
-  const [initiatingCall, setInitiatingCall] = useState<string | null>(null);
-  const [voiceAgentService] = useState(() => VoiceAgentService.getInstance());
+  // State for voice interviews
+  const [requestingInterview, setRequestingInterview] = useState<string | null>(null);
+  const [voiceInterviewService] = useState(() => VoiceInterviewService.getInstance());
 
   // Redirect if not company user
   React.useEffect(() => {
+    console.log('🔍 Auth check - User:', user?.id, 'UserType:', userType);
     if (!user || userType !== 'company') {
+      console.log('⚠️ Authentication failed, redirecting to /auth');
+      console.log('User exists:', !!user, 'User type:', userType);
       navigate('/auth');
       return;
     }
@@ -117,60 +119,45 @@ const ScreeningResults = () => {
     });
   };
 
-  const handleInitiateCall = async (result: ScreeningResult) => {
+  const handleRequestVoiceScreening = async (result: ScreeningResult) => {
     try {
-      setInitiatingCall(result.id);
+      setRequestingInterview(result.id);
       
-      // Check if candidate has phone number
-      if (!result.phone) {
+      console.log('🎯 Starting voice screening request for:', result.id);
+      console.log('🔐 Current user:', user?.id);
+      console.log('👤 User type:', userType);
+      
+      const response = await voiceInterviewService.requestVoiceScreening(result.id);
+      
+      console.log('📝 Voice screening response:', response);
+      
+      if (response.success) {
         toast({
-          title: "Phone Number Required",
-          description: "This candidate doesn't have a phone number on file. Please add one to initiate the call.",
-          variant: "destructive",
+          title: "Voice Screening Requested",
+          description: `Voice screening interview has been requested for ${result.first_name} ${result.last_name}. They will receive an email with the interview link.`,
         });
-        setInitiatingCall(null);
-        return;
-      }
-      
-      // Fetch job details
-      const jobDetails = await OutboundCallService.fetchJobDetails(result.job_id || null);
-      
-      // Get resume summary
-      const resumeSummary = await OutboundCallService.getApplicationResume(result.email);
-      
-      // Prepare data for outbound call
-      const callData: VoiceAgentData = {
-        job_title: jobDetails.title,
-        full_name: `${result.first_name} ${result.last_name}`,
-        job_requirements: jobDetails.requirements,
-        job_description: `${jobDetails.description}\n\nKey Responsibilities:\n${jobDetails.responsibilities}`,
-        resume: resumeSummary,
-        candidate_phone: result.phone,
-        screening_result_id: result.id
-      };
-
-      console.log('Initiating outbound call with data:', callData);
-      
-      const callResult = await voiceAgentService.initiateOutboundCall(callData);
-      
-      if (callResult.success) {
-        toast({
-          title: "Call Initiated",
-          description: `AI agent is now calling ${result.first_name} ${result.last_name} at ${result.phone}`,
-        });
+        
+        console.log('✅ Voice screening request successful');
+        
+        // Instead of reloading, just update the local state
+        // The button will show as disabled due to the requestingInterview state
+        // and the database has been updated
+        
       } else {
-        throw new Error(callResult.error || 'Failed to initiate call');
+        console.error('❌ Voice screening request failed:', response.error);
+        throw new Error(response.error || 'Failed to request voice screening');
       }
     } catch (error) {
-      console.error('Failed to initiate call:', error);
+      console.error('💥 Exception in handleRequestVoiceScreening:', error);
       
       toast({
-        title: "Failed to Initiate Call",
-        description: error instanceof Error ? error.message : "Unable to initiate the outbound call. Please try again.",
+        title: "Failed to Request Voice Screening",
+        description: error instanceof Error ? error.message : "Unable to request voice screening. Please try again.",
         variant: "destructive",
       });
     } finally {
-      setInitiatingCall(null);
+      console.log('🏁 Cleaning up voice screening request state');
+      setRequestingInterview(null);
     }
   };
 
@@ -592,14 +579,23 @@ const ScreeningResults = () => {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handleInitiateCall(result)}
-                            disabled={initiatingCall !== null}
-                            className="flex items-center gap-1 border-blue-300 text-blue-600 hover:bg-blue-50"
+                            onClick={() => handleRequestVoiceScreening(result)}
+                            disabled={requestingInterview !== null || result.voice_screening_requested}
+                            className={`flex items-center gap-1 ${
+                              result.voice_screening_requested 
+                                ? 'border-green-300 text-green-600 hover:bg-green-50' 
+                                : 'border-blue-300 text-blue-600 hover:bg-blue-50'
+                            }`}
                           >
-                            {initiatingCall === result.id ? (
+                            {requestingInterview === result.id ? (
                               <>
                                 <Mic className="h-4 w-4 animate-spin" />
-                                Starting...
+                                Requesting...
+                              </>
+                            ) : result.voice_screening_requested ? (
+                              <>
+                                <Mic className="h-4 w-4" />
+                                Interview Requested
                               </>
                             ) : (
                               <>
@@ -608,6 +604,26 @@ const ScreeningResults = () => {
                               </>
                             )}
                           </Button>
+
+                          {/* Development: Direct Interview Link */}
+                          {process.env.NODE_ENV === 'development' && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                const link = VoiceInterviewService.generateInterviewLink(result.id, true);
+                                VoiceInterviewService.copyInterviewLink(result.id, true);
+                                toast({
+                                  title: "Interview Link Copied",
+                                  description: "Direct interview link copied to clipboard (auto-start enabled)",
+                                });
+                              }}
+                              className="flex items-center gap-1 border-purple-300 text-purple-600 hover:bg-purple-50"
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                              Copy Link
+                            </Button>
+                          )}
                           
                           <Button
                             variant="ghost"
@@ -707,33 +723,33 @@ const ScreeningResults = () => {
                             </div>
                           )}
 
-                          {/* Call Summary */}
-                          {result.call_summary && (
+                          {/* Interview Summary */}
+                          {result.interview_summary && (
                             <div className="mt-6 space-y-2">
                               <h4 className="font-semibold text-blue-700 flex items-center">
                                 <Mic className="h-4 w-4 mr-2" />
                                 Voice Interview Summary
                               </h4>
                               <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                                <p className="text-sm text-gray-700">{result.call_summary}</p>
-                                {result.call_completed_at && (
+                                <p className="text-sm text-gray-700">{result.interview_summary}</p>
+                                {result.interview_completed_at && (
                                   <p className="text-xs text-gray-500 mt-2">
-                                    Completed: {new Date(result.call_completed_at).toLocaleString()}
+                                    Completed: {new Date(result.interview_completed_at).toLocaleString()}
                                   </p>
                                 )}
                               </div>
                             </div>
                           )}
 
-                          {/* Call Error */}
-                          {result.call_error_message && (
+                          {/* Voice Screening Status */}
+                          {result.voice_screening_requested && !result.interview_summary && (
                             <div className="mt-6 space-y-2">
-                              <h4 className="font-semibold text-red-700 flex items-center">
-                                <MicOff className="h-4 w-4 mr-2" />
-                                Call Error
+                              <h4 className="font-semibold text-orange-700 flex items-center">
+                                <Mic className="h-4 w-4 mr-2" />
+                                Voice Screening Status
                               </h4>
-                              <div className="bg-red-50 p-4 rounded-lg border border-red-200">
-                                <p className="text-sm text-gray-700">{result.call_error_message}</p>
+                              <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
+                                <p className="text-sm text-gray-700">Voice screening interview has been requested. Candidate will receive an email with the interview link.</p>
                               </div>
                             </div>
                           )}
