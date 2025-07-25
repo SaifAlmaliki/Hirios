@@ -67,6 +67,69 @@ export class VoiceInterviewService {
 
       console.log('Company profile:', companyProfile);
 
+      // Get screening result details for the webhook
+      const { data: screeningResult, error: fetchError } = await supabase
+        .from('screening_results')
+        .select(`
+          *,
+          jobs:job_id (
+            id,
+            title,
+            description,
+            requirements,
+            responsibilities
+          )
+        `)
+        .eq('id', screeningResultId)
+        .single();
+
+      if (fetchError || !screeningResult) {
+        console.error('Failed to fetch screening result:', fetchError);
+        throw new Error('Failed to fetch screening result details');
+      }
+
+      // Generate interview link
+      const interviewLink = VoiceInterviewService.generateInterviewLink(screeningResultId, true);
+      console.log('📋 Generated interview link:', interviewLink);
+
+      // Prepare webhook data
+      const job = screeningResult.jobs as any;
+      const webhookData = {
+        screening_result_id: screeningResultId,
+        candidate_name: `${screeningResult.first_name} ${screeningResult.last_name}`,
+        candidate_email: screeningResult.email,
+        job_title: job?.title || 'Position',
+        interview_link: interviewLink,
+        timestamp: new Date().toISOString()
+      };
+
+      console.log('📤 Sending webhook data:', webhookData);
+
+      // Send webhook to n8n
+      const webhookUrl = import.meta.env.VITE_SCREENING_WEBHOOK_URL;
+      if (!webhookUrl) {
+        console.warn('⚠️ VITE_SCREENING_WEBHOOK_URL not configured, skipping webhook');
+      } else {
+        try {
+          const webhookResponse = await fetch(webhookUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(webhookData)
+          });
+
+          if (webhookResponse.ok) {
+            console.log('✅ Webhook sent successfully to n8n');
+          } else {
+            console.error('❌ Webhook failed:', webhookResponse.status, webhookResponse.statusText);
+          }
+        } catch (webhookError) {
+          console.error('❌ Webhook error:', webhookError);
+          // Don't fail the whole process if webhook fails
+        }
+      }
+
       // Update voice_screening_requested to true
       const { data, error } = await supabase
         .from('screening_results')
