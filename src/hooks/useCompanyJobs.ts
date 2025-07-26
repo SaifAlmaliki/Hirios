@@ -1,9 +1,12 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import { Job } from './useJobs';
 
 export const useCompanyJobs = () => {
+  const { userType } = useAuth();
+  
   return useQuery({
     queryKey: ['company-jobs'],
     queryFn: async () => {
@@ -42,5 +45,7 @@ export const useCompanyJobs = () => {
       console.log('Company jobs fetched successfully:', data);
       return data as Job[];
     },
+    // Only enable the query if user is a company user
+    enabled: userType === 'company',
   });
 };
