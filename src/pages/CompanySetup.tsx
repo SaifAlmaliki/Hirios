@@ -82,11 +82,11 @@ const CompanySetup = () => {
         description: "Company profile saved successfully!",
       });
 
-      navigate('/subscription');
-    } catch (error: any) {
+      navigate('/job-portal');
+    } catch (error: unknown) {
       toast({
         title: "Error",
-        description: error.message || "Failed to save company profile",
+        description: error instanceof Error ? error.message : "Failed to save company profile",
         variant: "destructive",
       });
     } finally {
@@ -94,8 +94,8 @@ const CompanySetup = () => {
     }
   };
 
-  const handleSubscription = () => {
-    navigate('/subscription');
+  const handleJobPortal = () => {
+    navigate('/job-portal');
   };
 
   if (!user || userType !== 'company') {
@@ -219,11 +219,11 @@ const CompanySetup = () => {
                 <Button 
                   type="button" 
                   variant="outline" 
-                  onClick={handleSubscription}
+                  onClick={handleJobPortal}
                   className="flex-1"
                 >
                   <CreditCard className="h-4 w-4 mr-2" />
-                  Manage Subscription
+                  Go to Dashboard
                 </Button>
               </div>
             </form>

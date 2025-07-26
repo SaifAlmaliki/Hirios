@@ -34,7 +34,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useScreeningResults, useScreeningResultsStats, useAddNoteToScreeningResult, ScreeningResult } from '@/hooks/useScreeningResults';
-import { useHasAIAccess } from '@/hooks/useSubscription';
+
 import { VoiceInterviewService } from '@/services/voiceInterviewService';
 
 const ScreeningResults = () => {
@@ -45,7 +45,7 @@ const ScreeningResults = () => {
   // Data fetching
   const { data: screeningResults = [], isLoading, error } = useScreeningResults();
   const { data: stats } = useScreeningResultsStats();
-  const { data: hasAIAccess } = useHasAIAccess();
+
   const addNoteMutation = useAddNoteToScreeningResult();
 
   // State for filtering and sorting
@@ -266,50 +266,7 @@ const ScreeningResults = () => {
     return filtered;
   }, [screeningResults, searchTerm, scoreFilter, sortBy, sortOrder]);
 
-  // Show upgrade prompt for free users
-  // TEMPORARILY DISABLED FOR DEBUGGING - Re-enable by changing false to hasAIAccess === false
-  if (false) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-        <Card className="max-w-md w-full text-center">
-          <CardHeader>
-            <div className="mx-auto bg-blue-600 p-3 rounded-full w-fit mb-4">
-              <Brain className="h-8 w-8 text-white" />
-            </div>
-            <CardTitle className="text-2xl font-bold text-gray-900">
-              AI Screening Dashboard
-            </CardTitle>
-            <CardDescription>
-              Access detailed candidate screening results with AI insights
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-              <p className="text-orange-800 font-medium">Premium Feature Required</p>
-              <p className="text-orange-700 text-sm mt-1">
-                Upgrade to Premium to access AI screening results and candidate insights.
-              </p>
-            </div>
-            <div className="space-y-2">
-              <Button 
-                onClick={() => navigate('/subscription')}
-                className="w-full bg-blue-600 hover:bg-blue-700"
-              >
-                Upgrade to Premium
-              </Button>
-              <Button 
-                variant="outline" 
-                onClick={() => navigate('/job-portal')}
-                className="w-full"
-              >
-                Back to Dashboard
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+
 
 
 

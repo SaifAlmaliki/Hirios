@@ -2,7 +2,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { StripeService } from '@/services/stripeService';
+
 
 export interface Job {
   id: string;
@@ -44,7 +44,7 @@ export const useJobs = () => {
 export const useCreateJob = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const stripeService = StripeService.getInstance();
+
 
   return useMutation({
     mutationFn: async (jobData: Omit<Job, 'id' | 'created_at' | 'updated_at' | 'company_profile_id'>) => {
@@ -59,19 +59,12 @@ export const useCreateJob = () => {
 
       console.log('✅ User authenticated:', user.id, user.email);
 
-      // Step 2: Check if user can post more jobs
-      const { canPost, reason } = await stripeService.canPostJob(user.id);
-      if (!canPost) {
-        console.error('❌ Job posting limit reached:', reason);
-        throw new Error(reason || 'You have reached your job posting limit.');
-      }
-
       console.log('✅ User can post job');
 
       // Step 3: Find company profile
       const { data: profile, error: profileError } = await supabase
         .from('company_profiles')
-        .select('id, subscription_status, subscription_plan, company_name')
+        .select('id, company_name')
         .eq('user_id', user.id)
         .maybeSingle();
 

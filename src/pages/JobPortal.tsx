@@ -48,10 +48,6 @@ const JobPortal = () => {
     navigate('/company-setup');
   };
 
-  const handleSubscription = () => {
-    navigate('/subscription');
-  };
-
   const handleScreeningResults = () => {
     navigate('/screening-results');
   };
@@ -128,10 +124,7 @@ const JobPortal = () => {
                         <Settings className="h-4 w-4 mr-1" />
                         <span className="hidden sm:inline">Setup</span>
                       </Button>
-                      <Button variant="outline" size="sm" onClick={handleSubscription}>
-                        <span className="hidden sm:inline">Subscription</span>
-                        <span className="sm:hidden">Sub</span>
-                      </Button>
+
                       <Button variant="outline" size="sm" onClick={handleScreeningResults}>
                         <Brain className="h-4 w-4 mr-1" />
                         <span className="hidden sm:inline">AI Screening</span>
@@ -193,9 +186,7 @@ const JobPortal = () => {
                           <Settings className="h-4 w-4 mr-1" />
                           Setup
                         </Button>
-                        <Button variant="outline" size="sm" onClick={handleSubscription} className="w-full">
-                          Subscription
-                        </Button>
+
                         <Button variant="outline" size="sm" onClick={handleScreeningResults} className="w-full">
                           <Brain className="h-4 w-4 mr-1" />
                           AI Screening
