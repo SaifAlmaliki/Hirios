@@ -396,10 +396,10 @@ const HiriosLanding = () => {
                   </div>
                 </div>
                 <Button 
-                  className="w-full mt-6 bg-blue-600 hover:bg-blue-700"
-                  onClick={() => navigate('/subscription')}
+                  className="w-full mt-6 bg-gray-400 cursor-not-allowed"
+                  disabled
                 >
-                  Upgrade to Premium
+                  Premium (Coming Soon)
                 </Button>
               </CardContent>
             </Card>
