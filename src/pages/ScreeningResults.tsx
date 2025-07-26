@@ -221,7 +221,7 @@ const ScreeningResults = () => {
 
   // Filter and sort results
   const filteredAndSortedResults = useMemo(() => {
-    let filtered = screeningResults.filter(result => {
+    const filtered = screeningResults.filter(result => {
       const matchesSearch = 
         result.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         result.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -542,16 +542,17 @@ const ScreeningResults = () => {
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                           {result.resume_url && (
                             <Button
                               variant="outline"
                               size="sm"
                               onClick={() => window.open(result.resume_url, '_blank')}
-                              className="flex items-center gap-1 border-green-300 text-green-600 hover:bg-green-50"
+                              className="flex items-center gap-1 border-green-300 text-green-600 hover:bg-green-50 text-xs sm:text-sm min-w-0 shrink-0"
                             >
-                              <FileText className="h-4 w-4" />
-                              Resume
+                              <FileText className="h-3 w-3 sm:h-4 sm:w-4" />
+                              <span className="hidden xs:inline">Resume</span>
+                              <span className="xs:hidden">CV</span>
                             </Button>
                           )}
                           
@@ -561,7 +562,7 @@ const ScreeningResults = () => {
                             size="sm"
                             onClick={() => handleRequestVoiceScreening(result)}
                             disabled={requestingInterview !== null || result.voice_screening_requested}
-                            className={`flex items-center gap-1 ${
+                            className={`flex items-center gap-1 text-xs sm:text-sm min-w-0 shrink-0 ${
                               result.voice_screening_requested 
                                 ? 'border-green-300 text-green-600 hover:bg-green-50' 
                                 : 'border-blue-300 text-blue-600 hover:bg-blue-50'
@@ -569,18 +570,21 @@ const ScreeningResults = () => {
                           >
                             {requestingInterview === result.id ? (
                               <>
-                                <Mic className="h-4 w-4 animate-spin" />
-                                Requesting...
+                                <Mic className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
+                                <span className="hidden sm:inline">Requesting...</span>
+                                <span className="sm:hidden">...</span>
                               </>
                             ) : result.voice_screening_requested ? (
                               <>
-                                <Mic className="h-4 w-4" />
-                                Interview Requested
+                                <Mic className="h-3 w-3 sm:h-4 sm:w-4" />
+                                <span className="hidden sm:inline">Interview Requested</span>
+                                <span className="sm:hidden">Requested</span>
                               </>
                             ) : (
                               <>
-                                <Mic className="h-4 w-4" />
-                                Voice Agent
+                                <Mic className="h-3 w-3 sm:h-4 sm:w-4" />
+                                <span className="hidden xs:inline">Voice Agent</span>
+                                <span className="xs:hidden">Voice</span>
                               </>
                             )}
                           </Button>
@@ -598,10 +602,11 @@ const ScreeningResults = () => {
                                   description: "Direct interview link copied to clipboard (auto-start enabled)",
                                 });
                               }}
-                              className="flex items-center gap-1 border-purple-300 text-purple-600 hover:bg-purple-50"
+                              className="flex items-center gap-1 border-purple-300 text-purple-600 hover:bg-purple-50 text-xs sm:text-sm min-w-0 shrink-0"
                             >
-                              <ExternalLink className="h-4 w-4" />
-                              Copy Link
+                              <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4" />
+                              <span className="hidden xs:inline">Copy Link</span>
+                              <span className="xs:hidden">Link</span>
                             </Button>
                           )}
                           
@@ -609,15 +614,17 @@ const ScreeningResults = () => {
                             variant="ghost"
                             size="sm"
                             onClick={() => toggleRowExpansion(result.id)}
-                            className="flex items-center gap-1"
+                            className="flex items-center gap-1 text-xs sm:text-sm min-w-0 shrink-0"
                           >
                             {expandedRows.has(result.id) ? (
                               <>
-                                Less <ChevronUp className="h-4 w-4" />
+                                <span className="hidden xs:inline">Less</span>
+                                <ChevronUp className="h-3 w-3 sm:h-4 sm:w-4" />
                               </>
                             ) : (
                               <>
-                                Details <ChevronDown className="h-4 w-4" />
+                                <span className="hidden xs:inline">Details</span>
+                                <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4" />
                               </>
                             )}
                           </Button>
