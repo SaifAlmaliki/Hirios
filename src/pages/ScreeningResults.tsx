@@ -546,26 +546,24 @@ const ScreeningResults = () => {
                             )}
                           </Button>
 
-                          {/* Development: Direct Interview Link */}
-                          {process.env.NODE_ENV === 'development' && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => {
-                                const link = VoiceInterviewService.generateInterviewLink(result.id, true);
-                                VoiceInterviewService.copyInterviewLink(result.id, true);
-                                toast({
-                                  title: "Interview Link Copied",
-                                  description: "Direct interview link copied to clipboard (auto-start enabled)",
-                                });
-                              }}
-                              className="flex items-center gap-1 border-purple-300 text-purple-600 hover:bg-purple-50 text-xs sm:text-sm min-w-0 shrink-0"
-                            >
-                              <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4" />
-                              <span className="hidden xs:inline">Copy Link</span>
-                              <span className="xs:hidden">Link</span>
-                            </Button>
-                          )}
+                          {/* Direct Interview Link */}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              const link = VoiceInterviewService.generateInterviewLink(result.id, true);
+                              VoiceInterviewService.copyInterviewLink(result.id, true);
+                              toast({
+                                title: "Interview Link Copied",
+                                description: "Direct interview link copied to clipboard (auto-start enabled)",
+                              });
+                            }}
+                            className="flex items-center gap-1 border-purple-300 text-purple-600 hover:bg-purple-50 text-xs sm:text-sm min-w-0 shrink-0"
+                          >
+                            <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4" />
+                            <span className="hidden xs:inline">Copy Link</span>
+                            <span className="xs:hidden">Link</span>
+                          </Button>
                           
                           <Button
                             variant="ghost"
