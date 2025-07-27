@@ -126,7 +126,7 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
 
     // Phone validation (must include country code with + prefix)
     const phoneRegex = /^\+[1-9]\d{1,14}$/;
-    if (!phoneRegex.test(applicationData.phone.replace(/[\s\-\(\)]/g, ''))) {
+    if (!phoneRegex.test(applicationData.phone.replace(/[\s\-()]/g, ''))) {
       toast({
         title: "Invalid phone number format",
         description: "Please enter a valid phone number with country code (e.g., +49151234567).",
@@ -262,13 +262,6 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
                           <span className="font-medium truncate">{job.employment_type}</span>
                         </div>
                       </div>
-
-                      {job.responsibilities && (
-                        <div className="flex items-center text-sm font-semibold text-blue-700 bg-blue-50 px-3 py-2 rounded-lg inline-flex w-fit">
-                          <CheckCircle className="h-4 w-4 mr-2" />
-                          Key Responsibilities
-                        </div>
-                      )}
                     </div>
                   </CardHeader>
                   
