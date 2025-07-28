@@ -28,7 +28,13 @@ import {
   Mic,
   MicOff,
   FileText,
-  ExternalLink
+  ExternalLink,
+  Eye,
+  Phone,
+  MapPin,
+  Building2,
+  ArrowLeft,
+  Star
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -42,6 +48,22 @@ const ScreeningResults = () => {
   const { user, userType } = useAuth();
   const { toast } = useToast();
   
+  // Security check: Only allow companies to access this page
+  if (!user || userType !== 'company') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-6xl mb-4">🚫</div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h1>
+          <p className="text-gray-600 mb-4">This page is only available for company accounts.</p>
+          <Button onClick={() => navigate('/job-portal')}>
+            Go to Job Portal
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   // Data fetching
   const { data: screeningResults = [], isLoading, error } = useScreeningResults();
   const { data: stats } = useScreeningResultsStats();

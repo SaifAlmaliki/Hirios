@@ -10,6 +10,8 @@ import Index from "./pages/Index";
 import HiriosLanding from "./pages/HiriosLanding";
 import JobPortal from "./pages/JobPortal";
 import Auth from "./pages/Auth";
+import AuthConfirm from "./pages/AuthConfirm";
+import ResetPassword from "./pages/ResetPassword";
 import CompanySetup from "./pages/CompanySetup";
 
 import ScreeningResults from "./pages/ScreeningResults";
@@ -45,6 +47,8 @@ const App = () => (
             <Route path="/" element={<HiriosLanding />} />
             <Route path="/job-portal-old" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/auth/confirm" element={<AuthConfirm />} />
+            <Route path="/auth/reset-password" element={<ResetPassword />} />
             <Route path="/job-portal" element={<JobPortal />} />
             <Route path="/company-setup" element={<CompanySetup />} />
             <Route path="/screening-results" element={<ScreeningResults />} />
