@@ -13,7 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 const JobPortal = () => {
   const [isCompanyView, setIsCompanyView] = useState(true);
   const { data: jobs = [], isLoading } = useJobs(); // This fetches all public jobs for UserView
-  const { user, userType, signOut } = useAuth();
+  const { user, userType, signOut, loading } = useAuth();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -39,6 +39,18 @@ const JobPortal = () => {
       setIsCompanyView(false);
     }
   }, [userType]);
+
+  // Show loading state while auth is being determined
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleSignOut = async () => {
     await signOut();
@@ -87,30 +99,6 @@ const JobPortal = () => {
             
             {/* Desktop navigation */}
             <div className="hidden md:flex items-center space-x-4">
-              {/* View Toggle - only show if user is not authenticated */}
-              {!user && (
-                <div className="flex items-center space-x-3 bg-gray-100 p-2 rounded-lg">
-                  <div className={`flex items-center space-x-2 px-3 py-1 rounded-md transition-colors ${!isCompanyView ? 'bg-blue-600 text-white' : 'text-gray-600'}`}>
-                    <Users className="h-4 w-4" />
-                    <Label htmlFor="view-toggle" className="text-sm font-medium cursor-pointer">
-                      Job Seeker
-                    </Label>
-                  </div>
-                  <Switch
-                    id="view-toggle"
-                    checked={isCompanyView}
-                    onCheckedChange={setIsCompanyView}
-                    className="data-[state=checked]:bg-blue-600"
-                  />
-                  <div className={`flex items-center space-x-2 px-3 py-1 rounded-md transition-colors ${isCompanyView ? 'bg-blue-600 text-white' : 'text-gray-600'}`}>
-                    <Building2 className="h-4 w-4" />
-                    <Label htmlFor="view-toggle" className="text-sm font-medium cursor-pointer">
-                      Company
-                    </Label>
-                  </div>
-                </div>
-              )}
-
               {/* User Actions */}
               {user ? (
                 <div className="flex items-center space-x-3 flex-wrap">
@@ -150,29 +138,6 @@ const JobPortal = () => {
           {/* Mobile menu */}
           {isMobileMenuOpen && (
             <div className="md:hidden py-4 border-t border-gray-200 space-y-4">
-              {!user && (
-                <div className="flex items-center justify-center space-x-3 bg-gray-100 p-2 rounded-lg mx-auto w-fit">
-                  <div className={`flex items-center space-x-2 px-3 py-1 rounded-md transition-colors ${!isCompanyView ? 'bg-blue-600 text-white' : 'text-gray-600'}`}>
-                    <Users className="h-4 w-4" />
-                    <Label htmlFor="mobile-view-toggle" className="text-sm font-medium cursor-pointer">
-                      Job Seeker
-                    </Label>
-                  </div>
-                  <Switch
-                    id="mobile-view-toggle"
-                    checked={isCompanyView}
-                    onCheckedChange={setIsCompanyView}
-                    className="data-[state=checked]:bg-blue-600"
-                  />
-                  <div className={`flex items-center space-x-2 px-3 py-1 rounded-md transition-colors ${isCompanyView ? 'bg-blue-600 text-white' : 'text-gray-600'}`}>
-                    <Building2 className="h-4 w-4" />
-                    <Label htmlFor="mobile-view-toggle" className="text-sm font-medium cursor-pointer">
-                      Company
-                    </Label>
-                  </div>
-                </div>
-              )}
-              
               {user && (
                 <div className="space-y-3 px-4">
                   <div className="text-sm text-gray-600 text-center">

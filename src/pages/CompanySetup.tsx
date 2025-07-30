@@ -6,13 +6,47 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Building2, CreditCard } from 'lucide-react';
+import { Building2, ArrowLeft, CreditCard } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
 const CompanySetup = () => {
+  const { user, userType, loading } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasProfile, setHasProfile] = useState(false);
+
+  // Show loading state while auth is being determined
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Security check: Only allow companies to access this page
+  if (!user || userType !== 'company') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-6xl mb-4">🚫</div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h1>
+          <p className="text-gray-600 mb-4">This page is only available for company accounts.</p>
+          <Button onClick={() => navigate('/job-portal')}>
+            Go to Job Portal
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   const [companyData, setCompanyData] = useState({
     company_name: '',
     company_description: '',
@@ -21,25 +55,16 @@ const CompanySetup = () => {
     industry: '',
     address: '',
     phone: '',
+    logo_url: '',
   });
-  const [loading, setLoading] = useState(false);
-  const [hasProfile, setHasProfile] = useState(false);
-  const { user, userType } = useAuth();
-  const navigate = useNavigate();
-  const { toast } = useToast();
 
   useEffect(() => {
-    if (!user || userType !== 'company') {
-      navigate('/auth');
-      return;
-    }
-
     // Check if company profile already exists
     const checkProfile = async () => {
       const { data } = await supabase
         .from('company_profiles')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('user_id', user!.id)
         .single();
       
       if (data) {
@@ -57,7 +82,7 @@ const CompanySetup = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setIsSubmitting(true);
 
     try {
       if (hasProfile) {
@@ -90,17 +115,13 @@ const CompanySetup = () => {
         variant: "destructive",
       });
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
   const handleJobPortal = () => {
     navigate('/job-portal');
   };
-
-  if (!user || userType !== 'company') {
-    return null;
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
@@ -212,8 +233,8 @@ const CompanySetup = () => {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button type="submit" className="flex-1" disabled={loading}>
-                  {loading ? 'Saving...' : hasProfile ? 'Update Profile' : 'Save Profile'}
+                <Button type="submit" className="flex-1" disabled={isSubmitting}>
+                  {isSubmitting ? 'Saving...' : hasProfile ? 'Update Profile' : 'Save Profile'}
                 </Button>
                 
                 <Button 
