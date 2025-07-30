@@ -13,11 +13,23 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
 const CompanySetup = () => {
-  const { user, userType } = useAuth();
+  const { user, userType, loading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasProfile, setHasProfile] = useState(false);
+
+  // Show loading state while auth is being determined
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Security check: Only allow companies to access this page
   if (!user || userType !== 'company') {
@@ -70,7 +82,7 @@ const CompanySetup = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setIsSubmitting(true);
 
     try {
       if (hasProfile) {
@@ -103,7 +115,7 @@ const CompanySetup = () => {
         variant: "destructive",
       });
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -221,8 +233,8 @@ const CompanySetup = () => {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button type="submit" className="flex-1" disabled={loading}>
-                  {loading ? 'Saving...' : hasProfile ? 'Update Profile' : 'Save Profile'}
+                <Button type="submit" className="flex-1" disabled={isSubmitting}>
+                  {isSubmitting ? 'Saving...' : hasProfile ? 'Update Profile' : 'Save Profile'}
                 </Button>
                 
                 <Button 
