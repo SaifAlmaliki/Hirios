@@ -124,17 +124,6 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
       return;
     }
 
-    // Phone validation (must include country code with + prefix)
-    const phoneRegex = /^\+[1-9]\d{1,14}$/;
-    if (!phoneRegex.test(applicationData.phone.replace(/[\s\-()]/g, ''))) {
-      toast({
-        title: "Invalid phone number format",
-        description: "Please enter a valid phone number with country code (e.g., +49151234567).",
-        variant: "destructive",
-      });
-      return;
-    }
-
     setIsUploading(true);
 
     try {
@@ -217,11 +206,11 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
             {jobs.map((job) => {
               const isExpanded = expandedJobs.has(job.id);
               return (
-                <Card key={job.id} className="hover:shadow-lg transition-all duration-300 border-2 border-gray-100 hover:border-blue-200 bg-white h-fit">
+                <Card key={job.id} className="hover:shadow-lg transition-all duration-300 border-2 border-gray-100 hover:border-blue-200 bg-white h-full flex flex-col">
                   <CardHeader className="pb-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-t-lg">
                     <div className="space-y-4">
                       <div className="flex justify-between items-start">
@@ -265,7 +254,7 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
                     </div>
                   </CardHeader>
                   
-                  <CardContent className="pt-4 pb-4 space-y-4">
+                  <CardContent className="pt-4 pb-4 space-y-4 flex-1">
                     {/* Job Description */}
                     <div>
                       <h4 className="font-semibold text-gray-900 mb-2 text-base">Job Description</h4>
@@ -322,7 +311,7 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
 
                     {/* Show More/Less Button */}
                     {(job.description.length > 200 || (job.responsibilities && job.responsibilities.length > 150) || (job.requirements && job.requirements.length > 150) || (job.benefits && job.benefits.length > 150)) && (
-                      <div className="flex justify-center pt-3 border-t border-gray-200">
+                      <div className="flex justify-center pt-3 border-t border-gray-200 mt-auto">
                         <Button
                           variant="ghost"
                           onClick={() => toggleJobExpansion(job.id)}
@@ -340,6 +329,7 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
                         </Button>
                       </div>
                     )}
+                  </CardContent>
 
                     {/* Application Dialog */}
                     <Dialog open={isDialogOpen && selectedJob?.id === job.id} onOpenChange={(open) => {
@@ -394,13 +384,10 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
                               id="phone"
                               value={applicationData.phone}
                               onChange={(e) => setApplicationData(prev => ({ ...prev, phone: e.target.value }))}
-                              placeholder="Enter your phone number with country code (e.g., +49151234567)"
+                              placeholder="Enter your phone number"
                               className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                               disabled={isUploading}
                             />
-                            <p className="text-xs text-gray-500">
-                              Please include country code (e.g., +49 for Germany, +1 for US/Canada)
-                            </p>
                           </div>
                           
                           <div className="space-y-2">
@@ -445,9 +432,8 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
                         </form>
                       </DialogContent>
                     </Dialog>
-                  </CardContent>
-                </Card>
-              );
+                  </Card>
+                );
             })}
           </div>
         )}
