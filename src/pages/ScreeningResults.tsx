@@ -124,14 +124,14 @@ const ScreeningResults = () => {
 
   const handleSaveNote = () => {
     if (!selectedResult) return;
-
+    
     addNoteMutation.mutate(
       { id: selectedResult.id, notes: noteText },
       {
-        onSuccess: () => {
-          setNoteDialogOpen(false);
-          setSelectedResult(null);
-          setNoteText('');
+      onSuccess: () => {
+        setNoteDialogOpen(false);
+        setSelectedResult(null);
+        setNoteText('');
         },
       }
     );
@@ -143,10 +143,10 @@ const ScreeningResults = () => {
     try {
       await voiceInterviewService.requestVoiceScreening(result.id);
       
-      toast({
+        toast({
         title: "Success",
         description: "Voice interview requested successfully!",
-      });
+        });
     } catch (error) {
       toast({
         title: "Error",

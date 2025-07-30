@@ -32,90 +32,100 @@ const ScreeningResultActions: React.FC<ScreeningResultActionsProps> = ({
   const { toast } = useToast();
 
   return (
-    <div className="flex flex-wrap items-center gap-3">
-      {resumeUrl && (
+    <div className="flex flex-wrap items-center gap-4 w-96 justify-end">
+      {/* Resume Button - Increased width */}
+      <div className="w-24">
+        {resumeUrl && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => window.open(resumeUrl, '_blank')}
+            className="flex items-center gap-2 border-green-300 text-green-600 hover:bg-green-50 text-xs sm:text-sm h-9 px-3 w-full"
+          >
+            <FileText className="h-4 w-4" />
+            <span className="hidden xs:inline">Resume</span>
+            <span className="xs:hidden">CV</span>
+          </Button>
+        )}
+      </div>
+      
+      {/* Voice Interview Button - Updated text */}
+      <div className="w-36">
         <Button
           variant="outline"
           size="sm"
-          onClick={() => window.open(resumeUrl, '_blank')}
-          className="flex items-center gap-2 border-green-300 text-green-600 hover:bg-green-50 text-xs sm:text-sm min-w-0 shrink-0 h-9 px-3"
+          onClick={onRequestVoiceScreening}
+          disabled={isRequestingInterview || isVoiceScreeningRequested}
+          className={`flex items-center gap-2 text-xs sm:text-sm h-9 px-3 w-full ${
+            isVoiceScreeningRequested 
+              ? 'border-green-300 text-green-600 hover:bg-green-50' 
+              : 'border-blue-300 text-blue-600 hover:bg-blue-50'
+          }`}
         >
-          <FileText className="h-4 w-4" />
-          <span className="hidden xs:inline">Resume</span>
-          <span className="xs:hidden">CV</span>
+          {isRequestingInterview ? (
+            <>
+              <Mic className="h-4 w-4 animate-spin" />
+              <span className="hidden sm:inline">Sending...</span>
+              <span className="sm:hidden">...</span>
+            </>
+          ) : isVoiceScreeningRequested ? (
+            <>
+              <Mic className="h-4 w-4" />
+              <span className="hidden sm:inline">Interview Sent</span>
+              <span className="sm:hidden">Sent</span>
+            </>
+          ) : (
+            <>
+              <Mic className="h-4 w-4" />
+              <span className="hidden xs:inline">Send Interview</span>
+              <span className="xs:hidden">Send</span>
+            </>
+          )}
         </Button>
-      )}
-      
-      {/* Voice Agent Button */}
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={onRequestVoiceScreening}
-        disabled={isRequestingInterview || isVoiceScreeningRequested}
-        className={`flex items-center gap-2 text-xs sm:text-sm min-w-0 shrink-0 h-9 px-3 ${
-          isVoiceScreeningRequested 
-            ? 'border-green-300 text-green-600 hover:bg-green-50' 
-            : 'border-blue-300 text-blue-600 hover:bg-blue-50'
-        }`}
-      >
-        {isRequestingInterview ? (
-          <>
-            <Mic className="h-4 w-4 animate-spin" />
-            <span className="hidden sm:inline">Requesting...</span>
-            <span className="sm:hidden">...</span>
-          </>
-        ) : isVoiceScreeningRequested ? (
-          <>
-            <Mic className="h-4 w-4" />
-            <span className="hidden sm:inline">Interview Requested</span>
-            <span className="sm:hidden">Requested</span>
-          </>
-        ) : (
-          <>
-            <Mic className="h-4 w-4" />
-            <span className="hidden xs:inline">Voice Agent</span>
-            <span className="xs:hidden">Voice</span>
-          </>
-        )}
-      </Button>
+      </div>
 
-      {/* Direct Interview Link */}
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={() => {
-          const link = VoiceInterviewService.generateInterviewLink(resultId, true);
-          VoiceInterviewService.copyInterviewLink(resultId, true);
-          toast({
-            title: "Interview Link Copied",
-            description: "Direct interview link copied to clipboard (auto-start enabled)",
-          });
-        }}
-        className="flex items-center gap-2 border-purple-300 text-purple-600 hover:bg-purple-50 text-xs sm:text-sm min-w-0 shrink-0 h-9 px-3"
-      >
-        <ExternalLink className="h-4 w-4" />
-        <span className="hidden xs:inline">Copy Link</span>
-        <span className="xs:hidden">Link</span>
-      </Button>
+      {/* Direct Interview Link - Increased width */}
+      <div className="w-28">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            const link = VoiceInterviewService.generateInterviewLink(resultId, true);
+            VoiceInterviewService.copyInterviewLink(resultId, true);
+            toast({
+              title: "Interview Link Copied",
+              description: "Direct interview link copied to clipboard (auto-start enabled)",
+            });
+          }}
+          className="flex items-center gap-2 border-purple-300 text-purple-600 hover:bg-purple-50 text-xs sm:text-sm h-9 px-3 w-full"
+        >
+          <ExternalLink className="h-4 w-4" />
+          <span className="hidden xs:inline">Copy Link</span>
+          <span className="xs:hidden">Link</span>
+        </Button>
+      </div>
       
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={onToggleExpansion}
-        className="flex items-center gap-2 text-xs sm:text-sm min-w-0 shrink-0 h-9 px-3 text-gray-600 hover:text-gray-900"
-      >
-        {isExpanded ? (
-          <>
-            <span className="hidden xs:inline">Less</span>
-            <ChevronUp className="h-4 w-4" />
-          </>
-        ) : (
-          <>
-            <span className="hidden xs:inline">Details</span>
-            <ChevronDown className="h-4 w-4" />
-          </>
-        )}
-      </Button>
+      {/* Details Toggle - Increased width */}
+      <div className="w-24">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onToggleExpansion}
+          className="flex items-center gap-2 text-xs sm:text-sm h-9 px-3 w-full text-gray-600 hover:text-gray-900"
+        >
+          {isExpanded ? (
+            <>
+              <span className="hidden xs:inline">Less</span>
+              <ChevronUp className="h-4 w-4" />
+            </>
+          ) : (
+            <>
+              <span className="hidden xs:inline">Details</span>
+              <ChevronDown className="h-4 w-4" />
+            </>
+          )}
+        </Button>
+      </div>
     </div>
   );
 };

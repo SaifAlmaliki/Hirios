@@ -42,6 +42,7 @@ const ScreeningResultHeader: React.FC<ScreeningResultHeaderProps> = ({
 
   return (
     <div className="flex-1">
+      {/* Name and Score Row */}
       <div className="flex items-center gap-4 mb-4">
         <h3 className="text-lg font-semibold text-gray-900 flex items-center">
           <User className="h-5 w-5 mr-3 text-blue-600" />
@@ -52,25 +53,31 @@ const ScreeningResultHeader: React.FC<ScreeningResultHeaderProps> = ({
         </Badge>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-sm text-gray-600">
-        <div className="flex items-center">
-          <Mail className="h-4 w-4 mr-3 text-gray-500" />
+      {/* Contact Information Grid - Custom Column Widths */}
+      <div className="grid grid-cols-12 gap-6 text-sm text-gray-600">
+        {/* Email Column - More space (4/12) */}
+        <div className="col-span-4 flex items-center min-w-0">
+          <Mail className="h-4 w-4 mr-3 text-gray-500 flex-shrink-0" />
           <span className="truncate">{email}</span>
         </div>
-        <div className="flex items-center">
-          <Briefcase className="h-4 w-4 mr-3 text-gray-500" />
+        
+        {/* Job Title Column - Medium space (3/12) */}
+        <div className="col-span-3 flex items-center min-w-0">
+          <Briefcase className="h-4 w-4 mr-3 text-gray-500 flex-shrink-0" />
           <span className="truncate">{jobTitle || 'No job linked'}</span>
         </div>
-        <div className="flex items-center">
-          <Calendar className="h-4 w-4 mr-3 text-gray-500" />
-          <span>{new Date(createdAt).toLocaleDateString()}</span>
+        
+        {/* Date Column - Less space (2/12) */}
+        <div className="col-span-2 flex items-center min-w-0">
+          <Calendar className="h-4 w-4 mr-3 text-gray-500 flex-shrink-0" />
+          <span className="truncate">{new Date(createdAt).toLocaleDateString()}</span>
         </div>
-        {phone && (
-          <div className="flex items-center">
-            <Mic className="h-4 w-4 mr-3 text-gray-500" />
-            <span className="truncate">{phone}</span>
-          </div>
-        )}
+        
+        {/* Phone Column - Less space (3/12) */}
+        <div className="col-span-3 flex items-center min-w-0">
+          <Mic className="h-4 w-4 mr-3 text-gray-500 flex-shrink-0" />
+          <span className="truncate">{phone || 'No phone'}</span>
+        </div>
       </div>
     </div>
   );
