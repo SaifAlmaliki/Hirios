@@ -28,7 +28,8 @@ const ScreeningResultCard: React.FC<ScreeningResultCardProps> = ({
   return (
     <Card className="border-l-4 border-l-blue-500 shadow-sm hover:shadow-md transition-shadow duration-200">
       <CardHeader className="pb-6">
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-start gap-6">
+        {/* Mobile-first responsive layout */}
+        <div className="flex flex-col space-y-4 lg:flex-row lg:space-y-0 lg:justify-between lg:items-start lg:gap-6">
           <ScreeningResultHeader
             firstName={result.first_name}
             lastName={result.last_name}

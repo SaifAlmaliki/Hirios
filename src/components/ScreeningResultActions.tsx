@@ -32,9 +32,9 @@ const ScreeningResultActions: React.FC<ScreeningResultActionsProps> = ({
   const { toast } = useToast();
 
   return (
-    <div className="flex flex-wrap items-center gap-4 w-96 justify-end">
-      {/* Resume Button - Increased width */}
-      <div className="w-24">
+    <div className="flex flex-wrap items-center gap-3 w-full lg:w-96 lg:justify-end">
+      {/* Resume Button - Responsive width */}
+      <div className="w-20 sm:w-24">
         {resumeUrl && (
           <Button
             variant="outline"
@@ -49,8 +49,8 @@ const ScreeningResultActions: React.FC<ScreeningResultActionsProps> = ({
         )}
       </div>
       
-      {/* Voice Interview Button - Updated text */}
-      <div className="w-36">
+      {/* Voice Interview Button - Responsive width */}
+      <div className="w-28 sm:w-32 lg:w-36">
         <Button
           variant="outline"
           size="sm"
@@ -84,8 +84,8 @@ const ScreeningResultActions: React.FC<ScreeningResultActionsProps> = ({
         </Button>
       </div>
 
-      {/* Direct Interview Link - Increased width */}
-      <div className="w-28">
+      {/* Direct Interview Link - Responsive width */}
+      <div className="w-20 sm:w-24 lg:w-28">
         <Button
           variant="outline"
           size="sm"
@@ -105,8 +105,8 @@ const ScreeningResultActions: React.FC<ScreeningResultActionsProps> = ({
         </Button>
       </div>
       
-      {/* Details Toggle - Increased width */}
-      <div className="w-24">
+      {/* Details Toggle - Responsive width */}
+      <div className="w-16 sm:w-20 lg:w-24">
         <Button
           variant="ghost"
           size="sm"

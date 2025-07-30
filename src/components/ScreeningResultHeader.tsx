@@ -43,38 +43,38 @@ const ScreeningResultHeader: React.FC<ScreeningResultHeaderProps> = ({
   return (
     <div className="flex-1">
       {/* Name and Score Row */}
-      <div className="flex items-center gap-4 mb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-4">
         <h3 className="text-lg font-semibold text-gray-900 flex items-center">
           <User className="h-5 w-5 mr-3 text-blue-600" />
           {firstName} {lastName}
         </h3>
-        <Badge className={`${getScoreColor(overallFit)} border-0 px-3 py-1`}>
+        <Badge className={`${getScoreColor(overallFit)} border-0 px-3 py-1 w-fit`}>
           {overallFit}% - {getScoreLabel(overallFit)}
         </Badge>
       </div>
       
-      {/* Contact Information Grid - Custom Column Widths */}
-      <div className="grid grid-cols-12 gap-6 text-sm text-gray-600">
-        {/* Email Column - More space (4/12) */}
-        <div className="col-span-4 flex items-center min-w-0">
+      {/* Contact Information Grid - Mobile Responsive */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-4 lg:gap-6 text-sm text-gray-600">
+        {/* Email Column - Full width on mobile, 4/12 on desktop */}
+        <div className="col-span-1 lg:col-span-4 flex items-center min-w-0">
           <Mail className="h-4 w-4 mr-3 text-gray-500 flex-shrink-0" />
           <span className="truncate">{email}</span>
         </div>
         
-        {/* Job Title Column - Medium space (3/12) */}
-        <div className="col-span-3 flex items-center min-w-0">
+        {/* Job Title Column - Full width on mobile, 3/12 on desktop */}
+        <div className="col-span-1 lg:col-span-3 flex items-center min-w-0">
           <Briefcase className="h-4 w-4 mr-3 text-gray-500 flex-shrink-0" />
           <span className="truncate">{jobTitle || 'No job linked'}</span>
         </div>
         
-        {/* Date Column - Less space (2/12) */}
-        <div className="col-span-2 flex items-center min-w-0">
+        {/* Date Column - Full width on mobile, 2/12 on desktop */}
+        <div className="col-span-1 lg:col-span-2 flex items-center min-w-0">
           <Calendar className="h-4 w-4 mr-3 text-gray-500 flex-shrink-0" />
           <span className="truncate">{new Date(createdAt).toLocaleDateString()}</span>
         </div>
         
-        {/* Phone Column - Less space (3/12) */}
-        <div className="col-span-3 flex items-center min-w-0">
+        {/* Phone Column - Full width on mobile, 3/12 on desktop */}
+        <div className="col-span-1 lg:col-span-3 flex items-center min-w-0">
           <Mic className="h-4 w-4 mr-3 text-gray-500 flex-shrink-0" />
           <span className="truncate">{phone || 'No phone'}</span>
         </div>
