@@ -25,6 +25,7 @@ export interface ScreeningResult {
   voice_screening_requested?: boolean;
   interview_summary?: string;
   interview_completed_at?: string;
+  application_id?: string;  // Add application_id field
   // Job details from join
   job?: {
     id: string;
@@ -65,8 +66,8 @@ export const useScreeningResults = () => {
         throw new Error('Company profile not found');
       }
 
-      console.log('Fetching screening results from database...');
-      console.log('Company profile ID:', profile.id);
+      console.log('📊 Fetching screening results...');
+      console.log('🏢 Company profile ID:', profile.id);
       
       // Fetch screening results with job information for this company
       const { data, error } = await supabase
@@ -83,14 +84,12 @@ export const useScreeningResults = () => {
         `)
         .order('created_at', { ascending: false });
       
-      console.log('Screening results for company:', data);
-      
       if (error) {
-        console.error('Error fetching screening results:', error);
+        console.error('❌ Error fetching screening results:', error);
         throw error;
       }
       
-      console.log('Screening results fetched successfully:', data);
+      console.log('✅ Screening results loaded:', data?.length || 0, 'candidates');
       
       // Fetch resume URLs for each candidate
       const resultsWithResumes = await Promise.all(
@@ -104,12 +103,16 @@ export const useScreeningResults = () => {
               .limit(1)
               .single();
             
+            if (appError) {
+              console.warn('⚠️ No resume found for:', result.email);
+            }
+            
             return {
               ...result,
               resume_url: application?.resume_url || null
             };
           } catch (error) {
-            console.log(`No application found for ${result.email}`);
+            console.warn('⚠️ Error fetching resume for:', result.email);
             return {
               ...result,
               resume_url: null
@@ -118,7 +121,7 @@ export const useScreeningResults = () => {
         })
       );
       
-      return resultsWithResumes as unknown as ScreeningResult[];
+      return resultsWithResumes as ScreeningResult[];
     },
     enabled: !!user,
   });

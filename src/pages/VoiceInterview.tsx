@@ -8,7 +8,7 @@ import { VoiceInterviewService, VoiceInterviewData } from '@/services/voiceInter
 import { useToast } from '@/hooks/use-toast';
 
 const VoiceInterview = () => {
-  const { screeningResultId } = useParams<{ screeningResultId: string }>();
+  const { screeningResultId, applicationId } = useParams<{ screeningResultId: string; applicationId: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -29,7 +29,7 @@ const VoiceInterview = () => {
       }
 
       try {
-        const data = await VoiceInterviewService.getInterviewData(screeningResultId);
+        const data = await VoiceInterviewService.getInterviewData(screeningResultId, applicationId);
         if (data) {
           setInterviewData(data);
           
@@ -50,7 +50,7 @@ const VoiceInterview = () => {
     };
 
     loadInterviewData();
-  }, [screeningResultId]);
+  }, [screeningResultId, applicationId]);
 
   // Auto-start interview if requested
   useEffect(() => {

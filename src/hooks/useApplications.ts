@@ -20,18 +20,18 @@ export const useApplications = () => {
   return useQuery({
     queryKey: ['applications'],
     queryFn: async () => {
-      console.log('Fetching applications from database...');
+      console.log('📋 Fetching applications...');
       const { data, error } = await supabase
         .from('applications')
         .select('*')
         .order('created_at', { ascending: false });
       
       if (error) {
-        console.error('Error fetching applications:', error);
+        console.error('❌ Error fetching applications:', error);
         throw error;
       }
       
-      console.log('Applications fetched successfully:', data);
+      console.log('✅ Applications loaded:', data?.length || 0, 'submissions');
       return data as Application[];
     },
   });
@@ -48,7 +48,7 @@ export const useCreateApplication = () => {
       resume_file?: File;
       job_details?: Job;
     }) => {
-      console.log('Creating application:', applicationData);
+      console.log('📝 Creating application for:', applicationData.full_name, '-', applicationData.job_title);
       
       // Store application in database with resume URL from Supabase storage
       const { data, error } = await supabase
@@ -65,11 +65,11 @@ export const useCreateApplication = () => {
         .single();
 
       if (error) {
-        console.error('Error creating application:', error);
+        console.error('❌ Error creating application:', error);
         throw error;
       }
 
-      console.log('Application created successfully:', data);
+      console.log('✅ Application created:', data.id);
 
       // Send to webhook after successful database insert
       try {
@@ -78,19 +78,19 @@ export const useCreateApplication = () => {
 
         // If there's a resume file, encode it for webhook
         if (applicationData.resume_file) {
-          console.log('Encoding resume file to base64 for webhook...');
+          console.log('📄 Encoding resume for webhook...');
           resume_base64 = await fileToBase64(applicationData.resume_file);
           resume_filename = applicationData.resume_file.name;
-          console.log('Resume encoded successfully for webhook');
         }
 
         await sendApplicationToWebhook({
+          application_id: data.id,
           full_name: applicationData.full_name,
           email: applicationData.email,
           phone: applicationData.phone,
           resume_base64,
           resume_filename,
-          job_id: applicationData.job_id,  // Added job_id as top-level field
+          job_id: applicationData.job_id,
           job_title: applicationData.job_title || 'Unknown Position',
           company: applicationData.company || 'Unknown Company',
           applied_at: data.created_at,
@@ -107,9 +107,9 @@ export const useCreateApplication = () => {
             benefits: applicationData.job_details?.benefits,
           }
         });
-        console.log('Application data sent to webhook successfully');
+        console.log('📤 Webhook sent successfully');
       } catch (webhookError) {
-        console.warn('Failed to send to webhook, but application was saved:', webhookError);
+        console.warn('⚠️ Webhook failed, but application was saved:', webhookError);
         // Don't throw here - we don't want to fail the application creation if webhook fails
       }
 

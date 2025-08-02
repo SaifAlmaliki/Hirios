@@ -24,18 +24,18 @@ export const useJobs = () => {
   return useQuery({
     queryKey: ['jobs'],
     queryFn: async () => {
-      console.log('Fetching jobs from database...');
+      console.log('📋 Fetching jobs...');
       const { data, error } = await supabase
         .from('jobs')
         .select('*')
         .order('created_at', { ascending: false });
       
       if (error) {
-        console.error('Error fetching jobs:', error);
+        console.error('❌ Error fetching jobs:', error);
         throw error;
       }
       
-      console.log('Jobs fetched successfully:', data);
+      console.log('✅ Jobs loaded:', data?.length || 0, 'positions');
       return data as Job[];
     },
   });

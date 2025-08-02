@@ -73,7 +73,7 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
       const fileName = `${applicantEmail}_${Date.now()}.${fileExt}`;
       const filePath = `${fileName}`;
 
-      console.log('Uploading resume to storage:', filePath);
+      console.log('📄 Uploading resume:', file.name);
       
       const { data, error } = await supabase.storage
         .from('resumes')
@@ -83,11 +83,11 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
         });
 
       if (error) {
-        console.error('Storage upload error:', error);
+        console.error('❌ Storage upload error:', error);
         throw error;
       }
 
-      console.log('Resume uploaded successfully:', data);
+      console.log('✅ Resume uploaded:', data.path);
       
       // Get the public URL
       const { data: urlData } = supabase.storage
@@ -96,7 +96,7 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
 
       return urlData.publicUrl;
     } catch (error) {
-      console.error('Failed to upload resume:', error);
+      console.error('❌ Resume upload failed:', error);
       return null;
     }
   };
@@ -131,7 +131,7 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
       
       // Upload resume to Supabase storage if provided
       if (applicationData.resume) {
-        console.log('Starting resume upload...');
+        console.log('📤 Starting resume upload...');
         resumeUrl = await uploadResumeToStorage(applicationData.resume, applicationData.email);
         
         if (!resumeUrl) {
@@ -143,7 +143,7 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
           setIsUploading(false);
           return;
         }
-        console.log('Resume uploaded, URL:', resumeUrl);
+        console.log('✅ Resume URL ready');
       }
 
       // Submit application with resume URL

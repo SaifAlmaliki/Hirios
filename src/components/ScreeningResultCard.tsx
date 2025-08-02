@@ -42,6 +42,7 @@ const ScreeningResultCard: React.FC<ScreeningResultCardProps> = ({
 
           <ScreeningResultActions
             resultId={result.id}
+            applicationId={result.application_id}
             resumeUrl={result.resume_url}
             isRequestingInterview={isRequestingInterview}
             isVoiceScreeningRequested={result.voice_screening_requested || false}

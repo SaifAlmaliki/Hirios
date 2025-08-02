@@ -8,6 +8,8 @@ export interface VoiceInterviewData {
   job_description: string;
   resume: string;
   screening_result_id: string;
+  job_id: string;
+  application_id: string;
 }
 
 export interface InterviewResponse {
@@ -65,7 +67,7 @@ export class VoiceInterviewService {
       }
 
       // Generate interview link
-      const interviewLink = VoiceInterviewService.generateInterviewLink(screeningResultId, true);
+      const interviewLink = VoiceInterviewService.generateInterviewLink(screeningResultId, screeningResult.application_id || '', true);
 
       // Prepare webhook data
       const job = screeningResult.jobs as any;
@@ -125,14 +127,21 @@ export class VoiceInterviewService {
       // Request microphone access
       await navigator.mediaDevices.getUserMedia({ audio: true });
 
+      // Log the complete interview data for verification
+      console.log('🎤 Starting voice interview for:', interviewData.full_name);
+
       // Prepare dynamic variables to match ElevenLabs prompt exactly
       const dynamicVariables = {
         full_name: interviewData.full_name,
         job_title: interviewData.job_title,
         job_requirements: interviewData.job_requirements,
         job_description: interviewData.job_description,
-        candidate_resume: interviewData.resume
+        candidate_resume: interviewData.resume,
+        job_id: interviewData.job_id
       };
+
+      // Log the dynamic variables being sent to 11labs
+      console.log('🚀 Connecting to 11labs...');
 
       // Store variables for debugging access (development only)
       if (process.env.NODE_ENV === 'development') {
@@ -144,22 +153,22 @@ export class VoiceInterviewService {
         agentId: this.agentId,
         dynamicVariables,
         onConnect: () => {
-          console.log('Connected to ElevenLabs agent');
+          console.log('✅ Connected to 11labs');
         },
         onDisconnect: (reason) => {
-          console.log('Disconnected from ElevenLabs agent:', reason);
+          console.log('❌ Disconnected from 11labs:', reason);
         },
         onError: (error) => {
-          console.error('ElevenLabs conversation error:', error);
+          console.error('💥 11labs error:', error);
         },
         onModeChange: (mode) => {
-          console.log('Mode changed to:', mode);
+          console.log('🔄 Mode:', mode);
         },
         onMessage: (message) => {
-          console.log('Agent message:', message);
+          console.log('💬 Agent:', message);
         },
         onStatusChange: (status) => {
-          console.log('Status changed to:', status);
+          console.log('📊 Status:', status);
         }
       });
 
@@ -168,7 +177,7 @@ export class VoiceInterviewService {
       };
 
     } catch (error) {
-      console.error('Failed to start conversation:', error);
+      console.error('💥 Failed to start conversation:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to start conversation. Please ensure microphone access is granted.'
@@ -217,17 +226,17 @@ export class VoiceInterviewService {
   }
 
   // Generate direct interview link
-  static generateInterviewLink(screeningResultId: string, autoStart: boolean = false): string {
+  static generateInterviewLink(screeningResultId: string, applicationId: string, autoStart: boolean = false): string {
     const baseUrl = window.location.origin;
-    const path = `/interview/${screeningResultId}`;
+    const path = `/interview/${screeningResultId}/${applicationId}`;
     const params = autoStart ? '?autostart=true' : '';
     return `${baseUrl}${path}${params}`;
   }
 
   // Method to copy interview link to clipboard
-  static async copyInterviewLink(screeningResultId: string, autoStart: boolean = false): Promise<boolean> {
+  static async copyInterviewLink(screeningResultId: string, applicationId: string, autoStart: boolean = false): Promise<boolean> {
     try {
-      const link = this.generateInterviewLink(screeningResultId, autoStart);
+      const link = this.generateInterviewLink(screeningResultId, applicationId, autoStart);
       await navigator.clipboard.writeText(link);
       return true;
     } catch (error) {
@@ -237,8 +246,10 @@ export class VoiceInterviewService {
   }
 
   // Helper method to get interview data for a screening result
-  static async getInterviewData(screeningResultId: string): Promise<VoiceInterviewData | null> {
+  static async getInterviewData(screeningResultId: string, applicationId?: string): Promise<VoiceInterviewData | null> {
     try {
+      console.log('🔍 Loading interview data...');
+      
       const { data: result, error } = await supabase
         .from('screening_results')
         .select(`
@@ -255,31 +266,48 @@ export class VoiceInterviewService {
         .single();
 
       if (error || !result) {
-        console.error('Failed to fetch screening result:', error);
+        console.error('❌ Failed to fetch screening result:', error);
         return null;
       }
 
-      // Get resume data (using resume_text column from applications table)
+      // Use provided applicationId or fall back to result.application_id
+      const targetApplicationId = applicationId || result.application_id;
+      
+      if (!targetApplicationId) {
+        console.error('❌ No application ID found');
+        return null;
+      }
+
+      // Get resume data using the specific application ID
       const { data: application } = await supabase
         .from('applications')
-        .select('resume_text')
-        .eq('email', result.email)
-        .eq('job_id', result.job_id)
+        .select('resume_text, id')
+        .eq('id', targetApplicationId)
         .single();
+
+      if (!application) {
+        console.error('❌ Failed to fetch application data');
+        return null;
+      }
 
       const job = result.jobs as any;
       
-      return {
+      const interviewData = {
         job_title: job?.title || 'Position',
         full_name: `${result.first_name} ${result.last_name}`,
         job_requirements: job?.requirements || '',
         job_description: `${job?.description || ''}\n\nKey Responsibilities:\n${job?.responsibilities || ''}`,
         resume: application?.resume_text || 'Resume content will be available after database configuration is completed.',
-        screening_result_id: screeningResultId
+        screening_result_id: screeningResultId,
+        job_id: result.job_id,
+        application_id: targetApplicationId
       };
 
+      console.log('✅ Interview data ready for:', interviewData.full_name);
+      return interviewData;
+
     } catch (error) {
-      console.error('Failed to get interview data:', error);
+      console.error('💥 Failed to get interview data:', error);
       return null;
     }
   }

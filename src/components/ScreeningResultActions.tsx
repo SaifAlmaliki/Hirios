@@ -12,6 +12,7 @@ import { VoiceInterviewService } from '@/services/voiceInterviewService';
 
 interface ScreeningResultActionsProps {
   resultId: string;
+  applicationId?: string;  // Add applicationId prop
   resumeUrl?: string;
   isRequestingInterview: boolean;
   isVoiceScreeningRequested: boolean;
@@ -22,6 +23,7 @@ interface ScreeningResultActionsProps {
 
 const ScreeningResultActions: React.FC<ScreeningResultActionsProps> = ({
   resultId,
+  applicationId,  // Add to destructuring
   resumeUrl,
   isRequestingInterview,
   isVoiceScreeningRequested,
@@ -90,8 +92,8 @@ const ScreeningResultActions: React.FC<ScreeningResultActionsProps> = ({
           variant="outline"
           size="sm"
           onClick={() => {
-            const link = VoiceInterviewService.generateInterviewLink(resultId, true);
-            VoiceInterviewService.copyInterviewLink(resultId, true);
+            const link = VoiceInterviewService.generateInterviewLink(resultId, applicationId || '', true);
+            VoiceInterviewService.copyInterviewLink(resultId, applicationId || '', true);
             toast({
               title: "Interview Link Copied",
               description: "Direct interview link copied to clipboard (auto-start enabled)",
