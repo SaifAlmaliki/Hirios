@@ -10,6 +10,7 @@ export interface VoiceInterviewData {
   screening_result_id: string;
   job_id: string;
   application_id: string;
+  company: string;
 }
 
 export interface InterviewResponse {
@@ -56,7 +57,8 @@ export class VoiceInterviewService {
             title,
             description,
             requirements,
-            responsibilities
+            responsibilities,
+            company
           )
         `)
         .eq('id', screeningResultId)
@@ -124,8 +126,22 @@ export class VoiceInterviewService {
 
   async startConversation(interviewData: VoiceInterviewData): Promise<InterviewResponse> {
     try {
-      // Request microphone access
-      await navigator.mediaDevices.getUserMedia({ audio: true });
+      // Request microphone access with more detailed logging
+      console.log('🎤 Requesting microphone access...');
+      
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true
+        } 
+      });
+      
+      console.log('✅ Microphone access granted:', {
+        trackCount: stream.getTracks().length,
+        audioTracks: stream.getAudioTracks().length,
+        videoTracks: stream.getVideoTracks().length
+      });
 
       // Log the complete interview data for verification
       console.log('🎤 Starting voice interview for:', interviewData.full_name);
@@ -137,16 +153,20 @@ export class VoiceInterviewService {
         job_requirements: interviewData.job_requirements,
         job_description: interviewData.job_description,
         candidate_resume: interviewData.resume,
-        job_id: interviewData.job_id
+        job_id: interviewData.job_id,
+        company: interviewData.company,
+        application_id: interviewData.application_id
       };
 
       // Log the dynamic variables being sent to 11labs
       console.log('🚀 Connecting to 11labs...');
+      console.log('📋 Dynamic variables:', dynamicVariables);
 
       // Store variables for debugging access (development only)
       if (process.env.NODE_ENV === 'development') {
         (window as any).lastInterviewVariables = dynamicVariables;
         (window as any).lastInterviewData = interviewData;
+        (window as any).audioStream = stream;
       }
       
       this.conversation = await Conversation.startSession({
@@ -163,6 +183,12 @@ export class VoiceInterviewService {
         },
         onModeChange: (mode) => {
           console.log('🔄 Mode:', mode);
+          // Add more detailed mode logging
+          if (mode.mode === 'listening') {
+            console.log('👂 Agent is now listening for your response...');
+          } else if (mode.mode === 'speaking') {
+            console.log('🗣️ Agent is speaking...');
+          }
         },
         onMessage: (message) => {
           console.log('💬 Agent:', message);
@@ -259,7 +285,8 @@ export class VoiceInterviewService {
             title,
             description,
             requirements,
-            responsibilities
+            responsibilities,
+            company
           )
         `)
         .eq('id', screeningResultId)
@@ -300,7 +327,8 @@ export class VoiceInterviewService {
         resume: application?.resume_text || 'Resume content will be available after database configuration is completed.',
         screening_result_id: screeningResultId,
         job_id: result.job_id,
-        application_id: targetApplicationId
+        application_id: targetApplicationId,
+        company: job?.company || 'Company Name'
       };
 
       console.log('✅ Interview data ready for:', interviewData.full_name);
