@@ -254,81 +254,89 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
                     </div>
                   </CardHeader>
                   
-                  <CardContent className="pt-4 pb-4 space-y-4 flex-1 bg-white">
-                    {/* Job Description */}
-                    <div>
+                  <CardContent className="pt-4 pb-4 space-y-4 flex-1 bg-white flex flex-col">
+                    {/* Job Description - Always shown */}
+                    <div className="flex-shrink-0">
                       <h4 className="font-semibold text-gray-800 mb-2 text-base">Job Description</h4>
-                      <div className="bg-gray-100 p-3 rounded-lg border border-gray-200">
+                      <div className="bg-gray-100 p-3 rounded-lg border border-gray-200 min-h-[80px]">
                         <p className="text-gray-700 leading-relaxed text-sm">
-                          {isExpanded ? job.description : `${job.description.substring(0, 200)}${job.description.length > 200 ? '...' : ''}`}
+                          {isExpanded ? job.description : `${job.description.substring(0, 150)}${job.description.length > 150 ? '...' : ''}`}
                         </p>
                       </div>
                     </div>
 
-                    {/* Responsibilities */}
-                    {job.responsibilities && (isExpanded || job.responsibilities.length < 150) && (
-                      <div>
-                        <h4 className="font-semibold text-gray-800 mb-2 text-base">Key Responsibilities</h4>
-                        <div className="bg-blue-50 p-3 rounded-lg border border-blue-100">
+                    {/* Key Responsibilities - Always shown */}
+                    <div className="flex-shrink-0">
+                      <h4 className="font-semibold text-gray-800 mb-2 text-base">Key Responsibilities</h4>
+                      <div className="bg-blue-50 p-3 rounded-lg border border-blue-100 min-h-[80px]">
+                        {job.responsibilities ? (
                           <div className="text-gray-700 space-y-1 text-sm">
-                            {job.responsibilities.split('\n').filter(resp => resp.trim()).map((resp, index) => (
+                            {(isExpanded ? job.responsibilities : job.responsibilities.substring(0, 120) + (job.responsibilities.length > 120 ? '...' : ''))
+                              .split('\n').filter(resp => resp.trim()).slice(0, isExpanded ? undefined : 2).map((resp, index) => (
                               <div key={index} className="flex items-start">
                                 <span className="text-blue-600 mr-2 mt-1">•</span>
                                 <span>{resp.trim()}</span>
                               </div>
                             ))}
                           </div>
-                        </div>
+                        ) : (
+                          <p className="text-gray-500 text-sm italic">Responsibilities will be discussed during the interview process.</p>
+                        )}
                       </div>
-                    )}
+                    </div>
 
-                    {/* Requirements */}
-                    {job.requirements && (isExpanded || job.requirements.length < 150) && (
-                      <div>
-                        <h4 className="font-semibold text-gray-800 mb-2 text-base">Requirements</h4>
-                        <div className="bg-green-50 p-3 rounded-lg border border-green-100">
+                    {/* Requirements - Always shown */}
+                    <div className="flex-shrink-0">
+                      <h4 className="font-semibold text-gray-800 mb-2 text-base">Requirements</h4>
+                      <div className="bg-green-50 p-3 rounded-lg border border-green-100 min-h-[80px]">
+                        {job.requirements ? (
                           <div className="text-gray-700 space-y-1 text-sm">
-                            {job.requirements.split('\n').filter(req => req.trim()).map((req, index) => (
+                            {(isExpanded ? job.requirements : job.requirements.substring(0, 120) + (job.requirements.length > 120 ? '...' : ''))
+                              .split('\n').filter(req => req.trim()).slice(0, isExpanded ? undefined : 2).map((req, index) => (
                               <div key={index} className="flex items-start">
-                                <span className="text-blue-600 mr-2 mt-1">•</span>
+                                <span className="text-green-600 mr-2 mt-1">•</span>
                                 <span>{req.trim()}</span>
                               </div>
                             ))}
                           </div>
-                        </div>
+                        ) : (
+                          <p className="text-gray-500 text-sm italic">Basic qualifications and experience preferred.</p>
+                        )}
                       </div>
-                    )}
+                    </div>
 
-                    {/* Benefits */}
-                    {job.benefits && (isExpanded || job.benefits.length < 150) && (
-                      <div>
-                        <h4 className="font-semibold text-gray-900 mb-2 text-base">Benefits</h4>
-                        <div className="bg-green-50 p-3 rounded-lg">
-                          <p className="text-gray-700 leading-relaxed text-sm">{job.benefits}</p>
-                        </div>
+                    {/* Benefits - Always shown */}
+                    <div className="flex-shrink-0">
+                      <h4 className="font-semibold text-gray-800 mb-2 text-base">Benefits</h4>
+                      <div className="bg-yellow-50 p-3 rounded-lg border border-yellow-100 min-h-[60px]">
+                        {job.benefits ? (
+                          <p className="text-gray-700 leading-relaxed text-sm">
+                            {isExpanded ? job.benefits : `${job.benefits.substring(0, 100)}${job.benefits.length > 100 ? '...' : ''}`}
+                          </p>
+                        ) : (
+                          <p className="text-gray-500 text-sm italic">Competitive salary and benefits package available.</p>
+                        )}
                       </div>
-                    )}
+                    </div>
 
-                    {/* Show More/Less Button */}
-                    {(job.description.length > 200 || (job.responsibilities && job.responsibilities.length > 150) || (job.requirements && job.requirements.length > 150) || (job.benefits && job.benefits.length > 150)) && (
-                      <div className="flex justify-center pt-3 border-t border-gray-200 mt-auto">
-                        <Button
-                          variant="ghost"
-                          onClick={() => toggleJobExpansion(job.id)}
-                          className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 px-4 py-2 rounded-lg text-sm font-medium"
-                        >
-                          {isExpanded ? (
-                            <>
-                              Show Less <ChevronUp className="h-3 w-3 ml-2" />
-                            </>
-                          ) : (
-                            <>
-                              Show More <ChevronDown className="h-3 w-3 ml-2" />
-                            </>
-                          )}
-                        </Button>
-                      </div>
-                    )}
+                    {/* Show More/Less Button - Always shown at bottom */}
+                    <div className="flex justify-center pt-3 border-t border-gray-200 mt-auto">
+                      <Button
+                        variant="ghost"
+                        onClick={() => toggleJobExpansion(job.id)}
+                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 px-4 py-2 rounded-lg text-sm font-medium"
+                      >
+                        {isExpanded ? (
+                          <>
+                            Show Less <ChevronUp className="h-3 w-3 ml-2" />
+                          </>
+                        ) : (
+                          <>
+                            Show More <ChevronDown className="h-3 w-3 ml-2" />
+                          </>
+                        )}
+                      </Button>
+                    </div>
                   </CardContent>
 
                     {/* Application Dialog */}
