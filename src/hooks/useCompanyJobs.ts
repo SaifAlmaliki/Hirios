@@ -5,20 +5,18 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Job } from './useJobs';
 
 export const useCompanyJobs = () => {
-  const { userType } = useAuth();
-  
+  const { user } = useAuth();
+
   return useQuery({
-    queryKey: ['company-jobs'],
+    queryKey: ['company-jobs', user?.id],
     queryFn: async () => {
-      console.log('Fetching company jobs from database...');
-      
-      // Get current user
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      if (userError || !user) {
+      if (!user) {
         throw new Error('User not authenticated');
       }
 
-      // Get company profile
+      console.log('🏢 Fetching company jobs...');
+      
+      // Get company profile first
       const { data: profile, error: profileError } = await supabase
         .from('company_profiles')
         .select('id')
@@ -26,11 +24,11 @@ export const useCompanyJobs = () => {
         .single();
 
       if (profileError || !profile) {
-        console.error('Error fetching company profile:', profileError);
-        return [];
+        console.error('❌ Error fetching company profile:', profileError);
+        throw new Error('Company profile not found');
       }
 
-      // Get jobs for this company
+      // Fetch jobs for this company
       const { data, error } = await supabase
         .from('jobs')
         .select('*')
@@ -38,14 +36,13 @@ export const useCompanyJobs = () => {
         .order('created_at', { ascending: false });
       
       if (error) {
-        console.error('Error fetching company jobs:', error);
+        console.error('❌ Error fetching company jobs:', error);
         throw error;
       }
       
-      console.log('Company jobs fetched successfully:', data);
+      console.log('✅ Company jobs loaded:', data?.length || 0, 'positions');
       return data as Job[];
     },
-    // Only enable the query if user is a company user
-    enabled: userType === 'company',
+    enabled: !!user,
   });
 };

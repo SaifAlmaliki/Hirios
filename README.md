@@ -19,7 +19,10 @@ Hirios is a comprehensive job portal application that connects job seekers with 
 - **Application Management**: View and manage candidate applications
 - **Dashboard Analytics**: Overview of job postings and application metrics
 - **Resume Management**: Access and review candidate resumes
-- **Subscription System**: Built-in subscription management (currently bypassed for demo)
+- **AI Screening Results**: Review AI-generated candidate fit scores and insights
+- **Direct Interview Link**: Generate and copy candidate interview links
+- **Voice Interview (AI)**: Start AI-powered voice interviews for screened candidates
+- **Premium features**: Marked as "Coming Soon" in UI
 
 ### Core Features
 - **Dual User Types**: Separate interfaces for job seekers and companies
@@ -27,7 +30,8 @@ Hirios is a comprehensive job portal application that connects job seekers with 
 - **File Upload**: Secure resume storage using Supabase Storage
 - **Responsive UI**: Modern design using shadcn/ui components
 - **Authentication**: Secure user management with Supabase Auth
-- **Webhook Integration**: External API integration for application processing
+- **Webhook Integration**: External workflow trigger for screening-related events
+- **Voice AI Integration**: ElevenLabs Realtime Conversations for interviews
 
 ## 🏗️ Architecture
 
@@ -56,7 +60,8 @@ Hirios is a comprehensive job portal application that connects job seekers with 
   "react-hook-form": "^7.53.0",
   "react-router-dom": "^6.28.0",
   "@radix-ui/*": "Various UI primitives",
-  "tailwindcss": "^3.4.1"
+  "tailwindcss": "^3.4.1",
+  "@elevenlabs/client": "Realtime voice interviews"
 }
 ```
 
@@ -73,16 +78,13 @@ Hirios is a comprehensive job portal application that connects job seekers with 
   - `created_at`, `updated_at` (TIMESTAMPTZ)
 
 #### `company_profiles`
-- **Purpose**: Extended company information and subscription management
+- **Purpose**: Extended company information
 - **Fields**:
   - `id` (UUID, Primary Key)
   - `user_id` (UUID, FK to auth.users)
   - `company_name`, `company_description` (TEXT)
   - `company_website`, `company_size`, `industry` (TEXT)
   - `address`, `phone`, `logo_url` (TEXT)
-  - `subscription_status` (TEXT: 'active' | 'inactive' | 'cancelled')
-  - `subscription_end_date` (TIMESTAMPTZ)
-  - `stripe_customer_id` (TEXT)
   - `created_at`, `updated_at` (TIMESTAMPTZ)
 
 #### `jobs`
@@ -154,15 +156,19 @@ interface AuthContextType {
 ## 🔧 Environment Variables
 
 ### Environment Configuration
-The application uses environment variables stored in `.env.local` file:
+The application uses environment variables stored in a local env file (recommended: `.env.local` for development):
 
 ```bash
 # Supabase Configuration
 VITE_SUPABASE_URL=https://bwuomwyodoyyrqgdlwrp.supabase.co
 VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
-# Webhook Configuration  
-VITE_WEBHOOK_URL=https://n8n.cognitechx.com/webhook-test/Hirios
+# Screening Webhook (optional)
+VITE_SCREENING_WEBHOOK_URL=https://n8n.cognitechx.com/webhook-test/Hirios
+
+# Voice Interview (ElevenLabs)
+VITE_ELEVENLABS_KEY=your_11labs_api_key
+VITE_AGENT_ID=your_agent_id
 
 # Application Configuration
 VITE_APP_NAME=Hirios
@@ -172,20 +178,20 @@ VITE_APP_DESCRIPTION=Job Portal Application
 ### Required Environment Variables
 - **`VITE_SUPABASE_URL`**: Your Supabase project URL
 - **`VITE_SUPABASE_ANON_KEY`**: Your Supabase anonymous key
-- **`VITE_WEBHOOK_URL`**: External webhook endpoint for application processing
+- **`VITE_SCREENING_WEBHOOK_URL`**: Optional: webhook endpoint for screening events
+- **`VITE_ELEVENLABS_KEY`**: ElevenLabs API key for voice interviews
+- **`VITE_AGENT_ID`**: ElevenLabs Agent ID used for interviews
 - **`VITE_APP_NAME`**: Application name (optional)
 - **`VITE_APP_DESCRIPTION`**: Application description (optional)
 
 ### Environment Setup for Development
-1. Copy `.env.example` to `.env` in the project root
-   ```bash
-   cp .env.example .env
-   ```
-2. Update the values in `.env` with your actual configuration:
+1. Create a `.env.local` file in the project root
+2. Add and update the variables shown above with your actual configuration:
    - Replace `your_supabase_project_url` with your Supabase project URL
    - Replace `your_supabase_anon_key` with your Supabase anonymous key
-   - Replace `your_webhook_endpoint_url` with your webhook URL
-3. The application will automatically validate required environment variables on startup
+   - Optionally set `VITE_SCREENING_WEBHOOK_URL` to your webhook URL
+   - Set `VITE_ELEVENLABS_KEY` and `VITE_AGENT_ID` for voice interviews
+3. The application reads `VITE_`-prefixed variables at build time
 
 **Note**: All environment variables must be prefixed with `VITE_` to be accessible in the frontend application.
 
@@ -211,13 +217,18 @@ Hirios/
 │   │   └── supabase/        # Supabase client and types
 │   ├── lib/                 # Utility functions
 │   ├── pages/               # Page components
-│   │   ├── Index.tsx        # Landing page
-│   │   ├── Auth.tsx         # Authentication page
-│   │   ├── JobPortal.tsx    # Main application page
-│   │   ├── CompanySetup.tsx # Company onboarding
-│   │   └── Subscription.tsx # Subscription management
+│   │   ├── HiriosLanding.tsx # Marketing landing page (/)
+│   │   ├── Index.tsx         # Legacy job portal (kept as /job-portal-old)
+│   │   ├── Auth.tsx          # Authentication page
+│   │   ├── AuthConfirm.tsx   # Email confirmation handler
+│   │   ├── ResetPassword.tsx # Password reset flow
+│   │   ├── JobPortal.tsx     # Main application dashboard
+│   │   ├── CompanySetup.tsx  # Company onboarding
+│   │   ├── ScreeningResults.tsx # AI screening dashboard
+│   │   ├── VoiceInterview.tsx   # AI voice interview page
+│   │   └── NotFound.tsx      # 404 fallback
 │   ├── services/            # External API services
-│   │   └── webhookService.ts # Webhook integration
+│   │   └── voiceInterviewService.ts # ElevenLabs + data aggregation
 │   └── main.tsx             # Application entry point
 ├── supabase/
 │   ├── migrations/          # Database migrations
@@ -226,6 +237,20 @@ Hirios/
 ├── package.json             # Dependencies and scripts
 └── vite.config.ts          # Vite configuration
 ```
+
+## 🧭 Routes
+
+Defined in `src/App.tsx` using React Router:
+
+- `/` → `HiriosLanding`
+- `/auth` → `Auth` (sign in/up)
+- `/auth/confirm` → `AuthConfirm`
+- `/auth/reset-password` → `ResetPassword`
+- `/job-portal` → `JobPortal` (company or job seeker view)
+- `/company-setup` → `CompanySetup`
+- `/screening-results` → `ScreeningResults` (company-only UI)
+- `/interview/:screeningResultId/:applicationId` → `VoiceInterview`
+- `*` → `NotFound`
 
 ## 🔄 Data Flow
 
@@ -240,8 +265,13 @@ Hirios/
 2. Selects job and fills application form
 3. Resume uploaded to Supabase Storage
 4. Application data saved to `applications` table
-5. Webhook triggered to external processing system
-6. Optional: AI screening results stored in `screening_results`
+5. Optional webhook triggered to external processing system
+6. AI screening results stored in `screening_results` (if configured)
+
+### Voice Interview Flow
+1. From `ScreeningResults`, a company can request a voice interview (sends webhook and marks record)
+2. A direct link can be generated/copied to invite the candidate
+3. On visit, `VoiceInterview` loads candidate/job data and starts a realtime AI conversation (with mic permission)
 
 ### Authentication Flow
 1. User registration/login via Supabase Auth
@@ -315,7 +345,7 @@ The application is designed for deployment on modern hosting platforms:
 - ✅ Authentication required for sensitive operations
 - ✅ File upload restrictions (PDF only for resumes)
 - ✅ Environment variables properly configured
-- ⚠️ Some tables have public access policies for demo purposes
+- ⚠️ Some endpoints/data may have relaxed policies for demo purposes
 
 ### Production Security Recommendations
 1. **RLS Policies**: Review and restrict public access policies
@@ -347,8 +377,14 @@ This project is part of the Lovable platform ecosystem.
 
 ### Webhook Service
 - **Purpose**: Send application data to external processing systems
-- **URL**: `https://n8n.cognitechx.com/webhook-test/Hirios`
-- **Data**: Application details with base64-encoded resume
+- **Env Var**: `VITE_SCREENING_WEBHOOK_URL`
+- **Example**: `https://n8n.cognitechx.com/webhook-test/Hirios`
+- **Data**: Screening metadata (candidate, job, link) where applicable
+
+### ElevenLabs Realtime
+- **Purpose**: Run AI-powered voice interviews
+- **Env Vars**: `VITE_ELEVENLABS_KEY`, `VITE_AGENT_ID`
+- **Client**: `@elevenlabs/client` via `voiceInterviewService.ts`
 
 ### Supabase Services Used
 - **Database**: PostgreSQL with real-time capabilities

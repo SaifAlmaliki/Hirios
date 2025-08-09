@@ -32,7 +32,11 @@ import {
   MapPin,
   Building2,
   ArrowLeft,
-  Star
+  Star,
+  Menu,
+  X,
+  LogOut,
+  Settings,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -45,7 +49,7 @@ import { VoiceInterviewService } from '@/services/voiceInterviewService';
 const ScreeningResults = () => {
   // ALL HOOKS MUST BE CALLED FIRST - NO CONDITIONAL HOOKS
   const navigate = useNavigate();
-  const { user, userType, loading } = useAuth();
+  const { user, userType, loading, signOut } = useAuth();
   const { toast } = useToast();
   
   // Data fetching
@@ -68,6 +72,54 @@ const ScreeningResults = () => {
   // State for voice interviews
   const [requestingInterview, setRequestingInterview] = useState<string | null>(null);
   const [voiceInterviewService] = useState(() => VoiceInterviewService.getInstance());
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Filter and sort results - must be before any conditional returns
+  const filteredAndSortedResults = useMemo(() => {
+    const filtered = screeningResults.filter(result => {
+      const matchesSearch = 
+        result.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        result.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        result.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (result.job?.title || '').toLowerCase().includes(searchTerm.toLowerCase());
+
+      const matchesScore = scoreFilter === 'all' || 
+        (scoreFilter === 'excellent' && (result.overall_fit || 0) > 70) ||
+        (scoreFilter === 'good' && (result.overall_fit || 0) >= 40 && (result.overall_fit || 0) <= 70) ||
+        (scoreFilter === 'poor' && (result.overall_fit || 0) < 40);
+
+      return matchesSearch && matchesScore;
+    });
+
+    // Sort results
+    filtered.sort((a, b) => {
+      let aValue, bValue;
+      
+      switch (sortBy) {
+        case 'score':
+          aValue = a.overall_fit || 0;
+          bValue = b.overall_fit || 0;
+          break;
+        case 'name':
+          aValue = `${a.first_name} ${a.last_name}`;
+          bValue = `${b.first_name} ${b.last_name}`;
+          break;
+        case 'date':
+        default:
+          aValue = new Date(a.created_at).getTime();
+          bValue = new Date(b.created_at).getTime();
+          break;
+      }
+
+      if (sortOrder === 'asc') {
+        return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+      } else {
+        return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+      }
+    });
+
+    return filtered;
+  }, [screeningResults, searchTerm, scoreFilter, sortBy, sortOrder]);
 
   // Redirect if not company user - THIS MUST BE AFTER ALL HOOKS
   React.useEffect(() => {
@@ -166,56 +218,17 @@ const ScreeningResults = () => {
     });
   };
 
-  // Filter and sort results
-  const filteredAndSortedResults = useMemo(() => {
-    const filtered = screeningResults.filter(result => {
-      const matchesSearch = 
-        result.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        result.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        result.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (result.job?.title || '').toLowerCase().includes(searchTerm.toLowerCase());
+  const handleSignOut = async () => {
+    await signOut();
+  };
 
-      const matchesScore = scoreFilter === 'all' || 
-        (scoreFilter === 'excellent' && (result.overall_fit || 0) > 70) ||
-        (scoreFilter === 'good' && (result.overall_fit || 0) >= 40 && (result.overall_fit || 0) <= 70) ||
-        (scoreFilter === 'poor' && (result.overall_fit || 0) < 40);
+  const handleCompanySetup = () => {
+    navigate('/company-setup');
+  };
 
-      return matchesSearch && matchesScore;
-    });
-
-    // Sort results
-    filtered.sort((a, b) => {
-      let aValue, bValue;
-      
-      switch (sortBy) {
-        case 'score':
-          aValue = a.overall_fit || 0;
-          bValue = b.overall_fit || 0;
-          break;
-        case 'name':
-          aValue = `${a.first_name} ${a.last_name}`;
-          bValue = `${b.first_name} ${b.last_name}`;
-          break;
-        case 'date':
-        default:
-          aValue = new Date(a.created_at).getTime();
-          bValue = new Date(b.created_at).getTime();
-          break;
-      }
-
-      if (sortOrder === 'asc') {
-        return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
-      } else {
-        return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
-      }
-    });
-
-    return filtered;
-  }, [screeningResults, searchTerm, scoreFilter, sortBy, sortOrder]);
-
-
-
-
+  const handleScreeningResults = () => {
+    navigate('/screening-results');
+  };
 
   if (isLoading) {
     return (
@@ -245,227 +258,331 @@ const ScreeningResults = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4 sm:p-6 lg:p-8">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-              <Brain className="h-8 w-8 mr-3 text-blue-600" />
-              AI Screening Results
-            </h1>
-            <p className="text-gray-600 mt-1">Comprehensive candidate analysis and insights</p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+      {/* Header (reused from JobPortal) */}
+      <div className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center space-x-3">
+              <div className="bg-blue-600 p-2 rounded-lg">
+                <Building2 className="h-6 w-6 text-white" />
+              </div>
+              <h1
+                className="text-xl font-bold text-gray-900 cursor-pointer hover:text-blue-700"
+                onClick={() => navigate('/job-portal')}
+              >
+                Job Portal
+              </h1>
+            </div>
+
+            {/* Mobile menu button */}
+            <div className="md:hidden">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="p-1" 
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              >
+                {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </Button>
+            </div>
+
+            {/* Desktop navigation */}
+            <div className="hidden md:flex items-center space-x-4">
+              {/* User Actions */}
+              {user ? (
+                <div className="flex items-center space-x-3 flex-wrap">
+                  <span className="text-sm text-gray-600 hidden lg:inline">
+                    {user.email} ({userType})
+                  </span>
+
+                  {userType === 'company' && (
+                    <>
+                      <Button variant="outline" size="sm" onClick={handleCompanySetup}>
+                        <Settings className="h-4 w-4 mr-1" />
+                        <span className="hidden sm:inline">Setup</span>
+                      </Button>
+
+                      <Button variant="outline" size="sm" onClick={handleScreeningResults}>
+                        <Brain className="h-4 w-4 mr-1" />
+                        <span className="hidden sm:inline">AI Screening</span>
+                        <span className="sm:hidden">AI</span>
+                      </Button>
+                    </>
+                  )}
+
+                  <Button variant="outline" size="sm" onClick={handleSignOut}>
+                    <LogOut className="h-4 w-4 mr-1" />
+                    <span className="hidden sm:inline">Sign Out</span>
+                    <span className="sm:hidden">Out</span>
+                  </Button>
+                </div>
+              ) : (
+                <Button onClick={() => navigate('/auth')} size="sm">
+                  Sign In
+                </Button>
+              )}
+            </div>
           </div>
-          <div className="flex gap-3">
-            <Button
-              onClick={handleExportPDF}
-              variant="outline"
-              className="flex items-center gap-2"
-            >
-              <Download className="h-4 w-4" />
-              Export PDF
-            </Button>
-            <Button
-              onClick={() => navigate('/job-portal')}
-              variant="outline"
-            >
-              Back to Dashboard
-            </Button>
-          </div>
+
+          {/* Mobile menu */}
+          {isMobileMenuOpen && (
+            <div className="md:hidden py-4 border-t border-gray-200 space-y-4">
+              {user && (
+                <div className="space-y-3 px-4">
+                  <div className="text-sm text-gray-600 text-center">
+                    {user.email} ({userType})
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    {userType === 'company' && (
+                      <>
+                        <Button variant="outline" size="sm" onClick={handleCompanySetup} className="w-full">
+                          <Settings className="h-4 w-4 mr-1" />
+                          Setup
+                        </Button>
+
+                        <Button variant="outline" size="sm" onClick={handleScreeningResults} className="w-full">
+                          <Brain className="h-4 w-4 mr-1" />
+                          AI Screening
+                        </Button>
+                      </>
+                    )}
+
+                    <Button variant="outline" size="sm" onClick={handleSignOut} className="w-full">
+                      <LogOut className="h-4 w-4 mr-1" />
+                      Sign Out
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {!user && (
+                <div className="px-4">
+                  <Button onClick={() => navigate('/auth')} size="sm" className="w-full">
+                    Sign In
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
+      </div>
 
-        {/* Stats Cards */}
-        {stats && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card className="bg-blue-50 border-blue-100">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Screened</CardTitle>
-                <Users className="h-4 w-4 text-blue-600" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-blue-600">{stats.total}</div>
-                <p className="text-xs text-gray-600">+{stats.recentCount} this week</p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-green-50 border-green-100">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Excellent Fits</CardTitle>
-                <Award className="h-4 w-4 text-green-600" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-green-600">{stats.excellent}</div>
-                <p className="text-xs text-gray-600">{stats.total > 0 ? Math.round((stats.excellent / stats.total) * 100) : 0}% of total</p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-yellow-50 border-yellow-100">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Good Fits</CardTitle>
-                <TrendingUp className="h-4 w-4 text-yellow-600" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-yellow-600">{stats.good}</div>
-                <p className="text-xs text-gray-600">{stats.total > 0 ? Math.round((stats.good / stats.total) * 100) : 0}% of total</p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-purple-50 border-purple-100">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Average Score</CardTitle>
-                <Brain className="h-4 w-4 text-purple-600" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-purple-600">{stats.averageScore}%</div>
-                <Progress value={stats.averageScore} className="mt-2" />
-              </CardContent>
-            </Card>
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
+        <div className="space-y-6">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">AI Screening Results</h1>
+              <p className="text-gray-600 mt-1">Comprehensive candidate analysis and insights</p>
+            </div>
+            <div className="flex gap-3">
+              <Button
+                onClick={handleExportPDF}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                <Download className="h-4 w-4" />
+                Export PDF
+              </Button>
+            </div>
           </div>
-        )}
 
-        {/* Filters */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center">
-              <Filter className="h-5 w-5 mr-2" />
-              Filters & Search
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="search">Search Candidates</Label>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <Input
-                    id="search"
-                    placeholder="Name, email, or job title..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
+          {/* Stats Cards */}
+          {stats && (
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-6">
+              <Card className="bg-blue-50 border-blue-100">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Total Screened</CardTitle>
+                  <Users className="h-4 w-4 text-blue-600" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-blue-600">{stats.total}</div>
+                  <p className="text-xs text-gray-600">+{stats.recentCount} this week</p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-green-50 border-green-100">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Excellent Fits</CardTitle>
+                  <Award className="h-4 w-4 text-green-600" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-green-600">{stats.excellent}</div>
+                  <p className="text-xs text-gray-600">{stats.total > 0 ? Math.round((stats.excellent / stats.total) * 100) : 0}% of total</p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-yellow-50 border-yellow-100">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Good Fits</CardTitle>
+                  <TrendingUp className="h-4 w-4 text-yellow-600" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-yellow-600">{stats.good}</div>
+                  <p className="text-xs text-gray-600">{stats.total > 0 ? Math.round((stats.good / stats.total) * 100) : 0}% of total</p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-purple-50 border-purple-100">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Average Score</CardTitle>
+                  <Brain className="h-4 w-4 text-purple-600" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-purple-600">{stats.averageScore}%</div>
+                  <Progress value={stats.averageScore} className="mt-2" />
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {/* Filters */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center">
+                <Filter className="h-5 w-5 mr-2" />
+                Filters & Search
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="search">Search Candidates</Label>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Input
+                      id="search"
+                      placeholder="Name, email, or job title..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="score-filter">Filter by Score</Label>
+                  <Select value={scoreFilter} onValueChange={setScoreFilter}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="All scores" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Scores</SelectItem>
+                      <SelectItem value="excellent">Excellent (&gt;70%)</SelectItem>
+                      <SelectItem value="good">Good (40-70%)</SelectItem>
+                      <SelectItem value="poor">Poor (&lt;40%)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="sort-by">Sort By</Label>
+                  <Select value={sortBy} onValueChange={setSortBy}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sort by..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="date">Date Screened</SelectItem>
+                      <SelectItem value="score">Overall Fit Score</SelectItem>
+                      <SelectItem value="name">Candidate Name</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="sort-order">Order</Label>
+                  <Select value={sortOrder} onValueChange={setSortOrder}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Order..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="desc">Descending</SelectItem>
+                      <SelectItem value="asc">Ascending</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
+            </CardContent>
+          </Card>
 
-              <div className="space-y-2">
-                <Label htmlFor="score-filter">Filter by Score</Label>
-                <Select value={scoreFilter} onValueChange={setScoreFilter}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="All scores" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Scores</SelectItem>
-                    <SelectItem value="excellent">Excellent (&gt;70%)</SelectItem>
-                    <SelectItem value="good">Good (40-70%)</SelectItem>
-                    <SelectItem value="poor">Poor (&lt;40%)</SelectItem>
-                  </SelectContent>
-                </Select>
+          {/* Results Table */}
+          <Card>
+            <CardHeader>
+              <div className="flex justify-between items-center">
+                <CardTitle className="text-lg">
+                  Screening Results ({filteredAndSortedResults.length})
+                </CardTitle>
               </div>
+            </CardHeader>
+            <CardContent>
+              {filteredAndSortedResults.length === 0 ? (
+                <div className="text-center py-8">
+                  <Brain className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-600">No screening results found matching your criteria.</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {filteredAndSortedResults.map((result) => (
+                    <ScreeningResultCard
+                      key={result.id}
+                      result={result}
+                      requestingInterview={requestingInterview}
+                      onRequestVoiceScreening={handleRequestVoiceScreening}
+                      expandedRows={expandedRows}
+                      onToggleExpansion={toggleRowExpansion}
+                    />
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
-              <div className="space-y-2">
-                <Label htmlFor="sort-by">Sort By</Label>
-                <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sort by..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="date">Date Screened</SelectItem>
-                    <SelectItem value="score">Overall Fit Score</SelectItem>
-                    <SelectItem value="name">Candidate Name</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="sort-order">Order</Label>
-                <Select value={sortOrder} onValueChange={setSortOrder}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Order..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="desc">Descending</SelectItem>
-                    <SelectItem value="asc">Ascending</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Results Table */}
-        <Card>
-          <CardHeader>
-            <div className="flex justify-between items-center">
-              <CardTitle className="text-lg">
-                Screening Results ({filteredAndSortedResults.length})
-              </CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {filteredAndSortedResults.length === 0 ? (
-              <div className="text-center py-8">
-                <Brain className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600">No screening results found matching your criteria.</p>
-              </div>
-            ) : (
+          {/* Add Note Dialog */}
+          <Dialog open={noteDialogOpen} onOpenChange={setNoteDialogOpen}>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>
+                  {selectedResult?.notes ? 'Edit Note' : 'Add Note'}
+                </DialogTitle>
+                <DialogDescription>
+                  Add your notes about {selectedResult?.first_name} {selectedResult?.last_name}
+                </DialogDescription>
+              </DialogHeader>
               <div className="space-y-4">
-                {filteredAndSortedResults.map((result) => (
-                  <ScreeningResultCard
-                    key={result.id}
-                    result={result}
-                    requestingInterview={requestingInterview}
-                    onRequestVoiceScreening={handleRequestVoiceScreening}
-                    expandedRows={expandedRows}
-                    onToggleExpansion={toggleRowExpansion}
+                <div className="space-y-2">
+                  <Label htmlFor="note-text">Note</Label>
+                  <Textarea
+                    id="note-text"
+                    placeholder="Enter your notes about this candidate..."
+                    value={noteText}
+                    onChange={(e) => setNoteText(e.target.value)}
+                    rows={4}
                   />
-                ))}
+                </div>
+                <div className="flex justify-end gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => setNoteDialogOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleSaveNote}
+                    disabled={addNoteMutation.isPending}
+                  >
+                    {addNoteMutation.isPending ? 'Saving...' : 'Save Note'}
+                  </Button>
+                </div>
               </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Add Note Dialog */}
-        <Dialog open={noteDialogOpen} onOpenChange={setNoteDialogOpen}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>
-                {selectedResult?.notes ? 'Edit Note' : 'Add Note'}
-              </DialogTitle>
-              <DialogDescription>
-                Add your notes about {selectedResult?.first_name} {selectedResult?.last_name}
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="note-text">Note</Label>
-                <Textarea
-                  id="note-text"
-                  placeholder="Enter your notes about this candidate..."
-                  value={noteText}
-                  onChange={(e) => setNoteText(e.target.value)}
-                  rows={4}
-                />
-              </div>
-              <div className="flex justify-end gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => setNoteDialogOpen(false)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  onClick={handleSaveNote}
-                  disabled={addNoteMutation.isPending}
-                >
-                  {addNoteMutation.isPending ? 'Saving...' : 'Save Note'}
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
     </div>
   );
 };
 
-export default ScreeningResults; 
+export default ScreeningResults;

@@ -1,11 +1,12 @@
 
 interface ApplicationWebhookData {
+  application_id: string;
   full_name: string;
   email: string;
   phone: string;
   resume_base64?: string;
   resume_filename?: string;
-  job_id: string;  // Added job_id as top-level field for easier access
+  job_id: string;
   job_title: string;
   company: string;
   applied_at: string;
@@ -46,33 +47,54 @@ const fileToBase64 = (file: File): Promise<string> => {
   });
 };
 
-export const sendApplicationToWebhook = async (
-  applicationData: ApplicationWebhookData
-) => {
+export const sendApplicationToWebhook = async (data: ApplicationWebhookData): Promise<boolean> => {
+  const webhookUrl = import.meta.env.VITE_WEBHOOK_URL;
+  
+  if (!webhookUrl) {
+    console.warn('⚠️ No webhook URL configured');
+    return false;
+  }
+
   try {
-    console.log('Sending application data to webhook:', WEBHOOK_URL);
-    
-    const response = await fetch(WEBHOOK_URL, {
+    console.log('📤 Sending webhook for:', data.full_name);
+    console.log('📋 Webhook payload:', {
+      application_id: data.application_id,
+      full_name: data.full_name,
+      email: data.email,
+      phone: data.phone,
+      job_id: data.job_id,
+      job_title: data.job_title,
+      company: data.company,
+      applied_at: data.applied_at,
+      resume_filename: data.resume_filename,
+      resume_base64_length: data.resume_base64?.length || 0,
+      job_details: {
+        job_id: data.job_details.job_id,
+        title: data.job_details.title,
+        company: data.job_details.company,
+        department: data.job_details.department,
+        location: data.job_details.location,
+        employment_type: data.job_details.employment_type
+      }
+    });
+
+    const response = await fetch(webhookUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        type: 'job_application',
-        data: applicationData,
-        timestamp: new Date().toISOString(),
-      }),
+      body: JSON.stringify(data)
     });
 
     if (!response.ok) {
-      throw new Error(`Webhook request failed: ${response.status}`);
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
 
-    console.log('Application data sent successfully to webhook');
+    console.log('✅ Webhook delivered successfully');
     return true;
   } catch (error) {
-    console.error('Failed to send application to webhook:', error);
-    throw error;
+    console.error('❌ Webhook failed:', error);
+    return false;
   }
 };
 

@@ -217,6 +217,7 @@ export type Database = {
           voice_screening_requested: boolean
           interview_summary: string | null
           interview_completed_at: string | null
+          application_id: string | null
         }
         Insert: {
           id?: string
@@ -238,6 +239,7 @@ export type Database = {
           voice_screening_requested?: boolean
           interview_summary?: string | null
           interview_completed_at?: string | null
+          application_id?: string | null
         }
         Update: {
           id?: string
@@ -259,6 +261,7 @@ export type Database = {
           voice_screening_requested?: boolean
           interview_summary?: string | null
           interview_completed_at?: string | null
+          application_id?: string | null
         }
         Relationships: [
           {
@@ -266,6 +269,13 @@ export type Database = {
             columns: ["job_id"]
             isOneToOne: false
             referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "screening_results_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "applications"
             referencedColumns: ["id"]
           }
         ]

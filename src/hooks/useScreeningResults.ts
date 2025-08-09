@@ -25,6 +25,7 @@ export interface ScreeningResult {
   voice_screening_requested?: boolean;
   interview_summary?: string;
   interview_completed_at?: string;
+  application_id?: string;  // Add application_id field
   // Job details from join
   job?: {
     id: string;
@@ -34,6 +35,7 @@ export interface ScreeningResult {
   };
   // Resume URL from applications table
   resume_url?: string;
+  resume_text?: string;
 }
 
 export const useScreeningResults = () => {
@@ -65,9 +67,6 @@ export const useScreeningResults = () => {
         throw new Error('Company profile not found');
       }
 
-      console.log('Fetching screening results from database...');
-      console.log('Company profile ID:', profile.id);
-      
       // Fetch screening results with job information for this company
       const { data, error } = await supabase
         .from('screening_results')
@@ -83,42 +82,64 @@ export const useScreeningResults = () => {
         `)
         .order('created_at', { ascending: false });
       
-      console.log('Screening results for company:', data);
-      
       if (error) {
-        console.error('Error fetching screening results:', error);
+        console.error('❌ Error fetching screening results:', error);
         throw error;
       }
-      
-      console.log('Screening results fetched successfully:', data);
       
       // Fetch resume URLs for each candidate
       const resultsWithResumes = await Promise.all(
         (data || []).map(async (result: any) => {
           try {
-            const { data: application, error: appError } = await supabase
-              .from('applications')
-              .select('resume_url')
-              .eq('email', result.email)
-              .order('created_at', { ascending: false })
-              .limit(1)
-              .single();
+            // Use application_id if available, otherwise fall back to email matching
+            let application = null;
+            let appError = null;
+
+            if (result.application_id) {
+              // Use application_id for direct lookup
+              const { data: appData, error: appErr } = await supabase
+                .from('applications')
+                .select('resume_url, resume_text')
+                .eq('id', result.application_id)
+                .maybeSingle();
+              
+              application = appData;
+              appError = appErr;
+            } else {
+              // Fall back to email matching (less reliable)
+              const { data: appData, error: appErr } = await supabase
+                .from('applications')
+                .select('resume_url, resume_text')
+                .eq('email', result.email)
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .maybeSingle();
+              
+              application = appData;
+              appError = appErr;
+            }
+            
+            if (appError) {
+              console.warn('⚠️ No resume found for:', result.email, 'application_id:', result.application_id);
+            }
             
             return {
               ...result,
-              resume_url: application?.resume_url || null
+              resume_url: application?.resume_url || null,
+              resume_text: application?.resume_text || null
             };
           } catch (error) {
-            console.log(`No application found for ${result.email}`);
+            console.warn('⚠️ Error fetching resume for:', result.email, 'application_id:', result.application_id);
             return {
               ...result,
-              resume_url: null
+              resume_url: null,
+              resume_text: null
             };
           }
         })
       );
       
-      return resultsWithResumes as unknown as ScreeningResult[];
+      return resultsWithResumes as ScreeningResult[];
     },
     enabled: !!user,
   });
@@ -157,8 +178,6 @@ export const useScreeningResultsStats = () => {
       const { data, error } = await supabase
         .from('screening_results')
         .select('overall_fit, created_at');
-      
-      console.log('Stats data for company:', data);
       
       if (error) {
         console.error('Error fetching screening stats:', error);
@@ -212,7 +231,6 @@ export const useCreateScreeningResult = () => {
         throw new Error('AI screening is only available for Premium subscribers. Please upgrade your plan to access this feature.');
       }
 
-      console.log('Creating screening result:', screeningData);
       const { data, error } = await supabase
         .from('screening_results')
         .insert([screeningData])
@@ -224,7 +242,6 @@ export const useCreateScreeningResult = () => {
         throw error;
       }
 
-      console.log('Screening result created successfully:', data);
       return data as ScreeningResult;
     },
     onSuccess: () => {
@@ -252,7 +269,6 @@ export const useUpdateScreeningResult = () => {
 
   return useMutation({
     mutationFn: async ({ id, ...updateData }: Partial<ScreeningResult> & { id: string }) => {
-      console.log('Updating screening result:', id, updateData);
       const { data, error } = await supabase
         .from('screening_results')
         .update(updateData)
@@ -265,7 +281,6 @@ export const useUpdateScreeningResult = () => {
         throw error;
       }
 
-      console.log('Screening result updated successfully:', data);
       return data as ScreeningResult;
     },
     onSuccess: () => {
@@ -293,7 +308,6 @@ export const useAddNoteToScreeningResult = () => {
 
   return useMutation({
     mutationFn: async ({ id, notes }: { id: string; notes: string }) => {
-      console.log('Adding note to screening result:', id, notes);
       const { data, error } = await supabase
         .from('screening_results')
         .update({ notes, updated_at: new Date().toISOString() })
@@ -306,7 +320,6 @@ export const useAddNoteToScreeningResult = () => {
         throw error;
       }
 
-      console.log('Note added successfully:', data);
       return data as ScreeningResult;
     },
     onSuccess: () => {
@@ -343,7 +356,6 @@ export const useUpdateCallStatus = () => {
       call_summary?: string;
       call_error_message?: string;
     }) => {
-      console.log('Updating call status:', id, call_status);
       
       const updateData: any = { call_status };
       
@@ -368,7 +380,6 @@ export const useUpdateCallStatus = () => {
         throw error;
       }
 
-      console.log('Call status updated successfully:', data);
       return data as ScreeningResult;
     },
     onSuccess: () => {

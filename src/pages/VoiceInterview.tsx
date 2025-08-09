@@ -8,7 +8,7 @@ import { VoiceInterviewService, VoiceInterviewData } from '@/services/voiceInter
 import { useToast } from '@/hooks/use-toast';
 
 const VoiceInterview = () => {
-  const { screeningResultId } = useParams<{ screeningResultId: string }>();
+  const { screeningResultId, applicationId } = useParams<{ screeningResultId: string; applicationId: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -18,6 +18,7 @@ const VoiceInterview = () => {
   const [isConnecting, setIsConnecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [autoStart, setAutoStart] = useState(false);
+  const [microphoneStatus, setMicrophoneStatus] = useState<'unknown' | 'granted' | 'denied' | 'testing'>('unknown');
   const [voiceInterviewService] = useState(() => VoiceInterviewService.getInstance());
 
   useEffect(() => {
@@ -29,7 +30,7 @@ const VoiceInterview = () => {
       }
 
       try {
-        const data = await VoiceInterviewService.getInterviewData(screeningResultId);
+        const data = await VoiceInterviewService.getInterviewData(screeningResultId, applicationId);
         if (data) {
           setInterviewData(data);
           
@@ -50,7 +51,7 @@ const VoiceInterview = () => {
     };
 
     loadInterviewData();
-  }, [screeningResultId]);
+  }, [screeningResultId, applicationId]);
 
   // Auto-start interview if requested
   useEffect(() => {
@@ -131,6 +132,42 @@ const VoiceInterview = () => {
     }
   };
 
+  const testMicrophone = async () => {
+    setMicrophoneStatus('testing');
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true
+        } 
+      });
+      
+      console.log('🎤 Microphone test successful:', {
+        trackCount: stream.getTracks().length,
+        audioTracks: stream.getAudioTracks().length
+      });
+      
+      setMicrophoneStatus('granted');
+      toast({
+        title: "Microphone Test",
+        description: "Microphone access granted successfully!",
+      });
+      
+      // Stop the test stream
+      stream.getTracks().forEach(track => track.stop());
+      
+    } catch (err) {
+      console.error('❌ Microphone test failed:', err);
+      setMicrophoneStatus('denied');
+      toast({
+        title: "Microphone Test Failed",
+        description: "Please check your microphone permissions and try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -189,6 +226,9 @@ const VoiceInterview = () => {
             <p className="text-sm text-blue-800">
               <strong>Position:</strong> {interviewData.job_title}
             </p>
+            <p className="text-sm text-blue-800">
+              <strong>Company:</strong> {interviewData.company}
+            </p>
           </div>
 
           {/* Interview Status */}
@@ -244,17 +284,41 @@ const VoiceInterview = () => {
             )}
           </div>
 
-          {/* Instructions */}
-          <div className="bg-gray-50 p-4 rounded-lg border">
-            <h3 className="font-semibold text-gray-900 mb-2">Interview Instructions</h3>
-            <ul className="text-sm text-gray-600 space-y-1">
-              <li>• Ensure you're in a quiet environment</li>
-              <li>• Speak clearly and at a normal pace</li>
-              <li>• Answer questions honestly and completely</li>
-              <li>• The interview will be recorded for evaluation</li>
-              <li>• You can end the interview at any time</li>
-            </ul>
-          </div>
+                     {/* Microphone Status */}
+           <div className="bg-gray-50 p-4 rounded-lg border">
+             <h3 className="font-semibold text-gray-900 mb-2">Microphone Status</h3>
+             <div className="flex items-center justify-between">
+               <div className="flex items-center space-x-2">
+                 <Mic className={`h-4 w-4 ${microphoneStatus === 'granted' ? 'text-green-600' : microphoneStatus === 'denied' ? 'text-red-600' : 'text-gray-600'}`} />
+                 <span className="text-sm">
+                   {microphoneStatus === 'granted' && 'Microphone Ready'}
+                   {microphoneStatus === 'denied' && 'Microphone Access Denied'}
+                   {microphoneStatus === 'testing' && 'Testing Microphone...'}
+                   {microphoneStatus === 'unknown' && 'Microphone Status Unknown'}
+                 </span>
+               </div>
+               <Button
+                 onClick={testMicrophone}
+                 size="sm"
+                 variant="outline"
+                 disabled={microphoneStatus === 'testing'}
+               >
+                 Test Microphone
+               </Button>
+             </div>
+           </div>
+
+           {/* Instructions */}
+           <div className="bg-gray-50 p-4 rounded-lg border">
+             <h3 className="font-semibold text-gray-900 mb-2">Interview Instructions</h3>
+             <ul className="text-sm text-gray-600 space-y-1">
+               <li>• Ensure you're in a quiet environment</li>
+               <li>• Speak clearly and at a normal pace</li>
+               <li>• Answer questions honestly and completely</li>
+               <li>• The interview will be recorded for evaluation</li>
+               <li>• You can end the interview at any time</li>
+             </ul>
+           </div>
 
           {/* Debug Information (only in development) */}
           {process.env.NODE_ENV === 'development' && (
@@ -268,20 +332,28 @@ const VoiceInterview = () => {
                 {interviewData && (
                   <details className="mt-2">
                     <summary className="cursor-pointer font-medium">View Interview Variables</summary>
-                    <pre className="mt-2 text-xs bg-yellow-100 p-2 rounded overflow-auto">
-                      {JSON.stringify({
-                        user_name: interviewData.full_name,
-                        job_title: interviewData.job_title,
-                        job_requirements: interviewData.job_requirements?.substring(0, 100) + '...',
-                        job_description: interviewData.job_description?.substring(0, 100) + '...',
-                        resume_length: interviewData.resume?.length || 0
-                      }, null, 2)}
-                    </pre>
+                                         <pre className="mt-2 text-xs bg-yellow-100 p-2 rounded overflow-auto">
+                       {JSON.stringify({
+                         user_name: interviewData.full_name,
+                         job_title: interviewData.job_title,
+                         company: interviewData.company,
+                         application_id: interviewData.application_id,
+                         job_requirements: interviewData.job_requirements?.substring(0, 100) + '...',
+                         job_description: interviewData.job_description?.substring(0, 100) + '...',
+                         resume_length: interviewData.resume?.length || 0
+                       }, null, 2)}
+                     </pre>
                   </details>
                 )}
-                <p className="text-xs text-yellow-600 mt-2">
-                  💡 Open browser console for detailed logs. Use <code>voiceInterviewService.logCurrentState()</code> for more info.
-                </p>
+                                 <p className="text-xs text-yellow-600 mt-2">
+                   💡 Open browser console for detailed logs. Use <code>voiceInterviewService.logCurrentState()</code> for more info.
+                 </p>
+                 <div className="mt-2 p-2 bg-yellow-100 rounded text-xs">
+                   <p><strong>Audio Debug:</strong></p>
+                   <p>• Check if microphone is working: Click "Test Microphone" above</p>
+                   <p>• Browser console shows detailed audio logs</p>
+                   <p>• If agent keeps switching modes without hearing you, try refreshing the page</p>
+                 </div>
               </div>
             </div>
           )}

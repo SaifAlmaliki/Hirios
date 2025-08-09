@@ -73,7 +73,7 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
       const fileName = `${applicantEmail}_${Date.now()}.${fileExt}`;
       const filePath = `${fileName}`;
 
-      console.log('Uploading resume to storage:', filePath);
+      console.log('📄 Uploading resume:', file.name);
       
       const { data, error } = await supabase.storage
         .from('resumes')
@@ -83,11 +83,11 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
         });
 
       if (error) {
-        console.error('Storage upload error:', error);
+        console.error('❌ Storage upload error:', error);
         throw error;
       }
 
-      console.log('Resume uploaded successfully:', data);
+      console.log('✅ Resume uploaded:', data.path);
       
       // Get the public URL
       const { data: urlData } = supabase.storage
@@ -96,7 +96,7 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
 
       return urlData.publicUrl;
     } catch (error) {
-      console.error('Failed to upload resume:', error);
+      console.error('❌ Resume upload failed:', error);
       return null;
     }
   };
@@ -131,7 +131,7 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
       
       // Upload resume to Supabase storage if provided
       if (applicationData.resume) {
-        console.log('Starting resume upload...');
+        console.log('📤 Starting resume upload...');
         resumeUrl = await uploadResumeToStorage(applicationData.resume, applicationData.email);
         
         if (!resumeUrl) {
@@ -143,7 +143,7 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
           setIsUploading(false);
           return;
         }
-        console.log('Resume uploaded, URL:', resumeUrl);
+        console.log('✅ Resume URL ready');
       }
 
       // Submit application with resume URL
@@ -210,26 +210,26 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
             {jobs.map((job) => {
               const isExpanded = expandedJobs.has(job.id);
               return (
-                <Card key={job.id} className="hover:shadow-lg transition-all duration-300 border-2 border-gray-100 hover:border-blue-200 bg-white h-full flex flex-col">
-                  <CardHeader className="pb-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-t-lg">
+                <Card key={job.id} className="hover:shadow-xl transition-all duration-300 border border-gray-300 hover:border-gray-400 bg-gray-50 hover:bg-gray-100 h-full flex flex-col shadow-md">
+                  <CardHeader className="pb-4 bg-gradient-to-r from-gray-800 to-gray-900 text-white rounded-t-lg">
                     <div className="space-y-4">
                       <div className="flex justify-between items-start">
                         <div className="flex-1">
-                          <CardTitle className="text-xl font-bold text-gray-900 mb-2">{job.title}</CardTitle>
-                          <CardDescription className="text-base font-semibold text-blue-700 mb-3 flex items-center">
+                          <CardTitle className="text-xl font-bold text-white mb-2">{job.title}</CardTitle>
+                          <CardDescription className="text-base font-semibold text-blue-200 mb-3 flex items-center">
                             <Building className="h-4 w-4 mr-2" />
                             {job.company}
                           </CardDescription>
                         </div>
                         
                         <div className="flex flex-col items-end space-y-2">
-                          <div className="flex items-center text-xs text-gray-500 bg-white px-2 py-1 rounded-full shadow-sm">
+                          <div className="flex items-center text-xs text-gray-300 bg-gray-700 px-2 py-1 rounded-full shadow-sm">
                             <Calendar className="h-3 w-3 mr-1" />
                             Posted {new Date(job.created_at).toLocaleDateString()}
                           </div>
                           <Button 
                             onClick={() => handleApply(job)}
-                            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-sm font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
+                            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 text-sm font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200 border border-blue-400"
                             size="sm"
                           >
                             Apply Now
@@ -238,97 +238,105 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
                       </div>
                       
                       <div className="grid grid-cols-1 xl:grid-cols-3 gap-2 text-xs">
-                        <div className="flex items-center text-gray-700 bg-white px-2 py-1 rounded-lg shadow-sm">
-                          <Users className="h-3 w-3 mr-2 text-blue-600" />
+                        <div className="flex items-center text-gray-200 bg-gray-700 px-2 py-1 rounded-lg shadow-sm">
+                          <Users className="h-3 w-3 mr-2 text-blue-300" />
                           <span className="font-medium truncate">{job.department}</span>
                         </div>
-                        <div className="flex items-center text-gray-700 bg-white px-2 py-1 rounded-lg shadow-sm">
-                          <MapPin className="h-3 w-3 mr-2 text-green-600" />
+                        <div className="flex items-center text-gray-200 bg-gray-700 px-2 py-1 rounded-lg shadow-sm">
+                          <MapPin className="h-3 w-3 mr-2 text-green-300" />
                           <span className="font-medium truncate">{job.location}</span>
                         </div>
-                        <div className="flex items-center text-gray-700 bg-white px-2 py-1 rounded-lg shadow-sm">
-                          <Clock className="h-3 w-3 mr-2 text-purple-600" />
+                        <div className="flex items-center text-gray-200 bg-gray-700 px-2 py-1 rounded-lg shadow-sm">
+                          <Clock className="h-3 w-3 mr-2 text-purple-300" />
                           <span className="font-medium truncate">{job.employment_type}</span>
                         </div>
                       </div>
                     </div>
                   </CardHeader>
                   
-                  <CardContent className="pt-4 pb-4 space-y-4 flex-1">
-                    {/* Job Description */}
-                    <div>
-                      <h4 className="font-semibold text-gray-900 mb-2 text-base">Job Description</h4>
-                      <div className="bg-gray-50 p-3 rounded-lg">
+                  <CardContent className="pt-4 pb-4 space-y-4 flex-1 bg-white flex flex-col">
+                    {/* Job Description - Always shown */}
+                    <div className="flex-shrink-0">
+                      <h4 className="font-semibold text-gray-800 mb-2 text-base">Job Description</h4>
+                      <div className="bg-gray-100 p-3 rounded-lg border border-gray-200 min-h-[80px]">
                         <p className="text-gray-700 leading-relaxed text-sm">
-                          {isExpanded ? job.description : `${job.description.substring(0, 200)}${job.description.length > 200 ? '...' : ''}`}
+                          {isExpanded ? job.description : `${job.description.substring(0, 150)}${job.description.length > 150 ? '...' : ''}`}
                         </p>
                       </div>
                     </div>
 
-                    {/* Responsibilities */}
-                    {job.responsibilities && (isExpanded || job.responsibilities.length < 150) && (
-                      <div>
-                        <h4 className="font-semibold text-gray-900 mb-2 text-base">Key Responsibilities</h4>
-                        <div className="bg-blue-50 p-3 rounded-lg">
+                    {/* Key Responsibilities - Always shown */}
+                    <div className="flex-shrink-0">
+                      <h4 className="font-semibold text-gray-800 mb-2 text-base">Key Responsibilities</h4>
+                      <div className="bg-blue-50 p-3 rounded-lg border border-blue-100 min-h-[80px]">
+                        {job.responsibilities ? (
                           <div className="text-gray-700 space-y-1 text-sm">
-                            {job.responsibilities.split('\n').filter(resp => resp.trim()).map((resp, index) => (
+                            {(isExpanded ? job.responsibilities : job.responsibilities.substring(0, 120) + (job.responsibilities.length > 120 ? '...' : ''))
+                              .split('\n').filter(resp => resp.trim()).slice(0, isExpanded ? undefined : 2).map((resp, index) => (
                               <div key={index} className="flex items-start">
                                 <span className="text-blue-600 mr-2 mt-1">•</span>
                                 <span>{resp.trim()}</span>
                               </div>
                             ))}
                           </div>
-                        </div>
+                        ) : (
+                          <p className="text-gray-500 text-sm italic">Responsibilities will be discussed during the interview process.</p>
+                        )}
                       </div>
-                    )}
+                    </div>
 
-                    {/* Requirements */}
-                    {job.requirements && (isExpanded || job.requirements.length < 150) && (
-                      <div>
-                        <h4 className="font-semibold text-gray-900 mb-2 text-base">Requirements</h4>
-                        <div className="bg-blue-50 p-3 rounded-lg">
+                    {/* Requirements - Always shown */}
+                    <div className="flex-shrink-0">
+                      <h4 className="font-semibold text-gray-800 mb-2 text-base">Requirements</h4>
+                      <div className="bg-green-50 p-3 rounded-lg border border-green-100 min-h-[80px]">
+                        {job.requirements ? (
                           <div className="text-gray-700 space-y-1 text-sm">
-                            {job.requirements.split('\n').filter(req => req.trim()).map((req, index) => (
+                            {(isExpanded ? job.requirements : job.requirements.substring(0, 120) + (job.requirements.length > 120 ? '...' : ''))
+                              .split('\n').filter(req => req.trim()).slice(0, isExpanded ? undefined : 2).map((req, index) => (
                               <div key={index} className="flex items-start">
-                                <span className="text-blue-600 mr-2 mt-1">•</span>
+                                <span className="text-green-600 mr-2 mt-1">•</span>
                                 <span>{req.trim()}</span>
                               </div>
                             ))}
                           </div>
-                        </div>
+                        ) : (
+                          <p className="text-gray-500 text-sm italic">Basic qualifications and experience preferred.</p>
+                        )}
                       </div>
-                    )}
+                    </div>
 
-                    {/* Benefits */}
-                    {job.benefits && (isExpanded || job.benefits.length < 150) && (
-                      <div>
-                        <h4 className="font-semibold text-gray-900 mb-2 text-base">Benefits</h4>
-                        <div className="bg-green-50 p-3 rounded-lg">
-                          <p className="text-gray-700 leading-relaxed text-sm">{job.benefits}</p>
-                        </div>
+                    {/* Benefits - Always shown */}
+                    <div className="flex-shrink-0">
+                      <h4 className="font-semibold text-gray-800 mb-2 text-base">Benefits</h4>
+                      <div className="bg-yellow-50 p-3 rounded-lg border border-yellow-100 min-h-[60px]">
+                        {job.benefits ? (
+                          <p className="text-gray-700 leading-relaxed text-sm">
+                            {isExpanded ? job.benefits : `${job.benefits.substring(0, 100)}${job.benefits.length > 100 ? '...' : ''}`}
+                          </p>
+                        ) : (
+                          <p className="text-gray-500 text-sm italic">Competitive salary and benefits package available.</p>
+                        )}
                       </div>
-                    )}
+                    </div>
 
-                    {/* Show More/Less Button */}
-                    {(job.description.length > 200 || (job.responsibilities && job.responsibilities.length > 150) || (job.requirements && job.requirements.length > 150) || (job.benefits && job.benefits.length > 150)) && (
-                      <div className="flex justify-center pt-3 border-t border-gray-200 mt-auto">
-                        <Button
-                          variant="ghost"
-                          onClick={() => toggleJobExpansion(job.id)}
-                          className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 px-4 py-2 rounded-lg text-sm font-medium"
-                        >
-                          {isExpanded ? (
-                            <>
-                              Show Less <ChevronUp className="h-3 w-3 ml-2" />
-                            </>
-                          ) : (
-                            <>
-                              Show More <ChevronDown className="h-3 w-3 ml-2" />
-                            </>
-                          )}
-                        </Button>
-                      </div>
-                    )}
+                    {/* Show More/Less Button - Always shown at bottom */}
+                    <div className="flex justify-center pt-3 border-t border-gray-200 mt-auto">
+                      <Button
+                        variant="ghost"
+                        onClick={() => toggleJobExpansion(job.id)}
+                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 px-4 py-2 rounded-lg text-sm font-medium"
+                      >
+                        {isExpanded ? (
+                          <>
+                            Show Less <ChevronUp className="h-3 w-3 ml-2" />
+                          </>
+                        ) : (
+                          <>
+                            Show More <ChevronDown className="h-3 w-3 ml-2" />
+                          </>
+                        )}
+                      </Button>
+                    </div>
                   </CardContent>
 
                     {/* Application Dialog */}
