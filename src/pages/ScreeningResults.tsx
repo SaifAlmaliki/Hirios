@@ -69,6 +69,53 @@ const ScreeningResults = () => {
   const [requestingInterview, setRequestingInterview] = useState<string | null>(null);
   const [voiceInterviewService] = useState(() => VoiceInterviewService.getInstance());
 
+  // Filter and sort results - must be before any conditional returns
+  const filteredAndSortedResults = useMemo(() => {
+    const filtered = screeningResults.filter(result => {
+      const matchesSearch = 
+        result.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        result.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        result.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (result.job?.title || '').toLowerCase().includes(searchTerm.toLowerCase());
+
+      const matchesScore = scoreFilter === 'all' || 
+        (scoreFilter === 'excellent' && (result.overall_fit || 0) > 70) ||
+        (scoreFilter === 'good' && (result.overall_fit || 0) >= 40 && (result.overall_fit || 0) <= 70) ||
+        (scoreFilter === 'poor' && (result.overall_fit || 0) < 40);
+
+      return matchesSearch && matchesScore;
+    });
+
+    // Sort results
+    filtered.sort((a, b) => {
+      let aValue, bValue;
+      
+      switch (sortBy) {
+        case 'score':
+          aValue = a.overall_fit || 0;
+          bValue = b.overall_fit || 0;
+          break;
+        case 'name':
+          aValue = `${a.first_name} ${a.last_name}`;
+          bValue = `${b.first_name} ${b.last_name}`;
+          break;
+        case 'date':
+        default:
+          aValue = new Date(a.created_at).getTime();
+          bValue = new Date(b.created_at).getTime();
+          break;
+      }
+
+      if (sortOrder === 'asc') {
+        return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+      } else {
+        return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+      }
+    });
+
+    return filtered;
+  }, [screeningResults, searchTerm, scoreFilter, sortBy, sortOrder]);
+
   // Redirect if not company user - THIS MUST BE AFTER ALL HOOKS
   React.useEffect(() => {
     if (!loading && (!user || userType !== 'company')) {
@@ -165,57 +212,6 @@ const ScreeningResults = () => {
       description: "PDF export feature coming soon!",
     });
   };
-
-  // Filter and sort results
-  const filteredAndSortedResults = useMemo(() => {
-    const filtered = screeningResults.filter(result => {
-      const matchesSearch = 
-        result.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        result.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        result.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (result.job?.title || '').toLowerCase().includes(searchTerm.toLowerCase());
-
-      const matchesScore = scoreFilter === 'all' || 
-        (scoreFilter === 'excellent' && (result.overall_fit || 0) > 70) ||
-        (scoreFilter === 'good' && (result.overall_fit || 0) >= 40 && (result.overall_fit || 0) <= 70) ||
-        (scoreFilter === 'poor' && (result.overall_fit || 0) < 40);
-
-      return matchesSearch && matchesScore;
-    });
-
-    // Sort results
-    filtered.sort((a, b) => {
-      let aValue, bValue;
-      
-      switch (sortBy) {
-        case 'score':
-          aValue = a.overall_fit || 0;
-          bValue = b.overall_fit || 0;
-          break;
-        case 'name':
-          aValue = `${a.first_name} ${a.last_name}`;
-          bValue = `${b.first_name} ${b.last_name}`;
-          break;
-        case 'date':
-        default:
-          aValue = new Date(a.created_at).getTime();
-          bValue = new Date(b.created_at).getTime();
-          break;
-      }
-
-      if (sortOrder === 'asc') {
-        return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
-      } else {
-        return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
-      }
-    });
-
-    return filtered;
-  }, [screeningResults, searchTerm, scoreFilter, sortBy, sortOrder]);
-
-
-
-
 
   if (isLoading) {
     return (

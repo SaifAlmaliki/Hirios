@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -20,7 +20,7 @@ const Auth = () => {
   const [resetEmailSent, setResetEmailSent] = useState(false);
   const [resendEmailSent, setResendEmailSent] = useState(false);
   const [activeTab, setActiveTab] = useState('signin');
-  const { signUp, signIn, resetPassword, resendConfirmation } = useAuth();
+  const { signUp, signIn, resetPassword, resendConfirmation, user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -81,12 +81,44 @@ const Auth = () => {
     }
   };
 
+  // If already authenticated, redirect away from /auth
+  useEffect(() => {
+    console.log('[Auth] redirect effect', { authLoading, hasUser: !!user });
+    if (!authLoading && user) {
+      // Support redirect back if stored in sessionStorage (e.g., from interview/auth flow)
+      const redirectUrl = sessionStorage.getItem('postLoginRedirectUrl');
+      if (redirectUrl) {
+        console.log('[Auth] Redirecting to postLoginRedirectUrl');
+        sessionStorage.removeItem('postLoginRedirectUrl');
+        window.location.href = redirectUrl; // preserve query params
+      } else {
+        console.log('[Auth] Navigating to /job-portal');
+        navigate('/job-portal');
+      }
+    }
+  }, [authLoading, user, navigate]);
+
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    console.log('[Auth] handleSignIn start', { email });
     
     try {
-      const { error } = await signIn(email, password);
+      // Add an 8s timeout fallback so the UI never hangs indefinitely
+      const timeoutPromise = new Promise<{ error: any }>((_, reject) => {
+        const id = setTimeout(() => {
+          clearTimeout(id);
+          reject(new Error('Sign-in timed out. Please check your connection and try again.'));
+        }, 8000);
+      });
+
+      const result = await Promise.race([
+        signIn(email, password),
+        timeoutPromise,
+      ]) as { error: any };
+
+      const { error } = result || { error: null };
+      console.log('[Auth] signIn finished', { hasError: !!error });
       
       if (error) {
         toast({
@@ -99,15 +131,18 @@ const Auth = () => {
           title: "Success",
           description: "Logged in successfully!",
         });
+        console.log('[Auth] Navigate after sign-in');
         navigate('/job-portal');
       }
     } catch (error) {
+      console.error('[Auth] signIn threw error', error);
       toast({
         title: "Error",
-        description: "An unexpected error occurred",
+        description: error instanceof Error ? error.message : "An unexpected error occurred",
         variant: "destructive",
       });
     } finally {
+      console.log('[Auth] handleSignIn finally setLoading(false)');
       setLoading(false);
     }
   };
