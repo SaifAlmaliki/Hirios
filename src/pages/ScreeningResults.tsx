@@ -375,10 +375,7 @@ const ScreeningResults = () => {
           {/* Header */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-                <Brain className="h-8 w-8 mr-3 text-blue-600" />
-                AI Screening Results
-              </h1>
+              <h1 className="text-3xl font-bold text-gray-900">AI Screening Results</h1>
               <p className="text-gray-600 mt-1">Comprehensive candidate analysis and insights</p>
             </div>
             <div className="flex gap-3">
@@ -395,7 +392,7 @@ const ScreeningResults = () => {
 
           {/* Stats Cards */}
           {stats && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-6">
               <Card className="bg-blue-50 border-blue-100">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Total Screened</CardTitle>

@@ -348,7 +348,7 @@ const CompanyView: React.FC = () => {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
-            <h2 className="text-2xl font-bold text-blue-900">Company Dashboard</h2>
+            <h2 className="text-3xl font-bold text-gray-900">Company Dashboard</h2>
             <p className="text-gray-600 mt-1">Loading your job postings...</p>
           </div>
         </div>
@@ -371,7 +371,7 @@ const CompanyView: React.FC = () => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-blue-900">Company Dashboard</h2>
+          <h2 className="text-3xl font-bold text-gray-900">Company Dashboard</h2>
           <p className="text-gray-600 mt-1">Manage your job postings and applications</p>
         </div>
         
@@ -403,7 +403,7 @@ const CompanyView: React.FC = () => {
       </div>
 
       {/* Dashboard Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
         <Card className="bg-blue-50 border-blue-100">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Applications</CardTitle>
