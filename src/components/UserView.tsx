@@ -118,23 +118,23 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
                <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
                  <div className="overflow-x-auto">
                    <table className="w-full">
-                     <thead className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 border-b border-gray-200/60">
-                       <tr>
-                         <th className="px-8 py-6 text-left text-xs font-bold text-slate-700 uppercase tracking-wider">
-                           Position & Company
-                         </th>
-                         <th className="px-8 py-6 text-left text-xs font-bold text-slate-700 uppercase tracking-wider">
-                           Location
-                         </th>
-                         <th className="px-8 py-6 text-left text-xs font-bold text-slate-700 uppercase tracking-wider">
-                           Department
-                         </th>
-                         <th className="px-8 py-6 text-left text-xs font-bold text-slate-700 uppercase tracking-wider">
-                           Type & Posted
-                         </th>
-                       </tr>
-                     </thead>
-                     <tbody className="bg-white divide-y divide-gray-100/60">
+                                           <thead className="bg-gradient-to-r from-blue-600 to-blue-700 border-b-2 border-blue-800">
+                        <tr>
+                          <th className="px-8 py-6 text-left text-xs font-bold text-white uppercase tracking-wider">
+                            Position & Company
+                          </th>
+                          <th className="px-8 py-6 text-left text-xs font-bold text-white uppercase tracking-wider">
+                            Location
+                          </th>
+                          <th className="px-8 py-6 text-left text-xs font-bold text-white uppercase tracking-wider">
+                            Department
+                          </th>
+                          <th className="px-8 py-6 text-left text-xs font-bold text-white uppercase tracking-wider">
+                            Type & Posted
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y-2 divide-blue-100">
                        {currentJobs.map((job, index) => (
                          <tr 
                            key={job.id} 
@@ -143,69 +143,69 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
                            }`}
                            onClick={() => handleJobClick(job.id)}
                          >
-                           <td className="px-8 py-6">
-                             <div className="flex items-start">
-                               <div className="flex-shrink-0 h-12 w-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow duration-300">
-                                 <Building className="h-6 w-6 text-white" />
-                               </div>
-                               <div className="ml-4">
-                                 <div className="text-lg font-bold text-slate-900 group-hover:text-blue-600 transition-colors duration-300 mb-1">
-                                   {job.title}
-                                 </div>
-                                 <div className="text-sm font-medium text-slate-600">
-                                   {job.company}
-                                 </div>
-                               </div>
-                             </div>
-                           </td>
-                           <td className="px-8 py-6 whitespace-nowrap">
-                             <div className="flex items-center">
-                               <div className="flex-shrink-0 h-10 w-10 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-sm">
-                                 <MapPin className="h-5 w-5 text-white" />
-                               </div>
-                               <div className="ml-3">
-                                 <div className="text-sm font-semibold text-slate-900">
-                                   {job.location}
-                                 </div>
-                               </div>
-                             </div>
-                           </td>
-                           <td className="px-8 py-6 whitespace-nowrap">
-                             <div className="flex items-center">
-                               <div className="flex-shrink-0 h-10 w-10 bg-gradient-to-br from-violet-500 to-violet-600 rounded-xl flex items-center justify-center shadow-sm">
-                                 <Users className="h-5 w-5 text-white" />
-                               </div>
-                               <div className="ml-3">
-                                 <div className="text-sm font-semibold text-slate-900">
-                                   {job.department}
-                                 </div>
-                               </div>
-                             </div>
-                           </td>
-                           <td className="px-8 py-6">
-                             <div className="flex flex-col space-y-3">
-                               <div className="flex items-center">
-                                 <div className="flex-shrink-0 h-8 w-8 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg flex items-center justify-center shadow-sm">
-                                   <Clock className="h-4 w-4 text-white" />
-                                 </div>
-                                 <div className="ml-3">
-                                   <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-sm">
-                                     {job.employment_type}
-                                   </span>
-                                 </div>
-                               </div>
-                               <div className="flex items-center">
-                                 <div className="flex-shrink-0 h-8 w-8 bg-gradient-to-br from-slate-500 to-slate-600 rounded-lg flex items-center justify-center shadow-sm">
-                                   <Calendar className="h-4 w-4 text-white" />
-                                 </div>
-                                 <div className="ml-3">
-                                   <div className="text-xs font-medium text-slate-600">
-                                     {new Date(job.created_at).toLocaleDateString()}
-                                   </div>
-                                 </div>
-                               </div>
-                             </div>
-                           </td>
+                                                       <td className="px-8 py-6">
+                              <div className="flex items-start">
+                                <div className="flex-shrink-0 h-8 w-8 bg-blue-50 border-2 border-blue-200 rounded-lg flex items-center justify-center group-hover:border-blue-300 group-hover:bg-blue-100 transition-all duration-300">
+                                  <Building className="h-4 w-4 text-blue-600" />
+                                </div>
+                                <div className="ml-3">
+                                  <div className="text-lg font-bold text-slate-900 group-hover:text-blue-600 transition-colors duration-300 mb-1">
+                                    {job.title}
+                                  </div>
+                                  <div className="text-sm font-medium text-slate-600">
+                                    {job.company}
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-8 py-6 whitespace-nowrap">
+                              <div className="flex items-center">
+                                <div className="flex-shrink-0 h-7 w-7 bg-emerald-50 border-2 border-emerald-200 rounded-lg flex items-center justify-center">
+                                  <MapPin className="h-3.5 w-3.5 text-emerald-600" />
+                                </div>
+                                <div className="ml-3">
+                                  <div className="text-sm font-semibold text-slate-900">
+                                    {job.location}
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-8 py-6 whitespace-nowrap">
+                              <div className="flex items-center">
+                                <div className="flex-shrink-0 h-7 w-7 bg-violet-50 border-2 border-violet-200 rounded-lg flex items-center justify-center">
+                                  <Users className="h-3.5 w-3.5 text-violet-600" />
+                                </div>
+                                <div className="ml-3">
+                                  <div className="text-sm font-semibold text-slate-900">
+                                    {job.department}
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-8 py-6">
+                              <div className="flex flex-col space-y-2">
+                                <div className="flex items-center">
+                                  <div className="flex-shrink-0 h-6 w-6 bg-amber-50 border-2 border-amber-200 rounded-md flex items-center justify-center">
+                                    <Clock className="h-3 w-3 text-amber-600" />
+                                  </div>
+                                  <div className="ml-2">
+                                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-sm">
+                                      {job.employment_type}
+                                    </span>
+                                  </div>
+                                </div>
+                                <div className="flex items-center">
+                                  <div className="flex-shrink-0 h-6 w-6 bg-slate-50 border-2 border-slate-200 rounded-md flex items-center justify-center">
+                                    <Calendar className="h-3 w-3 text-slate-600" />
+                                  </div>
+                                  <div className="ml-2">
+                                    <div className="text-xs font-medium text-slate-600">
+                                      {new Date(job.created_at).toLocaleDateString()}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
                          </tr>
                        ))}
                      </tbody>
@@ -235,8 +235,8 @@ const UserView: React.FC<UserViewProps> = ({ jobs }) => {
                      {/* Company and Location Row */}
                      <div className="flex items-center justify-between mb-6">
                        <div className="flex items-center">
-                         <div className="flex-shrink-0 h-12 w-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-sm">
-                           <Building className="h-6 w-6 text-white" />
+                         <div className="flex-shrink-0 h-8 w-8 bg-blue-50 border-2 border-blue-200 rounded-lg flex items-center justify-center">
+                           <Building className="h-4 w-4 text-blue-600" />
                          </div>
                          <div className="ml-4">
                            <div className="text-sm font-semibold text-slate-900">

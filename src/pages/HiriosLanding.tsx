@@ -2,6 +2,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { AuroraHero } from '@/components/ui/futurastic-hero-section';
 import { 
   Building2, 
   ArrowRight, 
@@ -37,60 +38,10 @@ const HiriosLanding = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Floating Header - Mobile Responsive */}
-      <header className="fixed top-2 sm:top-4 left-1/2 transform -translate-x-1/2 z-50 bg-white/80 backdrop-blur-md rounded-full px-3 sm:px-6 py-2 sm:py-3 shadow-lg border border-gray-200/50 w-[95%] sm:w-auto max-w-md sm:max-w-none">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2 sm:space-x-3">
-            <div className="bg-blue-600 p-1.5 sm:p-2 rounded-full animate-pulse">
-              <Brain className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
-            </div>
-            <span className="font-bold text-gray-900 text-base sm:text-lg">Hirios</span>
-          </div>
-          <Button 
-            onClick={() => navigate('/auth')} 
-            size="sm"
-            className="ml-2 sm:ml-8 bg-blue-600 hover:bg-blue-700 text-xs sm:text-sm px-3 sm:px-4"
-          >
-            Get Started
-          </Button>
-        </div>
-      </header>
 
-      {/* Hero Section - Mobile Responsive */}
-      <section className="pt-20 sm:pt-32 pb-12 sm:pb-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-50 to-indigo-100">
-        <div className="max-w-6xl mx-auto text-center">
-          <div className="animate-fade-in">
-            <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 mb-4 sm:mb-6 leading-tight px-2">
-              Hire Smarter, Not Harder
-              <br className="hidden sm:block" />
-              <span className="block sm:inline text-blue-600">AI-Powered Candidate Screening in Seconds</span>
-            </h1>
-            <p className="text-lg sm:text-xl md:text-2xl text-gray-600 mb-6 sm:mb-8 max-w-4xl mx-auto leading-relaxed px-2">
-              Upload a job description and resumes—our AI analyzes fit, ranks candidates, and explains why. No more manual screening.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-8 sm:mb-16 px-4">
-              <Button 
-                onClick={() => navigate('/auth')}
-                size="lg"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg font-semibold hover:scale-105 transition-transform w-full sm:w-auto"
-              >
-                Start Screening with AI
-                <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
-              </Button>
-              <Button 
-                variant="outline"
-                size="lg"
-                className="border-2 border-blue-600 text-blue-600 hover:bg-blue-50 px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg font-semibold hover:scale-105 transition-transform w-full sm:w-auto"
-                onClick={() => document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' })}
-              >
-                See How It Works
-                <BarChart3 className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
+
+      {/* Futurastic Hero Section */}
+      <AuroraHero />
 
       {/* How It Works */}
       <section id="demo" className="py-20 px-4 sm:px-6 lg:px-8 bg-white">

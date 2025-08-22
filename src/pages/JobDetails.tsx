@@ -329,135 +329,77 @@ const JobDetails = () => {
             </CardHeader>
           </Card>
 
-          {/* Job Details */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Main Content */}
-            <div className="lg:col-span-2 space-y-6">
-              {/* Job Description */}
-              <Card className="shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-xl text-gray-900">Job Description</CardTitle>
-                </CardHeader>
-                <CardContent>
+          {/* Job Details - Single Column Layout */}
+          <div className="space-y-6">
+            {/* Job Description */}
+            <Card className="shadow-sm">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg text-gray-900">Job Description</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="prose max-w-none">
+                  <p className="text-gray-700 leading-relaxed whitespace-pre-wrap text-sm">{job.description}</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Key Responsibilities */}
+            <Card className="shadow-sm">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg text-gray-900">Key Responsibilities</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                {job.responsibilities ? (
+                  <div className="grid grid-cols-1 gap-2">
+                    {job.responsibilities.split('\n').filter(resp => resp.trim()).map((resp, index) => (
+                      <div key={index} className="flex items-start">
+                        <CheckCircle className="h-4 w-4 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                        <span className="text-gray-700 text-sm">{resp.trim()}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-500 italic text-sm">Responsibilities will be discussed during the interview process.</p>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Requirements */}
+            <Card className="shadow-sm">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg text-gray-900">Requirements</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                {job.requirements ? (
+                  <div className="grid grid-cols-1 gap-2">
+                    {job.requirements.split('\n').filter(req => req.trim()).map((req, index) => (
+                      <div key={index} className="flex items-start">
+                        <CheckCircle className="h-4 w-4 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
+                        <span className="text-gray-700 text-sm">{req.trim()}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-500 italic text-sm">Basic qualifications and experience preferred.</p>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Benefits */}
+            <Card className="shadow-sm">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg text-gray-900">Benefits</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                {job.benefits ? (
                   <div className="prose max-w-none">
-                    <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{job.description}</p>
+                    <p className="text-gray-700 leading-relaxed whitespace-pre-wrap text-sm">{job.benefits}</p>
                   </div>
-                </CardContent>
-              </Card>
-
-              {/* Key Responsibilities */}
-              <Card className="shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-xl text-gray-900">Key Responsibilities</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {job.responsibilities ? (
-                    <div className="space-y-3">
-                      {job.responsibilities.split('\n').filter(resp => resp.trim()).map((resp, index) => (
-                        <div key={index} className="flex items-start">
-                          <CheckCircle className="h-5 w-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" />
-                          <span className="text-gray-700">{resp.trim()}</span>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-gray-500 italic">Responsibilities will be discussed during the interview process.</p>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Requirements */}
-              <Card className="shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-xl text-gray-900">Requirements</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {job.requirements ? (
-                    <div className="space-y-3">
-                      {job.requirements.split('\n').filter(req => req.trim()).map((req, index) => (
-                        <div key={index} className="flex items-start">
-                          <CheckCircle className="h-5 w-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
-                          <span className="text-gray-700">{req.trim()}</span>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-gray-500 italic">Basic qualifications and experience preferred.</p>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Benefits */}
-              <Card className="shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-xl text-gray-900">Benefits</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {job.benefits ? (
-                    <div className="prose max-w-none">
-                      <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{job.benefits}</p>
-                    </div>
-                  ) : (
-                    <p className="text-gray-500 italic">Competitive salary and benefits package available.</p>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Sidebar */}
-            <div className="space-y-6">
-              {/* Quick Apply Card */}
-              <Card className="shadow-sm bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
-                <CardHeader>
-                  <CardTitle className="text-lg text-blue-900">Ready to Apply?</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <p className="text-sm text-blue-800">
-                    Take the next step in your career journey with this exciting opportunity.
-                  </p>
-                  <Button 
-                    onClick={handleApply}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3"
-                    size="lg"
-                  >
-                    Apply for this Position
-                  </Button>
-                </CardContent>
-              </Card>
-
-              {/* Job Summary */}
-              <Card className="shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-lg text-gray-900">Job Summary</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600">Company:</span>
-                      <span className="text-sm font-medium text-gray-900">{job.company}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600">Department:</span>
-                      <span className="text-sm font-medium text-gray-900">{job.department}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600">Location:</span>
-                      <span className="text-sm font-medium text-gray-900">{job.location}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600">Type:</span>
-                      <span className="text-sm font-medium text-gray-900">{job.employment_type}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600">Posted:</span>
-                      <span className="text-sm font-medium text-gray-900">
-                        {new Date(job.created_at).toLocaleDateString()}
-                      </span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+                ) : (
+                  <p className="text-gray-500 italic text-sm">Competitive salary and benefits package available.</p>
+                )}
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
