@@ -5,8 +5,10 @@ import {
   Mic,
   ExternalLink,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Eye
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { VoiceInterviewService } from '@/services/voiceInterviewService';
 
@@ -19,6 +21,7 @@ interface ScreeningResultActionsProps {
   isExpanded: boolean;
   onRequestVoiceScreening: () => void;
   onToggleExpansion: () => void;
+  showViewDetails?: boolean; // Optional prop to show/hide view details button
 }
 
 const ScreeningResultActions: React.FC<ScreeningResultActionsProps> = ({
@@ -29,9 +32,11 @@ const ScreeningResultActions: React.FC<ScreeningResultActionsProps> = ({
   isVoiceScreeningRequested,
   isExpanded,
   onRequestVoiceScreening,
-  onToggleExpansion
+  onToggleExpansion,
+  showViewDetails = true
 }) => {
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   return (
     <div className="flex flex-wrap items-center gap-3 w-full lg:w-96 lg:justify-end">
@@ -106,6 +111,22 @@ const ScreeningResultActions: React.FC<ScreeningResultActionsProps> = ({
           <span className="xs:hidden">Link</span>
         </Button>
       </div>
+
+      {/* View Details Button - Only show if enabled */}
+      {showViewDetails && (
+        <div className="w-20 sm:w-24 lg:w-28">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate(`/screening-results/${resultId}`)}
+            className="flex items-center gap-2 border-indigo-300 text-indigo-600 hover:bg-indigo-50 text-xs sm:text-sm h-9 px-3 w-full"
+          >
+            <Eye className="h-4 w-4" />
+            <span className="hidden xs:inline">View</span>
+            <span className="xs:hidden">View</span>
+          </Button>
+        </div>
+      )}
       
       {/* Details Toggle - Responsive width */}
       <div className="w-16 sm:w-20 lg:w-24">

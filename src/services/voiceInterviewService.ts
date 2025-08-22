@@ -254,7 +254,9 @@ export class VoiceInterviewService {
   // Generate direct interview link
   static generateInterviewLink(screeningResultId: string, applicationId: string, autoStart: boolean = false): string {
     const baseUrl = window.location.origin;
-    const path = `/interview/${screeningResultId}/${applicationId}`;
+    // Use applicationId if provided, otherwise use screeningResultId as fallback
+    const finalApplicationId = applicationId && applicationId.trim() !== '' ? applicationId : screeningResultId;
+    const path = `/interview/${screeningResultId}/${finalApplicationId}`;
     const params = autoStart ? '?autostart=true' : '';
     return `${baseUrl}${path}${params}`;
   }

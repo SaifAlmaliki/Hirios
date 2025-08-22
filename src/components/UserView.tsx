@@ -1,449 +1,363 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { MapPin, Clock, DollarSign, Calendar, Upload, FileText, Building, ChevronDown, ChevronUp, Users, Briefcase, CheckCircle } from 'lucide-react';
+import { 
+  Pagination, 
+  PaginationContent, 
+  PaginationItem, 
+  PaginationLink, 
+  PaginationNext, 
+  PaginationPrevious 
+} from '@/components/ui/pagination';
+import { 
+  MapPin, 
+  Clock, 
+  Calendar, 
+  Users, 
+  Briefcase, 
+  Search,
+  ArrowRight,
+  Building
+} from 'lucide-react';
 import { Job } from '../hooks/useJobs';
-import { useCreateApplication } from '../hooks/useApplications';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
 
 interface UserViewProps {
   jobs: Job[];
 }
 
 const UserView: React.FC<UserViewProps> = ({ jobs }) => {
-  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
-  const [expandedJobs, setExpandedJobs] = useState<Set<string>>(new Set());
-  const [applicationData, setApplicationData] = useState({
-    full_name: '',
-    email: '',
-    phone: '',
-    resume: null as File | null
-  });
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
+  const navigate = useNavigate();
   
-  const createApplicationMutation = useCreateApplication();
-  const { toast } = useToast();
-
-  const toggleJobExpansion = (jobId: string) => {
-    const newExpanded = new Set(expandedJobs);
-    if (newExpanded.has(jobId)) {
-      newExpanded.delete(jobId);
-    } else {
-      newExpanded.add(jobId);
-    }
-    setExpandedJobs(newExpanded);
-  };
-
-  const handleApply = (job: Job) => {
-    setSelectedJob(job);
-    setIsDialogOpen(true);
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (file.type !== 'application/pdf') {
-        toast({
-          title: "Invalid file type",
-          description: "Please upload a PDF file only.",
-          variant: "destructive",
-        });
-        return;
-      }
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
-        toast({
-          title: "File too large",
-          description: "Please upload a file smaller than 5MB.",
-          variant: "destructive",
-        });
-        return;
-      }
-      setApplicationData(prev => ({ ...prev, resume: file }));
-    }
-  };
-
-  const uploadResumeToStorage = async (file: File, applicantEmail: string): Promise<string | null> => {
-    try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${applicantEmail}_${Date.now()}.${fileExt}`;
-      const filePath = `${fileName}`;
-
-      console.log('📄 Uploading resume:', file.name);
-      
-      const { data, error } = await supabase.storage
-        .from('resumes')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false
-        });
-
-      if (error) {
-        console.error('❌ Storage upload error:', error);
-        throw error;
-      }
-
-      console.log('✅ Resume uploaded:', data.path);
-      
-      // Get the public URL
-      const { data: urlData } = supabase.storage
-        .from('resumes')
-        .getPublicUrl(filePath);
-
-      return urlData.publicUrl;
-    } catch (error) {
-      console.error('❌ Resume upload failed:', error);
-      return null;
-    }
-  };
-
-  const handleSubmitApplication = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const jobsPerPage = 10;
+  
+  // Search state (client-based)
+  const [searchTerm, setSearchTerm] = useState('');
+  
+  // Filter jobs based on search (client-side filtering)
+  const filteredJobs = useMemo(() => {
+    if (!searchTerm.trim()) return jobs;
     
-    if (!applicationData.full_name || !applicationData.email || !applicationData.phone || !selectedJob) {
-      toast({
-        title: "Missing information",
-        description: "Please fill in all required fields.",
-        variant: "destructive",
-      });
-      return;
-    }
+    const searchLower = searchTerm.toLowerCase();
+    return jobs.filter(job => 
+      job.title.toLowerCase().includes(searchLower) ||
+      job.company.toLowerCase().includes(searchLower) ||
+      job.department.toLowerCase().includes(searchLower) ||
+      job.location.toLowerCase().includes(searchLower) ||
+      job.employment_type.toLowerCase().includes(searchLower)
+    );
+  }, [jobs, searchTerm]);
 
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(applicationData.email)) {
-      toast({
-        title: "Invalid email",
-        description: "Please enter a valid email address.",
-        variant: "destructive",
-      });
-      return;
-    }
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredJobs.length / jobsPerPage);
+  const startIndex = (currentPage - 1) * jobsPerPage;
+  const endIndex = startIndex + jobsPerPage;
+  const currentJobs = filteredJobs.slice(startIndex, endIndex);
 
-    setIsUploading(true);
+  // Reset to first page when search changes
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
-    try {
-      let resumeUrl: string | null = null;
-      
-      // Upload resume to Supabase storage if provided
-      if (applicationData.resume) {
-        console.log('📤 Starting resume upload...');
-        resumeUrl = await uploadResumeToStorage(applicationData.resume, applicationData.email);
-        
-        if (!resumeUrl) {
-          toast({
-            title: "Upload failed",
-            description: "Failed to upload resume. Please try again.",
-            variant: "destructive",
-          });
-          setIsUploading(false);
-          return;
-        }
-        console.log('✅ Resume URL ready');
-      }
-
-      // Submit application with resume URL
-      createApplicationMutation.mutate({
-        job_id: selectedJob.id,
-        full_name: applicationData.full_name,
-        email: applicationData.email,
-        phone: applicationData.phone,
-        resume_url: resumeUrl,
-        status: 'pending',
-        job_title: selectedJob.title,
-        company: selectedJob.company,
-        resume_file: applicationData.resume || undefined,
-        job_details: selectedJob
-      }, {
-        onSuccess: () => {
-          setApplicationData({
-            full_name: '',
-            email: '',
-            phone: '',
-            resume: null
-          });
-          setIsDialogOpen(false);
-          setSelectedJob(null);
-          setIsUploading(false);
-        },
-        onError: () => {
-          setIsUploading(false);
-        }
-      });
-    } catch (error) {
-      console.error('Application submission failed:', error);
-      toast({
-        title: "Submission failed",
-        description: "Failed to submit application. Please try again.",
-        variant: "destructive",
-      });
-      setIsUploading(false);
-    }
+  const handleJobClick = (jobId: string) => {
+    navigate(`/job-details/${jobId}`);
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Header */}
       <div className="text-center">
         <h2 className="text-3xl font-bold text-gray-900 mb-2">Current Job Postings</h2>
         <p className="text-lg text-gray-600">Discover your next career opportunity</p>
       </div>
 
-      {/* Job Listings */}
-      <div>
-        {jobs.length === 0 ? (
-          <Card className="text-center py-16 bg-gray-50">
+      {/* Search Bar */}
+      <div className="max-w-2xl mx-auto">
+        <div className="relative">
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+          <Input
+            placeholder="Search jobs by title, company, department, location, or type..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-12 pr-4 py-4 text-lg border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl shadow-sm"
+          />
+        </div>
+      </div>
+
+      {/* Results Count */}
+      <div className="text-center text-sm text-gray-600">
+        Showing {filteredJobs.length} of {jobs.length} jobs
+      </div>
+
+      {/* Job Table */}
+      <div className="space-y-4">
+        {filteredJobs.length === 0 ? (
+          <Card className="text-center py-16 bg-gray-50 border-0 shadow-sm">
             <CardContent>
               <div className="text-gray-500">
                 <Briefcase className="h-16 w-16 mx-auto mb-6 text-gray-400" />
-                <h3 className="text-xl font-semibold mb-3">No Jobs Available</h3>
-                <p className="text-lg">Check back later for new opportunities!</p>
+                <h3 className="text-xl font-semibold mb-3">
+                  {jobs.length === 0 ? 'No Jobs Available' : 'No Jobs Match Your Search'}
+                </h3>
+                <p className="text-lg">
+                  {jobs.length === 0 
+                    ? 'Check back later for new opportunities!' 
+                    : 'Try adjusting your search terms.'
+                  }
+                </p>
               </div>
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-            {jobs.map((job) => {
-              const isExpanded = expandedJobs.has(job.id);
-              return (
-                <Card key={job.id} className="hover:shadow-xl transition-all duration-300 border border-gray-300 hover:border-gray-400 bg-gray-50 hover:bg-gray-100 h-full flex flex-col shadow-md">
-                  <CardHeader className="pb-4 bg-gradient-to-r from-gray-800 to-gray-900 text-white rounded-t-lg">
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                          <CardTitle className="text-xl font-bold text-white mb-2">{job.title}</CardTitle>
-                          <CardDescription className="text-base font-semibold text-blue-200 mb-3 flex items-center">
-                            <Building className="h-4 w-4 mr-2" />
-                            {job.company}
-                          </CardDescription>
+          <>
+            {/* Desktop Table View */}
+            <div className="hidden lg:block">
+              <Card className="border-0 shadow-lg overflow-hidden">
+                <CardContent className="p-0">
+                  <div className="overflow-x-auto">
+                                         <table className="w-full">
+                       <thead className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
+                         <tr>
+                           <th className="px-8 py-6 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                             Position & Company
+                           </th>
+                           <th className="px-8 py-6 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                             Location
+                           </th>
+                           <th className="px-8 py-6 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                             Department
+                           </th>
+                           <th className="px-8 py-6 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                             Type & Posted
+                           </th>
+                         </tr>
+                       </thead>
+                      <tbody className="bg-white divide-y divide-gray-100">
+                        {currentJobs.map((job, index) => (
+                                                     <tr 
+                             key={job.id} 
+                             className={`hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-200 cursor-pointer ${
+                               index % 2 === 0 ? 'bg-white' : 'bg-gray-50/30'
+                             }`}
+                             onClick={() => handleJobClick(job.id)}
+                           >
+                             <td className="px-8 py-6">
+                               <div className="flex items-start">
+                                 <div className="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                   <Building className="h-5 w-5 text-blue-600" />
+                                 </div>
+                                 <div className="ml-4">
+                                   <div className="text-lg font-semibold text-gray-900 hover:text-blue-600 transition-colors duration-200 mb-1">
+                                     {job.title}
+                                   </div>
+                                   <div className="text-sm font-medium text-gray-600">
+                                     {job.company}
+                                   </div>
+                                 </div>
+                               </div>
+                             </td>
+                             <td className="px-8 py-6 whitespace-nowrap">
+                               <div className="flex items-center">
+                                 <div className="flex-shrink-0 h-8 w-8 bg-green-100 rounded-full flex items-center justify-center">
+                                   <MapPin className="h-4 w-4 text-green-600" />
+                                 </div>
+                                 <div className="ml-3">
+                                   <div className="text-sm font-medium text-gray-900">
+                                     {job.location}
+                                   </div>
+                                 </div>
+                               </div>
+                             </td>
+                             <td className="px-8 py-6 whitespace-nowrap">
+                               <div className="flex items-center">
+                                 <div className="flex-shrink-0 h-8 w-8 bg-purple-100 rounded-full flex items-center justify-center">
+                                   <Users className="h-4 w-4 text-purple-600" />
+                                 </div>
+                                 <div className="ml-3">
+                                   <div className="text-sm font-medium text-gray-900">
+                                     {job.department}
+                                   </div>
+                                 </div>
+                               </div>
+                             </td>
+                             <td className="px-8 py-6">
+                               <div className="flex flex-col space-y-2">
+                                 <div className="flex items-center">
+                                   <div className="flex-shrink-0 h-6 w-6 bg-orange-100 rounded-full flex items-center justify-center">
+                                     <Clock className="h-3 w-3 text-orange-600" />
+                                   </div>
+                                   <div className="ml-2">
+                                     <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">
+                                       {job.employment_type}
+                                     </span>
+                                   </div>
+                                 </div>
+                                 <div className="flex items-center">
+                                   <div className="flex-shrink-0 h-6 w-6 bg-gray-100 rounded-full flex items-center justify-center">
+                                     <Calendar className="h-3 w-3 text-gray-600" />
+                                   </div>
+                                   <div className="ml-2">
+                                     <div className="text-xs text-gray-500">
+                                       {new Date(job.created_at).toLocaleDateString()}
+                                     </div>
+                                   </div>
+                                 </div>
+                               </div>
+                             </td>
+                           </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="lg:hidden space-y-4">
+              {currentJobs.map((job, index) => (
+                <Card 
+                  key={job.id} 
+                  className={`border-0 shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer ${
+                    index % 2 === 0 ? 'bg-white' : 'bg-gray-50/30'
+                  }`}
+                  onClick={() => handleJobClick(job.id)}
+                >
+                  <CardContent className="p-6">
+                    {/* Job Title */}
+                    <div className="mb-4">
+                      <h3 className="text-xl font-semibold text-gray-900 hover:text-blue-600 transition-colors duration-200 mb-2">
+                        {job.title}
+                      </h3>
+                    </div>
+
+                    {/* Company and Location Row */}
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                          <Building className="h-5 w-5 text-blue-600" />
                         </div>
-                        
-                        <div className="flex flex-col items-end space-y-2">
-                          <div className="flex items-center text-xs text-gray-300 bg-gray-700 px-2 py-1 rounded-full shadow-sm">
-                            <Calendar className="h-3 w-3 mr-1" />
+                        <div className="ml-3">
+                          <div className="text-sm font-medium text-gray-900">
+                            {job.company}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0 h-8 w-8 bg-green-100 rounded-full flex items-center justify-center">
+                          <MapPin className="h-4 w-4 text-green-600" />
+                        </div>
+                        <div className="ml-2">
+                          <div className="text-sm font-medium text-gray-900">
+                            {job.location}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Department and Employment Type Row */}
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0 h-8 w-8 bg-purple-100 rounded-full flex items-center justify-center">
+                          <Users className="h-4 w-4 text-purple-600" />
+                        </div>
+                        <div className="ml-3">
+                          <div className="text-sm font-medium text-gray-900">
+                            {job.department}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0 h-8 w-8 bg-orange-100 rounded-full flex items-center justify-center">
+                          <Clock className="h-4 w-4 text-orange-600" />
+                        </div>
+                        <div className="ml-2">
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">
+                            {job.employment_type}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Posted Date and View Details */}
+                    <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0 h-6 w-6 bg-gray-100 rounded-full flex items-center justify-center">
+                          <Calendar className="h-3 w-3 text-gray-600" />
+                        </div>
+                        <div className="ml-2">
+                          <div className="text-xs text-gray-500">
                             Posted {new Date(job.created_at).toLocaleDateString()}
                           </div>
-                          <Button 
-                            onClick={() => handleApply(job)}
-                            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 text-sm font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200 border border-blue-400"
-                            size="sm"
-                          >
-                            Apply Now
-                          </Button>
                         </div>
                       </div>
-                      
-                      <div className="grid grid-cols-1 xl:grid-cols-3 gap-2 text-xs">
-                        <div className="flex items-center text-gray-200 bg-gray-700 px-2 py-1 rounded-lg shadow-sm">
-                          <Users className="h-3 w-3 mr-2 text-blue-300" />
-                          <span className="font-medium truncate">{job.department}</span>
-                        </div>
-                        <div className="flex items-center text-gray-200 bg-gray-700 px-2 py-1 rounded-lg shadow-sm">
-                          <MapPin className="h-3 w-3 mr-2 text-green-300" />
-                          <span className="font-medium truncate">{job.location}</span>
-                        </div>
-                        <div className="flex items-center text-gray-200 bg-gray-700 px-2 py-1 rounded-lg shadow-sm">
-                          <Clock className="h-3 w-3 mr-2 text-purple-300" />
-                          <span className="font-medium truncate">{job.employment_type}</span>
-                        </div>
+                      <div className="flex items-center text-blue-600 hover:text-blue-700">
+                        <span className="text-sm font-medium mr-1">View Details</span>
+                        <ArrowRight className="h-4 w-4" />
                       </div>
-                    </div>
-                  </CardHeader>
-                  
-                  <CardContent className="pt-4 pb-4 space-y-4 flex-1 bg-white flex flex-col">
-                    {/* Job Description - Always shown */}
-                    <div className="flex-shrink-0">
-                      <h4 className="font-semibold text-gray-800 mb-2 text-base">Job Description</h4>
-                      <div className="bg-gray-100 p-3 rounded-lg border border-gray-200 min-h-[80px]">
-                        <p className="text-gray-700 leading-relaxed text-sm">
-                          {isExpanded ? job.description : `${job.description.substring(0, 150)}${job.description.length > 150 ? '...' : ''}`}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Key Responsibilities - Always shown */}
-                    <div className="flex-shrink-0">
-                      <h4 className="font-semibold text-gray-800 mb-2 text-base">Key Responsibilities</h4>
-                      <div className="bg-blue-50 p-3 rounded-lg border border-blue-100 min-h-[80px]">
-                        {job.responsibilities ? (
-                          <div className="text-gray-700 space-y-1 text-sm">
-                            {(isExpanded ? job.responsibilities : job.responsibilities.substring(0, 120) + (job.responsibilities.length > 120 ? '...' : ''))
-                              .split('\n').filter(resp => resp.trim()).slice(0, isExpanded ? undefined : 2).map((resp, index) => (
-                              <div key={index} className="flex items-start">
-                                <span className="text-blue-600 mr-2 mt-1">•</span>
-                                <span>{resp.trim()}</span>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <p className="text-gray-500 text-sm italic">Responsibilities will be discussed during the interview process.</p>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Requirements - Always shown */}
-                    <div className="flex-shrink-0">
-                      <h4 className="font-semibold text-gray-800 mb-2 text-base">Requirements</h4>
-                      <div className="bg-green-50 p-3 rounded-lg border border-green-100 min-h-[80px]">
-                        {job.requirements ? (
-                          <div className="text-gray-700 space-y-1 text-sm">
-                            {(isExpanded ? job.requirements : job.requirements.substring(0, 120) + (job.requirements.length > 120 ? '...' : ''))
-                              .split('\n').filter(req => req.trim()).slice(0, isExpanded ? undefined : 2).map((req, index) => (
-                              <div key={index} className="flex items-start">
-                                <span className="text-green-600 mr-2 mt-1">•</span>
-                                <span>{req.trim()}</span>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <p className="text-gray-500 text-sm italic">Basic qualifications and experience preferred.</p>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Benefits - Always shown */}
-                    <div className="flex-shrink-0">
-                      <h4 className="font-semibold text-gray-800 mb-2 text-base">Benefits</h4>
-                      <div className="bg-yellow-50 p-3 rounded-lg border border-yellow-100 min-h-[60px]">
-                        {job.benefits ? (
-                          <p className="text-gray-700 leading-relaxed text-sm">
-                            {isExpanded ? job.benefits : `${job.benefits.substring(0, 100)}${job.benefits.length > 100 ? '...' : ''}`}
-                          </p>
-                        ) : (
-                          <p className="text-gray-500 text-sm italic">Competitive salary and benefits package available.</p>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Show More/Less Button - Always shown at bottom */}
-                    <div className="flex justify-center pt-3 border-t border-gray-200 mt-auto">
-                      <Button
-                        variant="ghost"
-                        onClick={() => toggleJobExpansion(job.id)}
-                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 px-4 py-2 rounded-lg text-sm font-medium"
-                      >
-                        {isExpanded ? (
-                          <>
-                            Show Less <ChevronUp className="h-3 w-3 ml-2" />
-                          </>
-                        ) : (
-                          <>
-                            Show More <ChevronDown className="h-3 w-3 ml-2" />
-                          </>
-                        )}
-                      </Button>
                     </div>
                   </CardContent>
+                </Card>
+              ))}
+            </div>
 
-                    {/* Application Dialog */}
-                    <Dialog open={isDialogOpen && selectedJob?.id === job.id} onOpenChange={(open) => {
-                      setIsDialogOpen(open);
-                      if (!open) {
-                        setSelectedJob(null);
-                        setApplicationData({
-                          full_name: '',
-                          email: '',
-                          phone: '',
-                          resume: null
-                        });
-                      }
-                    }}>
-                      <DialogContent className="sm:max-w-md">
-                        <DialogHeader>
-                          <DialogTitle className="text-xl text-blue-900">Apply for {job.title}</DialogTitle>
-                          <DialogDescription>
-                            Please fill in your information to apply for this position at {job.company}.
-                          </DialogDescription>
-                        </DialogHeader>
-                        
-                        <form onSubmit={handleSubmitApplication} className="space-y-4 mt-4">
-                          <div className="space-y-2">
-                            <Label htmlFor="full_name" className="text-sm font-medium text-gray-700">Full Name *</Label>
-                            <Input
-                              id="full_name"
-                              value={applicationData.full_name}
-                              onChange={(e) => setApplicationData(prev => ({ ...prev, full_name: e.target.value }))}
-                              placeholder="Enter your full name"
-                              className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                              disabled={isUploading}
-                            />
-                          </div>
-                          
-                          <div className="space-y-2">
-                            <Label htmlFor="email" className="text-sm font-medium text-gray-700">Email Address *</Label>
-                            <Input
-                              id="email"
-                              type="email"
-                              value={applicationData.email}
-                              onChange={(e) => setApplicationData(prev => ({ ...prev, email: e.target.value }))}
-                              placeholder="Enter your email address"
-                              className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                              disabled={isUploading}
-                            />
-                          </div>
-                          
-                          <div className="space-y-2">
-                            <Label htmlFor="phone" className="text-sm font-medium text-gray-700">Phone Number *</Label>
-                            <Input
-                              id="phone"
-                              value={applicationData.phone}
-                              onChange={(e) => setApplicationData(prev => ({ ...prev, phone: e.target.value }))}
-                              placeholder="Enter your phone number"
-                              className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                              disabled={isUploading}
-                            />
-                          </div>
-                          
-                          <div className="space-y-2">
-                            <Label htmlFor="resume" className="text-sm font-medium text-gray-700">Resume (PDF only)</Label>
-                            <div className="flex items-center space-x-2">
-                              <Input
-                                id="resume"
-                                type="file"
-                                accept=".pdf"
-                                onChange={handleFileChange}
-                                className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                                disabled={isUploading}
-                              />
-                              <Upload className="h-4 w-4 text-gray-400" />
-                            </div>
-                            {applicationData.resume && (
-                              <p className="text-sm text-green-600 flex items-center">
-                                <FileText className="h-4 w-4 mr-1" />
-                                {applicationData.resume.name}
-                              </p>
-                            )}
-                            <p className="text-xs text-gray-500">Maximum file size: 5MB</p>
-                          </div>
-                          
-                          <div className="flex justify-end space-x-3 pt-4">
-                            <Button 
-                              type="button" 
-                              variant="outline" 
-                              onClick={() => setIsDialogOpen(false)}
-                              disabled={isUploading}
-                            >
-                              Cancel
-                            </Button>
-                            <Button 
-                              type="submit"
-                              disabled={createApplicationMutation.isPending || isUploading}
-                              className="bg-blue-600 hover:bg-blue-700 text-white"
-                            >
-                              {isUploading ? 'Uploading Resume...' : createApplicationMutation.isPending ? 'Submitting...' : 'Submit Application'}
-                            </Button>
-                          </div>
-                        </form>
-                      </DialogContent>
-                    </Dialog>
-                  </Card>
-                );
-            })}
-          </div>
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex justify-center mt-8">
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious 
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          if (currentPage > 1) setCurrentPage(currentPage - 1);
+                        }}
+                        className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      />
+                    </PaginationItem>
+                    
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                      <PaginationItem key={page}>
+                        <PaginationLink
+                          href="#"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setCurrentPage(page);
+                          }}
+                          isActive={currentPage === page}
+                          className="cursor-pointer"
+                        >
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ))}
+                    
+                    <PaginationItem>
+                      <PaginationNext 
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+                        }}
+                        className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </div>
+            )}
+
+            {/* Page Info */}
+            {totalPages > 1 && (
+              <div className="text-center text-sm text-gray-600 mt-4">
+                Page {currentPage} of {totalPages} • Showing {startIndex + 1}-{Math.min(endIndex, filteredJobs.length)} of {filteredJobs.length} jobs
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

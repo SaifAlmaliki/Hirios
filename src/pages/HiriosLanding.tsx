@@ -26,6 +26,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 
+
 const HiriosLanding = () => {
   const navigate = useNavigate();
   const [openFaq, setOpenFaq] = React.useState<number | null>(null);
@@ -196,6 +197,24 @@ const HiriosLanding = () => {
                   Detailed explanation of why the candidate is or isn't a good fit for the position.
                 </p>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Dynamic AI Showcase */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-white mb-4">Experience AI in Action</h2>
+            <p className="text-xl text-gray-300">Watch our dynamic AI system at work</p>
+          </div>
+          
+          <div className="flex justify-center">
+            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg p-8 text-white text-center max-w-md">
+              <Brain className="h-16 w-16 mx-auto mb-4 text-white" />
+              <h3 className="text-xl font-semibold mb-2">AI-Powered Screening Demo</h3>
+              <p className="text-blue-100">Experience our intelligent candidate matching system in action</p>
             </div>
           </div>
         </div>

@@ -15,7 +15,9 @@ import ResetPassword from "./pages/ResetPassword";
 import CompanySetup from "./pages/CompanySetup";
 
 import ScreeningResults from "./pages/ScreeningResults";
+import ScreeningResultDetail from "./pages/ScreeningResultDetail";
 import VoiceInterview from "./pages/VoiceInterview";
+import JobDetails from "./pages/JobDetails";
 import NotFound from "./pages/NotFound";
 import { VoiceInterviewService } from "./services/voiceInterviewService";
 
@@ -50,8 +52,10 @@ const App = () => (
             <Route path="/auth/confirm" element={<AuthConfirm />} />
             <Route path="/auth/reset-password" element={<ResetPassword />} />
             <Route path="/job-portal" element={<JobPortal />} />
+            <Route path="/job-details/:jobId" element={<JobDetails />} />
             <Route path="/company-setup" element={<CompanySetup />} />
             <Route path="/screening-results" element={<ScreeningResults />} />
+            <Route path="/screening-results/:id" element={<ScreeningResultDetail />} />
             <Route path="/interview/:screeningResultId/:applicationId" element={<VoiceInterview />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

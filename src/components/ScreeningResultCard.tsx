@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
+import { useNavigate } from 'react-router-dom';
 import { ScreeningResult } from '@/hooks/useScreeningResults';
 import ScreeningResultHeader from './ScreeningResultHeader';
 import ScreeningResultActions from './ScreeningResultActions';
@@ -24,9 +25,22 @@ const ScreeningResultCard: React.FC<ScreeningResultCardProps> = ({
 }) => {
   const isExpanded = expandedRows.has(result.id);
   const isRequestingInterview = requestingInterview === result.id;
+  const navigate = useNavigate();
+
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Don't navigate if clicking on buttons or interactive elements
+    const target = e.target as HTMLElement;
+    if (target.closest('button') || target.closest('[role="button"]')) {
+      return;
+    }
+    navigate(`/screening-results/${result.id}`);
+  };
 
   return (
-    <Card className="border-l-4 border-l-blue-500 shadow-sm hover:shadow-md transition-shadow duration-200">
+    <Card 
+      className="border-l-4 border-l-blue-500 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer hover:bg-gray-50"
+      onClick={handleCardClick}
+    >
       <CardHeader className="pb-6">
         {/* Mobile-first responsive layout */}
         <div className="flex flex-col space-y-4 lg:flex-row lg:space-y-0 lg:justify-between lg:items-start lg:gap-6">
@@ -49,6 +63,7 @@ const ScreeningResultCard: React.FC<ScreeningResultCardProps> = ({
             isExpanded={isExpanded}
             onRequestVoiceScreening={() => onRequestVoiceScreening(result)}
             onToggleExpansion={() => onToggleExpansion(result.id)}
+            showViewDetails={false}
           />
         </div>
 
