@@ -74,14 +74,14 @@ const ScreeningResultDetail = () => {
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 80) return 'text-green-600';
-    if (score >= 60) return 'text-yellow-600';
+    if (score > 70) return 'text-green-600';
+    if (score >= 40) return 'text-yellow-600';
     return 'text-red-600';
   };
 
   const getScoreBadgeColor = (score: number) => {
-    if (score >= 80) return 'bg-green-100 text-green-800';
-    if (score >= 60) return 'bg-yellow-100 text-yellow-800';
+    if (score > 70) return 'bg-green-100 text-green-800';
+    if (score >= 40) return 'bg-yellow-100 text-yellow-800';
     return 'bg-red-100 text-red-800';
   };
 
@@ -194,8 +194,8 @@ const ScreeningResultDetail = () => {
                     className="h-3"
                   />
                   <Badge className={`${getScoreBadgeColor(result.overall_fit || 0)} text-sm px-3 py-1`}>
-                    {result.overall_fit && result.overall_fit >= 80 ? 'Excellent' : 
-                     result.overall_fit && result.overall_fit >= 60 ? 'Good' : 'Needs Review'}
+                    {result.overall_fit && result.overall_fit > 70 ? 'Excellent' : 
+                     result.overall_fit && result.overall_fit >= 40 ? 'Good' : 'Poor'}
                   </Badge>
                 </div>
               </CardContent>

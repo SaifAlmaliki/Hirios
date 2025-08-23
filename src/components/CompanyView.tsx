@@ -6,11 +6,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Building, Users, UserCheck, TrendingUp, Eye, FileText, MapPin, Clock, DollarSign, Briefcase, Edit, Trash2, CheckCircle } from 'lucide-react';
+import { Plus, Building, Eye, FileText, MapPin, Clock, Briefcase, Edit, Trash2, CheckCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useCreateJob, useUpdateJob, useDeleteJob } from '../hooks/useJobs';
 import { useCompanyJobs } from '../hooks/useCompanyJobs';
-import { useCompanyApplications } from '../hooks/useApplications';
+
 import JobApplicationsView from './JobApplicationsView';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -324,22 +324,7 @@ const CompanyView: React.FC = () => {
     setIsJobDetailViewOpen(true);
   };
 
-  // Dashboard metrics calculations
-  const { data: allApplications = [], isLoading: applicationsLoading } = useCompanyApplications();
-  const totalApplications = allApplications.length;
-  const shortlistedCount = allApplications.filter(app => app.status === 'shortlisted').length;
-  const hiredCount = allApplications.filter(app => app.status === 'hired').length;
-  const hireRate = totalApplications > 0 ? Math.round((hiredCount / totalApplications) * 100) : 0;
 
-  // Debug logging
-  console.log('📊 Dashboard metrics:', {
-    totalApplications,
-    shortlistedCount,
-    hiredCount,
-    hireRate,
-    applicationsLoading,
-    applicationsCount: allApplications.length
-  });
 
   const formatEmploymentType = (type: string) => {
     return type.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
@@ -412,52 +397,7 @@ const CompanyView: React.FC = () => {
         </Dialog>
       </div>
 
-      {/* Dashboard Metrics */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-        <Card className="bg-blue-50 border-blue-100">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Applications</CardTitle>
-            <Users className="h-4 w-4 text-gray-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalApplications}</div>
-            <p className="text-sm text-gray-500">+20% from last month</p>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-green-50 border-green-100">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Shortlisted</CardTitle>
-            <UserCheck className="h-4 w-4 text-gray-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{shortlistedCount}</div>
-            <p className="text-sm text-gray-500">+10% from last month</p>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-purple-50 border-purple-100">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Hired</CardTitle>
-            <Building className="h-4 w-4 text-gray-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{hiredCount}</div>
-            <p className="text-sm text-gray-500">+5% from last month</p>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-yellow-50 border-yellow-100">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Hire Rate</CardTitle>
-            <TrendingUp className="h-4 w-4 text-gray-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{hireRate}%</div>
-            <p className="text-sm text-gray-500">Steady growth</p>
-          </CardContent>
-        </Card>
-      </div>
+
 
       {/* Job Listings */}
       <div className="space-y-4">

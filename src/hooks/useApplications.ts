@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { sendApplicationToWebhook, fileToBase64 } from '../services/webhookService';
 import { Job } from './useJobs';
-import { useAuth } from '@/contexts/AuthContext';
+
 
 export interface Application {
   id: string;
@@ -38,70 +38,7 @@ export const useApplications = () => {
   });
 };
 
-// New hook to fetch applications for the current company only
-export const useCompanyApplications = () => {
-  const { user } = useAuth();
 
-  return useQuery({
-    queryKey: ['company-applications', user?.id, 'filtered'],
-    queryFn: async () => {
-      if (!user) {
-        throw new Error('User not authenticated');
-      }
-
-      console.log('🏢 Fetching company applications...');
-      
-      // Get company profile first
-      const { data: profile, error: profileError } = await supabase
-        .from('company_profiles')
-        .select('id')
-        .eq('user_id', user.id)
-        .single();
-
-      if (profileError || !profile) {
-        console.error('❌ Error fetching company profile:', profileError);
-        throw new Error('Company profile not found');
-      }
-
-      // Fetch applications for jobs posted by this company
-      // First get all job IDs for this company
-      const { data: companyJobs, error: jobsError } = await supabase
-        .from('jobs')
-        .select('id')
-        .eq('company_profile_id', profile.id);
-
-      if (jobsError) {
-        console.error('❌ Error fetching company jobs:', jobsError);
-        throw jobsError;
-      }
-
-      if (!companyJobs || companyJobs.length === 0) {
-        console.log('✅ No jobs found for company, returning empty applications');
-        return [];
-      }
-
-      const jobIds = companyJobs.map(job => job.id);
-
-      // Then fetch applications for those jobs
-      const { data, error } = await supabase
-        .from('applications')
-        .select('*')
-        .in('job_id', jobIds)
-        .order('created_at', { ascending: false });
-      
-      if (error) {
-        console.error('❌ Error fetching company applications:', error);
-        throw error;
-      }
-      
-      console.log('✅ Company applications loaded:', data?.length || 0, 'submissions');
-      console.log('🏢 Company profile ID:', profile.id);
-      console.log('📋 Company job IDs:', jobIds);
-      return data as Application[];
-    },
-    enabled: !!user,
-  });
-};
 
 export const useCreateApplication = () => {
   const queryClient = useQueryClient();
