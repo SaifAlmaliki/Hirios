@@ -10,7 +10,7 @@ import { Plus, Building, Users, UserCheck, TrendingUp, Eye, FileText, MapPin, Cl
 import { useToast } from '@/hooks/use-toast';
 import { useCreateJob, useUpdateJob, useDeleteJob } from '../hooks/useJobs';
 import { useCompanyJobs } from '../hooks/useCompanyJobs';
-import { useApplications } from '../hooks/useApplications';
+import { useCompanyApplications } from '../hooks/useApplications';
 import JobApplicationsView from './JobApplicationsView';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -325,11 +325,21 @@ const CompanyView: React.FC = () => {
   };
 
   // Dashboard metrics calculations
-  const { data: allApplications = [] } = useApplications();
+  const { data: allApplications = [], isLoading: applicationsLoading } = useCompanyApplications();
   const totalApplications = allApplications.length;
   const shortlistedCount = allApplications.filter(app => app.status === 'shortlisted').length;
   const hiredCount = allApplications.filter(app => app.status === 'hired').length;
   const hireRate = totalApplications > 0 ? Math.round((hiredCount / totalApplications) * 100) : 0;
+
+  // Debug logging
+  console.log('📊 Dashboard metrics:', {
+    totalApplications,
+    shortlistedCount,
+    hiredCount,
+    hireRate,
+    applicationsLoading,
+    applicationsCount: allApplications.length
+  });
 
   const formatEmploymentType = (type: string) => {
     return type.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');

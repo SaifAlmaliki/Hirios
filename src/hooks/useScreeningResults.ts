@@ -43,7 +43,7 @@ export const useScreeningResults = () => {
   const stripeService = StripeService.getInstance();
 
   return useQuery({
-    queryKey: ['screening_results', user?.id],
+    queryKey: ['screening_results', user?.id, 'company-filtered'],
     queryFn: async () => {
       if (!user) {
         throw new Error('User not authenticated');
@@ -68,6 +68,25 @@ export const useScreeningResults = () => {
       }
 
       // Fetch screening results with job information for this company
+      // First get all job IDs for this company
+      const { data: companyJobs, error: jobsError } = await supabase
+        .from('jobs')
+        .select('id')
+        .eq('company_profile_id', profile.id);
+
+      if (jobsError) {
+        console.error('❌ Error fetching company jobs:', jobsError);
+        throw jobsError;
+      }
+
+      if (!companyJobs || companyJobs.length === 0) {
+        console.log('✅ No jobs found for company, returning empty screening results');
+        return [];
+      }
+
+      const jobIds = companyJobs.map(job => job.id);
+
+      // Then fetch screening results for those jobs
       const { data, error } = await supabase
         .from('screening_results')
         .select(`
@@ -80,6 +99,7 @@ export const useScreeningResults = () => {
             company_profile_id
           )
         `)
+        .in('job_id', jobIds)
         .order('created_at', { ascending: false });
       
       if (error) {
@@ -139,6 +159,9 @@ export const useScreeningResults = () => {
         })
       );
       
+      console.log('✅ Company screening results loaded:', data?.length || 0, 'results');
+      console.log('🏢 Company profile ID:', profile.id);
+      console.log('📋 Company job IDs:', jobIds);
       return resultsWithResumes as ScreeningResult[];
     },
     enabled: !!user,
@@ -150,7 +173,7 @@ export const useScreeningResultsStats = () => {
   const stripeService = StripeService.getInstance();
 
   return useQuery({
-    queryKey: ['screening_results_stats', user?.id],
+    queryKey: ['screening_results_stats', user?.id, 'company-filtered'],
     queryFn: async () => {
       if (!user) {
         throw new Error('User not authenticated');
@@ -174,10 +197,38 @@ export const useScreeningResultsStats = () => {
         return null;
       }
 
-      // Fetch screening results for stats - now filtered by company via RLS
+      // Fetch screening results for stats - filter by company
+      // First get all job IDs for this company
+      const { data: companyJobs, error: jobsError } = await supabase
+        .from('jobs')
+        .select('id')
+        .eq('company_profile_id', profile.id);
+
+      if (jobsError) {
+        console.error('❌ Error fetching company jobs for stats:', jobsError);
+        return null;
+      }
+
+      if (!companyJobs || companyJobs.length === 0) {
+        console.log('✅ No jobs found for company, returning empty stats');
+        return {
+          total: 0,
+          excellent: 0,
+          good: 0,
+          poor: 0,
+          averageScore: 0,
+          recentCount: 0,
+          chartData: []
+        };
+      }
+
+      const jobIds = companyJobs.map(job => job.id);
+
+      // Then fetch screening results for those jobs
       const { data, error } = await supabase
         .from('screening_results')
-        .select('overall_fit, created_at');
+        .select('overall_fit, created_at')
+        .in('job_id', jobIds);
       
       if (error) {
         console.error('Error fetching screening stats:', error);
