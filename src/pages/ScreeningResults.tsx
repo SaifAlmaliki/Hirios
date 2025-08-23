@@ -5,16 +5,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { 
-  Brain, 
-  TrendingUp, 
-  Users, 
-  Award, 
   Filter, 
   Download, 
   StickyNote,
@@ -37,11 +32,12 @@ import {
   X,
   LogOut,
   Settings,
+  Brain,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { useScreeningResults, useScreeningResultsStats, useAddNoteToScreeningResult, ScreeningResult } from '@/hooks/useScreeningResults';
+import { useScreeningResults, useAddNoteToScreeningResult, ScreeningResult } from '@/hooks/useScreeningResults';
 import ScreeningResultCard from '@/components/ScreeningResultCard';
 
 import { VoiceInterviewService } from '@/services/voiceInterviewService';
@@ -54,7 +50,6 @@ const ScreeningResults = () => {
   
   // Data fetching
   const { data: screeningResults = [], isLoading, error } = useScreeningResults();
-  const { data: stats } = useScreeningResultsStats();
   const addNoteMutation = useAddNoteToScreeningResult();
 
   // State for filtering and sorting
@@ -390,54 +385,8 @@ const ScreeningResults = () => {
             </div>
           </div>
 
-          {/* Stats Cards */}
-          {stats && (
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-6">
-              <Card className="bg-blue-50 border-blue-100">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Screened</CardTitle>
-                  <Users className="h-4 w-4 text-blue-600" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-blue-600">{stats.total}</div>
-                  <p className="text-xs text-gray-600">+{stats.recentCount} this week</p>
-                </CardContent>
-              </Card>
 
-              <Card className="bg-green-50 border-green-100">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Excellent Fits</CardTitle>
-                  <Award className="h-4 w-4 text-green-600" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-green-600">{stats.excellent}</div>
-                  <p className="text-xs text-gray-600">{stats.total > 0 ? Math.round((stats.excellent / stats.total) * 100) : 0}% of total</p>
-                </CardContent>
-              </Card>
 
-              <Card className="bg-yellow-50 border-yellow-100">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Good Fits</CardTitle>
-                  <TrendingUp className="h-4 w-4 text-yellow-600" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-yellow-600">{stats.good}</div>
-                  <p className="text-xs text-gray-600">{stats.total > 0 ? Math.round((stats.good / stats.total) * 100) : 0}% of total</p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-purple-50 border-purple-100">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Average Score</CardTitle>
-                  <Brain className="h-4 w-4 text-purple-600" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-purple-600">{stats.averageScore}%</div>
-                  <Progress value={stats.averageScore} className="mt-2" />
-                </CardContent>
-              </Card>
-            </div>
-          )}
 
           {/* Filters */}
           <Card>

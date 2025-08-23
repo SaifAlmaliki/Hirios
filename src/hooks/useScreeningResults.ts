@@ -3,7 +3,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
-import { StripeService } from '@/services/stripeService';
 
 export interface ScreeningResult {
   id: string;
@@ -40,7 +39,6 @@ export interface ScreeningResult {
 
 export const useScreeningResults = () => {
   const { user } = useAuth();
-  const stripeService = StripeService.getInstance();
 
   return useQuery({
     queryKey: ['screening_results', user?.id, 'company-filtered'],
@@ -51,7 +49,7 @@ export const useScreeningResults = () => {
 
       // Check if user has AI access (premium subscription)
       // TEMPORARILY DISABLED FOR DEBUGGING
-      const hasAccess = true; // await stripeService.hasAIAccess(user.id);
+      const hasAccess = true; // Premium access temporarily enabled for all users
       if (!hasAccess) {
         throw new Error('AI screening is only available for Premium subscribers. Please upgrade your plan to access this feature.');
       }
@@ -168,190 +166,11 @@ export const useScreeningResults = () => {
   });
 };
 
-export const useScreeningResultsStats = () => {
-  const { user } = useAuth();
-  const stripeService = StripeService.getInstance();
 
-  return useQuery({
-    queryKey: ['screening_results_stats', user?.id, 'company-filtered'],
-    queryFn: async () => {
-      if (!user) {
-        throw new Error('User not authenticated');
-      }
 
-      // Check if user has AI access (premium subscription)
-      // TEMPORARILY DISABLED FOR DEBUGGING
-      const hasAccess = true; // await stripeService.hasAIAccess(user.id);
-      if (!hasAccess) {
-        return null;
-      }
 
-      // Get company profile first
-      const { data: profile, error: profileError } = await supabase
-        .from('company_profiles')
-        .select('id')
-        .eq('user_id', user.id)
-        .single();
 
-      if (profileError || !profile) {
-        return null;
-      }
 
-      // Fetch screening results for stats - filter by company
-      // First get all job IDs for this company
-      const { data: companyJobs, error: jobsError } = await supabase
-        .from('jobs')
-        .select('id')
-        .eq('company_profile_id', profile.id);
-
-      if (jobsError) {
-        console.error('❌ Error fetching company jobs for stats:', jobsError);
-        return null;
-      }
-
-      if (!companyJobs || companyJobs.length === 0) {
-        console.log('✅ No jobs found for company, returning empty stats');
-        return {
-          total: 0,
-          excellent: 0,
-          good: 0,
-          poor: 0,
-          averageScore: 0,
-          recentCount: 0,
-          chartData: []
-        };
-      }
-
-      const jobIds = companyJobs.map(job => job.id);
-
-      // Then fetch screening results for those jobs
-      const { data, error } = await supabase
-        .from('screening_results')
-        .select('overall_fit, created_at')
-        .in('job_id', jobIds);
-      
-      if (error) {
-        console.error('Error fetching screening stats:', error);
-        return null;
-      }
-
-      const total = data.length;
-      const excellent = data.filter(r => (r.overall_fit || 0) > 70).length;
-      const good = data.filter(r => (r.overall_fit || 0) >= 40 && (r.overall_fit || 0) <= 70).length;
-      const poor = data.filter(r => (r.overall_fit || 0) < 40).length;
-      const averageScore = total > 0 ? Math.round(data.reduce((sum, r) => sum + (r.overall_fit || 0), 0) / total) : 0;
-
-      // Last 7 days data for chart
-      const sevenDaysAgo = new Date();
-      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-      const recentData = data.filter(r => new Date(r.created_at) >= sevenDaysAgo);
-
-      return {
-        total,
-        excellent,
-        good,
-        poor,
-        averageScore,
-        recentCount: recentData.length,
-        chartData: recentData.map(r => ({
-          date: new Date(r.created_at).toLocaleDateString(),
-          score: r.overall_fit || 0
-        }))
-      };
-    },
-    enabled: !!user,
-  });
-};
-
-export const useCreateScreeningResult = () => {
-  const queryClient = useQueryClient();
-  const { toast } = useToast();
-  const { user } = useAuth();
-  const stripeService = StripeService.getInstance();
-
-  return useMutation({
-    mutationFn: async (screeningData: Omit<ScreeningResult, 'id' | 'created_at' | 'updated_at'>) => {
-      if (!user) {
-        throw new Error('User not authenticated');
-      }
-
-      // Check if user has AI access (premium subscription)
-      // TEMPORARILY DISABLED FOR DEBUGGING
-      const hasAccess = true; // await stripeService.hasAIAccess(user.id);
-      if (!hasAccess) {
-        throw new Error('AI screening is only available for Premium subscribers. Please upgrade your plan to access this feature.');
-      }
-
-      const { data, error } = await supabase
-        .from('screening_results')
-        .insert([screeningData])
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Error creating screening result:', error);
-        throw error;
-      }
-
-      return data as ScreeningResult;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['screening_results'] });
-      queryClient.invalidateQueries({ queryKey: ['screening_results_stats'] });
-      toast({
-        title: "Screening Result Saved",
-        description: "The screening result has been saved successfully.",
-      });
-    },
-    onError: (error) => {
-      console.error('Failed to create screening result:', error);
-      toast({
-        title: "Error",
-        description: "Failed to save screening result. Please try again.",
-        variant: "destructive",
-      });
-    },
-  });
-};
-
-export const useUpdateScreeningResult = () => {
-  const queryClient = useQueryClient();
-  const { toast } = useToast();
-
-  return useMutation({
-    mutationFn: async ({ id, ...updateData }: Partial<ScreeningResult> & { id: string }) => {
-      const { data, error } = await supabase
-        .from('screening_results')
-        .update(updateData)
-        .eq('id', id)
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Error updating screening result:', error);
-        throw error;
-      }
-
-      return data as ScreeningResult;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['screening_results'] });
-      queryClient.invalidateQueries({ queryKey: ['screening_results_stats'] });
-      toast({
-        title: "Screening Result Updated",
-        description: "The screening result has been updated successfully.",
-      });
-    },
-    onError: (error) => {
-      console.error('Failed to update screening result:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update screening result. Please try again.",
-        variant: "destructive",
-      });
-    },
-  });
-};
 
 export const useAddNoteToScreeningResult = () => {
   const queryClient = useQueryClient();

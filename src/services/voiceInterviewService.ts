@@ -78,9 +78,13 @@ export class VoiceInterviewService {
         candidate_name: `${screeningResult.first_name} ${screeningResult.last_name}`,
         candidate_email: screeningResult.email,
         job_title: job?.title || 'Position',
+        company_name: job?.company || 'Unknown Company',
         interview_link: interviewLink,
         timestamp: new Date().toISOString()
       };
+
+      console.log('📤 Webhook payload prepared:', webhookData);
+      console.log('🏢 Company name from job:', job?.company);
 
       // Send webhook to n8n
       const webhookUrl = import.meta.env.VITE_SCREENING_WEBHOOK_URL;
