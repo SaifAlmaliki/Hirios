@@ -37,114 +37,113 @@ const HiriosLanding = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-
+    <div className="min-h-screen bg-gray-950">
 
       {/* Futurastic Hero Section */}
       <AuroraHero />
 
       {/* How It Works */}
-      <section id="demo" className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+      <section id="demo" className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-900">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">How It Works</h2>
-            <p className="text-xl text-gray-600">Simple workflow for smarter hiring decisions</p>
+            <h2 className="text-4xl font-bold text-white mb-4">How It Works</h2>
+            <p className="text-xl text-gray-300">Simple workflow for smarter hiring decisions</p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-12">
             {/* Step 1: Company Posts Job */}
             <div className="text-center">
-              <div className="bg-blue-100 p-6 rounded-full w-fit mx-auto mb-6 relative">
-                <Building2 className="h-12 w-12 text-blue-600" />
+              <div className="bg-blue-600/20 p-6 rounded-full w-fit mx-auto mb-6 relative border border-blue-600/30">
+                <Building2 className="h-12 w-12 text-blue-400" />
                 <div className="absolute -top-2 -right-2 bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
                   1
                 </div>
               </div>
-              <h3 className="text-lg font-semibold mb-3">Company Registers & Posts Jobs</h3>
-              <p className="text-gray-600 text-sm">
+              <h3 className="text-lg font-semibold mb-3 text-white">Company Registers & Posts Jobs</h3>
+              <p className="text-gray-300 text-sm">
                 Companies sign up, complete their profile, and post jobs with detailed descriptions and requirements.
               </p>
             </div>
 
             {/* Step 2: Job Seekers Apply */}
             <div className="text-center">
-              <div className="bg-green-100 p-6 rounded-full w-fit mx-auto mb-6 relative">
-                <Users className="h-12 w-12 text-green-600" />
+              <div className="bg-green-600/20 p-6 rounded-full w-fit mx-auto mb-6 relative border border-green-600/30">
+                <Users className="h-12 w-12 text-green-400" />
                 <div className="absolute -top-2 -right-2 bg-green-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
                   2
                 </div>
               </div>
-              <h3 className="text-lg font-semibold mb-3">Job Seekers Apply</h3>
-              <p className="text-gray-600 text-sm">
+              <h3 className="text-lg font-semibold mb-3 text-white">Job Seekers Apply</h3>
+              <p className="text-gray-300 text-sm">
                 Job seekers register for free, browse available positions, and submit applications with their resumes.
               </p>
             </div>
 
             {/* Step 3: AI Analysis */}
             <div className="text-center">
-              <div className="bg-purple-100 p-6 rounded-full w-fit mx-auto mb-6 relative">
-                <Brain className="h-12 w-12 text-purple-600" />
+              <div className="bg-purple-600/20 p-6 rounded-full w-fit mx-auto mb-6 relative border border-purple-600/30">
+                <Brain className="h-12 w-12 text-purple-400" />
                 <div className="absolute -top-2 -right-2 bg-purple-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
                   3
                 </div>
               </div>
-              <h3 className="text-lg font-semibold mb-3">AI Analyzes Applications</h3>
-              <p className="text-gray-600 text-sm">
+              <h3 className="text-lg font-semibold mb-3 text-white">AI Analyzes Applications</h3>
+              <p className="text-gray-300 text-sm">
                 Our AI agent automatically analyzes each resume against job requirements, generating detailed insights.
               </p>
             </div>
 
             {/* Step 4: Company Reviews */}
             <div className="text-center">
-              <div className="bg-orange-100 p-6 rounded-full w-fit mx-auto mb-6 relative">
-                <BarChart3 className="h-12 w-12 text-orange-600" />
+              <div className="bg-orange-600/20 p-6 rounded-full w-fit mx-auto mb-6 relative border border-orange-600/30">
+                <BarChart3 className="h-12 w-12 text-orange-400" />
                 <div className="absolute -top-2 -right-2 bg-orange-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
                   4
                 </div>
               </div>
-              <h3 className="text-lg font-semibold mb-3">Review AI Insights</h3>
-              <p className="text-gray-600 text-sm">
+              <h3 className="text-lg font-semibold mb-3 text-white">Review AI Insights</h3>
+              <p className="text-gray-300 text-sm">
                 Companies receive scored candidates with strengths, weaknesses, and AI justifications for easy screening.
               </p>
             </div>
           </div>
 
           {/* Detailed Flow Explanation */}
-          <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-8 mt-12">
-            <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center">What Companies Get for Each Candidate</h3>
+          <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 rounded-2xl p-8 mt-12 border border-blue-600/20">
+            <h3 className="text-2xl font-bold text-white mb-6 text-center">What Companies Get for Each Candidate</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-white rounded-lg p-6 shadow-sm">
+              <div className="bg-gray-800/50 rounded-lg p-6 shadow-sm border border-gray-700/50">
                 <div className="flex items-center mb-4">
-                  <div className="bg-green-100 p-2 rounded-full mr-3">
-                    <Target className="h-6 w-6 text-green-600" />
+                  <div className="bg-green-600/20 p-2 rounded-full mr-3 border border-green-600/30">
+                    <Target className="h-6 w-6 text-green-400" />
                   </div>
-                  <h4 className="font-semibold text-gray-900">Match Score</h4>
+                  <h4 className="font-semibold text-white">Match Score</h4>
                 </div>
-                <p className="text-gray-600 text-sm">
+                <p className="text-gray-300 text-sm">
                   Percentage match based on skills, experience, and job requirements alignment.
                 </p>
               </div>
 
-              <div className="bg-white rounded-lg p-6 shadow-sm">
+              <div className="bg-gray-800/50 rounded-lg p-6 shadow-sm border border-gray-700/50">
                 <div className="flex items-center mb-4">
-                  <div className="bg-blue-100 p-2 rounded-full mr-3">
-                    <TrendingUp className="h-6 w-6 text-blue-600" />
+                  <div className="bg-blue-600/20 p-2 rounded-full mr-3 border border-blue-600/30">
+                    <TrendingUp className="h-6 w-6 text-blue-400" />
                   </div>
-                  <h4 className="font-semibold text-gray-900">Strengths & Weaknesses</h4>
+                  <h4 className="font-semibold text-white">Strengths & Weaknesses</h4>
                 </div>
-                <p className="text-gray-600 text-sm">
+                <p className="text-gray-300 text-sm">
                   Clear breakdown of candidate's strong points and areas that may need development.
                 </p>
               </div>
 
-              <div className="bg-white rounded-lg p-6 shadow-sm">
+              <div className="bg-gray-800/50 rounded-lg p-6 shadow-sm border border-gray-700/50">
                 <div className="flex items-center mb-4">
-                  <div className="bg-purple-100 p-2 rounded-full mr-3">
-                    <CheckCircle className="h-6 w-6 text-purple-600" />
+                  <div className="bg-purple-600/20 p-2 rounded-full mr-3 border border-purple-600/30">
+                    <CheckCircle className="h-6 w-6 text-purple-400" />
                   </div>
-                  <h4 className="font-semibold text-gray-900">AI Justification</h4>
+                  <h4 className="font-semibold text-white">AI Justification</h4>
                 </div>
-                <p className="text-gray-600 text-sm">
+                <p className="text-gray-300 text-sm">
                   Detailed explanation of why the candidate is or isn't a good fit for the position.
                 </p>
               </div>
@@ -155,50 +154,50 @@ const HiriosLanding = () => {
 
 
       {/* Key Features */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-950">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Why Choose Hirios?</h2>
-            <p className="text-xl text-gray-600">Everything you need for intelligent hiring</p>
+            <h2 className="text-4xl font-bold text-white mb-4">Why Choose Hirios?</h2>
+            <p className="text-xl text-gray-300">Everything you need for intelligent hiring</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="bg-blue-100 p-4 rounded-full w-fit mx-auto mb-6">
-                <Zap className="h-8 w-8 text-blue-600" />
+              <div className="bg-blue-600/20 p-4 rounded-full w-fit mx-auto mb-6 border border-blue-600/30">
+                <Zap className="h-8 w-8 text-blue-400" />
               </div>
-              <h3 className="text-lg font-semibold mb-3">Smart Scoring</h3>
-              <p className="text-gray-600 text-sm">
+              <h3 className="text-lg font-semibold mb-3 text-white">Smart Scoring</h3>
+              <p className="text-gray-300 text-sm">
                 AI compares resumes to job requirements with accurate % match scores.
               </p>
             </div>
 
             <div className="text-center">
-              <div className="bg-green-100 p-4 rounded-full w-fit mx-auto mb-6">
-                <Shield className="h-8 w-8 text-green-600" />
+              <div className="bg-green-600/20 p-4 rounded-full w-fit mx-auto mb-6 border border-green-600/30">
+                <Shield className="h-8 w-8 text-green-400" />
               </div>
-              <h3 className="text-lg font-semibold mb-3">Bias Reduction</h3>
-              <p className="text-gray-600 text-sm">
+              <h3 className="text-lg font-semibold mb-3 text-white">Bias Reduction</h3>
+              <p className="text-gray-300 text-sm">
                 Focus on skills and experience, not names, schools, or demographics.
               </p>
             </div>
 
             <div className="text-center">
-              <div className="bg-purple-100 p-4 rounded-full w-fit mx-auto mb-6">
-                <Clock className="h-8 w-8 text-purple-600" />
+              <div className="bg-purple-600/20 p-4 rounded-full w-fit mx-auto mb-6 border border-purple-600/30">
+                <Clock className="h-8 w-8 text-purple-400" />
               </div>
-              <h3 className="text-lg font-semibold mb-3">Time Saved</h3>
-              <p className="text-gray-600 text-sm">
+              <h3 className="text-lg font-semibold mb-3 text-white">Time Saved</h3>
+              <p className="text-gray-300 text-sm">
                 Cut screening time by 80% and focus only on top candidates.
               </p>
             </div>
 
             <div className="text-center">
-              <div className="bg-orange-100 p-4 rounded-full w-fit mx-auto mb-6">
-                <Target className="h-8 w-8 text-orange-600" />
+              <div className="bg-orange-600/20 p-4 rounded-full w-fit mx-auto mb-6 border border-orange-600/30">
+                <Target className="h-8 w-8 text-orange-400" />
               </div>
-              <h3 className="text-lg font-semibold mb-3">ATS Ready</h3>
-              <p className="text-gray-600 text-sm">
+              <h3 className="text-lg font-semibold mb-3 text-white">ATS Ready</h3>
+              <p className="text-gray-300 text-sm">
                 Ready to integrate with any ATS or use manual uploads.
               </p>
             </div>
@@ -207,53 +206,53 @@ const HiriosLanding = () => {
       </section>
 
       {/* Social Proof - Mobile Responsive */}
-      <section className="py-12 sm:py-20 px-4 sm:px-6 lg:px-8 bg-white">
+      <section className="py-12 sm:py-20 px-4 sm:px-6 lg:px-8 bg-gray-900">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8 sm:mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">What Companies Say</h2>
-            <p className="text-lg sm:text-xl text-gray-600">Trusted by hiring teams worldwide</p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">What Companies Say</h2>
+            <p className="text-lg sm:text-xl text-gray-300">Trusted by hiring teams worldwide</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
-            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <Card className="border border-gray-700/50 shadow-lg hover:shadow-xl transition-shadow duration-300 bg-gray-800/50">
               <CardContent className="p-6 sm:p-8">
                 <div className="flex mb-4">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <Star key={star} className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-400 fill-current" />
                   ))}
                 </div>
-                <p className="text-gray-700 mb-4 sm:mb-6 text-base sm:text-lg leading-relaxed">
+                <p className="text-gray-200 mb-4 sm:mb-6 text-base sm:text-lg leading-relaxed">
                   "Hirios cut our screening time by 75%—we now focus only on top candidates. The AI insights are incredibly accurate."
                 </p>
                 <div className="flex items-center">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold mr-3 sm:mr-4 text-sm sm:text-base">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold mr-3 sm:mr-4 text-sm sm:text-base">
                     S
                   </div>
                   <div>
-                    <div className="font-semibold text-sm sm:text-base">Sarah Mitchell</div>
-                    <div className="text-gray-500 text-xs sm:text-sm">HR Director, TechFlow Solutions</div>
+                    <div className="font-semibold text-sm sm:text-base text-white">Sarah Mitchell</div>
+                    <div className="text-gray-400 text-xs sm:text-sm">HR Director, TechFlow Solutions</div>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <Card className="border border-gray-700/50 shadow-lg hover:shadow-xl transition-shadow duration-300 bg-gray-800/50">
               <CardContent className="p-6 sm:p-8">
                 <div className="flex mb-4">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <Star key={star} className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-400 fill-current" />
                   ))}
                 </div>
-                <p className="text-gray-700 mb-4 sm:mb-6 text-base sm:text-lg leading-relaxed">
+                <p className="text-gray-200 mb-4 sm:mb-6 text-base sm:text-lg leading-relaxed">
                   "Game changer for our startup. We hired 5 engineers in 2 weeks instead of 2 months. The scoring is spot-on."
                 </p>
                 <div className="flex items-center">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-500 rounded-full flex items-center justify-center text-white font-bold mr-3 sm:mr-4 text-sm sm:text-base">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-600 rounded-full flex items-center justify-center text-white font-bold mr-3 sm:mr-4 text-sm sm:text-base">
                     M
                   </div>
                   <div>
-                    <div className="font-semibold text-sm sm:text-base">Marcus Chen</div>
-                    <div className="text-gray-500 text-xs sm:text-sm">CEO, InnovateLab</div>
+                    <div className="font-semibold text-sm sm:text-base text-white">Marcus Chen</div>
+                    <div className="text-gray-400 text-xs sm:text-sm">CEO, InnovateLab</div>
                   </div>
                 </div>
               </CardContent>
@@ -263,50 +262,50 @@ const HiriosLanding = () => {
       </section>
 
       {/* Contact CTA Section */}
-      <section className="py-12 sm:py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-50 to-indigo-100">
+      <section className="py-12 sm:py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-900/30 to-purple-900/30">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8 sm:mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Ready to Transform Your Hiring?</h2>
-            <p className="text-lg sm:text-xl text-gray-600 px-4">Get a personalized demo and see how Hirios can revolutionize your recruitment process</p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Ready to Transform Your Hiring?</h2>
+            <p className="text-lg sm:text-xl text-gray-300 px-4">Get a personalized demo and see how Hirios can revolutionize your recruitment process</p>
           </div>
 
-          <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
+          <Card className="border border-gray-700/50 shadow-xl bg-gray-800/80 backdrop-blur-sm">
             <CardContent className="p-6 sm:p-12 text-center">
               <div className="mb-6 sm:mb-8">
                 <div className="bg-blue-600 p-3 sm:p-4 rounded-full w-fit mx-auto mb-4 sm:mb-6">
                   <Building2 className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
                 </div>
-                <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 sm:mb-4">Enterprise Solutions Available</h3>
-                <p className="text-base sm:text-lg text-gray-600 mb-6 sm:mb-8 leading-relaxed px-2">
+                <h3 className="text-2xl sm:text-3xl font-bold text-white mb-3 sm:mb-4">Enterprise Solutions Available</h3>
+                <p className="text-base sm:text-lg text-gray-300 mb-6 sm:mb-8 leading-relaxed px-2">
                   Whether you're a startup or enterprise, we'll customize Hirios to fit your unique hiring needs. 
                   Get advanced features, dedicated support, and seamless integrations.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8 text-sm sm:text-base">
-                <div className="flex items-center justify-center sm:justify-start">
-                  <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 mr-2 sm:mr-3 flex-shrink-0" />
+                <div className="flex items-center justify-center sm:justify-start text-gray-200">
+                  <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-400 mr-2 sm:mr-3 flex-shrink-0" />
                   <span>Custom AI Training</span>
                 </div>
-                <div className="flex items-center justify-center sm:justify-start">
-                  <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 mr-2 sm:mr-3 flex-shrink-0" />
+                <div className="flex items-center justify-center sm:justify-start text-gray-200">
+                  <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-400 mr-2 sm:mr-3 flex-shrink-0" />
                   <span>ATS Integration</span>
                 </div>
-                <div className="flex items-center justify-center sm:justify-start">
-                  <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 mr-2 sm:mr-3 flex-shrink-0" />
+                <div className="flex items-center justify-center sm:justify-start text-gray-200">
+                  <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-400 mr-2 sm:mr-3 flex-shrink-0" />
                   <span>Dedicated Support</span>
                 </div>
               </div>
 
-              <div className="bg-gray-50 rounded-lg p-4 sm:p-6 mb-6 sm:mb-8">
-                <h4 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2 sm:mb-3">Contact Us for Demo & Pricing</h4>
-                <div className="flex items-center justify-center text-blue-600 font-medium text-base sm:text-lg">
+              <div className="bg-gray-700/50 rounded-lg p-4 sm:p-6 mb-6 sm:mb-8 border border-gray-600/50">
+                <h4 className="text-lg sm:text-xl font-semibold text-white mb-2 sm:mb-3">Contact Us for Demo & Pricing</h4>
+                <div className="flex items-center justify-center text-blue-400 font-medium text-base sm:text-lg">
                   <span className="mr-2">📧</span>
-                  <a href="mailto:idraq.ai@gmail.com" className="hover:underline break-all">
-                    idraq.ai@gmail.com
+                  <a href="mailto:info@idraq.com" className="hover:underline break-all">
+                    info@idraq.com
                   </a>
                 </div>
-                <p className="text-sm sm:text-base text-gray-600 mt-2 sm:mt-3">
+                <p className="text-sm sm:text-base text-gray-300 mt-2 sm:mt-3">
                   We'll schedule a personalized demo and discuss custom pricing for your organization
                 </p>
               </div>
@@ -324,7 +323,7 @@ const HiriosLanding = () => {
                   onClick={() => navigate('/auth')}
                   variant="outline"
                   size="lg"
-                  className="border-2 border-blue-600 text-blue-600 hover:bg-blue-50 px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg font-semibold hover:scale-105 transition-transform w-full sm:w-auto"
+                  className="border-2 border-blue-400 text-blue-400 hover:bg-blue-400/10 px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg font-semibold hover:scale-105 transition-transform w-full sm:w-auto"
                 >
                   Try Free Version
                   <Zap className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
@@ -336,11 +335,11 @@ const HiriosLanding = () => {
       </section>
 
       {/* FAQ - Mobile Responsive */}
-      <section className="py-12 sm:py-20 px-4 sm:px-6 lg:px-8 bg-white">
+      <section className="py-12 sm:py-20 px-4 sm:px-6 lg:px-8 bg-gray-950">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-8 sm:mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h2>
-            <p className="text-lg sm:text-xl text-gray-600">Everything you need to know about Hirios</p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Frequently Asked Questions</h2>
+            <p className="text-lg sm:text-xl text-gray-300">Everything you need to know about Hirios</p>
           </div>
 
           <div className="space-y-4">
@@ -368,18 +367,18 @@ const HiriosLanding = () => {
             ].map((faq, index) => (
               <Collapsible key={index}>
                 <CollapsibleTrigger 
-                  className="flex w-full items-center justify-between rounded-lg border border-gray-200 px-4 sm:px-6 py-3 sm:py-4 text-left hover:bg-gray-50"
+                  className="flex w-full items-center justify-between rounded-lg border border-gray-700 px-4 sm:px-6 py-3 sm:py-4 text-left hover:bg-gray-800 transition-colors"
                   onClick={() => toggleFaq(index)}
                 >
-                  <span className="font-medium text-sm sm:text-base pr-2">{faq.question}</span>
+                  <span className="font-medium text-sm sm:text-base pr-2 text-white">{faq.question}</span>
                   {openFaq === index ? (
-                    <ChevronUp className="h-4 w-4 flex-shrink-0" />
+                    <ChevronUp className="h-4 w-4 flex-shrink-0 text-gray-400" />
                   ) : (
-                    <ChevronDown className="h-4 w-4 flex-shrink-0" />
+                    <ChevronDown className="h-4 w-4 flex-shrink-0 text-gray-400" />
                   )}
                 </CollapsibleTrigger>
-                <CollapsibleContent className="px-4 sm:px-6 py-3 sm:py-4 border-l border-r border-b border-gray-200 rounded-b-lg">
-                  <p className="text-gray-600 text-sm sm:text-base">{faq.answer}</p>
+                <CollapsibleContent className="px-4 sm:px-6 py-3 sm:py-4 border-l border-r border-b border-gray-700 rounded-b-lg bg-gray-800/50">
+                  <p className="text-gray-300 text-sm sm:text-base">{faq.answer}</p>
                 </CollapsibleContent>
               </Collapsible>
             ))}
@@ -388,7 +387,7 @@ const HiriosLanding = () => {
       </section>
 
       {/* Final CTA - Mobile Responsive */}
-      <section className="py-12 sm:py-20 px-4 sm:px-6 lg:px-8 bg-blue-600">
+      <section className="py-12 sm:py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-600 to-purple-600">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4 sm:mb-6 px-2">
             Start Hiring with AI Today
@@ -408,7 +407,7 @@ const HiriosLanding = () => {
       </section>
 
       {/* Footer - Mobile Responsive */}
-      <footer className="bg-gray-900 text-white py-8 sm:py-12">
+      <footer className="bg-gray-900 text-white py-8 sm:py-12 border-t border-gray-800">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center space-x-3 mb-4 md:mb-0">
