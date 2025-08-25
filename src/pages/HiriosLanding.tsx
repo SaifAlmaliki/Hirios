@@ -56,7 +56,7 @@ const HiriosLanding = () => {
               <div className="relative w-full max-w-4xl mx-auto">
                 <div className="aspect-video w-full rounded-2xl overflow-hidden shadow-2xl border border-gray-700/50">
                   <iframe
-                    src="https://www.youtube.com/embed/OK10OEMqzPE?autoplay=1&mute=1&loop=1&playlist=OK10OEMqzPE&controls=1&modestbranding=1&rel=0"
+                    src="https://www.youtube.com/embed/OK10OEMqzPE?autoplay=1&controls=1&modestbranding=1&rel=0"
                     title="Hirios - AI-Powered Hiring Platform"
                     className="w-full h-full"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
