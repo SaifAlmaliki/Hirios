@@ -18,7 +18,8 @@ import {
   Zap,
   Shield,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Play
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -41,6 +42,59 @@ const HiriosLanding = () => {
 
       {/* Futurastic Hero Section */}
       <AuroraHero />
+
+      {/* Video Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-950">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold text-white mb-4">See Hirios in Action</h2>
+            <p className="text-xl text-gray-300">Watch how AI-powered hiring transforms your recruitment process</p>
+          </div>
+          
+          <div className="relative">
+                          {/* Video Container */}
+              <div className="relative w-full max-w-4xl mx-auto">
+                <div className="aspect-video w-full rounded-2xl overflow-hidden shadow-2xl border border-gray-700/50">
+                  <iframe
+                    src="https://www.youtube.com/embed/OK10OEMqzPE?autoplay=1&mute=1&loop=1&playlist=OK10OEMqzPE&controls=1&modestbranding=1&rel=0"
+                    title="Hirios - AI-Powered Hiring Platform"
+                    className="w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    loading="lazy"
+                  />
+                </div>
+              </div>
+            
+            {/* Video Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+              <div className="text-center">
+                <div className="bg-blue-600/20 p-4 rounded-full w-fit mx-auto mb-4 border border-blue-600/30">
+                  <Clock className="h-8 w-8 text-blue-400" />
+                </div>
+                <h4 className="text-xl font-bold text-white mb-2">80% Time Saved</h4>
+                <p className="text-gray-300">Reduce screening time from weeks to days</p>
+              </div>
+              
+              <div className="text-center">
+                <div className="bg-green-600/20 p-4 rounded-full w-fit mx-auto mb-4 border border-green-600/30">
+                  <Target className="h-8 w-8 text-green-400" />
+                </div>
+                <h4 className="text-xl font-bold text-white mb-2">90% Accuracy</h4>
+                <p className="text-gray-300">AI-powered candidate matching</p>
+              </div>
+              
+              <div className="text-center">
+                <div className="bg-purple-600/20 p-4 rounded-full w-fit mx-auto mb-4 border border-purple-600/30">
+                  <TrendingUp className="h-8 w-8 text-purple-400" />
+                </div>
+                <h4 className="text-xl font-bold text-white mb-2">$50K+ Saved</h4>
+                <p className="text-gray-300">Annual cost savings on recruitment</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* How It Works */}
       <section id="demo" className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-900">
