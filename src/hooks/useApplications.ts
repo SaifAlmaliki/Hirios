@@ -15,6 +15,12 @@ export interface Application {
   resume_url?: string;
   status: string;
   created_at: string;
+  upload_source?: string;
+  uploaded_by_company?: boolean;
+  uploaded_by_user_id?: string;
+  processing_status?: string;
+  processing_error?: string;
+  original_filename?: string;
 }
 
 export const useApplications = () => {
@@ -97,6 +103,8 @@ export const useCreateApplication = () => {
           job_title: applicationData.job_title || 'Unknown Position',
           company: applicationData.company || 'Unknown Company',
           applied_at: data.created_at,
+          upload_source: applicationData.upload_source || 'job_seeker',
+          uploaded_by_company: applicationData.uploaded_by_company || false,
           job_details: {
             job_id: applicationData.job_id,
             title: applicationData.job_details?.title || applicationData.job_title || 'Unknown Position',

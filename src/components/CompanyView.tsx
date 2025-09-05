@@ -12,6 +12,7 @@ import { useCreateJob, useUpdateJob, useDeleteJob } from '../hooks/useJobs';
 import { useCompanyJobs } from '../hooks/useCompanyJobs';
 
 import JobApplicationsView from './JobApplicationsView';
+import CompanyResumeUpload from './CompanyResumeUpload';
 import { useAuth } from '@/contexts/AuthContext';
 
 // Separate JobForm component to prevent re-rendering issues
@@ -370,31 +371,40 @@ const CompanyView: React.FC = () => {
           <p className="text-gray-600 mt-1">Manage your job postings and applications</p>
         </div>
         
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-              <Plus className="h-4 w-4 mr-2" />
-              Post New Job
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle className="text-xl text-blue-900">Post a New Job</DialogTitle>
-              <DialogDescription>
-                Fill in the details below to post a new job opening.
-              </DialogDescription>
-            </DialogHeader>
-            <JobForm
-              jobData={jobData}
-              onInputChange={handleInputChange}
-              onSelectChange={handleSelectChange}
-              onSubmit={handleSubmit}
-              isEdit={false}
-              isLoading={createJobMutation.isPending}
-              onCancel={handleCancelCreate}
-            />
-          </DialogContent>
-        </Dialog>
+        <div className="flex space-x-3">
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                <Plus className="h-4 w-4 mr-2" />
+                Post New Job
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="text-xl text-blue-900">Post a New Job</DialogTitle>
+                <DialogDescription>
+                  Fill in the details below to post a new job opening.
+                </DialogDescription>
+              </DialogHeader>
+              <JobForm
+                jobData={jobData}
+                onInputChange={handleInputChange}
+                onSelectChange={handleSelectChange}
+                onSubmit={handleSubmit}
+                isEdit={false}
+                isLoading={createJobMutation.isPending}
+                onCancel={handleCancelCreate}
+              />
+            </DialogContent>
+          </Dialog>
+          
+          <CompanyResumeUpload onUploadComplete={() => {
+            // Refresh applications view if it's open
+            if (isApplicationsViewOpen) {
+              // The JobApplicationsView will automatically refresh due to React Query
+            }
+          }} />
+        </div>
       </div>
 
 

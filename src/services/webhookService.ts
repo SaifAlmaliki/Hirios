@@ -10,6 +10,8 @@ interface ApplicationWebhookData {
   job_title: string;
   company: string;
   applied_at: string;
+  upload_source?: string;
+  uploaded_by_company?: boolean;
   job_details: {
     job_id: string;
     title: string;
@@ -68,6 +70,8 @@ export const sendApplicationToWebhook = async (data: ApplicationWebhookData): Pr
       applied_at: data.applied_at,
       resume_filename: data.resume_filename,
       resume_base64_length: data.resume_base64?.length || 0,
+      upload_source: data.upload_source,
+      uploaded_by_company: data.uploaded_by_company,
       job_details: {
         job_id: data.job_details.job_id,
         title: data.job_details.title,
