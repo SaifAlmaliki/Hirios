@@ -10,7 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useCompanyJobs } from '@/hooks/useCompanyJobs';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { sendApplicationToWebhook, fileToBase64 } from '@/services/webhookService';
+import { sendResumeToWebhook, fileToBase64 } from '@/services/webhookService';
 
 interface UploadedFile {
   id: string;
@@ -191,33 +191,29 @@ const CompanyResumeUpload: React.FC<CompanyResumeUploadProps> = ({ onUploadCompl
       // Send to webhook for AI processing
       const resumeBase64 = await fileToBase64(uploadedFile.file);
       
-      try {
-        await sendApplicationToWebhook({
-          application_id: application.id,
-          full_name: uploadedFile.file.name.replace('.pdf', ''),
-          email: 'pending@extraction.com',
-          phone: 'pending',
-          resume_base64: resumeBase64,
-          resume_filename: uploadedFile.file.name,
-          job_id: jobId,
-          job_title: job.title,
-          company: job.company,
-          applied_at: application.created_at,
-          upload_source: 'company_upload',
-          uploaded_by_company: true,
-          job_details: {
-            job_id: jobId,
-            title: job.title,
-            company: job.company,
-            department: job.department,
-            location: job.location,
-            employment_type: job.employment_type,
-            description: job.description,
-            responsibilities: job.responsibilities,
-            requirements: job.requirements,
-            benefits: job.benefits,
-          }
-        });
+             try {
+         await sendResumeToWebhook({
+           resume_base64: resumeBase64,
+           resume_filename: uploadedFile.file.name,
+           job_id: jobId,
+           job_title: job.title,
+           company: job.company,
+           applied_at: application.created_at,
+           upload_source: 'company_upload',
+           uploaded_by_company: true,
+           job_details: {
+             job_id: jobId,
+             title: job.title,
+             company: job.company,
+             department: job.department,
+             location: job.location,
+             employment_type: job.employment_type,
+             description: job.description,
+             responsibilities: job.responsibilities,
+             requirements: job.requirements,
+             benefits: job.benefits,
+           }
+         });
 
         // Update status to completed
         setUploadedFiles(prev => prev.map(f => 

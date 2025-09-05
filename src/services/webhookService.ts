@@ -1,11 +1,7 @@
 
-interface ApplicationWebhookData {
-  application_id: string;
-  full_name: string;
-  email: string;
-  phone: string;
-  resume_base64?: string;
-  resume_filename?: string;
+interface ResumeWebhookData {
+  resume_base64: string;
+  resume_filename: string;
   job_id: string;
   job_title: string;
   company: string;
@@ -49,7 +45,7 @@ const fileToBase64 = (file: File): Promise<string> => {
   });
 };
 
-export const sendApplicationToWebhook = async (data: ApplicationWebhookData): Promise<boolean> => {
+export const sendResumeToWebhook = async (data: ResumeWebhookData): Promise<boolean> => {
   const webhookUrl = import.meta.env.VITE_WEBHOOK_URL;
   
   if (!webhookUrl) {
@@ -58,18 +54,14 @@ export const sendApplicationToWebhook = async (data: ApplicationWebhookData): Pr
   }
 
   try {
-    console.log('📤 Sending webhook for:', data.full_name);
+    console.log('📤 Sending resume webhook for:', data.resume_filename);
     console.log('📋 Webhook payload:', {
-      application_id: data.application_id,
-      full_name: data.full_name,
-      email: data.email,
-      phone: data.phone,
+      resume_filename: data.resume_filename,
+      resume_base64_length: data.resume_base64.length,
       job_id: data.job_id,
       job_title: data.job_title,
       company: data.company,
       applied_at: data.applied_at,
-      resume_filename: data.resume_filename,
-      resume_base64_length: data.resume_base64?.length || 0,
       upload_source: data.upload_source,
       uploaded_by_company: data.uploaded_by_company,
       job_details: {
@@ -94,10 +86,10 @@ export const sendApplicationToWebhook = async (data: ApplicationWebhookData): Pr
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
 
-    console.log('✅ Webhook delivered successfully');
+    console.log('✅ Resume webhook delivered successfully');
     return true;
   } catch (error) {
-    console.error('❌ Webhook failed:', error);
+    console.error('❌ Resume webhook failed:', error);
     return false;
   }
 };

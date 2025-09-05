@@ -2,7 +2,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { sendApplicationToWebhook, fileToBase64 } from '../services/webhookService';
+import { sendResumeToWebhook, fileToBase64 } from '../services/webhookService';
 import { Job } from './useJobs';
 
 
@@ -92,13 +92,9 @@ export const useCreateApplication = () => {
           resume_filename = applicationData.resume_file.name;
         }
 
-        await sendApplicationToWebhook({
-          application_id: data.id,
-          full_name: applicationData.full_name,
-          email: applicationData.email,
-          phone: applicationData.phone,
-          resume_base64,
-          resume_filename,
+        await sendResumeToWebhook({
+          resume_base64: resume_base64!,
+          resume_filename: resume_filename!,
           job_id: applicationData.job_id,
           job_title: applicationData.job_title || 'Unknown Position',
           company: applicationData.company || 'Unknown Company',
