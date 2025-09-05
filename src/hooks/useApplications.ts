@@ -9,17 +9,9 @@ import { Job } from './useJobs';
 export interface Application {
   id: string;
   job_id: string;
-  full_name: string;
-  email: string;
-  phone: string;
   resume_url?: string;
-  status: string;
   created_at: string;
-  upload_source?: string;
-  uploaded_by_company?: boolean;
   uploaded_by_user_id?: string;
-  processing_status?: string;
-  processing_error?: string;
   original_filename?: string;
 }
 
@@ -51,31 +43,34 @@ export const useCreateApplication = () => {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async (applicationData: Omit<Application, 'id' | 'created_at'> & { 
+    mutationFn: async (inputData: Omit<Application, 'id' | 'created_at'> & { 
       job_title?: string; 
       company?: string;
       resume_file?: File;
       job_details?: Job;
     }) => {
-      console.log('📝 Creating application for:', applicationData.full_name, '-', applicationData.job_title);
+      console.log('📝 Creating application for job:', inputData.job_title);
       
       // Store application in database with resume URL from Supabase storage
+      // Using direct insert with minimal fields (type assertion needed until migration is applied)
       const { data, error } = await supabase
         .from('applications')
         .insert([{
-          job_id: applicationData.job_id,
-          full_name: applicationData.full_name,
-          email: applicationData.email,
-          phone: applicationData.phone,
-          resume_url: applicationData.resume_url,
-          status: applicationData.status
-        }])
+          job_id: inputData.job_id,
+          resume_url: inputData.resume_url || null,
+          uploaded_by_user_id: inputData.uploaded_by_user_id || null,
+          original_filename: inputData.original_filename || null
+        }] as any)
         .select()
         .single();
 
       if (error) {
         console.error('❌ Error creating application:', error);
         throw error;
+      }
+
+      if (!data) {
+        throw new Error('Failed to create application: No data returned');
       }
 
       console.log('✅ Application created:', data.id);
@@ -86,32 +81,33 @@ export const useCreateApplication = () => {
         let resume_filename: string | undefined;
 
         // If there's a resume file, encode it for webhook
-        if (applicationData.resume_file) {
+        if (inputData.resume_file) {
           console.log('📄 Encoding resume for webhook...');
-          resume_base64 = await fileToBase64(applicationData.resume_file);
-          resume_filename = applicationData.resume_file.name;
+          resume_base64 = await fileToBase64(inputData.resume_file);
+          resume_filename = inputData.resume_file.name;
         }
 
         await sendResumeToWebhook({
+          application_id: data.id,
           resume_base64: resume_base64!,
           resume_filename: resume_filename!,
-          job_id: applicationData.job_id,
-          job_title: applicationData.job_title || 'Unknown Position',
-          company: applicationData.company || 'Unknown Company',
+          job_id: inputData.job_id,
+          job_title: inputData.job_title || 'Unknown Position',
+          company: inputData.company || 'Unknown Company',
           applied_at: data.created_at,
-          upload_source: applicationData.upload_source || 'job_seeker',
-          uploaded_by_company: applicationData.uploaded_by_company || false,
+          upload_source: 'job_seeker',
+          uploaded_by_company: false,
           job_details: {
-            job_id: applicationData.job_id,
-            title: applicationData.job_details?.title || applicationData.job_title || 'Unknown Position',
-            company: applicationData.job_details?.company || applicationData.company || 'Unknown Company',
-            department: applicationData.job_details?.department || 'Unknown Department',
-            location: applicationData.job_details?.location || 'Unknown Location',
-            employment_type: applicationData.job_details?.employment_type || 'Unknown',
-            description: applicationData.job_details?.description || 'No description available',
-            responsibilities: applicationData.job_details?.responsibilities || 'No responsibilities specified',
-            requirements: applicationData.job_details?.requirements,
-            benefits: applicationData.job_details?.benefits,
+            job_id: inputData.job_id,
+            title: inputData.job_details?.title || inputData.job_title || 'Unknown Position',
+            company: inputData.job_details?.company || inputData.company || 'Unknown Company',
+            department: inputData.job_details?.department || 'Unknown Department',
+            location: inputData.job_details?.location || 'Unknown Location',
+            employment_type: inputData.job_details?.employment_type || 'Unknown',
+            description: inputData.job_details?.description || 'No description available',
+            responsibilities: inputData.job_details?.responsibilities || 'No responsibilities specified',
+            requirements: inputData.job_details?.requirements,
+            benefits: inputData.job_details?.benefits,
           }
         });
         console.log('📤 Webhook sent successfully');

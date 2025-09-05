@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Download, Mail, Phone, User, Calendar, FileText } from 'lucide-react';
 import { useJobApplications } from '../hooks/useJobApplications';
+import { useScreeningResults } from '../hooks/useScreeningResults';
 import { Job } from '../hooks/useJobs';
 import ApplicationCard from './ApplicationCard';
 
@@ -17,6 +18,7 @@ interface JobApplicationsViewProps {
 
 const JobApplicationsView: React.FC<JobApplicationsViewProps> = ({ job, isOpen, onClose }) => {
   const { data: applications = [], isLoading } = useJobApplications(job?.id || '');
+  const { data: screeningResults = [] } = useScreeningResults();
 
   if (!job) return null;
 
@@ -52,13 +54,19 @@ const JobApplicationsView: React.FC<JobApplicationsViewProps> = ({ job, isOpen, 
             </div>
           ) : (
             <div className="grid gap-4">
-              {applications.map((application) => (
-                <ApplicationCard 
-                  key={application.id} 
-                  application={application}
-                  getStatusColor={getStatusColor}
-                />
-              ))}
+              {applications.map((application) => {
+                // Find matching screening result for this application
+                const screeningResult = screeningResults.find(sr => sr.application_id === application.id);
+                
+                return (
+                  <ApplicationCard 
+                    key={application.id} 
+                    application={application}
+                    screeningResult={screeningResult}
+                    getStatusColor={getStatusColor}
+                  />
+                );
+              })}
             </div>
           )}
         </div>

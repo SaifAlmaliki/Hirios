@@ -1,5 +1,6 @@
 
 interface ResumeWebhookData {
+  application_id: string;
   resume_base64: string;
   resume_filename: string;
   job_id: string;
@@ -56,6 +57,7 @@ export const sendResumeToWebhook = async (data: ResumeWebhookData): Promise<bool
   try {
     console.log('📤 Sending resume webhook for:', data.resume_filename);
     console.log('📋 Webhook payload:', {
+      application_id: data.application_id,
       resume_filename: data.resume_filename,
       resume_base64_length: data.resume_base64.length,
       job_id: data.job_id,

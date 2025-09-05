@@ -110,9 +110,10 @@ const CompanyResumeUpload: React.FC<CompanyResumeUploadProps> = ({ onUploadCompl
     try {
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}_${file.name}`;
-      const filePath = `company_uploads/${companyId}/${jobId}/${fileName}`;
+      const filePath = `${companyId}/${jobId}/${fileName}`;
 
       console.log('📄 Uploading company resume:', file.name);
+      console.log('📁 File path:', filePath);
       
       const { data, error } = await supabase.storage
         .from('company_uploads')
@@ -133,6 +134,7 @@ const CompanyResumeUpload: React.FC<CompanyResumeUploadProps> = ({ onUploadCompl
         .from('company_uploads')
         .getPublicUrl(filePath);
 
+      console.log('🔗 Generated URL:', urlData.publicUrl);
       return urlData.publicUrl;
     } catch (error) {
       console.error('❌ Company resume upload failed:', error);
@@ -160,27 +162,24 @@ const CompanyResumeUpload: React.FC<CompanyResumeUploadProps> = ({ onUploadCompl
         f.id === fileId ? { ...f, status: 'processing', progress: 50 } : f
       ));
 
-      // Create application record
-      const { data: application, error: appError } = await supabase
-        .from('applications')
-        .insert([{
-          job_id: jobId,
-          full_name: uploadedFile.file.name.replace('.pdf', ''), // Use filename as placeholder
-          email: 'pending@extraction.com', // Placeholder until AI extracts
-          phone: 'pending', // Placeholder until AI extracts
-          resume_url: resumeUrl,
-          status: 'pending',
-          upload_source: 'company_upload',
-          uploaded_by_company: true,
-          uploaded_by_user_id: user?.id,
-          processing_status: 'processing',
-          original_filename: uploadedFile.file.name
-        }])
-        .select()
-        .single();
+             // Create application record (type assertion needed until migration is applied)
+       const { data: application, error: appError } = await supabase
+         .from('applications')
+         .insert([{
+           job_id: jobId,
+           resume_url: resumeUrl,
+           uploaded_by_user_id: user?.id,
+           original_filename: uploadedFile.file.name
+         }] as any)
+         .select()
+         .single();
 
       if (appError) {
         throw new Error(`Failed to create application: ${appError.message}`);
+      }
+
+      if (!application) {
+        throw new Error('Failed to create application: No data returned');
       }
 
       // Update status to processing
@@ -193,6 +192,7 @@ const CompanyResumeUpload: React.FC<CompanyResumeUploadProps> = ({ onUploadCompl
       
              try {
          await sendResumeToWebhook({
+           application_id: application.id,
            resume_base64: resumeBase64,
            resume_filename: uploadedFile.file.name,
            job_id: jobId,
@@ -219,27 +219,18 @@ const CompanyResumeUpload: React.FC<CompanyResumeUploadProps> = ({ onUploadCompl
         setUploadedFiles(prev => prev.map(f => 
           f.id === fileId ? { ...f, status: 'completed', progress: 100 } : f
         ));
-      } catch (webhookError) {
-        console.warn('⚠️ Webhook failed, but application was created successfully:', webhookError);
-        
-        // Update processing status to failed in database
-        await supabase
-          .from('applications')
-          .update({ 
-            processing_status: 'failed',
-            processing_error: 'Webhook failed: CORS error. Please check n8n configuration.'
-          })
-          .eq('id', application.id);
-
-        // Update status to failed
-        setUploadedFiles(prev => prev.map(f => 
-          f.id === fileId ? { 
-            ...f, 
-            status: 'failed', 
-            error: 'Webhook failed: CORS error. Resume uploaded but AI processing failed.' 
-          } : f
-        ));
-      }
+             } catch (webhookError) {
+         console.warn('⚠️ Webhook failed, but application was created successfully:', webhookError);
+         
+         // Update status to failed
+         setUploadedFiles(prev => prev.map(f => 
+           f.id === fileId ? { 
+             ...f, 
+             status: 'failed', 
+             error: 'Webhook failed: CORS error. Resume uploaded but AI processing failed.' 
+           } : f
+         ));
+       }
 
       console.log('✅ Company resume upload completed:', uploadedFile.file.name);
 

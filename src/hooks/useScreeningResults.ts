@@ -124,17 +124,10 @@ export const useScreeningResults = () => {
               application = appData;
               appError = appErr;
             } else {
-              // Fall back to email matching (less reliable)
-              const { data: appData, error: appErr } = await supabase
-                .from('applications')
-                .select('resume_url, resume_text')
-                .eq('email', result.email)
-                .order('created_at', { ascending: false })
-                .limit(1)
-                .maybeSingle();
-              
-              application = appData;
-              appError = appErr;
+              // No application_id available, cannot fetch resume
+              console.warn('⚠️ No application_id available for screening result:', result.id);
+              application = null;
+              appError = new Error('No application_id available');
             }
             
             if (appError) {
