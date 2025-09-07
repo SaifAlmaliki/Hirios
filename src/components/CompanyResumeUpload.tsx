@@ -395,9 +395,10 @@ const CompanyResumeUpload: React.FC<CompanyResumeUploadProps> = ({ onUploadCompl
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-green-600 hover:bg-green-700 text-white">
+        <Button className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto">
           <Upload className="h-4 w-4 mr-2" />
-          Upload Resumes
+          <span className="hidden sm:inline">Upload Resumes</span>
+          <span className="sm:hidden">Upload</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-4xl max-h-[80vh] overflow-y-auto">
