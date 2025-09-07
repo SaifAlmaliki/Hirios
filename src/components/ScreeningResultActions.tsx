@@ -46,7 +46,15 @@ const ScreeningResultActions: React.FC<ScreeningResultActionsProps> = ({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => window.open(resumeUrl, '_blank')}
+            onClick={() => {
+              // Fix duplicate company_uploads in URL if present
+              let fixedUrl = resumeUrl;
+              if (resumeUrl.includes('/company_uploads/company_uploads/')) {
+                fixedUrl = resumeUrl.replace('/company_uploads/company_uploads/', '/company_uploads/');
+                console.log('🔧 Fixed duplicate company_uploads in URL:', fixedUrl);
+              }
+              window.open(fixedUrl, '_blank');
+            }}
             className="flex items-center gap-2 border-green-300 text-green-600 hover:bg-green-50 text-xs sm:text-sm h-9 px-3 w-full"
           >
             <FileText className="h-4 w-4" />
