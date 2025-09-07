@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useCreateJob, useUpdateJob, useDeleteJob } from '../hooks/useJobs';
 import { useCompanyJobs } from '../hooks/useCompanyJobs';
 import { useCompanyProfile } from '../hooks/useCompanyProfile';
+import { useNavigate } from 'react-router-dom';
 
 import JobApplicationsView from './JobApplicationsView';
 import CompanyResumeUpload from './CompanyResumeUpload';
@@ -167,6 +168,7 @@ const JobForm = React.memo(({
 
 const CompanyView: React.FC = () => {
   const { user, loading } = useAuth();
+  const navigate = useNavigate();
   
   // Show loading state while auth is being determined
   if (loading) {
@@ -181,19 +183,15 @@ const CompanyView: React.FC = () => {
   }
   
   // Security check: Only allow companies to access this view
+  useEffect(() => {
+    if (!user && !loading) {
+      // Redirect to landing page instead of showing access denied
+      navigate('/');
+    }
+  }, [user, loading, navigate]);
+
   if (!user) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-6xl mb-4">🚫</div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h1>
-          <p className="text-gray-600 mb-4">This area is only available for company accounts.</p>
-          <Button onClick={() => window.history.back()}>
-            Go Back
-          </Button>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
