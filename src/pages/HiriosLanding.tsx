@@ -163,6 +163,37 @@ const HiriosLanding = () => {
         </div>
       </section>
 
+      {/* See What You Get */}
+      <section className="py-20 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-white mb-4">See What You Get</h2>
+            <p className="text-xl text-gray-300">This is the level of detail you'll get from our AI analysis</p>
+          </div>
+
+          <div className="max-w-6xl mx-auto">
+            <div className="relative group">
+              <img 
+                src="/screening result.png" 
+                alt="AI Screening Result Example - Jane Smith Solutions Architect Analysis"
+                className="w-full h-auto rounded-xl shadow-2xl transition-all duration-500 group-hover:scale-105 group-hover:shadow-3xl border border-white/20"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            </div>
+
+            <div className="mt-8 text-center">
+              <div className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-xl p-6 border border-blue-600/30">
+                <h4 className="text-lg font-semibold text-white mb-3">What This Shows</h4>
+                <p className="text-gray-300 text-sm leading-relaxed">
+                  Our AI provides comprehensive analysis including match scores, detailed strengths and weaknesses, 
+                  risk assessment, potential rewards, and actionable recommendations - all based on your specific 
+                  job requirements and candidate qualifications.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Key Features */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-950">
