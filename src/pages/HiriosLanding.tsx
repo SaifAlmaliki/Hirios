@@ -195,6 +195,70 @@ const HiriosLanding = () => {
         </div>
       </section>
 
+      {/* AI Powered Voice Interview Capabilities */}
+      <section className="py-20 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-white mb-4">AI Powered Voice Interview Capabilities</h2>
+            <p className="text-xl text-gray-300">This is how we collect detailed candidate information before human interviews</p>
+          </div>
+
+          <div className="max-w-6xl mx-auto">
+            <div className="relative group">
+              <img 
+                src="/voice interview.png" 
+                alt="AI Voice Interview Interface - Jane Smith Solutions Architect Interview"
+                className="w-full h-auto rounded-xl shadow-2xl transition-all duration-500 group-hover:scale-105 group-hover:shadow-3xl border border-white/20"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            </div>
+
+            <div className="mt-8 text-center">
+              <div className="bg-gradient-to-r from-green-600/20 to-blue-600/20 rounded-xl p-6 border border-green-600/30">
+                <h4 className="text-lg font-semibold text-white mb-4">Comprehensive Information Collection</h4>
+                <p className="text-gray-300 text-sm leading-relaxed mb-4">
+                  Our AI voice interviewer automatically collects detailed candidate information including:
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-left">
+                  <div className="flex items-center text-gray-300 text-sm">
+                    <div className="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
+                    Motivation for role
+                  </div>
+                  <div className="flex items-center text-gray-300 text-sm">
+                    <div className="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
+                    Time management strategy
+                  </div>
+                  <div className="flex items-center text-gray-300 text-sm">
+                    <div className="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
+                    Recent experience summary
+                  </div>
+                  <div className="flex items-center text-gray-300 text-sm">
+                    <div className="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
+                    Preferred work environment
+                  </div>
+                  <div className="flex items-center text-gray-300 text-sm">
+                    <div className="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
+                    Relevant skills & tools
+                  </div>
+                  <div className="flex items-center text-gray-300 text-sm">
+                    <div className="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
+                    Career expectations
+                  </div>
+                  <div className="flex items-center text-gray-300 text-sm md:col-span-2 lg:col-span-1">
+                    <div className="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
+                    Availability & start date
+                  </div>
+                </div>
+                <p className="text-gray-300 text-sm leading-relaxed mt-4">
+                  This comprehensive data collection streamlines your hiring process by providing all the essential 
+                  information you need before conducting human interviews.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Key Features */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-950">
         <div className="max-w-6xl mx-auto">
