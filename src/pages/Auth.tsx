@@ -5,8 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Building2, Users, ArrowLeft, Mail, Lock, CheckCircle } from 'lucide-react';
+import { Building2, ArrowLeft, Mail, Lock, CheckCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -15,11 +14,23 @@ const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [userType, setUserType] = useState('job_seeker');
   const [loading, setLoading] = useState(false);
   const [resetEmailSent, setResetEmailSent] = useState(false);
   const [resendEmailSent, setResendEmailSent] = useState(false);
   const [activeTab, setActiveTab] = useState('signin');
+  
+  // Multi-step signup state
+  const [signupStep, setSignupStep] = useState(1);
+  const [companyData, setCompanyData] = useState({
+    company_name: '',
+    company_website: '',
+    company_description: '',
+    company_size: '',
+    industry: '',
+    address: '',
+    phone: ''
+  });
+  
   const { signUp, signIn, resetPassword, resendConfirmation, user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -27,28 +38,45 @@ const Auth = () => {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (password !== confirmPassword) {
-      toast({
-        title: "Error",
-        description: "Passwords do not match",
-        variant: "destructive",
-      });
+    if (signupStep === 1) {
+      // Validate step 1 (account details)
+      if (password !== confirmPassword) {
+        toast({
+          title: "Error",
+          description: "Passwords do not match",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (password.length < 6) {
+        toast({
+          title: "Error",
+          description: "Password must be at least 6 characters long",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (!companyData.company_name.trim()) {
+        toast({
+          title: "Error",
+          description: "Company name is required",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Move to step 2
+      setSignupStep(2);
       return;
     }
 
-    if (password.length < 6) {
-      toast({
-        title: "Error",
-        description: "Password must be at least 6 characters long",
-        variant: "destructive",
-      });
-      return;
-    }
-
+    // Step 2: Complete signup
     setLoading(true);
     
     try {
-      const { error } = await signUp(email, password, userType);
+      const { error } = await signUp(email, password, companyData);
       
       if (error) {
         toast({
@@ -62,10 +90,20 @@ const Auth = () => {
           description: "Account created successfully! Please check your email to confirm your account, then sign in.",
         });
         
-        // Clear form
+        // Clear form and reset
         setEmail('');
         setPassword('');
         setConfirmPassword('');
+        setCompanyData({
+          company_name: '',
+          company_website: '',
+          company_description: '',
+          company_size: '',
+          industry: '',
+          address: '',
+          phone: ''
+        });
+        setSignupStep(1);
         
         // Switch to sign-in tab
         setActiveTab('signin');
@@ -79,6 +117,14 @@ const Auth = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleCompanyDataChange = (field: string, value: string) => {
+    setCompanyData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const goBackToStep1 = () => {
+    setSignupStep(1);
   };
 
   // If already authenticated, redirect away from /auth
@@ -324,77 +370,191 @@ const Auth = () => {
               </TabsContent>
               
               <TabsContent value="signup" className="space-y-4">
+                {/* Progress Indicator */}
+                <div className="flex items-center justify-center space-x-2 mb-6">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                    signupStep >= 1 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-500'
+                  }`}>
+                    1
+                  </div>
+                  <div className={`w-16 h-1 ${signupStep >= 2 ? 'bg-blue-600' : 'bg-gray-200'}`}></div>
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                    signupStep >= 2 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-500'
+                  }`}>
+                    2
+                  </div>
+                </div>
+
                 <form onSubmit={handleSignUp} className="space-y-4">
-                  <div className="space-y-3">
-                    <Label className="text-sm font-medium text-gray-700">I am a:</Label>
-                    <RadioGroup value={userType} onValueChange={setUserType} className="space-y-2">
-                      <div className="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors">
-                        <RadioGroupItem value="job_seeker" id="job_seeker" className="h-4 w-4" />
-                        <Users className="h-5 w-5 text-blue-600" />
-                        <Label htmlFor="job_seeker" className="cursor-pointer flex-1 text-sm">
-                          Job Seeker
-                        </Label>
+                  {signupStep === 1 ? (
+                    <>
+                      {/* Step 1: Account Details */}
+                      <div className="text-center mb-6">
+                        <h3 className="text-lg font-semibold text-gray-900">Account Details</h3>
+                        <p className="text-sm text-gray-600">Create your account credentials</p>
                       </div>
-                      <div className="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors">
-                        <RadioGroupItem value="company" id="company" className="h-4 w-4" />
-                        <Building2 className="h-5 w-5 text-green-600" />
-                        <Label htmlFor="company" className="cursor-pointer flex-1 text-sm">
-                          Company
-                        </Label>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="signup-email" className="text-sm font-medium text-gray-700">Email</Label>
+                        <Input
+                          id="signup-email"
+                          type="email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          placeholder="m@example.com"
+                          className="h-10"
+                          required
+                        />
                       </div>
-                    </RadioGroup>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-email" className="text-sm font-medium text-gray-700">Email</Label>
-                    <Input
-                      id="signup-email"
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="m@example.com"
-                      className="h-10"
-                      required
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-password" className="text-sm font-medium text-gray-700">Password</Label>
-                    <Input
-                      id="signup-password"
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Create a password"
-                      className="h-10"
-                      required
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="confirm-password" className="text-sm font-medium text-gray-700">Confirm Password</Label>
-                    <Input
-                      id="confirm-password"
-                      type="password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      placeholder="Confirm your password"
-                      className="h-10"
-                      required
-                    />
-                  </div>
-                  
-                  {userType === 'company' && (
-                    <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
-                      <p className="text-xs text-blue-800">
-                        Companies need an active subscription (€25/month) to post jobs.
-                      </p>
-                    </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="signup-password" className="text-sm font-medium text-gray-700">Password</Label>
+                        <Input
+                          id="signup-password"
+                          type="password"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          placeholder="Create a password"
+                          className="h-10"
+                          required
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="confirm-password" className="text-sm font-medium text-gray-700">Confirm Password</Label>
+                        <Input
+                          id="confirm-password"
+                          type="password"
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          placeholder="Confirm your password"
+                          className="h-10"
+                          required
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="company-name" className="text-sm font-medium text-gray-700">Company Name *</Label>
+                        <Input
+                          id="company-name"
+                          type="text"
+                          value={companyData.company_name}
+                          onChange={(e) => handleCompanyDataChange('company_name', e.target.value)}
+                          placeholder="Your Company Name"
+                          className="h-10"
+                          required
+                        />
+                      </div>
+                      
+                      <Button type="submit" className="w-full h-10 bg-black hover:bg-gray-800">
+                        Continue to Company Details
+                        <ChevronRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      {/* Step 2: Company Information */}
+                      <div className="text-center mb-6">
+                        <h3 className="text-lg font-semibold text-gray-900">Company Information</h3>
+                        <p className="text-sm text-gray-600">Tell us about your company</p>
+                      </div>
+                      
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="company-website" className="text-sm font-medium text-gray-700">Website</Label>
+                          <Input
+                            id="company-website"
+                            type="url"
+                            value={companyData.company_website}
+                            onChange={(e) => handleCompanyDataChange('company_website', e.target.value)}
+                            placeholder="https://yourcompany.com"
+                            className="h-10"
+                          />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="company-description" className="text-sm font-medium text-gray-700">Description</Label>
+                          <textarea
+                            id="company-description"
+                            value={companyData.company_description}
+                            onChange={(e) => handleCompanyDataChange('company_description', e.target.value)}
+                            placeholder="Brief description of your company"
+                            className="w-full h-20 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                          />
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="company-size" className="text-sm font-medium text-gray-700">Company Size</Label>
+                            <select
+                              id="company-size"
+                              value={companyData.company_size}
+                              onChange={(e) => handleCompanyDataChange('company_size', e.target.value)}
+                              className="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            >
+                              <option value="">Select size</option>
+                              <option value="1-10">1-10 employees</option>
+                              <option value="11-50">11-50 employees</option>
+                              <option value="51-200">51-200 employees</option>
+                              <option value="201-500">201-500 employees</option>
+                              <option value="500+">500+ employees</option>
+                            </select>
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor="industry" className="text-sm font-medium text-gray-700">Industry</Label>
+                            <Input
+                              id="industry"
+                              type="text"
+                              value={companyData.industry}
+                              onChange={(e) => handleCompanyDataChange('industry', e.target.value)}
+                              placeholder="e.g., Technology, Healthcare"
+                              className="h-10"
+                            />
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="address" className="text-sm font-medium text-gray-700">Address</Label>
+                          <Input
+                            id="address"
+                            type="text"
+                            value={companyData.address}
+                            onChange={(e) => handleCompanyDataChange('address', e.target.value)}
+                            placeholder="Company address"
+                            className="h-10"
+                          />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="phone" className="text-sm font-medium text-gray-700">Phone</Label>
+                          <Input
+                            id="phone"
+                            type="tel"
+                            value={companyData.phone}
+                            onChange={(e) => handleCompanyDataChange('phone', e.target.value)}
+                            placeholder="+1 (555) 123-4567"
+                            className="h-10"
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="flex space-x-3">
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          onClick={goBackToStep1}
+                          className="flex-1 h-10"
+                        >
+                          <ChevronLeft className="mr-2 h-4 w-4" />
+                          Back
+                        </Button>
+                        <Button type="submit" className="flex-1 h-10 bg-black hover:bg-gray-800" disabled={loading}>
+                          {loading ? 'Creating Account...' : 'Create Account'}
+                        </Button>
+                      </div>
+                    </>
                   )}
-                  
-                  <Button type="submit" className="w-full h-10 bg-black hover:bg-gray-800" disabled={loading}>
-                    {loading ? 'Creating Account...' : 'Create Account'}
-                  </Button>
                 </form>
                 
                 {resendEmailSent && (

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Download, Mail, Phone, User, Calendar, Upload, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { Application } from '../hooks/useApplications';
 import { ScreeningResult } from '../hooks/useScreeningResults';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ApplicationCardProps {
   application: Application;
@@ -14,23 +15,46 @@ interface ApplicationCardProps {
 }
 
 const ApplicationCard: React.FC<ApplicationCardProps> = ({ application, screeningResult, getStatusColor }) => {
-  const handleDownloadResume = () => {
+  const handleDownloadResume = async () => {
     if (application.resume_url) {
-      // Fix duplicate company_uploads in URL if present
-      let fixedUrl = application.resume_url;
-      if (application.resume_url.includes('/company_uploads/company_uploads/')) {
-        fixedUrl = application.resume_url.replace('/company_uploads/company_uploads/', '/company_uploads/');
-        console.log('🔧 Fixed duplicate company_uploads in URL:', fixedUrl);
+      try {
+        // Extract file path from URL
+        const url = new URL(application.resume_url);
+        const pathParts = url.pathname.split('/');
+        const bucketIndex = pathParts.findIndex(part => part === 'company_uploads');
+        
+        if (bucketIndex !== -1 && bucketIndex < pathParts.length - 1) {
+          const filePath = pathParts.slice(bucketIndex + 1).join('/');
+          
+          // Generate fresh signed URL
+          const { data, error } = await supabase.storage
+            .from('company_uploads')
+            .createSignedUrl(filePath, 3600); // 1 hour expiry
+          
+          if (error) {
+            console.error('Error generating signed URL:', error);
+            // Fallback to original URL
+            window.open(application.resume_url, '_blank');
+            return;
+          }
+          
+          // Create a temporary link and trigger download
+          const link = document.createElement('a');
+          link.href = data.signedUrl;
+          link.download = `${screeningResult ? `${screeningResult.first_name} ${screeningResult.last_name}` : application.original_filename || 'Resume'}_Resume.pdf`;
+          link.target = '_blank';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        } else {
+          // Fallback for other URL formats
+          window.open(application.resume_url, '_blank');
+        }
+      } catch (error) {
+        console.error('Error handling resume download:', error);
+        // Fallback to original URL
+        window.open(application.resume_url, '_blank');
       }
-      
-      // Create a temporary link and trigger download
-      const link = document.createElement('a');
-      link.href = fixedUrl;
-      link.download = `${screeningResult ? `${screeningResult.first_name} ${screeningResult.last_name}` : application.original_filename || 'Resume'}_Resume.pdf`;
-      link.target = '_blank';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
     }
   };
 

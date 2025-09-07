@@ -1,19 +1,16 @@
 
 import React, { useState, useEffect } from 'react';
-import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Building2, Users, LogOut, Settings, Brain, Menu, X } from 'lucide-react';
+import { Building2, LogOut, Settings, Brain, Menu, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import CompanyView from '../components/CompanyView';
-import UserView from '../components/UserView';
-import { useJobs } from '../hooks/useJobs';
 import { useAuth } from '@/contexts/AuthContext';
 
 const JobPortal = () => {
-  const [isCompanyView, setIsCompanyView] = useState(true);
-  const { data: jobs = [], isLoading } = useJobs(); // This fetches all public jobs for UserView
-  const { user, userType, signOut, loading } = useAuth();
+  // Always company view for B2B platform
+  // Removed jobs fetching as it's no longer needed for B2B platform
+  const { user, signOut, loading } = useAuth();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -31,14 +28,6 @@ const JobPortal = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // If user is logged in, set view based on their user type
-  React.useEffect(() => {
-    if (userType === 'company') {
-      setIsCompanyView(true);
-    } else if (userType === 'job_seeker') {
-      setIsCompanyView(false);
-    }
-  }, [userType]);
 
   // Show loading state while auth is being determined
   if (loading) {
@@ -64,13 +53,7 @@ const JobPortal = () => {
     navigate('/screening-results');
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
-        <div className="text-lg text-gray-600">Loading jobs...</div>
-      </div>
-    );
-  }
+  // Removed isLoading check since we no longer fetch jobs in this component
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
@@ -103,23 +86,19 @@ const JobPortal = () => {
               {user ? (
                 <div className="flex items-center space-x-3 flex-wrap">
                   <span className="text-sm text-gray-600 hidden lg:inline">
-                    {user.email} ({userType})
+                    {user.email} (Company)
                   </span>
                   
-                  {userType === 'company' && (
-                    <>
-                      <Button variant="outline" size="sm" onClick={handleCompanySetup}>
-                        <Settings className="h-4 w-4 mr-1" />
-                        <span className="hidden sm:inline">Setup</span>
-                      </Button>
+                  <Button variant="outline" size="sm" onClick={handleCompanySetup}>
+                    <Settings className="h-4 w-4 mr-1" />
+                    <span className="hidden sm:inline">Setup</span>
+                  </Button>
 
-                      <Button variant="outline" size="sm" onClick={handleScreeningResults}>
-                        <Brain className="h-4 w-4 mr-1" />
-                        <span className="hidden sm:inline">AI Screening</span>
-                        <span className="sm:hidden">AI</span>
-                      </Button>
-                    </>
-                  )}
+                  <Button variant="outline" size="sm" onClick={handleScreeningResults}>
+                    <Brain className="h-4 w-4 mr-1" />
+                    <span className="hidden sm:inline">AI Screening</span>
+                    <span className="sm:hidden">AI</span>
+                  </Button>
                   
                   <Button variant="outline" size="sm" onClick={handleSignOut}>
                     <LogOut className="h-4 w-4 mr-1" />
@@ -141,23 +120,19 @@ const JobPortal = () => {
               {user && (
                 <div className="space-y-3 px-4">
                   <div className="text-sm text-gray-600 text-center">
-                    {user.email} ({userType})
+                    {user.email} (Company)
                   </div>
                   
                   <div className="grid grid-cols-2 gap-2">
-                    {userType === 'company' && (
-                      <>
-                        <Button variant="outline" size="sm" onClick={handleCompanySetup} className="w-full">
-                          <Settings className="h-4 w-4 mr-1" />
-                          Setup
-                        </Button>
+                    <Button variant="outline" size="sm" onClick={handleCompanySetup} className="w-full">
+                      <Settings className="h-4 w-4 mr-1" />
+                      Setup
+                    </Button>
 
-                        <Button variant="outline" size="sm" onClick={handleScreeningResults} className="w-full">
-                          <Brain className="h-4 w-4 mr-1" />
-                          AI Screening
-                        </Button>
-                      </>
-                    )}
+                    <Button variant="outline" size="sm" onClick={handleScreeningResults} className="w-full">
+                      <Brain className="h-4 w-4 mr-1" />
+                      AI Screening
+                    </Button>
                     
                     <Button variant="outline" size="sm" onClick={handleSignOut} className="w-full">
                       <LogOut className="h-4 w-4 mr-1" />
@@ -181,11 +156,7 @@ const JobPortal = () => {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
-        {isCompanyView ? (
-          <CompanyView />
-        ) : (
-          <UserView jobs={jobs} />
-        )}
+        <CompanyView />
       </div>
     </div>
   );
