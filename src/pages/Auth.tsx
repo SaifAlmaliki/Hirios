@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { AuroraBackground } from '@/components/ui/aurora-background';
 import { Building2, ArrowLeft, Mail, Lock, CheckCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -272,18 +273,18 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <AuroraBackground className="min-h-screen">
+      <div className="w-full max-w-md relative z-10">
         <Button
           variant="ghost"
           onClick={() => navigate('/')}
-          className="mb-6 text-blue-600 hover:text-blue-700"
+          className="mb-6 text-blue-600 hover:text-blue-700 bg-white/80 backdrop-blur-sm"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Home
         </Button>
         
-        <Card className="shadow-2xl border-0">
+        <Card className="shadow-2xl border-0 bg-white/95 backdrop-blur-sm">
           <CardHeader className="text-center pb-6">
             <CardTitle className="text-2xl font-bold text-gray-900 mb-2">Login to your account</CardTitle>
             <CardDescription className="text-gray-600">
@@ -592,7 +593,7 @@ const Auth = () => {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </AuroraBackground>
   );
 };
 
