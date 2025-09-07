@@ -38,6 +38,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useScreeningResults, useAddNoteToScreeningResult, ScreeningResult } from '@/hooks/useScreeningResults';
+import { useCompanyJobs } from '@/hooks/useCompanyJobs';
 import ScreeningResultCard from '@/components/ScreeningResultCard';
 
 import { VoiceInterviewService } from '@/services/voiceInterviewService';
@@ -50,6 +51,7 @@ const ScreeningResults = () => {
   
   // Data fetching
   const { data: screeningResults = [], isLoading, error } = useScreeningResults();
+  const { data: companyJobs = [], isLoading: jobsLoading } = useCompanyJobs();
   const addNoteMutation = useAddNoteToScreeningResult();
 
   // State for filtering and sorting
@@ -57,6 +59,7 @@ const ScreeningResults = () => {
   const [scoreFilter, setScoreFilter] = useState('all');
   const [sortBy, setSortBy] = useState('date');
   const [sortOrder, setSortOrder] = useState('desc');
+  const [selectedJobId, setSelectedJobId] = useState<string>('all');
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   
   // State for notes
@@ -83,7 +86,9 @@ const ScreeningResults = () => {
         (scoreFilter === 'good' && (result.overall_fit || 0) >= 40 && (result.overall_fit || 0) <= 70) ||
         (scoreFilter === 'poor' && (result.overall_fit || 0) < 40);
 
-      return matchesSearch && matchesScore;
+      const matchesJob = selectedJobId === 'all' || result.job_id === selectedJobId;
+
+      return matchesSearch && matchesScore && matchesJob;
     });
 
     // Sort results
@@ -114,7 +119,7 @@ const ScreeningResults = () => {
     });
 
     return filtered;
-  }, [screeningResults, searchTerm, scoreFilter, sortBy, sortOrder]);
+  }, [screeningResults, searchTerm, scoreFilter, sortBy, sortOrder, selectedJobId]);
 
   // Redirect if not company user - THIS MUST BE AFTER ALL HOOKS
   React.useEffect(() => {
@@ -384,7 +389,7 @@ const ScreeningResults = () => {
 
 
 
-          {/* Filters */}
+          {/* Combined Filters */}
           <Card>
             <CardHeader>
               <CardTitle className="text-lg flex items-center">
@@ -393,7 +398,40 @@ const ScreeningResults = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="space-y-4">
+                {/* Job Title Filter */}
+                <div className="space-y-2">
+                  <Label htmlFor="job-filter">Filter by Job Title</Label>
+                  <p className="text-sm text-gray-600">Filter screening results by specific job positions you've posted</p>
+                  <Select value={selectedJobId} onValueChange={setSelectedJobId}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="All job titles" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Job Titles</SelectItem>
+                      {jobsLoading ? (
+                        <SelectItem value="loading" disabled>Loading jobs...</SelectItem>
+                      ) : companyJobs.length === 0 ? (
+                        <SelectItem value="no-jobs" disabled>No jobs posted yet</SelectItem>
+                      ) : (
+                        companyJobs.map((job) => {
+                          const resultCount = screeningResults.filter(result => result.job_id === job.id).length;
+                          return (
+                            <SelectItem key={job.id} value={job.id}>
+                              {job.title} ({resultCount} results)
+                            </SelectItem>
+                          );
+                        })
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Separator */}
+                <div className="border-t border-gray-200"></div>
+
+                {/* Other Filters */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="search">Search Candidates</Label>
                   <div className="relative">
@@ -448,6 +486,7 @@ const ScreeningResults = () => {
                       <SelectItem value="asc">Ascending</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
                 </div>
               </div>
             </CardContent>

@@ -155,10 +155,6 @@ const ScreeningResultDetail = () => {
                   </div>
                 )}
                 
-                <div className="flex items-center space-x-3 text-gray-600">
-                  <Calendar className="w-4 h-4" />
-                  <span className="text-sm">Applied {new Date(result.created_at).toLocaleDateString()}</span>
-                </div>
                 
                 {result.job && (
                   <>

@@ -126,12 +126,6 @@ const ApplicationCard: React.FC<ApplicationCardProps> = ({ application, screenin
               <span className="text-sm">{screeningResult.phone}</span>
             </div>
           )}
-          <div className="flex items-center text-gray-600">
-            <Calendar className="h-4 w-4 mr-2" />
-            <span className="text-sm">
-              {application.uploaded_by_user_id ? 'Uploaded' : 'Applied'} on {new Date(application.created_at).toLocaleDateString()}
-            </span>
-          </div>
           {application.original_filename && (
             <div className="flex items-center text-gray-600">
               <span className="text-sm text-gray-500">Original: {application.original_filename}</span>
