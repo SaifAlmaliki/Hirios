@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -39,6 +39,31 @@ const CompanyResumeUpload: React.FC<CompanyResumeUploadProps> = ({ onUploadCompl
 
   const MAX_FILES = 10;
   const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
+  // Auto-close dialog when all uploads are completed or failed
+  useEffect(() => {
+    if (uploadedFiles.length > 0 && !isUploading) {
+      const allProcessed = uploadedFiles.every(file => 
+        file.status === 'completed' || file.status === 'failed'
+      );
+      
+      if (allProcessed) {
+        // Show notification that dialog will close
+        toast({
+          title: "Upload completed",
+          description: "All resumes have been processed. Dialog will close automatically.",
+        });
+        
+        // Small delay to allow user to see the final status
+        const timer = setTimeout(() => {
+          setIsDialogOpen(false);
+          resetUpload();
+        }, 2000); // 2 second delay
+        
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [uploadedFiles, isUploading, toast]);
 
   const validateFile = (file: File): string | null => {
     if (file.type !== 'application/pdf') {
