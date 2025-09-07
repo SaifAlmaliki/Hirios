@@ -57,7 +57,6 @@ const ScreeningResults = () => {
   // State for filtering and sorting
   const [searchTerm, setSearchTerm] = useState('');
   const [scoreFilter, setScoreFilter] = useState('all');
-  const [sortBy, setSortBy] = useState('date');
   const [sortOrder, setSortOrder] = useState('desc');
   const [selectedJobId, setSelectedJobId] = useState<string>('all');
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
@@ -91,25 +90,10 @@ const ScreeningResults = () => {
       return matchesSearch && matchesScore && matchesJob;
     });
 
-    // Sort results
+    // Sort results by score
     filtered.sort((a, b) => {
-      let aValue, bValue;
-      
-      switch (sortBy) {
-        case 'score':
-          aValue = a.overall_fit || 0;
-          bValue = b.overall_fit || 0;
-          break;
-        case 'name':
-          aValue = `${a.first_name} ${a.last_name}`;
-          bValue = `${b.first_name} ${b.last_name}`;
-          break;
-        case 'date':
-        default:
-          aValue = new Date(a.created_at).getTime();
-          bValue = new Date(b.created_at).getTime();
-          break;
-      }
+      const aValue = a.overall_fit || 0;
+      const bValue = b.overall_fit || 0;
 
       if (sortOrder === 'asc') {
         return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
@@ -119,7 +103,7 @@ const ScreeningResults = () => {
     });
 
     return filtered;
-  }, [screeningResults, searchTerm, scoreFilter, sortBy, sortOrder, selectedJobId]);
+  }, [screeningResults, searchTerm, scoreFilter, sortOrder, selectedJobId]);
 
   // Redirect if not company user - THIS MUST BE AFTER ALL HOOKS
   React.useEffect(() => {
@@ -398,11 +382,10 @@ const ScreeningResults = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {/* Job Title Filter */}
-                <div className="space-y-2">
-                  <Label htmlFor="job-filter">Filter by Job Title</Label>
-                  <p className="text-sm text-gray-600">Filter screening results by specific job positions you've posted</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                {/* Job Title Filter - 40% of space (2/5 columns) */}
+                <div className="col-span-1 lg:col-span-2 space-y-2">
+                  <Label htmlFor="job-filter">Job Title</Label>
                   <Select value={selectedJobId} onValueChange={setSelectedJobId}>
                     <SelectTrigger>
                       <SelectValue placeholder="All job titles" />
@@ -426,19 +409,15 @@ const ScreeningResults = () => {
                     </SelectContent>
                   </Select>
                 </div>
-
-                {/* Separator */}
-                <div className="border-t border-gray-200"></div>
-
-                {/* Other Filters */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="search">Search Candidates</Label>
+                
+                {/* Search Filter - 20% of space (1/5 column) */}
+                <div className="col-span-1 lg:col-span-1 space-y-2">
+                  <Label htmlFor="search">Search</Label>
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <Input
                       id="search"
-                      placeholder="Name, email, or job title..."
+                      placeholder="Name, email, job title..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       className="pl-10"
@@ -446,8 +425,9 @@ const ScreeningResults = () => {
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="score-filter">Filter by Score</Label>
+                {/* Score Filter - 20% of space (1/5 column) */}
+                <div className="col-span-1 lg:col-span-1 space-y-2">
+                  <Label htmlFor="score-filter">Score Filter</Label>
                   <Select value={scoreFilter} onValueChange={setScoreFilter}>
                     <SelectTrigger>
                       <SelectValue placeholder="All scores" />
@@ -461,32 +441,18 @@ const ScreeningResults = () => {
                   </Select>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="sort-by">Sort By</Label>
-                  <Select value={sortBy} onValueChange={setSortBy}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sort by..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="date">Date Screened</SelectItem>
-                      <SelectItem value="score">Overall Fit Score</SelectItem>
-                      <SelectItem value="name">Candidate Name</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="sort-order">Order</Label>
+                {/* Sort Order - 20% of space (1/5 column) */}
+                <div className="col-span-1 lg:col-span-1 space-y-2">
+                  <Label htmlFor="sort-order">Sort Order</Label>
                   <Select value={sortOrder} onValueChange={setSortOrder}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Order..." />
+                      <SelectValue placeholder="Sort order..." />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="desc">Descending</SelectItem>
-                      <SelectItem value="asc">Ascending</SelectItem>
+                      <SelectItem value="desc">Highest First</SelectItem>
+                      <SelectItem value="asc">Lowest First</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
                 </div>
               </div>
             </CardContent>
