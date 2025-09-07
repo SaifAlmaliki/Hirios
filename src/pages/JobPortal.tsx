@@ -86,7 +86,7 @@ const JobPortal = () => {
               {user ? (
                 <div className="flex items-center space-x-3 flex-wrap">
                   <span className="text-sm text-gray-600 hidden lg:inline">
-                    {user.email} (Company)
+                    {user.email}
                   </span>
                   
                   <Button variant="outline" size="sm" onClick={handleCompanySetup}>
@@ -120,7 +120,7 @@ const JobPortal = () => {
               {user && (
                 <div className="space-y-3 px-4">
                   <div className="text-sm text-gray-600 text-center">
-                    {user.email} (Company)
+                    {user.email}
                   </div>
                   
                   <div className="grid grid-cols-2 gap-2">
