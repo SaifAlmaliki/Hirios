@@ -6,7 +6,6 @@ import { AuroraHero } from '@/components/ui/futurastic-hero-section';
 import { 
   Building2, 
   ArrowRight, 
-  Star, 
   CheckCircle, 
   TrendingUp, 
   Clock, 
@@ -14,12 +13,10 @@ import {
   Upload,
   Brain,
   BarChart3,
-  Users,
   Zap,
   Shield,
   ChevronDown,
-  ChevronUp,
-  Play
+  ChevronUp
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -43,58 +40,6 @@ const HiriosLanding = () => {
       {/* Futurastic Hero Section */}
       <AuroraHero />
 
-      {/* Video Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-950">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-white mb-4">See Hirios in Action</h2>
-            <p className="text-xl text-gray-300">Watch how AI-powered hiring transforms your recruitment process</p>
-          </div>
-          
-          <div className="relative">
-                          {/* Video Container */}
-              <div className="relative w-full max-w-4xl mx-auto">
-                <div className="aspect-video w-full rounded-2xl overflow-hidden shadow-2xl border border-gray-700/50">
-                  <iframe
-                    src="https://www.youtube.com/embed/OK10OEMqzPE?autoplay=1&controls=1&modestbranding=1&rel=0"
-                    title="Hirios - AI-Powered Hiring Platform"
-                    className="w-full h-full"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    loading="lazy"
-                  />
-                </div>
-              </div>
-            
-            {/* Video Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
-              <div className="text-center">
-                <div className="bg-blue-600/20 p-4 rounded-full w-fit mx-auto mb-4 border border-blue-600/30">
-                  <Clock className="h-8 w-8 text-blue-400" />
-                </div>
-                <h4 className="text-xl font-bold text-white mb-2">80% Time Saved</h4>
-                <p className="text-gray-300">Reduce screening time from weeks to days</p>
-              </div>
-              
-              <div className="text-center">
-                <div className="bg-green-600/20 p-4 rounded-full w-fit mx-auto mb-4 border border-green-600/30">
-                  <Target className="h-8 w-8 text-green-400" />
-                </div>
-                <h4 className="text-xl font-bold text-white mb-2">90% Accuracy</h4>
-                <p className="text-gray-300">AI-powered candidate matching</p>
-              </div>
-              
-              <div className="text-center">
-                <div className="bg-purple-600/20 p-4 rounded-full w-fit mx-auto mb-4 border border-purple-600/30">
-                  <TrendingUp className="h-8 w-8 text-purple-400" />
-                </div>
-                <h4 className="text-xl font-bold text-white mb-2">$50K+ Saved</h4>
-                <p className="text-gray-300">Annual cost savings on recruitment</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* How It Works */}
       <section id="demo" className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-900">
@@ -105,31 +50,31 @@ const HiriosLanding = () => {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-12">
-            {/* Step 1: Company Posts Job */}
+            {/* Step 1: Upload Resumes */}
             <div className="text-center">
               <div className="bg-blue-600/20 p-6 rounded-full w-fit mx-auto mb-6 relative border border-blue-600/30">
-                <Building2 className="h-12 w-12 text-blue-400" />
+                <Upload className="h-12 w-12 text-blue-400" />
                 <div className="absolute -top-2 -right-2 bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
                   1
                 </div>
               </div>
-              <h3 className="text-lg font-semibold mb-3 text-white">Company Registers & Posts Jobs</h3>
+              <h3 className="text-lg font-semibold mb-3 text-white">Upload Resumes</h3>
               <p className="text-gray-300 text-sm">
-                Companies sign up, complete their profile, and post jobs with detailed descriptions and requirements.
+                Hiring managers upload resumes from any source - LinkedIn, job boards, referrals, or direct applications.
               </p>
             </div>
 
-            {/* Step 2: Job Seekers Apply */}
+            {/* Step 2: Define Job Requirements */}
             <div className="text-center">
               <div className="bg-green-600/20 p-6 rounded-full w-fit mx-auto mb-6 relative border border-green-600/30">
-                <Users className="h-12 w-12 text-green-400" />
+                <Building2 className="h-12 w-12 text-green-400" />
                 <div className="absolute -top-2 -right-2 bg-green-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
                   2
                 </div>
               </div>
-              <h3 className="text-lg font-semibold mb-3 text-white">Job Seekers Apply</h3>
+              <h3 className="text-lg font-semibold mb-3 text-white">Define Job Requirements</h3>
               <p className="text-gray-300 text-sm">
-                Job seekers register for free, browse available positions, and submit applications with their resumes.
+                Fill out the job description, responsibilities, and requirements to create a comprehensive job profile.
               </p>
             </div>
 
@@ -141,13 +86,13 @@ const HiriosLanding = () => {
                   3
                 </div>
               </div>
-              <h3 className="text-lg font-semibold mb-3 text-white">AI Analyzes Applications</h3>
+              <h3 className="text-lg font-semibold mb-3 text-white">AI Analysis</h3>
               <p className="text-gray-300 text-sm">
-                Our AI agent automatically analyzes each resume against job requirements, generating detailed insights.
+                Our AI analyzes each resume against job requirements, scoring candidates with detailed justifications.
               </p>
             </div>
 
-            {/* Step 4: Company Reviews */}
+            {/* Step 4: Review & Interview */}
             <div className="text-center">
               <div className="bg-orange-600/20 p-6 rounded-full w-fit mx-auto mb-6 relative border border-orange-600/30">
                 <BarChart3 className="h-12 w-12 text-orange-400" />
@@ -155,9 +100,9 @@ const HiriosLanding = () => {
                   4
                 </div>
               </div>
-              <h3 className="text-lg font-semibold mb-3 text-white">Review AI Insights</h3>
+              <h3 className="text-lg font-semibold mb-3 text-white">Review & Interview</h3>
               <p className="text-gray-300 text-sm">
-                Companies receive scored candidates with strengths, weaknesses, and AI justifications for easy screening.
+                Review AI insights, conduct voice interviews with top candidates, and make informed hiring decisions.
               </p>
             </div>
           </div>
@@ -165,7 +110,7 @@ const HiriosLanding = () => {
           {/* Detailed Flow Explanation */}
           <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 rounded-2xl p-8 mt-12 border border-blue-600/20">
             <h3 className="text-2xl font-bold text-white mb-6 text-center">What Companies Get for Each Candidate</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <div className="bg-gray-800/50 rounded-lg p-6 shadow-sm border border-gray-700/50">
                 <div className="flex items-center mb-4">
                   <div className="bg-green-600/20 p-2 rounded-full mr-3 border border-green-600/30">
@@ -174,7 +119,7 @@ const HiriosLanding = () => {
                   <h4 className="font-semibold text-white">Match Score</h4>
                 </div>
                 <p className="text-gray-300 text-sm">
-                  Percentage match based on skills, experience, and job requirements alignment.
+                  Percentage match based on skills, experience, and job requirements alignment with detailed scoring breakdown.
                 </p>
               </div>
 
@@ -186,7 +131,7 @@ const HiriosLanding = () => {
                   <h4 className="font-semibold text-white">Strengths & Weaknesses</h4>
                 </div>
                 <p className="text-gray-300 text-sm">
-                  Clear breakdown of candidate's strong points and areas that may need development.
+                  Clear breakdown of candidate's strong points and areas that may need development based on job requirements.
                 </p>
               </div>
 
@@ -195,10 +140,22 @@ const HiriosLanding = () => {
                   <div className="bg-purple-600/20 p-2 rounded-full mr-3 border border-purple-600/30">
                     <CheckCircle className="h-6 w-6 text-purple-400" />
                   </div>
-                  <h4 className="font-semibold text-white">AI Justification</h4>
+                  <h4 className="font-semibold text-white">Detailed Justification</h4>
                 </div>
                 <p className="text-gray-300 text-sm">
-                  Detailed explanation of why the candidate is or isn't a good fit for the position.
+                  Comprehensive explanation of why the candidate is or isn't a good fit, including specific examples from their resume.
+                </p>
+              </div>
+
+              <div className="bg-gray-800/50 rounded-lg p-6 shadow-sm border border-gray-700/50">
+                <div className="flex items-center mb-4">
+                  <div className="bg-orange-600/20 p-2 rounded-full mr-3 border border-orange-600/30">
+                    <Upload className="h-6 w-6 text-orange-400" />
+                  </div>
+                  <h4 className="font-semibold text-white">Voice Interview</h4>
+                </div>
+                <p className="text-gray-300 text-sm">
+                  AI-powered voice interviews with detailed summaries and insights for top candidates to make final decisions.
                 </p>
               </div>
             </div>
@@ -218,21 +175,21 @@ const HiriosLanding = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="text-center">
               <div className="bg-blue-600/20 p-4 rounded-full w-fit mx-auto mb-6 border border-blue-600/30">
-                <Zap className="h-8 w-8 text-blue-400" />
+                <Brain className="h-8 w-8 text-blue-400" />
               </div>
-              <h3 className="text-lg font-semibold mb-3 text-white">Smart Scoring</h3>
+              <h3 className="text-lg font-semibold mb-3 text-white">AI-Powered Screening</h3>
               <p className="text-gray-300 text-sm">
-                AI compares resumes to job requirements with accurate % match scores.
+                Advanced AI analyzes resumes and provides detailed insights with match scores.
               </p>
             </div>
 
             <div className="text-center">
               <div className="bg-green-600/20 p-4 rounded-full w-fit mx-auto mb-6 border border-green-600/30">
-                <Shield className="h-8 w-8 text-green-400" />
+                <Upload className="h-8 w-8 text-green-400" />
               </div>
-              <h3 className="text-lg font-semibold mb-3 text-white">Bias Reduction</h3>
+              <h3 className="text-lg font-semibold mb-3 text-white">Voice Interviews</h3>
               <p className="text-gray-300 text-sm">
-                Focus on skills and experience, not names, schools, or demographics.
+                Conduct AI-powered voice interviews with candidates for deeper insights.
               </p>
             </div>
 
@@ -248,72 +205,17 @@ const HiriosLanding = () => {
 
             <div className="text-center">
               <div className="bg-orange-600/20 p-4 rounded-full w-fit mx-auto mb-6 border border-orange-600/30">
-                <Target className="h-8 w-8 text-orange-400" />
+                <Shield className="h-8 w-8 text-orange-400" />
               </div>
-              <h3 className="text-lg font-semibold mb-3 text-white">ATS Ready</h3>
+              <h3 className="text-lg font-semibold mb-3 text-white">Modern UI</h3>
               <p className="text-gray-300 text-sm">
-                Ready to integrate with any ATS or use manual uploads.
+                Beautiful Aurora backgrounds and glassmorphism design for enhanced user experience.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Social Proof - Mobile Responsive */}
-      <section className="py-12 sm:py-20 px-4 sm:px-6 lg:px-8 bg-gray-900">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-8 sm:mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">What Companies Say</h2>
-            <p className="text-lg sm:text-xl text-gray-300">Trusted by hiring teams worldwide</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
-            <Card className="border border-gray-700/50 shadow-lg hover:shadow-xl transition-shadow duration-300 bg-gray-800/50">
-              <CardContent className="p-6 sm:p-8">
-                <div className="flex mb-4">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star key={star} className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-400 fill-current" />
-                  ))}
-                </div>
-                <p className="text-gray-200 mb-4 sm:mb-6 text-base sm:text-lg leading-relaxed">
-                  "Hirios cut our screening time by 75%—we now focus only on top candidates. The AI insights are incredibly accurate."
-                </p>
-                <div className="flex items-center">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold mr-3 sm:mr-4 text-sm sm:text-base">
-                    S
-                  </div>
-                  <div>
-                    <div className="font-semibold text-sm sm:text-base text-white">Sarah Mitchell</div>
-                    <div className="text-gray-400 text-xs sm:text-sm">HR Director, TechFlow Solutions</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border border-gray-700/50 shadow-lg hover:shadow-xl transition-shadow duration-300 bg-gray-800/50">
-              <CardContent className="p-6 sm:p-8">
-                <div className="flex mb-4">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star key={star} className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-400 fill-current" />
-                  ))}
-                </div>
-                <p className="text-gray-200 mb-4 sm:mb-6 text-base sm:text-lg leading-relaxed">
-                  "Game changer for our startup. We hired 5 engineers in 2 weeks instead of 2 months. The scoring is spot-on."
-                </p>
-                <div className="flex items-center">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-600 rounded-full flex items-center justify-center text-white font-bold mr-3 sm:mr-4 text-sm sm:text-base">
-                    M
-                  </div>
-                  <div>
-                    <div className="font-semibold text-sm sm:text-base text-white">Marcus Chen</div>
-                    <div className="text-gray-400 text-xs sm:text-sm">CEO, InnovateLab</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
 
       {/* Contact CTA Section */}
       <section className="py-12 sm:py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-900/30 to-purple-900/30">
@@ -399,24 +301,32 @@ const HiriosLanding = () => {
           <div className="space-y-4">
             {[
               {
-                question: "How does scoring work?",
-                answer: "AI weights skills, experience, and keywords from the job description to generate accurate match percentages."
+                question: "How does AI screening work?",
+                answer: "Upload resumes from any source (LinkedIn, job boards, etc.), define your job requirements, and our AI analyzes each resume against the job description, responsibilities, and requirements to provide detailed scores and justifications."
+              },
+              {
+                question: "What are voice interviews?",
+                answer: "AI-powered voice interviews allow you to conduct automated interviews with candidates, generating detailed summaries and insights for better hiring decisions."
               },
               {
                 question: "Is my data secure?",
-                answer: "Yes, all data is encrypted and stored securely. We follow industry best practices for data protection."
-              },
-              {
-                question: "Can I integrate with my existing ATS?",
-                answer: "Our platform is designed to integrate with popular ATS systems. Contact us for specific integration requirements."
+                answer: "Yes, all data is encrypted and stored securely using Supabase. We follow industry best practices for data protection and privacy."
               },
               {
                 question: "What file formats do you support?",
-                answer: "We currently support PDF resumes and job descriptions. More formats are coming soon."
+                answer: "We currently support PDF resumes and job descriptions. The platform is built on modern web technologies for optimal performance."
+              },
+              {
+                question: "Can I upload resumes from LinkedIn or other sources?",
+                answer: "Yes! You can upload resumes from any source - LinkedIn, job boards, referrals, direct applications, or any other recruitment channel. Our AI will analyze them all against your job requirements."
               },
               {
                 question: "How accurate is the AI scoring?",
-                answer: "Our AI has been trained on thousands of successful hires and provides 90%+ accuracy in candidate-job matching."
+                answer: "Our AI provides detailed analysis with match scores, strengths, weaknesses, and justifications. The system is continuously improved for better accuracy."
+              },
+              {
+                question: "Can I try the platform for free?",
+                answer: "Yes! You can sign up and start using Hirios immediately. Contact us for enterprise features and custom solutions."
               }
             ].map((faq, index) => (
               <Collapsible key={index}>

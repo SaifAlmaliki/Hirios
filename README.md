@@ -1,8 +1,8 @@
-# Hirios - Job Portal Application
+# Hirios - AI-Powered Job Portal Application
 
 ## Overview
 
-Hirios is a comprehensive job portal application that connects job seekers with companies. It provides a dual-interface platform where companies can post jobs and manage applications, while job seekers can browse opportunities and apply for positions. The application features modern UI components, real-time data management, and integrated file handling for resume uploads.
+Hirios is a comprehensive AI-powered job portal application that connects job seekers with companies through advanced screening and interview technology. Built on the Resynox platform, it provides a dual-interface platform where companies can post jobs, manage applications, and conduct AI-powered candidate screening and voice interviews, while job seekers can browse opportunities and apply for positions. The application features modern UI components with beautiful Aurora backgrounds, real-time data management, and integrated AI services for enhanced recruitment workflows.
 
 ## 🚀 Features
 
@@ -12,6 +12,7 @@ Hirios is a comprehensive job portal application that connects job seekers with 
 - **Easy Application Process**: Apply to jobs with resume upload functionality
 - **Application Tracking**: Monitor application status and history
 - **Responsive Design**: Optimized for desktop and mobile devices
+- **Beautiful UI**: Modern Aurora background animations for enhanced user experience
 
 ### For Companies
 - **Company Profile Management**: Complete company setup with branding and information
@@ -22,16 +23,41 @@ Hirios is a comprehensive job portal application that connects job seekers with 
 - **AI Screening Results**: Review AI-generated candidate fit scores and insights
 - **Direct Interview Link**: Generate and copy candidate interview links
 - **Voice Interview (AI)**: Start AI-powered voice interviews for screened candidates
+- **Beautiful UI**: Modern Aurora background animations and glassmorphism design
 - **Premium features**: Marked as "Coming Soon" in UI
 
 ### Core Features
 - **Dual User Types**: Separate interfaces for job seekers and companies
 - **Real-time Updates**: Live data synchronization using React Query
 - **File Upload**: Secure resume storage using Supabase Storage
-- **Responsive UI**: Modern design using shadcn/ui components
+- **Responsive UI**: Modern design using shadcn/ui components with Aurora backgrounds
 - **Authentication**: Secure user management with Supabase Auth
 - **Webhook Integration**: External workflow trigger for screening-related events
 - **Voice AI Integration**: ElevenLabs Realtime Conversations for interviews
+- **Resynox Platform**: Built on the Resynox development platform for enhanced productivity
+
+## 🚀 Resynox Platform Integration
+
+### About Resynox
+Hirios is built on the **Resynox platform**, an AI-powered development environment that enhances productivity and code quality. Resynox provides:
+
+- **AI-Powered Development**: Intelligent code generation and assistance
+- **Enhanced Productivity**: Streamlined development workflows
+- **Modern UI Components**: Access to cutting-edge design systems
+- **Real-time Collaboration**: Seamless team development experience
+- **Quality Assurance**: Built-in code quality and best practices
+
+### Current Development Status
+- ✅ **Core Application**: Fully functional job portal with dual user interfaces
+- ✅ **Authentication System**: Complete user management with Supabase Auth
+- ✅ **AI Screening**: Integrated AI-powered candidate screening
+- ✅ **Voice Interviews**: ElevenLabs integration for AI voice interviews
+- ✅ **Modern UI**: Beautiful Aurora backgrounds and glassmorphism design
+- ✅ **Responsive Design**: Optimized for all device types
+- ✅ **Aurora Backgrounds**: Animated gradient backgrounds across all pages
+- ✅ **Glassmorphism Effects**: Modern semi-transparent UI elements
+- 🔄 **Premium Features**: Additional features marked as "Coming Soon"
+- 🔄 **Enhanced Analytics**: Advanced reporting and insights (planned)
 
 ## 🏗️ Architecture
 
@@ -41,8 +67,18 @@ Hirios is a comprehensive job portal application that connects job seekers with 
 - **React Router** for client-side routing
 - **TanStack React Query** for server state management
 - **shadcn/ui** for consistent UI components
-- **Tailwind CSS** for styling
+- **Tailwind CSS** for styling with Aurora animations
 - **Lucide React** for icons
+- **Framer Motion** for smooth animations
+- **Resynox Platform** for AI-powered development assistance
+
+### UI/UX Design System
+- **Aurora Backgrounds**: Animated gradient backgrounds with flowing color transitions
+- **Glassmorphism**: Semi-transparent cards with backdrop blur effects
+- **shadcn/ui Components**: Modern, accessible UI component library
+- **Tailwind CSS**: Utility-first CSS framework with custom animations
+- **Framer Motion**: Smooth animations and transitions
+- **Responsive Design**: Mobile-first approach with breakpoint optimization
 
 ### Backend & Database
 - **Supabase** as Backend-as-a-Service
@@ -61,6 +97,7 @@ Hirios is a comprehensive job portal application that connects job seekers with 
   "react-router-dom": "^6.28.0",
   "@radix-ui/*": "Various UI primitives",
   "tailwindcss": "^3.4.1",
+  "framer-motion": "^12.23.12",
   "@elevenlabs/client": "Realtime voice interviews"
 }
 ```
@@ -202,39 +239,48 @@ Hirios/
 ├── src/
 │   ├── components/           # React components
 │   │   ├── ui/              # shadcn/ui components
+│   │   │   ├── aurora-background.tsx # Aurora animated background
+│   │   │   └── [other ui components]
 │   │   ├── ApplicationCard.tsx
 │   │   ├── CompanyView.tsx   # Company dashboard
 │   │   ├── UserView.tsx      # Job seeker interface
-│   │   └── JobApplicationsView.tsx
+│   │   ├── JobApplicationsView.tsx
+│   │   ├── ScreeningResultCard.tsx
+│   │   └── ScreeningResultActions.tsx
 │   ├── contexts/            # React contexts
 │   │   └── AuthContext.tsx   # Authentication state
 │   ├── hooks/               # Custom React hooks
 │   │   ├── useJobs.ts       # Job management
 │   │   ├── useApplications.ts # Application management
 │   │   ├── useCompanyJobs.ts # Company-specific jobs
-│   │   └── useScreeningResults.ts
+│   │   ├── useScreeningResults.ts
+│   │   └── useApplicationProcessing.ts
 │   ├── integrations/        # External service integrations
 │   │   └── supabase/        # Supabase client and types
 │   ├── lib/                 # Utility functions
 │   ├── pages/               # Page components
 │   │   ├── HiriosLanding.tsx # Marketing landing page (/)
 │   │   ├── Index.tsx         # Legacy job portal (kept as /job-portal-old)
-│   │   ├── Auth.tsx          # Authentication page
+│   │   ├── Auth.tsx          # Authentication page with Aurora background
 │   │   ├── AuthConfirm.tsx   # Email confirmation handler
 │   │   ├── ResetPassword.tsx # Password reset flow
 │   │   ├── JobPortal.tsx     # Main application dashboard
 │   │   ├── CompanySetup.tsx  # Company onboarding
 │   │   ├── ScreeningResults.tsx # AI screening dashboard
+│   │   ├── ScreeningResultDetail.tsx # Detailed screening view
 │   │   ├── VoiceInterview.tsx   # AI voice interview page
 │   │   └── NotFound.tsx      # 404 fallback
 │   ├── services/            # External API services
-│   │   └── voiceInterviewService.ts # ElevenLabs + data aggregation
+│   │   ├── voiceInterviewService.ts # ElevenLabs + data aggregation
+│   │   ├── proxyService.ts
+│   │   └── webhookService.ts
 │   └── main.tsx             # Application entry point
 ├── supabase/
 │   ├── migrations/          # Database migrations
 │   └── config.toml          # Supabase configuration
 ├── public/                  # Static assets
 ├── package.json             # Dependencies and scripts
+├── tailwind.config.ts       # Tailwind with Aurora animations
 └── vite.config.ts          # Vite configuration
 ```
 
@@ -306,6 +352,7 @@ Defined in `src/App.tsx` using React Router:
 4. **Access the application**
    - Open http://localhost:8080
    - The app will run on port 8080 by default
+   - Experience the beautiful Aurora backgrounds and modern UI design
 
 ### Available Scripts
 - `npm run dev` - Start development server
@@ -371,7 +418,7 @@ The application is designed for deployment on modern hosting platforms:
 
 ## 📄 License
 
-This project is part of the Lovable platform ecosystem.
+This project is built on the Resynox platform and is part of the modern AI-powered development ecosystem.
 
 ## 🔗 External Integrations
 
@@ -402,4 +449,4 @@ For technical support or questions about the application:
 
 ---
 
-**Built with ❤️ using React, TypeScript, Supabase, and shadcn/ui**
+**Built with ❤️ using React, TypeScript, Supabase, shadcn/ui, and the Resynox platform**
