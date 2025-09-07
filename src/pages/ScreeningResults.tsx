@@ -45,7 +45,7 @@ import { VoiceInterviewService } from '@/services/voiceInterviewService';
 const ScreeningResults = () => {
   // ALL HOOKS MUST BE CALLED FIRST - NO CONDITIONAL HOOKS
   const navigate = useNavigate();
-  const { user, userType, loading, signOut } = useAuth();
+  const { user, loading, signOut } = useAuth();
   const { toast } = useToast();
   
   // Data fetching
@@ -118,11 +118,11 @@ const ScreeningResults = () => {
 
   // Redirect if not company user - THIS MUST BE AFTER ALL HOOKS
   React.useEffect(() => {
-    if (!loading && (!user || userType !== 'company')) {
+    if (!loading && !user) {
       navigate('/auth');
       return;
     }
-  }, [user, userType, loading, navigate]);
+  }, [user, loading, navigate]);
 
   // Show loading state while auth is being determined
   if (loading) {
@@ -137,7 +137,7 @@ const ScreeningResults = () => {
   }
 
   // Security check: Only allow companies to access this page
-  if (!user || userType !== 'company') {
+  if (!user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
         <div className="text-center">
@@ -288,23 +288,19 @@ const ScreeningResults = () => {
               {user ? (
                 <div className="flex items-center space-x-3 flex-wrap">
                   <span className="text-sm text-gray-600 hidden lg:inline">
-                    {user.email} ({userType})
+                    {user.email} (Company)
                   </span>
 
-                  {userType === 'company' && (
-                    <>
-                      <Button variant="outline" size="sm" onClick={handleCompanySetup}>
-                        <Settings className="h-4 w-4 mr-1" />
-                        <span className="hidden sm:inline">Setup</span>
-                      </Button>
+                  <Button variant="outline" size="sm" onClick={handleCompanySetup}>
+                    <Settings className="h-4 w-4 mr-1" />
+                    <span className="hidden sm:inline">Setup</span>
+                  </Button>
 
-                      <Button variant="outline" size="sm" onClick={handleScreeningResults}>
-                        <Brain className="h-4 w-4 mr-1" />
-                        <span className="hidden sm:inline">AI Screening</span>
-                        <span className="sm:hidden">AI</span>
-                      </Button>
-                    </>
-                  )}
+                  <Button variant="outline" size="sm" onClick={handleScreeningResults}>
+                    <Brain className="h-4 w-4 mr-1" />
+                    <span className="hidden sm:inline">AI Screening</span>
+                    <span className="sm:hidden">AI</span>
+                  </Button>
 
                   <Button variant="outline" size="sm" onClick={handleSignOut}>
                     <LogOut className="h-4 w-4 mr-1" />
@@ -326,11 +322,11 @@ const ScreeningResults = () => {
               {user && (
                 <div className="space-y-3 px-4">
                   <div className="text-sm text-gray-600 text-center">
-                    {user.email} ({userType})
+                    {user.email} (Company)
                   </div>
 
                   <div className="grid grid-cols-2 gap-2">
-                    {userType === 'company' && (
+                    {user && (
                       <>
                         <Button variant="outline" size="sm" onClick={handleCompanySetup} className="w-full">
                           <Settings className="h-4 w-4 mr-1" />

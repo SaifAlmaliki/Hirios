@@ -129,13 +129,18 @@ const CompanyResumeUpload: React.FC<CompanyResumeUploadProps> = ({ onUploadCompl
 
       console.log('✅ Company resume uploaded:', data.path);
       
-      // Get the public URL
-      const { data: urlData } = supabase.storage
+      // Get the signed URL for private bucket (valid for 1 hour)
+      const { data: urlData, error: urlError } = await supabase.storage
         .from('company_uploads')
-        .getPublicUrl(filePath);
+        .createSignedUrl(filePath, 3600); // 1 hour expiry
 
-      console.log('🔗 Generated URL:', urlData.publicUrl);
-      return urlData.publicUrl;
+      if (urlError) {
+        console.error('❌ Error creating signed URL:', urlError);
+        throw urlError;
+      }
+
+      console.log('🔗 Generated signed URL:', urlData.signedUrl);
+      return urlData.signedUrl;
     } catch (error) {
       console.error('❌ Company resume upload failed:', error);
       return null;

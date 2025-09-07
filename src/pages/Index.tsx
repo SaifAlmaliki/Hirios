@@ -8,18 +8,14 @@ import { useAuth } from '@/contexts/AuthContext';
 
 const Index = () => {
   const navigate = useNavigate();
-  const { user, userType, signOut, loading } = useAuth();
+  const { user, signOut, loading } = useAuth();
 
-  // Redirect authenticated users directly to their dashboards
+  // Redirect authenticated users directly to company dashboard
   React.useEffect(() => {
     if (!loading && user) {
-      if (userType === 'job_seeker') {
-        navigate('/job-portal');
-      } else if (userType === 'company') {
-        navigate('/job-portal');
-      }
+      navigate('/job-portal');
     }
-  }, [user, userType, loading, navigate]);
+  }, [user, loading, navigate]);
 
   // Show loading state while checking authentication
   if (loading) {
@@ -41,7 +37,7 @@ const Index = () => {
               <div className="bg-blue-600 p-2 rounded-full">
                 <Building2 className="h-5 w-5 text-white" />
               </div>
-              <span className="font-bold text-gray-900">JobPortal Pro</span>
+              <span className="font-bold text-gray-900">Hirios</span>
             </div>
             <Button 
               onClick={() => navigate('/auth')} 
@@ -58,12 +54,12 @@ const Index = () => {
           <div className="max-w-6xl mx-auto text-center">
             <div className="animate-fade-in">
               <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 mb-6 leading-tight">
-                Your Dream Job
+                AI-Powered Resume
                 <br />
-                <span className="text-blue-600">Awaits Here</span>
+                <span className="text-blue-600">Screening Platform</span>
               </h1>
               <p className="text-xl sm:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
-                Connect top talent with exceptional opportunities. Whether you're seeking your next career move or building your dream team.
+                Streamline your hiring process with intelligent resume analysis. Upload candidate resumes and get instant AI-powered insights to make better hiring decisions.
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
@@ -72,7 +68,7 @@ const Index = () => {
                   size="lg"
                   className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 text-lg font-semibold hover-scale"
                 >
-                  Find Jobs
+                  Get Started
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
                 <Button 
@@ -81,7 +77,7 @@ const Index = () => {
                   size="lg"
                   className="border-2 border-blue-600 text-blue-600 hover:bg-blue-50 px-8 py-6 text-lg font-semibold hover-scale"
                 >
-                  Post Jobs
+                  Upload Resumes
                   <Building2 className="ml-2 h-5 w-5" />
                 </Button>
               </div>
@@ -91,15 +87,15 @@ const Index = () => {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mt-20">
               <div className="text-center animate-fade-in" style={{ animationDelay: '0.2s' }}>
                 <div className="text-4xl font-bold text-blue-600 mb-2">10K+</div>
-                <div className="text-gray-600">Jobs Posted</div>
+                <div className="text-gray-600">Resumes Analyzed</div>
               </div>
               <div className="text-center animate-fade-in" style={{ animationDelay: '0.4s' }}>
-                <div className="text-4xl font-bold text-blue-600 mb-2">5K+</div>
+                <div className="text-4xl font-bold text-blue-600 mb-2">500+</div>
                 <div className="text-gray-600">Companies</div>
               </div>
               <div className="text-center animate-fade-in" style={{ animationDelay: '0.6s' }}>
-                <div className="text-4xl font-bold text-blue-600 mb-2">50K+</div>
-                <div className="text-gray-600">Success Stories</div>
+                <div className="text-4xl font-bold text-blue-600 mb-2">95%</div>
+                <div className="text-gray-600">Accuracy Rate</div>
               </div>
             </div>
           </div>
@@ -110,7 +106,7 @@ const Index = () => {
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-16">
               <h2 className="text-4xl font-bold text-gray-900 mb-4">Success Stories</h2>
-              <p className="text-xl text-gray-600">Real people, real achievements, real impact</p>
+              <p className="text-xl text-gray-600">Real companies, real results, real impact</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -119,12 +115,12 @@ const Index = () => {
                   <div className="w-16 h-16 bg-blue-100 rounded-full mx-auto mb-4 flex items-center justify-center">
                     <TrendingUp className="h-8 w-8 text-blue-600" />
                   </div>
-                  <CardTitle className="text-xl">Sarah Chen</CardTitle>
-                  <CardDescription>Software Engineer at Google</CardDescription>
+                  <CardTitle className="text-xl">TechCorp Solutions</CardTitle>
+                  <CardDescription>Software Company</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <p className="text-gray-600 text-center">
-                    "Found my dream job in just 2 weeks! The platform made it so easy to connect with top tech companies."
+                    "Reduced our hiring time by 70%! The AI screening helped us identify top candidates instantly."
                   </p>
                 </CardContent>
               </Card>
@@ -149,12 +145,12 @@ const Index = () => {
                   <div className="w-16 h-16 bg-purple-100 rounded-full mx-auto mb-4 flex items-center justify-center">
                     <Globe className="h-8 w-8 text-purple-600" />
                   </div>
-                  <CardTitle className="text-xl">Marcus Johnson</CardTitle>
-                  <CardDescription>Marketing Director</CardDescription>
+                  <CardTitle className="text-xl">InnovateLabs</CardTitle>
+                  <CardDescription>Startup Company</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <p className="text-gray-600 text-center">
-                    "Transitioned from finance to marketing seamlessly. The platform opened doors I never knew existed."
+                    "Built our entire engineering team in 3 months. The AI insights saved us countless hours of manual screening."
                   </p>
                 </CardContent>
               </Card>
@@ -166,8 +162,8 @@ const Index = () => {
         <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold text-gray-900 mb-4">What Our Users Say</h2>
-              <p className="text-xl text-gray-600">Trusted by thousands of professionals worldwide</p>
+              <h2 className="text-4xl font-bold text-gray-900 mb-4">What Our Clients Say</h2>
+              <p className="text-xl text-gray-600">Trusted by hundreds of companies worldwide</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -179,7 +175,7 @@ const Index = () => {
                     ))}
                   </div>
                   <p className="text-gray-700 mb-6 text-lg leading-relaxed">
-                    "The best job platform I've ever used. Clean interface, relevant matches, and amazing support team."
+                    "The best hiring platform we've ever used. AI-powered insights, clean interface, and amazing support team."
                   </p>
                   <div className="flex items-center">
                     <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold mr-4">
@@ -187,7 +183,7 @@ const Index = () => {
                     </div>
                     <div>
                       <div className="font-semibold">Alex Rodriguez</div>
-                      <div className="text-gray-500 text-sm">Product Manager</div>
+                      <div className="text-gray-500 text-sm">HR Director</div>
                     </div>
                   </div>
                 </CardContent>
@@ -209,7 +205,7 @@ const Index = () => {
                     </div>
                     <div>
                       <div className="font-semibold">Lisa Park</div>
-                      <div className="text-gray-500 text-sm">HR Director</div>
+                      <div className="text-gray-500 text-sm">Talent Acquisition Manager</div>
                     </div>
                   </div>
                 </CardContent>
@@ -222,8 +218,8 @@ const Index = () => {
         <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold text-gray-900 mb-4">Why Choose JobPortal Pro?</h2>
-              <p className="text-xl text-gray-600">Everything you need for your career journey</p>
+              <h2 className="text-4xl font-bold text-gray-900 mb-4">Why Choose Hirios?</h2>
+              <p className="text-xl text-gray-600">Everything you need for intelligent hiring</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -231,9 +227,9 @@ const Index = () => {
                 <div className="bg-blue-100 p-4 rounded-full w-fit mx-auto mb-6 group-hover:bg-blue-200 transition-colors duration-300">
                   <CheckCircle className="h-8 w-8 text-blue-600" />
                 </div>
-                <h3 className="text-xl font-semibold mb-4">Instant Matching</h3>
+                <h3 className="text-xl font-semibold mb-4">AI-Powered Analysis</h3>
                 <p className="text-gray-600 leading-relaxed">
-                  AI-powered matching connects you with the most relevant opportunities based on your skills and preferences.
+                  Advanced AI algorithms analyze resumes and provide instant insights on candidate qualifications and fit.
                 </p>
               </div>
 
@@ -241,9 +237,9 @@ const Index = () => {
                 <div className="bg-green-100 p-4 rounded-full w-fit mx-auto mb-6 group-hover:bg-green-200 transition-colors duration-300">
                   <Users className="h-8 w-8 text-green-600" />
                 </div>
-                <h3 className="text-xl font-semibold mb-4">Global Network</h3>
+                <h3 className="text-xl font-semibold mb-4">Bulk Processing</h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Access to thousands of companies worldwide, from startups to Fortune 500 enterprises.
+                  Upload multiple resumes at once and get comprehensive analysis reports for your entire candidate pool.
                 </p>
               </div>
 
@@ -251,9 +247,9 @@ const Index = () => {
                 <div className="bg-purple-100 p-4 rounded-full w-fit mx-auto mb-6 group-hover:bg-purple-200 transition-colors duration-300">
                   <Award className="h-8 w-8 text-purple-600" />
                 </div>
-                <h3 className="text-xl font-semibold mb-4">Verified Quality</h3>
+                <h3 className="text-xl font-semibold mb-4">Secure & Private</h3>
                 <p className="text-gray-600 leading-relaxed">
-                  All companies and job postings are verified to ensure authentic, high-quality opportunities.
+                  Enterprise-grade security ensures your candidate data is protected with industry-standard encryption.
                 </p>
               </div>
             </div>
@@ -264,17 +260,17 @@ const Index = () => {
         <section className="py-20 px-4 sm:px-6 lg:px-8 bg-blue-600">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-4xl font-bold text-white mb-6">
-              Ready to Transform Your Career?
+              Ready to Transform Your Hiring Process?
             </h2>
             <p className="text-xl text-blue-100 mb-8 leading-relaxed">
-              Join thousands of professionals who've found their perfect match
+              Join hundreds of companies who've streamlined their recruitment with AI
             </p>
             <Button 
               onClick={() => navigate('/auth')}
               size="lg"
               className="bg-white text-blue-600 hover:bg-gray-100 px-12 py-6 text-lg font-semibold hover-scale"
             >
-              Start Your Journey Today
+              Start Screening Today
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
@@ -288,7 +284,7 @@ const Index = () => {
                 <div className="bg-blue-600 p-2 rounded-full">
                   <Building2 className="h-5 w-5 text-white" />
                 </div>
-                <span className="font-bold text-lg">JobPortal Pro</span>
+                <span className="font-bold text-lg">Hirios</span>
               </div>
               
               <div className="flex space-x-6 text-sm text-gray-400">
@@ -299,7 +295,7 @@ const Index = () => {
             </div>
             
             <div className="border-t border-gray-800 mt-6 pt-6 text-center text-sm text-gray-400">
-              © 2025 JobPortal Pro. All rights reserved.
+              © 2025 Hirios. All rights reserved.
             </div>
           </div>
         </footer>

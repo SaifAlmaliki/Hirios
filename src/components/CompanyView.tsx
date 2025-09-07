@@ -10,6 +10,7 @@ import { Plus, Building, Eye, FileText, MapPin, Clock, Briefcase, Edit, Trash2, 
 import { useToast } from '@/hooks/use-toast';
 import { useCreateJob, useUpdateJob, useDeleteJob } from '../hooks/useJobs';
 import { useCompanyJobs } from '../hooks/useCompanyJobs';
+import { useCompanyProfile } from '../hooks/useCompanyProfile';
 
 import JobApplicationsView from './JobApplicationsView';
 import CompanyResumeUpload from './CompanyResumeUpload';
@@ -48,15 +49,10 @@ const JobForm = React.memo(({
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor="company" className="text-sm font-medium text-gray-700">Company Name *</Label>
-        <Input
-          id="company"
-          name="company"
-          value={jobData.company}
-          onChange={onInputChange}
-          placeholder="Enter company name"
-          className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-        />
+        <Label htmlFor="company" className="text-sm font-medium text-gray-700">Company Name</Label>
+        <div className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-gray-700">
+          {jobData.company || 'Loading...'}
+        </div>
       </div>
     </div>
     
@@ -170,7 +166,7 @@ const JobForm = React.memo(({
 ));
 
 const CompanyView: React.FC = () => {
-  const { user, userType, loading } = useAuth();
+  const { user, loading } = useAuth();
   
   // Show loading state while auth is being determined
   if (loading) {
@@ -185,7 +181,7 @@ const CompanyView: React.FC = () => {
   }
   
   // Security check: Only allow companies to access this view
-  if (!user || userType !== 'company') {
+  if (!user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
         <div className="text-center">
@@ -210,6 +206,7 @@ const CompanyView: React.FC = () => {
   
   // Use company-specific jobs hook instead of all jobs
   const { data: jobs = [], isLoading: jobsLoading } = useCompanyJobs();
+  const { data: companyProfile } = useCompanyProfile();
   const selectedJob = jobs.find(job => job.id === selectedJobId) || null;
   
   const [jobData, setJobData] = useState({
@@ -229,6 +226,16 @@ const CompanyView: React.FC = () => {
   const updateJobMutation = useUpdateJob();
   const deleteJobMutation = useDeleteJob();
 
+  // Auto-populate company name when company profile is loaded
+  React.useEffect(() => {
+    if (companyProfile && !editingJob) {
+      setJobData(prev => ({
+        ...prev,
+        company: companyProfile.company_name
+      }));
+    }
+  }, [companyProfile, editingJob]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setJobData(prev => ({ ...prev, [name]: value }));
@@ -241,7 +248,7 @@ const CompanyView: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!jobData.title || !jobData.company || !jobData.department || !jobData.location || !jobData.employment_type || !jobData.description || !jobData.responsibilities) {
+    if (!jobData.title || !jobData.department || !jobData.location || !jobData.employment_type || !jobData.description || !jobData.responsibilities) {
       toast({
         title: "Error",
         description: "Please fill in all required fields.",
@@ -259,7 +266,7 @@ const CompanyView: React.FC = () => {
         onSuccess: () => {
           setJobData({
             title: '',
-            company: '',
+            company: companyProfile?.company_name || '',
             department: '',
             location: '',
             employment_type: 'full-time',
@@ -278,7 +285,7 @@ const CompanyView: React.FC = () => {
         onSuccess: () => {
           setJobData({
             title: '',
-            company: '',
+            company: companyProfile?.company_name || '',
             department: '',
             location: '',
             employment_type: 'full-time',

@@ -13,7 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
 const CompanySetup = () => {
-  const { user, userType, loading } = useAuth();
+  const { user, loading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -32,7 +32,7 @@ const CompanySetup = () => {
   }
 
   // Security check: Only allow companies to access this page
-  if (!user || userType !== 'company') {
+  if (!user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
         <div className="text-center">
@@ -65,16 +65,32 @@ const CompanySetup = () => {
         .from('company_profiles')
         .select('*')
         .eq('user_id', user!.id)
-        .single();
+        .maybeSingle();
       
       if (data) {
         setHasProfile(true);
         setCompanyData(data);
+      } else {
+        // If no profile exists, create a basic one
+        const { data: newProfile, error } = await supabase
+          .from('company_profiles')
+          .insert([{
+            user_id: user!.id,
+            company_name: 'My Company',
+            subscription_status: 'inactive'
+          }])
+          .select()
+          .single();
+        
+        if (newProfile && !error) {
+          setHasProfile(true);
+          setCompanyData(newProfile);
+        }
       }
     };
 
     checkProfile();
-  }, [user, userType, navigate]);
+  }, [user, navigate]);
 
   const handleInputChange = (field: string, value: string) => {
     setCompanyData(prev => ({ ...prev, [field]: value }));

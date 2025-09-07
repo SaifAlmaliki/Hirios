@@ -8,6 +8,7 @@ import {
   ChevronUp,
   Eye
 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { VoiceInterviewService } from '@/services/voiceInterviewService';
@@ -46,14 +47,33 @@ const ScreeningResultActions: React.FC<ScreeningResultActionsProps> = ({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => {
-              // Fix duplicate company_uploads in URL if present
-              let fixedUrl = resumeUrl;
-              if (resumeUrl.includes('/company_uploads/company_uploads/')) {
-                fixedUrl = resumeUrl.replace('/company_uploads/company_uploads/', '/company_uploads/');
-                console.log('🔧 Fixed duplicate company_uploads in URL:', fixedUrl);
+            onClick={async () => {
+              try {
+                // Extract file path from URL
+                const url = new URL(resumeUrl);
+                const pathParts = url.pathname.split('/');
+                const bucketIndex = pathParts.findIndex(part => part === 'company_uploads');
+                if (bucketIndex !== -1 && bucketIndex < pathParts.length - 1) {
+                  const filePath = pathParts.slice(bucketIndex + 1).join('/');
+                  
+                  // Generate fresh signed URL
+                  const { data, error } = await supabase.storage
+                    .from('company_uploads')
+                    .createSignedUrl(filePath, 3600); // 1 hour expiry
+                  
+                  if (error) {
+                    console.error('Error generating signed URL:', error);
+                    window.open(resumeUrl, '_blank'); // Fallback to original URL
+                  } else {
+                    window.open(data.signedUrl, '_blank');
+                  }
+                } else {
+                  window.open(resumeUrl, '_blank'); // Fallback for other URL formats
+                }
+              } catch (error) {
+                console.error('Error handling resume download:', error);
+                window.open(resumeUrl, '_blank'); // Fallback
               }
-              window.open(fixedUrl, '_blank');
             }}
             className="flex items-center gap-2 border-green-300 text-green-600 hover:bg-green-50 text-xs sm:text-sm h-9 px-3 w-full"
           >
