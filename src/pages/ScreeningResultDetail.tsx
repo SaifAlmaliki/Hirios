@@ -29,6 +29,16 @@ import { useAuth } from '@/contexts/AuthContext';
 import { VoiceInterviewService } from '@/services/voiceInterviewService';
 import { useToast } from '@/hooks/use-toast';
 import ScreeningResultActions from '@/components/ScreeningResultActions';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 const ScreeningResultDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -36,6 +46,7 @@ const ScreeningResultDetail = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [requestingInterview, setRequestingInterview] = useState<string | null>(null);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   
   const { data: screeningResults, isLoading, error } = useScreeningResults();
   
@@ -219,7 +230,7 @@ const ScreeningResultDetail = () => {
                   {/* Voice Interview Button */}
                   <Button
                     variant="outline"
-                    onClick={() => handleRequestVoiceScreening(result)}
+                    onClick={() => setShowConfirmDialog(true)}
                     disabled={requestingInterview === result.id || result.voice_screening_requested}
                     className={`flex items-center justify-center gap-2 w-full h-10 ${
                       result.voice_screening_requested 
@@ -240,7 +251,7 @@ const ScreeningResultDetail = () => {
                     ) : (
                       <>
                         <Mic className="h-4 w-4" />
-                        <span>Send Voice Interview</span>
+                        <span>Invite</span>
                       </>
                     )}
                   </Button>
@@ -430,6 +441,25 @@ const ScreeningResultDetail = () => {
           </div>
         </div>
       </div>
+
+      {/* Confirmation Dialog */}
+      <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Send AI Voice Interview Invitation</AlertDialogTitle>
+            <AlertDialogDescription>
+              You are about to send an email to the candidate with a link for an AI voice interview. 
+              The candidate will receive an email invitation to complete the voice interview process.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => handleRequestVoiceScreening(result)}>
+              Send Invitation
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
