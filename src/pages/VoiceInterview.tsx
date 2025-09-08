@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Particles } from '@/components/ui/particles';
 import { Mic, MicOff, Phone, PhoneOff, AlertCircle, CheckCircle } from 'lucide-react';
 import { VoiceInterviewService, VoiceInterviewData } from '@/services/voiceInterviewService';
 import { useToast } from '@/hooks/use-toast';
@@ -170,8 +171,20 @@ const VoiceInterview = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Card className="w-full max-w-md">
+      <div className="min-h-screen relative flex items-center justify-center p-4">
+        {/* Particles Background */}
+        <Particles
+          className="absolute inset-0"
+          quantity={1000}
+          ease={80}
+          color="#3B82F6"
+          staticity={50}
+          size={0.4}
+          refresh
+        />
+        
+        {/* Semi-transparent Card */}
+        <Card className="w-full max-w-md bg-white/90 backdrop-blur-sm border-white/20 shadow-xl">
           <CardContent className="p-6 text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
             <p>Loading interview...</p>
@@ -183,8 +196,20 @@ const VoiceInterview = () => {
 
   if (error || !interviewData) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Card className="w-full max-w-md">
+      <div className="min-h-screen relative flex items-center justify-center p-4">
+        {/* Particles Background */}
+        <Particles
+          className="absolute inset-0"
+          quantity={1000}
+          ease={80}
+          color="#3B82F6"
+          staticity={50}
+          size={0.4}
+          refresh
+        />
+        
+        {/* Semi-transparent Card */}
+        <Card className="w-full max-w-md bg-white/90 backdrop-blur-sm border-white/20 shadow-xl">
           <CardHeader>
             <CardTitle className="flex items-center text-red-600">
               <AlertCircle className="h-5 w-5 mr-2" />
@@ -205,8 +230,20 @@ const VoiceInterview = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-2xl">
+    <div className="min-h-screen relative flex items-center justify-center p-4">
+      {/* Particles Background */}
+      <Particles
+        className="absolute inset-0"
+        quantity={500}
+        ease={80}
+        color="#3B82F6"
+        staticity={50}
+        size={0.4}
+        refresh
+      />
+      
+      {/* Semi-transparent Card */}
+      <Card className="w-full max-w-2xl bg-white/90 backdrop-blur-sm border-white/20 shadow-xl">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-gray-900">
             Voice Interview
