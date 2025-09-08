@@ -25,14 +25,7 @@ import {
   Eye,
   Phone,
   MapPin,
-  Building2,
-  ArrowLeft,
   Star,
-  Menu,
-  X,
-  LogOut,
-  Settings,
-  Brain,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -40,6 +33,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useScreeningResults, useAddNoteToScreeningResult, ScreeningResult } from '@/hooks/useScreeningResults';
 import { useCompanyJobs } from '@/hooks/useCompanyJobs';
 import ScreeningResultCard from '@/components/ScreeningResultCard';
+import Navbar from '@/components/Navbar';
 
 import { VoiceInterviewService } from '@/services/voiceInterviewService';
 
@@ -69,7 +63,6 @@ const ScreeningResults = () => {
   // State for voice interviews
   const [requestingInterview, setRequestingInterview] = useState<string | null>(null);
   const [voiceInterviewService] = useState(() => VoiceInterviewService.getInstance());
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Filter and sort results - must be before any conditional returns
   const filteredAndSortedResults = useMemo(() => {
@@ -202,17 +195,6 @@ const ScreeningResults = () => {
     });
   };
 
-  const handleSignOut = async () => {
-    await signOut();
-  };
-
-  const handleCompanySetup = () => {
-    navigate('/company-setup');
-  };
-
-  const handleScreeningResults = () => {
-    navigate('/screening-results');
-  };
 
   if (isLoading) {
     return (
@@ -243,111 +225,7 @@ const ScreeningResults = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      {/* Header (reused from JobPortal) */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-3">
-              <div className="bg-blue-600 p-2 rounded-lg">
-                <Building2 className="h-6 w-6 text-white" />
-              </div>
-              <h1
-                className="text-xl font-bold text-gray-900 cursor-pointer hover:text-blue-700"
-                onClick={() => navigate('/job-portal')}
-              >
-                Job Portal
-              </h1>
-            </div>
-
-            {/* Mobile menu button */}
-            <div className="md:hidden">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="p-1" 
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              >
-                {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-              </Button>
-            </div>
-
-            {/* Desktop navigation */}
-            <div className="hidden md:flex items-center space-x-4">
-              {/* User Actions */}
-              {user ? (
-                <div className="flex items-center space-x-3 flex-wrap">
-                  <span className="text-sm text-gray-600 hidden lg:inline">
-                    {user.email}
-                  </span>
-
-                  <Button variant="outline" size="sm" onClick={handleCompanySetup}>
-                    <Settings className="h-4 w-4 mr-1" />
-                    <span className="hidden sm:inline">Setup</span>
-                  </Button>
-
-                  <Button variant="outline" size="sm" onClick={handleScreeningResults}>
-                    <Brain className="h-4 w-4 mr-1" />
-                    <span className="hidden sm:inline">AI Screening</span>
-                    <span className="sm:hidden">AI</span>
-                  </Button>
-
-                  <Button variant="outline" size="sm" onClick={handleSignOut}>
-                    <LogOut className="h-4 w-4 mr-1" />
-                    <span className="hidden sm:inline">Sign Out</span>
-                    <span className="sm:hidden">Out</span>
-                  </Button>
-                </div>
-              ) : (
-                <Button onClick={() => navigate('/auth')} size="sm">
-                  Sign In
-                </Button>
-              )}
-            </div>
-          </div>
-
-          {/* Mobile menu */}
-          {isMobileMenuOpen && (
-            <div className="md:hidden py-4 border-t border-gray-200 space-y-4">
-              {user && (
-                <div className="space-y-3 px-4">
-                  <div className="text-sm text-gray-600 text-center">
-                    {user.email}
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2">
-                    {user && (
-                      <>
-                        <Button variant="outline" size="sm" onClick={handleCompanySetup} className="w-full">
-                          <Settings className="h-4 w-4 mr-1" />
-                          Setup
-                        </Button>
-
-                        <Button variant="outline" size="sm" onClick={handleScreeningResults} className="w-full">
-                          <Brain className="h-4 w-4 mr-1" />
-                          AI Screening
-                        </Button>
-                      </>
-                    )}
-
-                    <Button variant="outline" size="sm" onClick={handleSignOut} className="w-full">
-                      <LogOut className="h-4 w-4 mr-1" />
-                      Sign Out
-                    </Button>
-                  </div>
-                </div>
-              )}
-
-              {!user && (
-                <div className="px-4">
-                  <Button onClick={() => navigate('/auth')} size="sm" className="w-full">
-                    Sign In
-                  </Button>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
+      <Navbar title="AI Screening Results" />
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 md:py-8">

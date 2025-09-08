@@ -13,7 +13,6 @@ import {
   FileText, 
   Building, 
   Users, 
-  ArrowLeft,
   CheckCircle,
   Briefcase
 } from 'lucide-react';
@@ -21,6 +20,7 @@ import { Job } from '../hooks/useJobs';
 import { useCreateApplication } from '../hooks/useApplications';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import Navbar from '@/components/Navbar';
 
 const JobDetails = () => {
   const { jobId } = useParams<{ jobId: string }>();
@@ -256,29 +256,13 @@ const JobDetails = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-3">
-              <Button
-                variant="ghost"
-                onClick={() => navigate('/job-portal')}
-                className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
-              >
-                <ArrowLeft className="h-4 w-4" />
-                Back to Jobs
-              </Button>
-            </div>
-            <div className="flex items-center space-x-3">
-              <div className="bg-blue-600 p-2 rounded-lg">
-                <Building className="h-6 w-6 text-white" />
-              </div>
-              <h1 className="text-xl font-bold text-gray-900">Job Details</h1>
-            </div>
-          </div>
-        </div>
-      </div>
+      <Navbar 
+        title="Job Details" 
+        showBackButton={true}
+        backButtonText="Back to Jobs"
+        backButtonPath="/job-portal"
+        maxWidth="4xl"
+      />
 
       {/* Main Content */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
