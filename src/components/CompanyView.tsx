@@ -372,7 +372,6 @@ const CompanyView: React.FC = () => {
       {/* Header */}
       <div className="space-y-4">
         <div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Company Dashboard</h2>
           <p className="text-gray-600 mt-1 text-sm sm:text-base">Manage your job postings and applications</p>
         </div>
         
@@ -428,15 +427,15 @@ const CompanyView: React.FC = () => {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-4">
             {jobs.map((job) => (
               <Card key={job.id} className="hover:shadow-lg transition-shadow duration-200 border-l-4 border-l-blue-500 cursor-pointer" onClick={() => handleViewJobDetail(job)}>
-                <CardHeader className="pb-3">
-                  <div className="space-y-3">
+                <CardHeader className="pb-2">
+                  <div className="space-y-2">
                     <div className="flex justify-between items-start gap-2">
                       <div className="flex-1 min-w-0">
-                        <CardTitle className="text-base sm:text-lg font-bold text-gray-900 mb-1 line-clamp-2">{job.title}</CardTitle>
-                        <div className="flex items-center text-blue-600 font-semibold mb-2">
+                        <CardTitle className="text-lg font-bold text-gray-900 mb-1 line-clamp-1">{job.title}</CardTitle>
+                        <div className="flex items-center text-blue-600 font-semibold mb-1">
                           <Building className="h-4 w-4 mr-1 flex-shrink-0" />
                           <span className="truncate">{job.company}</span>
                         </div>
@@ -481,33 +480,33 @@ const CompanyView: React.FC = () => {
                   </div>
                 </CardHeader>
                 <CardContent className="pt-0">
-                  <div className="space-y-3">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div className="space-y-2">
+                    <div className="flex flex-wrap gap-4">
                       <div className="flex items-center text-gray-600">
-                        <MapPin className="h-4 w-4 mr-2 text-gray-400 flex-shrink-0" />
+                        <MapPin className="h-4 w-4 mr-1 text-gray-400 flex-shrink-0" />
                         <span className="text-sm truncate">{job.location}</span>
                       </div>
                       
                       <div className="flex items-center text-gray-600">
-                        <Briefcase className="h-4 w-4 mr-2 text-gray-400 flex-shrink-0" />
+                        <Briefcase className="h-4 w-4 mr-1 text-gray-400 flex-shrink-0" />
                         <span className="text-sm truncate">{job.department}</span>
+                      </div>
+                      
+                      <div className="flex items-center text-gray-600">
+                        <Clock className="h-4 w-4 mr-1 text-gray-400 flex-shrink-0" />
+                        <span className="text-sm">{formatEmploymentType(job.employment_type)}</span>
                       </div>
                     </div>
                     
-                    <div className="flex items-center text-gray-600">
-                      <Clock className="h-4 w-4 mr-2 text-gray-400 flex-shrink-0" />
-                      <span className="text-sm">{formatEmploymentType(job.employment_type)}</span>
-                    </div>
-                    
-                    <div className="border-t pt-3">
-                      <p className="text-sm text-gray-600 line-clamp-2">
+                    <div className="border-t pt-2">
+                      <p className="text-sm text-gray-600 line-clamp-1">
                         {job.description}
                       </p>
                     </div>
                     
-                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 text-xs text-gray-500 pt-2">
+                    <div className="flex justify-between items-center text-xs text-gray-500 pt-1">
                       <span>Posted: {formatDate(job.created_at)}</span>
-                      <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full w-fit">
+                      <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
                         Active
                       </span>
                     </div>
