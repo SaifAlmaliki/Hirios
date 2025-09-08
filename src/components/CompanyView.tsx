@@ -368,7 +368,7 @@ const CompanyView: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pt-20">
       {/* Header */}
       <div className="space-y-4">
         <div>
