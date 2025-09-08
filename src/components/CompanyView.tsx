@@ -185,7 +185,6 @@ const CompanyView: React.FC = () => {
   // Security check: Only allow companies to access this view
   useEffect(() => {
     if (!user && !loading) {
-      // Redirect to landing page instead of showing access denied
       navigate('/');
     }
   }, [user, loading, navigate]);

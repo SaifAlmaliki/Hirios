@@ -19,6 +19,14 @@ const CompanySetup = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasProfile, setHasProfile] = useState(false);
 
+  // Redirect if not authenticated - THIS MUST BE AFTER ALL HOOKS
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate('/');
+      return;
+    }
+  }, [user, loading, navigate]);
+
   // Show loading state while auth is being determined
   if (loading) {
     return (
@@ -39,8 +47,8 @@ const CompanySetup = () => {
           <div className="text-6xl mb-4">🚫</div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h1>
           <p className="text-gray-600 mb-4">This page is only available for company accounts.</p>
-          <Button onClick={() => navigate('/job-portal')}>
-            Go to Job Portal
+          <Button onClick={() => navigate('/')}>
+            Go to Landing Page
           </Button>
         </div>
       </div>

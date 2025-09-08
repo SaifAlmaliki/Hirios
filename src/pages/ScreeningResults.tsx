@@ -26,6 +26,7 @@ import {
   Phone,
   MapPin,
   Star,
+  Brain,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -101,7 +102,7 @@ const ScreeningResults = () => {
   // Redirect if not company user - THIS MUST BE AFTER ALL HOOKS
   React.useEffect(() => {
     if (!loading && !user) {
-      navigate('/auth');
+      navigate('/');
       return;
     }
   }, [user, loading, navigate]);
@@ -126,8 +127,8 @@ const ScreeningResults = () => {
           <div className="text-6xl mb-4">🚫</div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h1>
           <p className="text-gray-600 mb-4">This page is only available for company accounts.</p>
-          <Button onClick={() => navigate('/job-portal')}>
-            Go to Job Portal
+          <Button onClick={() => navigate('/')}>
+            Go to Landing Page
           </Button>
         </div>
       </div>
