@@ -172,23 +172,44 @@ const HiriosLanding = () => {
           </div>
 
           <div className="max-w-6xl mx-auto">
-            <div className="relative group">
-              <img 
-                src="/screening result.png" 
-                alt="AI Screening Result Example - Jane Smith Solutions Architect Analysis"
-                className="w-full h-auto rounded-xl shadow-2xl transition-all duration-500 group-hover:scale-105 group-hover:shadow-3xl border border-white/20"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            {/* Enhanced Image Container */}
+            <div className="relative group mb-8">
+              <div className="relative overflow-hidden rounded-xl">
+                <img 
+                  src="/screening result.png" 
+                  alt="AI Screening Result Example - Jane Smith Solutions Architect Analysis"
+                  className="w-full max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-4xl xl:max-w-5xl mx-auto h-auto rounded-xl transition-all duration-500 group-hover:scale-[1.02] group-hover:shadow-3xl border border-white/20 cursor-pointer"
+                  onClick={() => window.open('/screening result.png', '_blank')}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                
+                {/* Interactive Overlay */}
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="bg-white/20 backdrop-blur-sm rounded-full p-4 border border-white/30">
+                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                    </svg>
+                  </div>
+                </div>
+                
+              </div>
             </div>
 
-            <div className="mt-8 text-center">
-              <div className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-xl p-6 border border-blue-600/30">
+            <div className="text-center">
+              <div className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-xl p-6 border border-blue-600/30 backdrop-blur-sm">
                 <h4 className="text-lg font-semibold text-white mb-3">What This Shows</h4>
-                <p className="text-gray-300 text-sm leading-relaxed">
+                <p className="text-gray-300 text-sm leading-relaxed mb-4">
                   Our AI provides comprehensive analysis including match scores, detailed strengths and weaknesses, 
                   risk assessment, potential rewards, and actionable recommendations - all based on your specific 
                   job requirements and candidate qualifications.
                 </p>
+                <Button 
+                  onClick={() => navigate('/auth')}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-all duration-300 hover:scale-105"
+                >
+                  Try Demo
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
               </div>
             </div>
           </div>
@@ -204,55 +225,80 @@ const HiriosLanding = () => {
           </div>
 
           <div className="max-w-6xl mx-auto">
-            <div className="relative group">
-              <img 
-                src="/voice interview.png" 
-                alt="AI Voice Interview Interface - Jane Smith Solutions Architect Interview"
-                className="w-full h-auto rounded-xl shadow-2xl transition-all duration-500 group-hover:scale-105 group-hover:shadow-3xl border border-white/20"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            </div>
-
-            <div className="mt-8 text-center">
-              <div className="bg-gradient-to-r from-green-600/20 to-blue-600/20 rounded-xl p-6 border border-green-600/30">
-                <h4 className="text-lg font-semibold text-white mb-4">Comprehensive Information Collection</h4>
-                <p className="text-gray-300 text-sm leading-relaxed mb-4">
-                  Our AI voice interviewer automatically collects detailed candidate information including:
-                </p>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-left">
-                  <div className="flex items-center text-gray-300 text-sm">
-                    <div className="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
-                    Motivation for role
-                  </div>
-                  <div className="flex items-center text-gray-300 text-sm">
-                    <div className="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
-                    Time management strategy
-                  </div>
-                  <div className="flex items-center text-gray-300 text-sm">
-                    <div className="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
-                    Recent experience summary
-                  </div>
-                  <div className="flex items-center text-gray-300 text-sm">
-                    <div className="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
-                    Preferred work environment
-                  </div>
-                  <div className="flex items-center text-gray-300 text-sm">
-                    <div className="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
-                    Relevant skills & tools
-                  </div>
-                  <div className="flex items-center text-gray-300 text-sm">
-                    <div className="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
-                    Career expectations
-                  </div>
-                  <div className="flex items-center text-gray-300 text-sm md:col-span-2 lg:col-span-1">
-                    <div className="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
-                    Availability & start date
+            {/* Responsive Layout: Side-by-side on large screens, stacked on smaller screens */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+              
+              {/* Image Container - Left side on large screens */}
+              <div className="relative group order-2 lg:order-1">
+                <div className="relative overflow-hidden rounded-xl">
+                  <img 
+                    src="/voice interview.png" 
+                    alt="AI Voice Interview Interface - Jane Smith Solutions Architect Interview"
+                    className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl mx-auto h-auto rounded-xl transition-all duration-500 group-hover:scale-[1.02] group-hover:shadow-3xl border border-white/20 cursor-pointer"
+                    onClick={() => window.open('/voice interview.png', '_blank')}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  
+                  {/* Interactive Overlay */}
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div className="bg-white/20 backdrop-blur-sm rounded-full p-4 border border-white/30">
+                      <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                      </svg>
+                    </div>
                   </div>
                 </div>
-                <p className="text-gray-300 text-sm leading-relaxed mt-4">
-                  This comprehensive data collection streamlines your hiring process by providing all the essential 
-                  information you need before conducting human interviews.
-                </p>
+              </div>
+
+              {/* Content Container - Right side on large screens */}
+              <div className="order-1 lg:order-2">
+                <div className="bg-gradient-to-r from-green-600/20 to-blue-600/20 rounded-xl p-6 border border-green-600/30 backdrop-blur-sm">
+                  <h4 className="text-lg font-semibold text-white mb-4">Comprehensive Information Collection</h4>
+                  <p className="text-gray-300 text-sm leading-relaxed mb-4">
+                    Our AI voice interviewer automatically collects detailed candidate information including:
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left mb-6">
+                    <div className="flex items-center text-gray-300 text-sm">
+                      <div className="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
+                      Motivation for role
+                    </div>
+                    <div className="flex items-center text-gray-300 text-sm">
+                      <div className="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
+                      Time management strategy
+                    </div>
+                    <div className="flex items-center text-gray-300 text-sm">
+                      <div className="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
+                      Recent experience summary
+                    </div>
+                    <div className="flex items-center text-gray-300 text-sm">
+                      <div className="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
+                      Preferred work environment
+                    </div>
+                    <div className="flex items-center text-gray-300 text-sm">
+                      <div className="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
+                      Relevant skills & tools
+                    </div>
+                    <div className="flex items-center text-gray-300 text-sm">
+                      <div className="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
+                      Career expectations
+                    </div>
+                    <div className="flex items-center text-gray-300 text-sm sm:col-span-2">
+                      <div className="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
+                      Availability & start date
+                    </div>
+                  </div>
+                  <p className="text-gray-300 text-sm leading-relaxed mb-4">
+                    This comprehensive data collection streamlines your hiring process by providing all the essential 
+                    information you need before conducting human interviews.
+                  </p>
+                  <Button 
+                    onClick={() => navigate('/auth')}
+                    className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition-all duration-300 hover:scale-105"
+                  >
+                    Try Voice Interview
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
@@ -396,32 +442,44 @@ const HiriosLanding = () => {
           <div className="space-y-4">
             {[
               {
+                question: "How does the pricing work?",
+                answer: "Hirios uses a point-based system perfect for B2B companies. it's pay-per-use: 1 point per resume screening and 2 points per voice interview. Companies purchase credit points and can buy more anytime. This flexible model means you only pay for what you use, making it cost-effective for any company size."
+              },
+              {
                 question: "How does AI screening work?",
-                answer: "Upload resumes from any source (LinkedIn, job boards, etc.), define your job requirements, and our AI analyzes each resume against the job description, responsibilities, and requirements to provide detailed scores and justifications."
+                answer: "Our AI agent deeply understands your job description, requirements, and responsibilities, then ranks uploaded resumes by relevance. It provides detailed justifications including strengths, weaknesses, and reasoning for each ranking. If you disagree with a ranking, you can always review the original resume for full transparency. All resumes are stored securely for reference."
               },
               {
-                question: "What are voice interviews?",
-                answer: "AI-powered voice interviews allow you to conduct automated interviews with candidates, generating detailed summaries and insights for better hiring decisions."
+                question: "What file formats and integrations do you support?",
+                answer: "We support PDF resume uploads and are open to integrating with enterprise ATS systems like Workday and Greenhouse. You can bulk upload resumes from LinkedIn job posts with one simple step. There's no limit on the number of resumes you can process - you're only charged based on usage (1 point per resume)."
               },
               {
-                question: "Is my data secure?",
-                answer: "Yes, all data is encrypted and stored securely using Supabase. We follow industry best practices for data protection and privacy."
+                question: "How accurate is the AI and can it handle different languages?",
+                answer: "Our AI is highly accurate as it comprehensively analyzes job requirements against candidate qualifications. The LLM can easily handle multiple languages for both resume analysis and voice interviews. If the AI makes an assessment you disagree with, you have full access to review the original resume for complete transparency."
               },
               {
-                question: "What file formats do you support?",
-                answer: "We currently support PDF resumes and job descriptions. The platform is built on modern web technologies for optimal performance."
+                question: "What are voice interviews and how do they work?",
+                answer: "AI-powered voice interviews take about 10 minutes and collect key information like start date, motivation for the role, and past experience. The AI voice agent can be customized with enterprise-specific questions and supports multiple languages. Interview summaries are analyzed and saved to candidate profiles, giving hiring managers valuable insights before human interviews."
               },
               {
-                question: "Can I upload resumes from LinkedIn or other sources?",
-                answer: "Yes! You can upload resumes from any source - LinkedIn, job boards, referrals, direct applications, or any other recruitment channel. Our AI will analyze them all against your job requirements."
+                question: "How is my data stored and secured?",
+                answer: "All candidate resumes are stored in secure Supabase storage using AWS infrastructure. We're fully GDPR compliant and all hiring results and resumes can be exported as PDF. Data is retained for 3 years unless different requirements are specified by your enterprise. We follow industry best practices for data protection and privacy."
               },
               {
-                question: "How accurate is the AI scoring?",
-                answer: "Our AI provides detailed analysis with match scores, strengths, weaknesses, and justifications. The system is continuously improved for better accuracy."
+                question: "What kind of support do you provide?",
+                answer: "We provide weekday support (9 AM - 5 PM, 5 days a week) for all users. While the system is self-explanatory and easy to use, we offer quick training sessions for recruiters. For enterprise clients, we can provide implementation assistance and custom onboarding to ensure smooth adoption."
               },
               {
-                question: "Can I try the platform for free?",
-                answer: "Yes! You can sign up and start using Hirios immediately. Contact us for enterprise features and custom solutions."
+                question: "Who is Hirios designed for?",
+                answer: "Hirios is perfect for medium to large companies across all industries that spend significant time and resources screening resumes. Whether you're hiring for technical or non-technical roles, our AI helps you find the right candidates faster. The system works in any browser with no minimum or maximum limits - you only pay for what you use."
+              },
+              {
+                question: "What do I need to get started?",
+                answer: "Simply enter your job description, requirements, and responsibilities for the position you want to screen candidates for. Hirios handles the rest! The system runs on any browser and requires no special setup."
+              },
+              {
+                question: "Can I export my data and results?",
+                answer: "Yes! All hiring results and resumes can be exported as PDF files. You maintain full control over your data and can export candidate information, screening results, and interview summaries whenever needed. This ensures you have complete records for your hiring process."
               }
             ].map((faq, index) => (
               <Collapsible key={index}>
