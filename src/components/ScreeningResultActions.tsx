@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
   FileText,
@@ -12,6 +12,16 @@ import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { VoiceInterviewService } from '@/services/voiceInterviewService';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 interface ScreeningResultActionsProps {
   resultId: string;
@@ -38,6 +48,7 @@ const ScreeningResultActions: React.FC<ScreeningResultActionsProps> = ({
 }) => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
   return (
     <div className="flex flex-wrap items-center gap-3 w-full lg:w-96 lg:justify-end">
@@ -89,7 +100,7 @@ const ScreeningResultActions: React.FC<ScreeningResultActionsProps> = ({
         <Button
           variant="outline"
           size="sm"
-          onClick={onRequestVoiceScreening}
+          onClick={() => setShowConfirmDialog(true)}
           disabled={isRequestingInterview || isVoiceScreeningRequested}
           className={`flex items-center gap-2 text-xs sm:text-sm h-9 px-3 w-full ${
             isVoiceScreeningRequested 
@@ -112,8 +123,8 @@ const ScreeningResultActions: React.FC<ScreeningResultActionsProps> = ({
           ) : (
             <>
               <Mic className="h-4 w-4" />
-              <span className="hidden xs:inline">Send Interview</span>
-              <span className="xs:hidden">Send</span>
+              <span className="hidden xs:inline">Invite</span>
+              <span className="xs:hidden">Invite</span>
             </>
           )}
         </Button>
@@ -177,6 +188,25 @@ const ScreeningResultActions: React.FC<ScreeningResultActionsProps> = ({
           )}
         </Button>
       </div>
+
+      {/* Confirmation Dialog */}
+      <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Send AI Voice Interview Invitation</AlertDialogTitle>
+            <AlertDialogDescription>
+              You are about to send an email to the candidate with a link for an AI voice interview. 
+              The candidate will receive an email invitation to complete the voice interview process.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={onRequestVoiceScreening}>
+              Send Invitation
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
