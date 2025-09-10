@@ -26,12 +26,21 @@ Hirios is a comprehensive AI-powered job portal application that connects job se
 - **Beautiful UI**: Modern Aurora background animations and glassmorphism design
 - **Premium features**: Marked as "Coming Soon" in UI
 
+### Team Collaboration
+- **Screening Team Collaboration**: Invite hiring managers and recruiters to collaborate on job postings
+- **Shared Job Management**: Team members can edit, view, and manage specific job postings together
+- **Email-Based Invitations**: Seamlessly invite colleagues by email to join your hiring team
+- **Collaborative Screening Process**: Share screening results and insights with team members
+- **Per-Job Access Control**: Grant collaboration access on a per-job basis for focused teamwork
+- **Real-Time Collaboration**: Team members can work together on candidate evaluation and job management
+
 ### Core Features
 - **Dual User Types**: Separate interfaces for job seekers and companies
 - **Real-time Updates**: Live data synchronization using React Query
 - **File Upload**: Secure resume storage using Supabase Storage
 - **Responsive UI**: Modern design using shadcn/ui components with Aurora backgrounds
 - **Authentication**: Secure user management with Supabase Auth
+- **Team Collaboration**: Email-based invitation system for collaborative hiring
 - **Webhook Integration**: External workflow trigger for screening-related events
 - **Voice AI Integration**: ElevenLabs Realtime Conversations for interviews
 - **Resynox Platform**: Built on the Resynox development platform for enhanced productivity
@@ -52,6 +61,7 @@ Hirios is built on the **Resynox platform**, an AI-powered development environme
 - ✅ **Authentication System**: Complete user management with Supabase Auth
 - ✅ **AI Screening**: Integrated AI-powered candidate screening
 - ✅ **Voice Interviews**: ElevenLabs integration for AI voice interviews
+- ✅ **Team Collaboration**: Email-based invitation system for collaborative hiring
 - ✅ **Modern UI**: Beautiful Aurora backgrounds and glassmorphism design
 - ✅ **Responsive Design**: Optimized for all device types
 - ✅ **Aurora Backgrounds**: Animated gradient backgrounds across all pages
