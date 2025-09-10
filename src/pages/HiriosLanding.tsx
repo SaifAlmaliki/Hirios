@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { AuroraHero } from '@/components/ui/futurastic-hero-section';
+import { Particles } from '@/components/ui/particles';
 import { 
   Building2, 
   ArrowRight, 
@@ -42,8 +43,14 @@ const HiriosLanding = () => {
 
 
       {/* How It Works */}
-      <section id="demo" className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-900">
-        <div className="max-w-6xl mx-auto">
+      <section id="demo" className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-900 relative">
+        <Particles
+          className="absolute inset-0"
+          quantity={1000}
+          color="#ffffff"
+          size={0.4}
+        />
+        <div className="max-w-6xl mx-auto relative z-10">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-white mb-4">How It Works</h2>
             <p className="text-xl text-gray-300">Simple workflow for smarter hiring decisions</p>
@@ -178,8 +185,14 @@ const HiriosLanding = () => {
       </section>
 
       {/* See What You Get */}
-      <section className="py-20 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-        <div className="container mx-auto px-4">
+      <section className="py-20 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative">
+        <Particles
+          className="absolute inset-0"
+          quantity={1000}
+          color="#ffffff"
+          size={0.4}
+        />
+        <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-white mb-4">See What You Get</h2>
             <p className="text-xl text-gray-300">This is the level of detail you'll get from our AI analysis</p>
@@ -231,8 +244,14 @@ const HiriosLanding = () => {
       </section>
 
       {/* AI Powered Voice Interview Capabilities */}
-      <section className="py-20 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-        <div className="container mx-auto px-4">
+      <section className="py-20 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative">
+        <Particles
+          className="absolute inset-0"
+          quantity={1000}
+          color="#ffffff"
+          size={0.4}
+        />
+        <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-white mb-4">AI Powered Voice Interview Capabilities</h2>
             <p className="text-xl text-gray-300">This is how we collect detailed candidate information before human interviews</p>
@@ -320,8 +339,14 @@ const HiriosLanding = () => {
       </section>
 
       {/* Key Features */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-950">
-        <div className="max-w-6xl mx-auto">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-950 relative">
+        <Particles
+          className="absolute inset-0"
+          quantity={1000}
+          color="#ffffff"
+          size={0.4}
+        />
+        <div className="max-w-6xl mx-auto relative z-10">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-white mb-4">Why Choose Hirios?</h2>
             <p className="text-xl text-gray-300">Everything you need for intelligent hiring</p>
@@ -383,8 +408,14 @@ const HiriosLanding = () => {
 
 
       {/* Contact CTA Section */}
-      <section className="py-12 sm:py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-900/30 to-purple-900/30">
-        <div className="max-w-4xl mx-auto">
+      <section className="py-12 sm:py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-900/30 to-purple-900/30 relative">
+        <Particles
+          className="absolute inset-0"
+          quantity={1000}
+          color="#ffffff"
+          size={0.4}
+        />
+        <div className="max-w-4xl mx-auto relative z-10">
           <div className="text-center mb-8 sm:mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Ready to Transform Your Hiring?</h2>
             <p className="text-lg sm:text-xl text-gray-300 px-4">Get a personalized demo and see how Hirios can revolutionize your recruitment process</p>
@@ -456,8 +487,14 @@ const HiriosLanding = () => {
       </section>
 
       {/* FAQ - Mobile Responsive */}
-      <section className="py-12 sm:py-20 px-4 sm:px-6 lg:px-8 bg-gray-950">
-        <div className="max-w-3xl mx-auto">
+      <section className="py-12 sm:py-20 px-4 sm:px-6 lg:px-8 bg-gray-950 relative">
+        <Particles
+          className="absolute inset-0"
+          quantity={1000}
+          color="#ffffff"
+          size={0.4}
+        />
+        <div className="max-w-3xl mx-auto relative z-10">
           <div className="text-center mb-8 sm:mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Frequently Asked Questions</h2>
             <p className="text-lg sm:text-xl text-gray-300">Everything you need to know about Hirios</p>
@@ -528,8 +565,14 @@ const HiriosLanding = () => {
       </section>
 
       {/* Final CTA - Mobile Responsive */}
-      <section className="py-12 sm:py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-600 to-purple-600">
-        <div className="max-w-4xl mx-auto text-center">
+      <section className="py-12 sm:py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-600 to-purple-600 relative">
+        <Particles
+          className="absolute inset-0"
+          quantity={1000}
+          color="#ffffff"
+          size={0.4}
+        />
+        <div className="max-w-4xl mx-auto text-center relative z-10">
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4 sm:mb-6 px-2">
             Start Hiring with AI Today
           </h2>
@@ -548,8 +591,14 @@ const HiriosLanding = () => {
       </section>
 
       {/* Footer - Mobile Responsive */}
-      <footer className="bg-gray-900 text-white py-8 sm:py-12 border-t border-gray-800">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <footer className="bg-gray-900 text-white py-8 sm:py-12 border-t border-gray-800 relative">
+        <Particles
+          className="absolute inset-0"
+          quantity={1000}
+          color="#ffffff"
+          size={0.4}
+        />
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center space-x-3 mb-4 md:mb-0">
               <div className="bg-blue-600 p-1.5 sm:p-2 rounded-full">
