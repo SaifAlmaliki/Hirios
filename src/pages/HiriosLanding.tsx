@@ -57,31 +57,31 @@ const HiriosLanding = () => {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 mb-12">
-            {/* Step 1: Upload Resumes */}
-            <div className="text-center">
-              <div className="bg-blue-600/20 p-6 rounded-full w-fit mx-auto mb-6 relative border border-blue-600/30">
-                <Upload className="h-12 w-12 text-blue-400" />
-                <div className="absolute -top-2 -right-2 bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
-                  1
-                </div>
-              </div>
-              <h3 className="text-lg font-semibold mb-3 text-white">Upload Resumes</h3>
-              <p className="text-gray-300 text-sm">
-                Hiring managers upload resumes from any source - LinkedIn, job boards, referrals, or direct applications.
-              </p>
-            </div>
-
-            {/* Step 2: Define Job Requirements */}
+            {/* Step 1: Define Job Requirements */}
             <div className="text-center">
               <div className="bg-green-600/20 p-6 rounded-full w-fit mx-auto mb-6 relative border border-green-600/30">
                 <Building2 className="h-12 w-12 text-green-400" />
                 <div className="absolute -top-2 -right-2 bg-green-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
-                  2
+                  1
                 </div>
               </div>
               <h3 className="text-lg font-semibold mb-3 text-white">Define Job Requirements</h3>
               <p className="text-gray-300 text-sm">
                 Fill out the job description, responsibilities, and requirements to create a comprehensive job profile.
+              </p>
+            </div>
+
+            {/* Step 2: Upload Resumes */}
+            <div className="text-center">
+              <div className="bg-blue-600/20 p-6 rounded-full w-fit mx-auto mb-6 relative border border-blue-600/30">
+                <Upload className="h-12 w-12 text-blue-400" />
+                <div className="absolute -top-2 -right-2 bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
+                  2
+                </div>
+              </div>
+              <h3 className="text-lg font-semibold mb-3 text-white">Upload Resumes</h3>
+              <p className="text-gray-300 text-sm">
+                Hiring managers upload resumes from any source - LinkedIn, job boards, referrals, or direct applications.
               </p>
             </div>
 
@@ -280,7 +280,7 @@ const HiriosLanding = () => {
         </div>
       </section>
 
-      {/* Key Features */}
+      {/* Why Choose Hirios */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-950 relative">
         <Particles
           className="absolute inset-0"
