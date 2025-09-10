@@ -278,8 +278,33 @@ const sendInvitationEmail = async (invitation: JobInvitation) => {
     // Create invitation link
     const invitationLink = `${window.location.origin}/invite/${invitation.token}`;
 
-    // For now, we'll just log the invitation details
-    // In production, you would integrate with an email service like Resend, SendGrid, etc.
+    // Send email using Supabase Edge Function with Resend
+    console.log('🚀 Attempting to call Edge Function...');
+    try {
+      const emailResponse = await supabase.functions.invoke('send-invitation-email', {
+        body: {
+          to: invitation.invited_email,
+          jobTitle: job.title,
+          companyName: job.company_profiles.company_name,
+          inviterCompany: inviter.company_name,
+          invitationLink,
+          expiresAt: invitation.expires_at,
+        },
+      });
+
+      console.log('📊 Edge Function Response:', emailResponse);
+
+      if (emailResponse.error) {
+        console.warn('⚠️ Failed to send email, but invitation was created:', emailResponse.error);
+      } else {
+        console.log('✅ Invitation email sent successfully');
+      }
+    } catch (emailError) {
+      console.error('💥 Error calling Edge Function:', emailError);
+      console.warn('⚠️ Email service unavailable, but invitation was created:', emailError);
+    }
+
+    // Log invitation details for debugging
     console.log('📧 Invitation Email Details:', {
       to: invitation.invited_email,
       jobTitle: job.title,
@@ -288,10 +313,6 @@ const sendInvitationEmail = async (invitation: JobInvitation) => {
       invitationLink,
       expiresAt: invitation.expires_at,
     });
-
-    // TODO: Integrate with email service
-    // For now, the invitation is created and can be accessed via the link
-    // The user will see the invitation details when they visit the link
   } catch (error) {
     console.error('Unexpected error sending invitation email:', error);
   }
