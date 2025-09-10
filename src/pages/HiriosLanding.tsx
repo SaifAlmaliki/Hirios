@@ -3,8 +3,8 @@ import { AuroraHero } from '@/components/ui/futurastic-hero-section';
 import { Particles } from '@/components/ui/particles';
 import {
   HowItWorks,
-  VoiceInterviewCapabilities,
   WhyChooseHirios,
+  CandidateBenefits,
   ContactCTA,
   FAQ,
   FinalCTA,
@@ -21,11 +21,11 @@ const HiriosLanding = () => {
       {/* How It Works */}
       <HowItWorks />
 
-      {/* AI Powered Voice Interview Capabilities */}
-      <VoiceInterviewCapabilities />
-
       {/* Why Choose Hirios */}
       <WhyChooseHirios />
+
+      {/* What Companies Get for Each Candidate */}
+      <CandidateBenefits />
 
       {/* Contact CTA Section */}
       <ContactCTA />

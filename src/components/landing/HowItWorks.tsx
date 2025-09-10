@@ -5,9 +5,7 @@ import {
   Upload,
   Brain,
   Target,
-  BarChart3,
-  TrendingUp,
-  CheckCircle
+  BarChart3
 } from 'lucide-react';
 
 const HowItWorks = () => {
@@ -97,59 +95,6 @@ const HowItWorks = () => {
           </div>
         </div>
 
-        {/* Detailed Flow Explanation */}
-        <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 rounded-2xl p-8 mt-12 border border-blue-600/20">
-          <h3 className="text-2xl font-bold text-white mb-6 text-center">What Companies Get for Each Candidate</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-gray-800/50 rounded-lg p-6 shadow-sm border border-gray-700/50">
-              <div className="flex items-center mb-4">
-                <div className="bg-green-600/20 p-2 rounded-full mr-3 border border-green-600/30">
-                  <Target className="h-6 w-6 text-green-400" />
-                </div>
-                <h4 className="font-semibold text-white">Match Score</h4>
-              </div>
-              <p className="text-gray-300 text-sm">
-                Percentage match based on skills, experience, and job requirements alignment with detailed scoring breakdown.
-              </p>
-            </div>
-
-            <div className="bg-gray-800/50 rounded-lg p-6 shadow-sm border border-gray-700/50">
-              <div className="flex items-center mb-4">
-                <div className="bg-blue-600/20 p-2 rounded-full mr-3 border border-blue-600/30">
-                  <TrendingUp className="h-6 w-6 text-blue-400" />
-                </div>
-                <h4 className="font-semibold text-white">Strengths & Weaknesses</h4>
-              </div>
-              <p className="text-gray-300 text-sm">
-                Clear breakdown of candidate's strong points and areas that may need development based on job requirements.
-              </p>
-            </div>
-
-            <div className="bg-gray-800/50 rounded-lg p-6 shadow-sm border border-gray-700/50">
-              <div className="flex items-center mb-4">
-                <div className="bg-purple-600/20 p-2 rounded-full mr-3 border border-purple-600/30">
-                  <CheckCircle className="h-6 w-6 text-purple-400" />
-                </div>
-                <h4 className="font-semibold text-white">Detailed Justification</h4>
-              </div>
-              <p className="text-gray-300 text-sm">
-                Comprehensive explanation of why the candidate is or isn't a good fit, including specific examples from their resume.
-              </p>
-            </div>
-
-            <div className="bg-gray-800/50 rounded-lg p-6 shadow-sm border border-gray-700/50">
-              <div className="flex items-center mb-4">
-                <div className="bg-orange-600/20 p-2 rounded-full mr-3 border border-orange-600/30">
-                  <Upload className="h-6 w-6 text-orange-400" />
-                </div>
-                <h4 className="font-semibold text-white">Voice Interview</h4>
-              </div>
-              <p className="text-gray-300 text-sm">
-                AI-powered voice interviews with detailed summaries and insights for top candidates to make final decisions.
-              </p>
-            </div>
-          </div>
-        </div>
       </div>
     </section>
   );
