@@ -179,6 +179,109 @@ export type Database = {
         }
         Relationships: []
       }
+      job_collaborators: {
+        Row: {
+          id: string
+          job_id: string
+          user_id: string
+          invited_by: string
+          role: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          job_id: string
+          user_id: string
+          invited_by: string
+          role?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          job_id?: string
+          user_id?: string
+          invited_by?: string
+          role?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_collaborators_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_collaborators_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_collaborators_invited_by_fkey"
+            columns: ["invited_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      job_invitations: {
+        Row: {
+          id: string
+          job_id: string
+          invited_email: string
+          invited_by: string
+          status: string
+          token: string
+          expires_at: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          job_id: string
+          invited_email: string
+          invited_by: string
+          status?: string
+          token?: string
+          expires_at?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          job_id?: string
+          invited_email?: string
+          invited_by?: string
+          status?: string
+          token?: string
+          expires_at?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_invitations_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_invitations_invited_by_fkey"
+            columns: ["invited_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       screening_results: {
         Row: {
           id: string

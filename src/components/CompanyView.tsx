@@ -15,6 +15,7 @@ import { useNavigate } from 'react-router-dom';
 
 import JobApplicationsView from './JobApplicationsView';
 import CompanyResumeUpload from './CompanyResumeUpload';
+import JobCollaborationManager from './JobCollaborationManager';
 import { useAuth } from '@/contexts/AuthContext';
 
 // Separate JobForm component to prevent re-rendering issues
@@ -25,7 +26,8 @@ const JobForm = React.memo(({
   onSubmit, 
   isEdit = false, 
   isLoading = false,
-  onCancel 
+  onCancel,
+  jobId 
 }: {
   jobData: any;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
@@ -34,6 +36,7 @@ const JobForm = React.memo(({
   isEdit?: boolean;
   isLoading?: boolean;
   onCancel: () => void;
+  jobId?: string;
 }) => (
   <form onSubmit={onSubmit} className="space-y-4 mt-4">
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -534,7 +537,18 @@ const CompanyView: React.FC = () => {
             isEdit={true}
             isLoading={updateJobMutation.isPending}
             onCancel={handleCancelEdit}
+            jobId={editingJob?.id}
           />
+          
+          {/* Collaboration Manager */}
+          {editingJob?.id && (
+            <div className="mt-6 pt-6 border-t">
+              <JobCollaborationManager 
+                jobId={editingJob.id} 
+                jobTitle={editingJob.title} 
+              />
+            </div>
+          )}
         </DialogContent>
       </Dialog>
 
