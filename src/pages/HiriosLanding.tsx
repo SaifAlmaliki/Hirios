@@ -49,7 +49,7 @@ const HiriosLanding = () => {
             <p className="text-xl text-gray-300">Simple workflow for smarter hiring decisions</p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-12">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 mb-12">
             {/* Step 1: Upload Resumes */}
             <div className="text-center">
               <div className="bg-blue-600/20 p-6 rounded-full w-fit mx-auto mb-6 relative border border-blue-600/30">
@@ -92,12 +92,26 @@ const HiriosLanding = () => {
               </p>
             </div>
 
-            {/* Step 4: Review & Interview */}
+            {/* Step 4: Team Collaboration */}
+            <div className="text-center">
+              <div className="bg-cyan-600/20 p-6 rounded-full w-fit mx-auto mb-6 relative border border-cyan-600/30">
+                <Target className="h-12 w-12 text-cyan-400" />
+                <div className="absolute -top-2 -right-2 bg-cyan-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
+                  4
+                </div>
+              </div>
+              <h3 className="text-lg font-semibold mb-3 text-white">Team Collaboration</h3>
+              <p className="text-gray-300 text-sm">
+                Invite hiring managers and recruiters to collaborate on screening results and share insights together.
+              </p>
+            </div>
+
+            {/* Step 5: Review & Interview */}
             <div className="text-center">
               <div className="bg-orange-600/20 p-6 rounded-full w-fit mx-auto mb-6 relative border border-orange-600/30">
                 <BarChart3 className="h-12 w-12 text-orange-400" />
                 <div className="absolute -top-2 -right-2 bg-orange-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
-                  4
+                  5
                 </div>
               </div>
               <h3 className="text-lg font-semibold mb-3 text-white">Review & Interview</h3>
@@ -313,7 +327,7 @@ const HiriosLanding = () => {
             <p className="text-xl text-gray-300">Everything you need for intelligent hiring</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
             <div className="text-center">
               <div className="bg-blue-600/20 p-4 rounded-full w-fit mx-auto mb-6 border border-blue-600/30">
                 <Brain className="h-8 w-8 text-blue-400" />
@@ -331,6 +345,16 @@ const HiriosLanding = () => {
               <h3 className="text-lg font-semibold mb-3 text-white">Voice Interviews</h3>
               <p className="text-gray-300 text-sm">
                 Conduct AI-powered voice interviews with candidates for deeper insights.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="bg-cyan-600/20 p-4 rounded-full w-fit mx-auto mb-6 border border-cyan-600/30">
+                <Target className="h-8 w-8 text-cyan-400" />
+              </div>
+              <h3 className="text-lg font-semibold mb-3 text-white">Team Collaboration</h3>
+              <p className="text-gray-300 text-sm">
+                Invite hiring managers and recruiters to collaborate on screening results together.
               </p>
             </div>
 
