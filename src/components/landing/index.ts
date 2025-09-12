@@ -1,3 +1,4 @@
+export { default as HiringFunnel } from './HiringFunnel';
 export { default as HowItWorks } from './HowItWorks';
 export { default as WhyChooseHirios } from './WhyChooseHirios';
 export { default as CandidateBenefits } from './CandidateBenefits';

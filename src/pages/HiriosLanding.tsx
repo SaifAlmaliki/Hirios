@@ -2,6 +2,7 @@ import React from 'react';
 import { AuroraHero } from '@/components/ui/futurastic-hero-section';
 import { Particles } from '@/components/ui/particles';
 import {
+  HiringFunnel,
   HowItWorks,
   WhyChooseHirios,
   CandidateBenefits,
@@ -17,6 +18,9 @@ const HiriosLanding = () => {
     <div className="min-h-screen bg-gray-950">
       {/* Futurastic Hero Section */}
       <AuroraHero />
+
+      {/* Hiring Funnel Section */}
+      <HiringFunnel />
 
       {/* How It Works */}
       <HowItWorks />
