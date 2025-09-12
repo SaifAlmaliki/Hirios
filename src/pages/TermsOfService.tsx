@@ -258,27 +258,6 @@ const TermsOfService = () => {
               </div>
             </section>
 
-            {/* Contact Information */}
-            <section className="bg-gray-900/50 rounded-2xl p-8 border border-gray-800">
-              <h2 className="text-2xl font-bold text-white mb-6">Contact Information</h2>
-              
-              <div className="space-y-4 text-gray-300">
-                <p>
-                  If you have any questions about these Terms of Service, please contact us:
-                </p>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <h3 className="text-lg font-semibold text-white mb-2">Email</h3>
-                    <p>legal@hirios.com</p>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-white mb-2">Support</h3>
-                    <p>support@hirios.com</p>
-                  </div>
-                </div>
-              </div>
-            </section>
           </div>
         </div>
       </div>
