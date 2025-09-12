@@ -1,8 +1,11 @@
 import React from 'react';
 import { Particles } from '@/components/ui/particles';
 import { Brain } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const Footer = () => {
+  const navigate = useNavigate();
+
   return (
     <footer className="bg-gray-900 text-white py-8 sm:py-12 border-t border-gray-800 relative">
       <Particles
@@ -21,9 +24,24 @@ const Footer = () => {
           </div>
           
           <div className="flex flex-wrap justify-center gap-4 sm:gap-6 text-xs sm:text-sm text-gray-400">
-            <span className="hover:text-white cursor-pointer transition-colors">Privacy Policy</span>
-            <span className="hover:text-white cursor-pointer transition-colors">Terms of Service</span>
-            <span className="hover:text-white cursor-pointer transition-colors">Contact Us</span>
+            <span 
+              onClick={() => navigate('/privacy-policy')}
+              className="hover:text-white cursor-pointer transition-colors"
+            >
+              Privacy Policy
+            </span>
+            <span 
+              onClick={() => navigate('/terms-of-service')}
+              className="hover:text-white cursor-pointer transition-colors"
+            >
+              Terms of Service
+            </span>
+            <span 
+              onClick={() => navigate('/contact-us')}
+              className="hover:text-white cursor-pointer transition-colors"
+            >
+              Contact Us
+            </span>
           </div>
         </div>
         

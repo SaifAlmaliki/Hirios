@@ -13,6 +13,9 @@ import Auth from "./pages/Auth";
 import AuthConfirm from "./pages/AuthConfirm";
 import ResetPassword from "./pages/ResetPassword";
 import CompanySetup from "./pages/CompanySetup";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
+import ContactUs from "./pages/ContactUs";
 
 import ScreeningResults from "./pages/ScreeningResults";
 import ScreeningResultDetail from "./pages/ScreeningResultDetail";
@@ -56,6 +59,9 @@ const App = () => (
             <Route path="/job-portal" element={<JobPortal />} />
             <Route path="/job-details/:jobId" element={<JobDetails />} />
             <Route path="/company-setup" element={<CompanySetup />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms-of-service" element={<TermsOfService />} />
+            <Route path="/contact-us" element={<ContactUs />} />
             <Route path="/screening-results" element={<ScreeningResults />} />
             <Route path="/screening-results/:id" element={<ScreeningResultDetail />} />
             <Route path="/interview/:screeningResultId/:applicationId" element={<VoiceInterview />} />
