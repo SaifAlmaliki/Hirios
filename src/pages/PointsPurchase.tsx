@@ -1,17 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Coins, Check, Star, Zap, Crown, Sparkles } from 'lucide-react';
+import { Coins, Check, Star, Zap, Crown, Sparkles, CheckCircle, XCircle } from 'lucide-react';
 import { usePoints } from '@/hooks/usePoints';
 import { useToast } from '@/hooks/use-toast';
 import { motion } from 'framer-motion';
 import Navbar from '@/components/Navbar';
+import { useSearchParams } from 'react-router-dom';
 
 const PointsPurchase = () => {
-  const { packages, points, addPoints, isAddingPoints, formatPrice, getPointsPerDollar } = usePoints();
+  const { packages, points, createCheckout, isCreatingCheckout, formatPrice, getPointsPerDollar, refreshPoints } = usePoints();
   const { toast } = useToast();
   const [selectedPackage, setSelectedPackage] = useState<string | null>(null);
+  const [searchParams] = useSearchParams();
+
+  // Handle success/cancel from Stripe
+  useEffect(() => {
+    const success = searchParams.get('success');
+    const canceled = searchParams.get('canceled');
+    const sessionId = searchParams.get('session_id');
+
+    if (success === 'true' && sessionId) {
+      toast({
+        title: "Payment Successful!",
+        description: "Your points have been added to your account.",
+      });
+      refreshPoints();
+      // Clean up URL
+      window.history.replaceState({}, '', '/points-purchase');
+    } else if (canceled === 'true') {
+      toast({
+        title: "Payment Canceled",
+        description: "Your payment was canceled. No charges were made.",
+        variant: "destructive",
+      });
+      // Clean up URL
+      window.history.replaceState({}, '', '/points-purchase');
+    }
+  }, [searchParams, toast, refreshPoints]);
 
   const handlePurchase = async (packageId: string) => {
     const selectedPkg = packages.find(pkg => pkg.id === packageId);
@@ -20,11 +47,22 @@ const PointsPurchase = () => {
     setSelectedPackage(packageId);
     
     try {
-      await addPoints({
+      // Get the Stripe price ID from environment variables
+      const priceId = getStripePriceId(selectedPkg.name);
+      if (!priceId) {
+        toast({
+          title: "Error",
+          description: "Price configuration not found for this package",
+          variant: "destructive",
+        });
+        setSelectedPackage(null);
+        return;
+      }
+
+      await createCheckout({
+        packageId: selectedPkg.id,
         points: selectedPkg.points,
-        transactionType: 'purchase',
-        description: `Purchased ${selectedPkg.name} - ${selectedPkg.points} points`,
-        referenceId: packageId
+        priceId: priceId
       });
       
       setSelectedPackage(null);
@@ -32,6 +70,18 @@ const PointsPurchase = () => {
       console.error('Purchase failed:', error);
       setSelectedPackage(null);
     }
+  };
+
+  // Helper function to get Stripe price ID based on package name
+  const getStripePriceId = (packageName: string): string | null => {
+    const priceIdMap: { [key: string]: string } = {
+      'Starter Pack': import.meta.env.VITE_STRIPE_STARTER_PRICE_ID,
+      'Growth Pack': import.meta.env.VITE_STRIPE_GROWTH_PRICE_ID,
+      'Business Pack': import.meta.env.VITE_STRIPE_BUSINESS_PRICE_ID,
+      'Enterprise Pack': import.meta.env.VITE_STRIPE_ENTERPRISE_PRICE_ID,
+    };
+    
+    return priceIdMap[packageName] || null;
   };
 
   const getPackageIcon = (points: number) => {
@@ -170,13 +220,13 @@ const PointsPurchase = () => {
                       
                       <Button
                         onClick={() => handlePurchase(pkg.id)}
-                        disabled={isAddingPoints || selectedPackage === pkg.id}
+                        disabled={isCreatingCheckout || selectedPackage === pkg.id}
                         className={`w-full bg-gradient-to-r ${getPackageColor(pkg.points)} hover:opacity-90 text-white font-semibold py-3`}
                       >
                         {selectedPackage === pkg.id ? (
                           <>
                             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                            Processing...
+                            Redirecting to Stripe...
                           </>
                         ) : (
                           <>

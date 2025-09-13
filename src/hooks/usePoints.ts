@@ -84,6 +84,40 @@ export const usePoints = () => {
     }
   });
 
+  // Create checkout session mutation
+  const createCheckoutMutation = useMutation({
+    mutationFn: async ({
+      packageId,
+      points,
+      priceId
+    }: {
+      packageId: string;
+      points: number;
+      priceId: string;
+    }) => {
+      return PointsService.createCheckoutSession(packageId, points, priceId);
+    },
+    onSuccess: (result) => {
+      if (result.success && result.data?.url) {
+        // Redirect to Stripe Checkout
+        window.location.href = result.data.url;
+      } else {
+        toast({
+          title: "Error",
+          description: result.error || "Failed to create checkout session",
+          variant: "destructive",
+        });
+      }
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to create checkout session",
+        variant: "destructive",
+      });
+    }
+  });
+
   // Deduct points mutation
   const deductPointsMutation = useMutation({
     mutationFn: async ({
@@ -161,8 +195,10 @@ export const usePoints = () => {
     // Mutations
     addPoints: addPointsMutation.mutate,
     deductPoints: deductPointsMutation.mutate,
+    createCheckout: createCheckoutMutation.mutate,
     isAddingPoints: addPointsMutation.isPending,
     isDeductingPoints: deductPointsMutation.isPending,
+    isCreatingCheckout: createCheckoutMutation.isPending,
     
     // Utilities
     hasEnoughPoints,

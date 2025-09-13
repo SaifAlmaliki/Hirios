@@ -468,7 +468,32 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      add_points: {
+        Args: {
+          target_user_id: string
+          points_to_add: number
+          transaction_type: string
+          description: string
+          reference_id?: string | null
+        }
+        Returns: boolean
+      }
+      deduct_points: {
+        Args: {
+          target_user_id: string
+          points_to_deduct: number
+          transaction_type: string
+          description: string
+          reference_id?: string | null
+        }
+        Returns: boolean
+      }
+      get_user_points: {
+        Args: {
+          target_user_id: string
+        }
+        Returns: number
+      }
     }
     Enums: {
       [_ in never]: never

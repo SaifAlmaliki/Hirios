@@ -70,6 +70,38 @@ export class PointsService {
   }
 
   /**
+   * Create Stripe checkout session for point purchase
+   */
+  static async createCheckoutSession(
+    packageId: string,
+    points: number,
+    priceId: string
+  ): Promise<PointsServiceResponse> {
+    try {
+      const { data, error } = await supabase.functions.invoke('create-checkout-session', {
+        body: {
+          packageId,
+          points,
+          priceId
+        }
+      });
+
+      if (error) {
+        console.error('Error creating checkout session:', error);
+        return { success: false, error: error.message };
+      }
+
+      return { success: true, data };
+    } catch (error) {
+      console.error('Error creating checkout session:', error);
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      };
+    }
+  }
+
+  /**
    * Deduct points from user account
    */
   static async deductPoints(
