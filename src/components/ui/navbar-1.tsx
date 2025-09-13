@@ -3,9 +3,10 @@
 import * as React from "react"
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Menu, X, Building2, Settings, Brain, LogOut } from "lucide-react"
+import { Menu, X, Building2, Settings, Brain, LogOut, Coins, History } from "lucide-react"
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { PointsBadge } from '@/components/ui/PointsBadge';
 
 interface Navbar1Props {
   title?: string;
@@ -40,6 +41,16 @@ const Navbar1: React.FC<Navbar1Props> = ({
 
   const handleScreeningResults = () => {
     navigate('/screening-results');
+    setIsOpen(false);
+  };
+
+  const handlePointsPurchase = () => {
+    navigate('/points-purchase');
+    setIsOpen(false);
+  };
+
+  const handlePointsHistory = () => {
+    navigate('/points-history');
     setIsOpen(false);
   };
 
@@ -112,10 +123,19 @@ const Navbar1: React.FC<Navbar1Props> = ({
                 {user.email}
               </span>
               
+              {/* Points Badge */}
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
+                transition={{ duration: 0.3, delay: 0.05 }}
+              >
+                <PointsBadge variant="default" />
+              </motion.div>
+              
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.1 }}
                 whileHover={{ scale: 1.05 }}
               >
                 <button
@@ -130,7 +150,7 @@ const Navbar1: React.FC<Navbar1Props> = ({
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.1 }}
+                transition={{ duration: 0.3, delay: 0.15 }}
                 whileHover={{ scale: 1.05 }}
               >
                 <button
@@ -146,6 +166,36 @@ const Navbar1: React.FC<Navbar1Props> = ({
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.2 }}
+                whileHover={{ scale: 1.05 }}
+              >
+                <button
+                  onClick={handlePointsPurchase}
+                  className="flex items-center px-3 py-2 text-sm text-gray-900 hover:text-purple-600 transition-colors font-medium rounded-full hover:bg-purple-50"
+                >
+                  <Coins className="h-4 w-4 mr-1" />
+                  Buy Points
+                </button>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.25 }}
+                whileHover={{ scale: 1.05 }}
+              >
+                <button
+                  onClick={handlePointsHistory}
+                  className="flex items-center px-3 py-2 text-sm text-gray-900 hover:text-green-600 transition-colors font-medium rounded-full hover:bg-green-50"
+                >
+                  <History className="h-4 w-4 mr-1" />
+                  History
+                </button>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.3 }}
                 whileHover={{ scale: 1.05 }}
               >
                 <button
@@ -214,7 +264,8 @@ const Navbar1: React.FC<Navbar1Props> = ({
                     exit={{ opacity: 0, x: 20 }}
                     className="text-center pb-4 border-b border-gray-200"
                   >
-                    <p className="text-sm text-gray-600">{user.email}</p>
+                    <p className="text-sm text-gray-600 mb-3">{user.email}</p>
+                    <PointsBadge variant="detailed" />
                   </motion.div>
 
                   <motion.div
@@ -250,7 +301,37 @@ const Navbar1: React.FC<Navbar1Props> = ({
                   <motion.div
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.35 }}
+                    exit={{ opacity: 0, x: 20 }}
+                  >
+                    <button
+                      onClick={handlePointsPurchase}
+                      className="flex items-center w-full text-base text-gray-900 font-medium py-3"
+                    >
+                      <Coins className="h-5 w-5 mr-3" />
+                      Buy Points
+                    </button>
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.4 }}
+                    exit={{ opacity: 0, x: 20 }}
+                  >
+                    <button
+                      onClick={handlePointsHistory}
+                      className="flex items-center w-full text-base text-gray-900 font-medium py-3"
+                    >
+                      <History className="h-5 w-5 mr-3" />
+                      Points History
+                    </button>
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.45 }}
                     exit={{ opacity: 0, x: 20 }}
                   >
                     <button

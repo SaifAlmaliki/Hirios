@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { PointsService } from '@/services/pointsService';
 
 interface CompanyData {
   company_name: string;
@@ -127,6 +128,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           console.error('Error creating company profile:', profileError);
           // Don't fail the signup if profile creation fails
           // The user can complete setup later
+        } else {
+          // Give new user 25 free points
+          try {
+            await PointsService.addPoints(
+              authData.user.id,
+              25,
+              'bonus',
+              'Welcome bonus - 25 free points for new users'
+            );
+            console.log('✅ Welcome bonus points added for new user');
+          } catch (pointsError) {
+            console.error('Error adding welcome bonus points:', pointsError);
+            // Don't fail the signup if points addition fails
+          }
         }
       } catch (error) {
         console.error('Unexpected error creating company profile:', error);

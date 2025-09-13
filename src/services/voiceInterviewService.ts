@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { Conversation } from '@elevenlabs/client';
+import { PointsService } from './pointsService';
 
 export interface VoiceInterviewData {
   job_title: string;
@@ -45,6 +46,12 @@ export class VoiceInterviewService {
       
       if (authError || !user) {
         throw new Error('User not authenticated');
+      }
+
+      // Check if user has enough points for voice interview (2 points)
+      const hasEnoughPoints = await PointsService.hasEnoughPoints(user.id, 2);
+      if (!hasEnoughPoints) {
+        throw new Error('Insufficient points. You need 2 points to request a voice interview. Please contact support@idraq.com to purchase more points.');
       }
 
       // Get screening result details for the webhook
