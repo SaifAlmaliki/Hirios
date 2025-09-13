@@ -289,6 +289,7 @@ export type Database = {
           last_name: string
           email: string
           phone: string | null
+          home_address: string | null
           strengths: string | null
           weaknesses: string | null
           risk_factor: string | null
@@ -311,6 +312,7 @@ export type Database = {
           last_name: string
           email: string
           phone?: string | null
+          home_address?: string | null
           strengths?: string | null
           weaknesses?: string | null
           risk_factor?: string | null
@@ -333,6 +335,7 @@ export type Database = {
           last_name?: string
           email?: string
           phone?: string | null
+          home_address?: string | null
           strengths?: string | null
           weaknesses?: string | null
           risk_factor?: string | null

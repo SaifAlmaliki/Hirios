@@ -51,6 +51,7 @@ const ScreeningResultCard: React.FC<ScreeningResultCardProps> = ({
             jobTitle={result.job?.title}
             createdAt={result.created_at}
             phone={result.phone}
+            homeAddress={result.home_address}
             overallFit={result.overall_fit || 0}
           />
 

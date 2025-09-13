@@ -10,6 +10,7 @@ export interface ScreeningResult {
   last_name: string;
   email: string;
   phone?: string;
+  home_address?: string;
   strengths?: string;
   weaknesses?: string;
   risk_factor?: string;
