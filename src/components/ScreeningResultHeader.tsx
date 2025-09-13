@@ -58,32 +58,35 @@ const ScreeningResultHeader: React.FC<ScreeningResultHeaderProps> = ({
       
       {/* Contact Information Grid - Mobile Responsive */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-4 lg:gap-6 text-sm text-gray-600">
-        {/* Email Column - Full width on mobile, 4/12 on desktop */}
-        <div className="col-span-1 lg:col-span-4 flex items-center min-w-0">
+        {/* Email Column - Full width on mobile, 6/12 on desktop */}
+        <div className="col-span-1 lg:col-span-6 flex items-center min-w-0">
           <Mail className="h-4 w-4 mr-3 text-gray-500 flex-shrink-0" />
           <span className="truncate">{email}</span>
         </div>
         
-        {/* Job Title Column - Full width on mobile, 6/12 on desktop (more space) */}
+        {/* Phone Column - Full width on mobile, 6/12 on desktop */}
         <div className="col-span-1 lg:col-span-6 flex items-center min-w-0">
-          <Briefcase className="h-4 w-4 mr-3 text-gray-500 flex-shrink-0" />
-          <span className="truncate" title={jobTitle || 'No job linked'}>{jobTitle || 'No job linked'}</span>
-        </div>
-        
-        {/* Phone Column - Full width on mobile, 2/12 on desktop */}
-        <div className="col-span-1 lg:col-span-2 flex items-center min-w-0">
           <Mic className="h-4 w-4 mr-3 text-gray-500 flex-shrink-0" />
           <span className="truncate">{phone || 'No phone'}</span>
         </div>
       </div>
       
-      {/* Home Address Row - Full width */}
-      {homeAddress && (
-        <div className="mt-4 flex items-center text-sm text-gray-600">
-          <MapPin className="h-4 w-4 mr-3 text-gray-500 flex-shrink-0" />
-          <span className="truncate">{homeAddress}</span>
+      {/* Second Row - Home Address and Job Title */}
+      <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-4 lg:gap-6 text-sm text-gray-600">
+        {/* Home Address Column - Full width on mobile, 4/12 on desktop */}
+        {homeAddress && (
+          <div className="col-span-1 lg:col-span-4 flex items-center min-w-0">
+            <MapPin className="h-4 w-4 mr-3 text-gray-500 flex-shrink-0" />
+            <span className="truncate">{homeAddress}</span>
+          </div>
+        )}
+        
+        {/* Job Title Column - Full width on mobile, remaining space on desktop */}
+        <div className={`col-span-1 ${homeAddress ? 'lg:col-span-8' : 'lg:col-span-12'} flex items-center min-w-0`}>
+          <Briefcase className="h-4 w-4 mr-3 text-gray-500 flex-shrink-0" />
+          <span className="truncate" title={jobTitle || 'No job linked'}>{jobTitle || 'No job linked'}</span>
         </div>
-      )}
+      </div>
     </div>
   );
 };
