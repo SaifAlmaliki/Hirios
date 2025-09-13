@@ -50,27 +50,24 @@ export const PointsBadge: React.FC<PointsBadgeProps> = ({
     <motion.div
       className={`
         inline-flex items-center gap-2 
-        bg-gradient-to-r from-blue-500 to-purple-600 
-        text-white rounded-full shadow-lg
+        bg-gray-100 hover:bg-gray-200 
+        text-gray-700 rounded-full 
+        border border-gray-200
+        transition-colors duration-200
         ${getVariantStyles()}
         ${className}
       `}
       initial={{ scale: 0.9, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ duration: 0.3 }}
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
     >
       {showIcon && (
-        <motion.div
-          animate={{ rotate: [0, 10, -10, 0] }}
-          transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-        >
-          <Coins className={getIconSize()} />
-        </motion.div>
+        <Coins className={`${getIconSize()} text-gray-600`} />
       )}
       
-      <span className="font-semibold">
+      <span className="font-medium text-gray-900">
         {formatPoints(points)}
       </span>
       
@@ -81,8 +78,8 @@ export const PointsBadge: React.FC<PointsBadgeProps> = ({
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
         >
-          <Zap className="h-3 w-3" />
-          <span className="text-xs opacity-90">Available</span>
+          <Zap className="h-3 w-3 text-gray-500" />
+          <span className="text-xs text-gray-500">Available</span>
         </motion.div>
       )}
     </motion.div>
