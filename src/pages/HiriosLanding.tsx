@@ -8,9 +8,9 @@ import {
   CandidateBenefits,
   ContactCTA,
   FAQ,
-  FinalCTA,
   Footer
 } from '@/components/landing';
+import PricingSection from '@/components/landing/PricingSection';
 
 
 const HiriosLanding = () => {
@@ -34,11 +34,20 @@ const HiriosLanding = () => {
       {/* Contact CTA Section */}
       <ContactCTA />
 
+      {/* Pricing Section */}
+      <PricingSection 
+        isVisitor={true}
+        onGetStarted={() => {
+          // Scroll to top and then navigate to auth
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          setTimeout(() => {
+            window.location.href = '/auth';
+          }, 500);
+        }}
+      />
+
       {/* FAQ */}
       <FAQ />
-
-      {/* Final CTA */}
-      <FinalCTA />
 
       {/* Footer */}
       <Footer />
