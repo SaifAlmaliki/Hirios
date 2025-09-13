@@ -23,6 +23,8 @@ import VoiceInterview from "./pages/VoiceInterview";
 import JobDetails from "./pages/JobDetails";
 import InviteAccept from "./pages/InviteAccept";
 import TestCollaboration from "./pages/TestCollaboration";
+import PointsPurchase from "./pages/PointsPurchase";
+import PointsHistory from "./pages/PointsHistory";
 import NotFound from "./pages/NotFound";
 import { VoiceInterviewService } from "./services/voiceInterviewService";
 
@@ -67,6 +69,8 @@ const App = () => (
             <Route path="/interview/:screeningResultId/:applicationId" element={<VoiceInterview />} />
             <Route path="/invite/:token" element={<InviteAccept />} />
             <Route path="/test-collaboration" element={<TestCollaboration />} />
+            <Route path="/points-purchase" element={<PointsPurchase />} />
+            <Route path="/points-history" element={<PointsHistory />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
