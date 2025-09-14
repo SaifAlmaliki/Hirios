@@ -22,13 +22,16 @@ import {
   FileText,
   ExternalLink,
   Star,
-  Download
+  Download,
+  X,
+  Edit3
 } from 'lucide-react';
-import { useScreeningResults, ScreeningResult } from '@/hooks/useScreeningResults';
+import { useScreeningResults, useUpdateFavoriteStatus, useUpdateDismissStatus, ScreeningResult } from '@/hooks/useScreeningResults';
 import { useAuth } from '@/contexts/AuthContext';
 import { VoiceInterviewService } from '@/services/voiceInterviewService';
 import { useToast } from '@/hooks/use-toast';
 import ScreeningResultActions from '@/components/ScreeningResultActions';
+import NotesEditDialog from '@/components/NotesEditDialog';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -47,6 +50,11 @@ const ScreeningResultDetail = () => {
   const { toast } = useToast();
   const [requestingInterview, setRequestingInterview] = useState<string | null>(null);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [isNotesDialogOpen, setIsNotesDialogOpen] = useState(false);
+  
+  // Add mutation hooks
+  const updateFavoriteMutation = useUpdateFavoriteStatus();
+  const updateDismissMutation = useUpdateDismissStatus();
   
   const { data: screeningResults, isLoading, error } = useScreeningResults();
   
@@ -118,6 +126,44 @@ const ScreeningResultDetail = () => {
             </div>
             
             <div className="flex items-center space-x-3">
+              {/* Favorite Button */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => updateFavoriteMutation.mutate({ 
+                  id: result.id, 
+                  is_favorite: !result.is_favorite 
+                })}
+                disabled={updateFavoriteMutation.isPending}
+                className={`flex items-center gap-2 ${
+                  result.is_favorite 
+                    ? 'border-yellow-300 text-yellow-600 hover:bg-yellow-50 bg-yellow-50' 
+                    : 'border-yellow-300 text-yellow-600 hover:bg-yellow-50'
+                }`}
+              >
+                <Star className={`h-4 w-4 ${result.is_favorite ? 'fill-current' : ''}`} />
+                {result.is_favorite ? 'Favorited' : 'Favorite'}
+              </Button>
+
+              {/* Dismiss Button */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => updateDismissMutation.mutate({ 
+                  id: result.id, 
+                  is_dismissed: !result.is_dismissed 
+                })}
+                disabled={updateDismissMutation.isPending}
+                className={`flex items-center gap-2 ${
+                  result.is_dismissed 
+                    ? 'border-red-300 text-red-600 hover:bg-red-50 bg-red-50' 
+                    : 'border-red-300 text-red-600 hover:bg-red-50'
+                }`}
+              >
+                <X className="h-4 w-4" />
+                {result.is_dismissed ? 'Restore' : 'Dismiss'}
+              </Button>
+
               <Badge className={`${getScoreBadgeColor(result.overall_fit || 0)} font-semibold`}>
                 {result.overall_fit}% Fit
               </Badge>
@@ -423,21 +469,34 @@ const ScreeningResultDetail = () => {
             )}
 
             {/* Notes Section */}
-            {result.notes && (
-              <Card className="shadow-lg border-0 bg-white">
-                <CardHeader>
+            <Card className="shadow-lg border-0 bg-white">
+              <CardHeader>
+                <div className="flex items-center justify-between">
                   <CardTitle className="flex items-center space-x-2 text-gray-700">
                     <FileText className="w-5 h-5" />
-                    <span>Notes</span>
+                    <span>Company Notes</span>
                   </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <p className="text-gray-700 text-sm leading-relaxed">{result.notes}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setIsNotesDialogOpen(true)}
+                    className="h-8 px-2 text-purple-600 hover:text-purple-700 hover:bg-purple-50"
+                  >
+                    <Edit3 className="h-3 w-3 mr-1" />
+                    Edit
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  {result.notes ? (
+                    <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">{result.notes}</p>
+                  ) : (
+                    <p className="text-gray-500 text-sm italic">No notes added yet. Click Edit to add notes about this candidate.</p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
@@ -460,6 +519,15 @@ const ScreeningResultDetail = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Notes Edit Dialog */}
+      <NotesEditDialog
+        isOpen={isNotesDialogOpen}
+        onClose={() => setIsNotesDialogOpen(false)}
+        resultId={result.id}
+        currentNotes={result.notes || ''}
+        candidateName={`${result.first_name} ${result.last_name}`}
+      />
     </div>
   );
 };

@@ -38,7 +38,13 @@ const ScreeningResultCard: React.FC<ScreeningResultCardProps> = ({
 
   return (
     <Card 
-      className="border-l-4 border-l-blue-500 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer hover:bg-gray-50"
+      className={`border-l-4 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer ${
+        result.is_dismissed 
+          ? 'border-l-red-500 bg-gray-50 opacity-75 hover:bg-gray-100' 
+          : result.is_favorite 
+            ? 'border-l-yellow-500 bg-yellow-50 hover:bg-yellow-100' 
+            : 'border-l-blue-500 hover:bg-gray-50'
+      }`}
       onClick={handleCardClick}
     >
       <CardHeader className="pb-6">
@@ -65,6 +71,8 @@ const ScreeningResultCard: React.FC<ScreeningResultCardProps> = ({
             onRequestVoiceScreening={() => onRequestVoiceScreening(result)}
             onToggleExpansion={() => onToggleExpansion(result.id)}
             showViewDetails={false}
+            isFavorite={result.is_favorite || false}
+            isDismissed={result.is_dismissed || false}
           />
         </div>
 
@@ -84,6 +92,8 @@ const ScreeningResultCard: React.FC<ScreeningResultCardProps> = ({
               interviewCompletedAt={result.interview_completed_at}
               voiceScreeningRequested={result.voice_screening_requested}
               notes={result.notes}
+              resultId={result.id}
+              candidateName={`${result.first_name} ${result.last_name}`}
             />
           </CardContent>
         </CollapsibleContent>
