@@ -107,45 +107,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { error: authError };
     }
 
-    // If user was created successfully, create company profile
+    // If user was created successfully, the database trigger will automatically create the company profile
+    // We just need to add welcome bonus points
     if (authData.user) {
       try {
-        const { error: profileError } = await supabase
-          .from('company_profiles')
-          .insert([{
-            user_id: authData.user.id,
-            company_name: companyData.company_name,
-            company_website: companyData.company_website || null,
-            company_description: companyData.company_description || null,
-            company_size: companyData.company_size || null,
-            industry: companyData.industry || null,
-            address: companyData.address || null,
-            phone: companyData.phone || null,
-            subscription_status: 'inactive'
-          }]);
-
-        if (profileError) {
-          console.error('Error creating company profile:', profileError);
-          // Don't fail the signup if profile creation fails
-          // The user can complete setup later
-        } else {
-          // Give new user 25 free points
-          try {
-            await PointsService.addPoints(
-              authData.user.id,
-              25,
-              'bonus',
-              'Welcome bonus - 25 free points for new users'
-            );
-            console.log('✅ Welcome bonus points added for new user');
-          } catch (pointsError) {
-            console.error('Error adding welcome bonus points:', pointsError);
-            // Don't fail the signup if points addition fails
-          }
-        }
-      } catch (error) {
-        console.error('Unexpected error creating company profile:', error);
-        // Don't fail the signup if profile creation fails
+        // Give new user 25 free points
+        await PointsService.addPoints(
+          authData.user.id,
+          25,
+          'bonus',
+          'Welcome bonus - 25 free points for new users'
+        );
+        console.log('✅ Welcome bonus points added for new user');
+      } catch (pointsError) {
+        console.error('Error adding welcome bonus points:', pointsError);
+        // Don't fail the signup if points addition fails
       }
     }
     
