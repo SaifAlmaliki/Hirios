@@ -32,6 +32,7 @@ import { VoiceInterviewService } from '@/services/voiceInterviewService';
 import { useToast } from '@/hooks/use-toast';
 import ScreeningResultActions from '@/components/ScreeningResultActions';
 import NotesEditDialog from '@/components/NotesEditDialog';
+import { supabase } from '@/integrations/supabase/client';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -92,6 +93,45 @@ const ScreeningResultDetail = () => {
     setTimeout(() => setRequestingInterview(null), 2000);
   };
 
+  const handleResumeDownload = async () => {
+    if (!result?.resume_url) {
+      toast({
+        title: "Resume not available",
+        description: "No resume found for this candidate.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      // Extract file path from URL
+      const url = new URL(result.resume_url);
+      const pathParts = url.pathname.split('/');
+      const bucketIndex = pathParts.findIndex(part => part === 'company_uploads');
+      
+      if (bucketIndex !== -1 && bucketIndex < pathParts.length - 1) {
+        const filePath = pathParts.slice(bucketIndex + 1).join('/');
+        
+        // Generate fresh signed URL
+        const { data, error } = await supabase.storage
+          .from('company_uploads')
+          .createSignedUrl(filePath, 3600); // 1 hour expiry
+        
+        if (error) {
+          console.error('Error generating signed URL:', error);
+          window.open(result.resume_url, '_blank'); // Fallback to original URL
+        } else {
+          window.open(data.signedUrl, '_blank');
+        }
+      } else {
+        window.open(result.resume_url, '_blank'); // Fallback for other URL formats
+      }
+    } catch (error) {
+      console.error('Error handling resume download:', error);
+      window.open(result.resume_url, '_blank'); // Fallback
+    }
+  };
+
   const getScoreColor = (score: number) => {
     if (score > 70) return 'text-green-600';
     if (score >= 40) return 'text-yellow-600';
@@ -108,24 +148,25 @@ const ScreeningResultDetail = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       {/* Header */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
+        <div className="w-full px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 py-4">
+            <div className="flex items-center space-x-2 sm:space-x-4 min-w-0 flex-1">
               <Button 
                 variant="ghost" 
                 onClick={() => navigate('/screening-results')}
-                className="hover:bg-gray-100"
+                className="hover:bg-gray-100 flex-shrink-0"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Results
+                <span className="hidden sm:inline">Back to Results</span>
+                <span className="sm:hidden">Back</span>
               </Button>
-              <Separator orientation="vertical" className="h-6" />
-              <h1 className="text-xl font-semibold text-gray-900">
+              <Separator orientation="vertical" className="h-6 hidden sm:block" />
+              <h1 className="text-lg sm:text-xl font-semibold text-gray-900 truncate">
                 {result.first_name} {result.last_name}
               </h1>
             </div>
             
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2 sm:space-x-3 flex-shrink-0">
               {/* Favorite Button */}
               <Button
                 variant="outline"
@@ -135,14 +176,14 @@ const ScreeningResultDetail = () => {
                   is_favorite: !result.is_favorite 
                 })}
                 disabled={updateFavoriteMutation.isPending}
-                className={`flex items-center gap-2 ${
+                className={`flex items-center gap-1 sm:gap-2 ${
                   result.is_favorite 
                     ? 'border-yellow-300 text-yellow-600 hover:bg-yellow-50 bg-yellow-50' 
                     : 'border-yellow-300 text-yellow-600 hover:bg-yellow-50'
                 }`}
               >
                 <Star className={`h-4 w-4 ${result.is_favorite ? 'fill-current' : ''}`} />
-                {result.is_favorite ? 'Favorited' : 'Favorite'}
+                <span className="hidden sm:inline">{result.is_favorite ? 'Favorited' : 'Favorite'}</span>
               </Button>
 
               {/* Dismiss Button */}
@@ -154,17 +195,17 @@ const ScreeningResultDetail = () => {
                   is_dismissed: !result.is_dismissed 
                 })}
                 disabled={updateDismissMutation.isPending}
-                className={`flex items-center gap-2 ${
+                className={`flex items-center gap-1 sm:gap-2 ${
                   result.is_dismissed 
                     ? 'border-red-300 text-red-600 hover:bg-red-50 bg-red-50' 
                     : 'border-red-300 text-red-600 hover:bg-red-50'
                 }`}
               >
                 <X className="h-4 w-4" />
-                {result.is_dismissed ? 'Restore' : 'Dismiss'}
+                <span className="hidden sm:inline">{result.is_dismissed ? 'Restore' : 'Dismiss'}</span>
               </Button>
 
-              <Badge className={`${getScoreBadgeColor(result.overall_fit || 0)} font-semibold`}>
+              <Badge className={`${getScoreBadgeColor(result.overall_fit || 0)} font-semibold text-xs sm:text-sm`}>
                 {result.overall_fit}% Fit
               </Badge>
             </div>
@@ -173,56 +214,55 @@ const ScreeningResultDetail = () => {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 max-w-7xl mx-auto">
           
           {/* Left Column - Candidate Info & Actions */}
-          <div className="lg:col-span-1 space-y-6">
+          <div className="xl:col-span-1 space-y-4 sm:space-y-6">
             
             {/* Candidate Profile Card */}
             <Card className="shadow-lg border-0 bg-white">
               <CardHeader className="pb-4">
-                <div className="flex items-center space-x-4">
-                  <Avatar className="w-16 h-16">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
+                  <Avatar className="w-16 h-16 flex-shrink-0">
                     <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-xl font-semibold">
                       {result.first_name.charAt(0)}{result.last_name.charAt(0)}
                     </AvatarFallback>
                   </Avatar>
-                  <div>
-                    <CardTitle className="text-xl text-gray-900">
+                  <div className="min-w-0 flex-1">
+                    <CardTitle className="text-lg sm:text-xl text-gray-900 truncate">
                       {result.first_name} {result.last_name}
                     </CardTitle>
-                    <CardDescription className="text-gray-600">
+                    <CardDescription className="text-gray-600 text-sm sm:text-base break-words leading-relaxed">
                       {result.job?.title || 'Candidate'}
                     </CardDescription>
                   </div>
                 </div>
               </CardHeader>
               
-              <CardContent className="space-y-4">
-                <div className="flex items-center space-x-3 text-gray-600">
-                  <Mail className="w-4 h-4" />
-                  <span className="text-sm">{result.email}</span>
+              <CardContent className="space-y-3 sm:space-y-4">
+                <div className="flex items-start space-x-3 text-gray-600">
+                  <Mail className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                  <span className="text-sm break-all">{result.email}</span>
                 </div>
                 
                 {result.phone && (
-                  <div className="flex items-center space-x-3 text-gray-600">
-                    <Phone className="w-4 h-4" />
+                  <div className="flex items-start space-x-3 text-gray-600">
+                    <Phone className="w-4 h-4 flex-shrink-0 mt-0.5" />
                     <span className="text-sm">{result.phone}</span>
                   </div>
                 )}
                 
-                
                 {result.job && (
                   <>
-                    <div className="flex items-center space-x-3 text-gray-600">
-                      <Briefcase className="w-4 h-4" />
-                      <span className="text-sm">{result.job.title}</span>
+                    <div className="flex items-start space-x-3 text-gray-600">
+                      <Briefcase className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                      <span className="text-sm break-words leading-relaxed">{result.job.title}</span>
                     </div>
                     
-                    <div className="flex items-center space-x-3 text-gray-600">
-                      <Building2 className="w-4 h-4" />
-                      <span className="text-sm">{result.job.company} - {result.job.department}</span>
+                    <div className="flex items-start space-x-3 text-gray-600">
+                      <Building2 className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                      <span className="text-sm break-words leading-relaxed">{result.job.company} - {result.job.department}</span>
                     </div>
                   </>
                 )}
@@ -232,21 +272,21 @@ const ScreeningResultDetail = () => {
             {/* Overall Score Card */}
             <Card className="shadow-lg border-0 bg-white">
               <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Brain className="w-5 h-5 text-blue-600" />
+                <CardTitle className="flex items-center space-x-2 text-sm sm:text-base">
+                  <Brain className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
                   <span>Overall Fit Score</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-center space-y-4">
-                  <div className={`text-4xl font-bold ${getScoreColor(result.overall_fit || 0)}`}>
+                <div className="text-center space-y-3 sm:space-y-4">
+                  <div className={`text-3xl sm:text-4xl font-bold ${getScoreColor(result.overall_fit || 0)}`}>
                     {result.overall_fit}%
                   </div>
                   <Progress 
                     value={result.overall_fit || 0} 
-                    className="h-3"
+                    className="h-2 sm:h-3"
                   />
-                  <Badge className={`${getScoreBadgeColor(result.overall_fit || 0)} text-sm px-3 py-1`}>
+                  <Badge className={`${getScoreBadgeColor(result.overall_fit || 0)} text-xs sm:text-sm px-2 sm:px-3 py-1`}>
                     {result.overall_fit && result.overall_fit > 70 ? 'Excellent' : 
                      result.overall_fit && result.overall_fit >= 40 ? 'Good' : 'Poor'}
                   </Badge>
@@ -260,16 +300,16 @@ const ScreeningResultDetail = () => {
                 <CardTitle>Actions</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="flex flex-col space-y-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-3">
                   {/* Resume Button */}
                   {result.resume_url && (
                     <Button
                       variant="outline"
-                      onClick={() => window.open(result.resume_url, '_blank')}
+                      onClick={handleResumeDownload}
                       className="flex items-center justify-center gap-2 border-green-300 text-green-600 hover:bg-green-50 w-full h-10"
                     >
                       <FileText className="h-4 w-4" />
-                      <span>View Resume</span>
+                      <span className="truncate">View Resume</span>
                     </Button>
                   )}
                   
@@ -287,17 +327,17 @@ const ScreeningResultDetail = () => {
                     {requestingInterview === result.id ? (
                       <>
                         <Mic className="h-4 w-4 animate-spin" />
-                        <span>Sending Interview...</span>
+                        <span className="truncate">Sending...</span>
                       </>
                     ) : result.voice_screening_requested ? (
                       <>
                         <Mic className="h-4 w-4" />
-                        <span>Interview Sent</span>
+                        <span className="truncate">Interview Sent</span>
                       </>
                     ) : (
                       <>
                         <Mic className="h-4 w-4" />
-                        <span>Invite</span>
+                        <span className="truncate">Invite</span>
                       </>
                     )}
                   </Button>
@@ -313,18 +353,70 @@ const ScreeningResultDetail = () => {
                         description: "Direct interview link copied to clipboard (auto-start enabled)",
                       });
                     }}
-                    className="flex items-center justify-center gap-2 border-purple-300 text-purple-600 hover:bg-purple-50 w-full h-10"
+                    className="flex items-center justify-center gap-2 border-purple-300 text-purple-600 hover:bg-purple-50 w-full h-10 sm:col-span-2 xl:col-span-1"
                   >
                     <ExternalLink className="h-4 w-4" />
-                    <span>Copy Interview Link</span>
+                    <span className="truncate">Copy Interview Link</span>
                   </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Company Notes Card - Moved from right column */}
+            <Card className="shadow-lg border-0 bg-white">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center space-x-2 text-gray-700">
+                    <FileText className="w-5 h-5" />
+                    <span>Company Notes</span>
+                  </CardTitle>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setIsNotesDialogOpen(true)}
+                    className="h-8 px-2 text-purple-600 hover:text-purple-700 hover:bg-purple-50"
+                  >
+                    <Edit3 className="h-3 w-3 mr-1" />
+                    Edit
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  {result.notes ? (
+                    <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">{result.notes}</p>
+                  ) : (
+                    <p className="text-gray-500 text-sm italic">No notes added yet. Click Edit to add notes about this candidate.</p>
+                  )}
                 </div>
               </CardContent>
             </Card>
           </div>
 
           {/* Right Column - Analysis Details */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="xl:col-span-2 space-y-4 sm:space-y-6">
+            
+            {/* AI Analysis Justification Card - Moved to top */}
+            <Card className="shadow-lg border-0 bg-white">
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2 text-purple-700">
+                  <Brain className="w-5 h-5" />
+                  <span>AI Analysis Justification</span>
+                </CardTitle>
+                <CardDescription>
+                  Detailed reasoning behind the overall fit score
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="prose prose-sm max-w-none text-gray-700 leading-relaxed">
+                  {result.justification ? (
+                    <p>{result.justification}</p>
+                  ) : (
+                    <p className="text-gray-500 italic">No AI analysis justification available</p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
             
             {/* Strengths Card */}
             <Card className="shadow-lg border-0 bg-white">
@@ -365,7 +457,7 @@ const ScreeningResultDetail = () => {
             </Card>
 
             {/* Risk & Reward Analysis */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
               {/* Risk Factors */}
               <Card className="shadow-lg border-0 bg-white">
                 <CardHeader>
@@ -405,27 +497,6 @@ const ScreeningResultDetail = () => {
               </Card>
             </div>
 
-            {/* AI Analysis Justification */}
-            <Card className="shadow-lg border-0 bg-white">
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2 text-purple-700">
-                  <Brain className="w-5 h-5" />
-                  <span>AI Analysis Justification</span>
-                </CardTitle>
-                <CardDescription>
-                  Detailed reasoning behind the overall fit score
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="prose prose-sm max-w-none text-gray-700 leading-relaxed">
-                  {result.justification ? (
-                    <p>{result.justification}</p>
-                  ) : (
-                    <p className="text-gray-500 italic">No AI analysis justification available</p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
 
             {/* Voice Interview Section */}
             {(result.voice_screening_requested || result.interview_summary) && (
@@ -468,35 +539,6 @@ const ScreeningResultDetail = () => {
               </Card>
             )}
 
-            {/* Notes Section */}
-            <Card className="shadow-lg border-0 bg-white">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center space-x-2 text-gray-700">
-                    <FileText className="w-5 h-5" />
-                    <span>Company Notes</span>
-                  </CardTitle>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setIsNotesDialogOpen(true)}
-                    className="h-8 px-2 text-purple-600 hover:text-purple-700 hover:bg-purple-50"
-                  >
-                    <Edit3 className="h-3 w-3 mr-1" />
-                    Edit
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="bg-gray-50 rounded-lg p-4">
-                  {result.notes ? (
-                    <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">{result.notes}</p>
-                  ) : (
-                    <p className="text-gray-500 text-sm italic">No notes added yet. Click Edit to add notes about this candidate.</p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
           </div>
         </div>
       </div>
