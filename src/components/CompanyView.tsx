@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Building, Eye, FileText, MapPin, Clock, Briefcase, Edit, Trash2, CheckCircle } from 'lucide-react';
+import { Plus, Building, Eye, FileText, MapPin, Clock, Briefcase, Edit, Trash2, CheckCircle, ChevronDown } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useCreateJob, useUpdateJob, useDeleteJob } from '../hooks/useJobs';
 import { useCompanyJobs } from '../hooks/useCompanyJobs';
@@ -14,7 +15,6 @@ import { useCompanyProfile } from '../hooks/useCompanyProfile';
 import { useNavigate } from 'react-router-dom';
 
 import JobApplicationsView from './JobApplicationsView';
-import CompanyResumeUpload from './CompanyResumeUpload';
 import JobCollaborationManager from './JobCollaborationManager';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -203,6 +203,7 @@ const CompanyView: React.FC = () => {
   const [isJobDetailViewOpen, setIsJobDetailViewOpen] = useState(false);
   const [editingJob, setEditingJob] = useState<any>(null);
   const [detailViewJob, setDetailViewJob] = useState<any>(null);
+  const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set());
   
   // Use company-specific jobs hook instead of all jobs
   const { data: jobs = [], isLoading: jobsLoading } = useCompanyJobs();
@@ -328,8 +329,21 @@ const CompanyView: React.FC = () => {
   };
 
   const handleViewJobDetail = (job: any) => {
-    setDetailViewJob(job);
-    setIsJobDetailViewOpen(true);
+    // Navigate to screening results for this specific job
+    navigate(`/screening-results/job/${job.id}`);
+  };
+
+  const toggleCardExpansion = (jobId: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent navigation when clicking the expand button
+    setExpandedCards(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(jobId)) {
+        newSet.delete(jobId);
+      } else {
+        newSet.add(jobId);
+      }
+      return newSet;
+    });
   };
 
 
@@ -404,12 +418,6 @@ const CompanyView: React.FC = () => {
             </DialogContent>
           </Dialog>
           
-          <CompanyResumeUpload onUploadComplete={() => {
-            // Refresh applications view if it's open
-            if (isApplicationsViewOpen) {
-              // The JobApplicationsView will automatically refresh due to React Query
-            }
-          }} />
         </div>
       </div>
 
@@ -430,92 +438,149 @@ const CompanyView: React.FC = () => {
           </Card>
         ) : (
           <div className="grid grid-cols-1 gap-4">
-            {jobs.map((job) => (
-              <Card key={job.id} className="hover:shadow-lg transition-shadow duration-200 border-l-4 border-l-blue-500 cursor-pointer" onClick={() => handleViewJobDetail(job)}>
-                <CardHeader className="pb-2">
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-start gap-2">
-                      <div className="flex-1 min-w-0">
-                        <CardTitle className="text-lg font-bold text-gray-900 mb-1 line-clamp-1">{job.title}</CardTitle>
-                        <div className="flex items-center text-blue-600 font-semibold mb-1">
-                          <Building className="h-4 w-4 mr-1 flex-shrink-0" />
-                          <span className="truncate">{job.company}</span>
+            {jobs.map((job) => {
+              const isExpanded = expandedCards.has(job.id);
+              return (
+                <Card key={job.id} className="hover:shadow-lg transition-shadow duration-200 border-l-4 border-l-blue-500">
+                  <Collapsible open={isExpanded} onOpenChange={(open) => {
+                    if (open !== isExpanded) {
+                      setExpandedCards(prev => {
+                        const newSet = new Set(prev);
+                        if (newSet.has(job.id)) {
+                          newSet.delete(job.id);
+                        } else {
+                          newSet.add(job.id);
+                        }
+                        return newSet;
+                      });
+                    }
+                  }}>
+                    <CardHeader className="pb-2">
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-start gap-2">
+                          <div className="flex-1 min-w-0 cursor-pointer" onClick={() => handleViewJobDetail(job)}>
+                            <CardTitle className="text-lg font-bold text-gray-900 mb-1 line-clamp-1">{job.title}</CardTitle>
+                            <div className="flex items-center text-blue-600 font-semibold mb-1">
+                              <Building className="h-4 w-4 mr-1 flex-shrink-0" />
+                              <span className="truncate">{job.company}</span>
+                            </div>
+                          </div>
+                          <div className="flex space-x-1 flex-shrink-0">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEditJob(job);
+                              }}
+                              className="text-blue-600 hover:text-blue-800 hover:bg-blue-50 p-1"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteJob(job.id);
+                              }}
+                              className="text-red-600 hover:text-red-800 hover:bg-red-50 p-1"
+                              disabled={deleteJobMutation.isPending}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleViewApplications(job.id);
+                              }}
+                              className="text-green-600 hover:text-green-800 hover:bg-green-50 p-1"
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <CollapsibleTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-gray-600 hover:text-gray-800 hover:bg-gray-50 p-1"
+                              >
+                                <ChevronDown className={`h-4 w-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                              </Button>
+                            </CollapsibleTrigger>
+                          </div>
                         </div>
                       </div>
-                      <div className="flex space-x-1 flex-shrink-0">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleEditJob(job);
-                          }}
-                          className="text-blue-600 hover:text-blue-800 hover:bg-blue-50 p-1"
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteJob(job.id);
-                          }}
-                          className="text-red-600 hover:text-red-800 hover:bg-red-50 p-1"
-                          disabled={deleteJobMutation.isPending}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleViewApplications(job.id);
-                          }}
-                          className="text-green-600 hover:text-green-800 hover:bg-green-50 p-1"
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <div className="space-y-2">
+                        <div className="flex flex-wrap gap-4">
+                          <div className="flex items-center text-gray-600">
+                            <MapPin className="h-4 w-4 mr-1 text-gray-400 flex-shrink-0" />
+                            <span className="text-sm truncate">{job.location}</span>
+                          </div>
+                          
+                          <div className="flex items-center text-gray-600">
+                            <Briefcase className="h-4 w-4 mr-1 text-gray-400 flex-shrink-0" />
+                            <span className="text-sm truncate">{job.department}</span>
+                          </div>
+                          
+                          <div className="flex items-center text-gray-600">
+                            <Clock className="h-4 w-4 mr-1 text-gray-400 flex-shrink-0" />
+                            <span className="text-sm">{formatEmploymentType(job.employment_type)}</span>
+                          </div>
+                        </div>
+                        
+                        <div className="border-t pt-2">
+                          <p className="text-sm text-gray-600 line-clamp-1">
+                            {job.description}
+                          </p>
+                        </div>
+                        
+                        <div className="flex justify-between items-center text-xs text-gray-500 pt-1">
+                          <span>Posted: {formatDate(job.created_at)}</span>
+                          <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                            Active
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <div className="space-y-2">
-                    <div className="flex flex-wrap gap-4">
-                      <div className="flex items-center text-gray-600">
-                        <MapPin className="h-4 w-4 mr-1 text-gray-400 flex-shrink-0" />
-                        <span className="text-sm truncate">{job.location}</span>
-                      </div>
-                      
-                      <div className="flex items-center text-gray-600">
-                        <Briefcase className="h-4 w-4 mr-1 text-gray-400 flex-shrink-0" />
-                        <span className="text-sm truncate">{job.department}</span>
-                      </div>
-                      
-                      <div className="flex items-center text-gray-600">
-                        <Clock className="h-4 w-4 mr-1 text-gray-400 flex-shrink-0" />
-                        <span className="text-sm">{formatEmploymentType(job.employment_type)}</span>
-                      </div>
-                    </div>
-                    
-                    <div className="border-t pt-2">
-                      <p className="text-sm text-gray-600 line-clamp-1">
-                        {job.description}
-                      </p>
-                    </div>
-                    
-                    <div className="flex justify-between items-center text-xs text-gray-500 pt-1">
-                      <span>Posted: {formatDate(job.created_at)}</span>
-                      <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-                        Active
-                      </span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                    </CardContent>
+                    <CollapsibleContent>
+                      <CardContent className="pt-0">
+                        <div className="space-y-4">
+                          <div className="border-t pt-4">
+                            <h4 className="font-semibold text-gray-900 mb-2">Job Description</h4>
+                            <p className="text-sm text-gray-700 whitespace-pre-wrap">{job.description}</p>
+                          </div>
+                          
+                          {job.responsibilities && (
+                            <div>
+                              <h4 className="font-semibold text-gray-900 mb-2">Responsibilities</h4>
+                              <p className="text-sm text-gray-700 whitespace-pre-wrap">{job.responsibilities}</p>
+                            </div>
+                          )}
+                          
+                          {job.requirements && (
+                            <div>
+                              <h4 className="font-semibold text-gray-900 mb-2">Requirements</h4>
+                              <p className="text-sm text-gray-700 whitespace-pre-wrap">{job.requirements}</p>
+                            </div>
+                          )}
+                          
+                          {job.benefits && (
+                            <div>
+                              <h4 className="font-semibold text-gray-900 mb-2">Benefits</h4>
+                              <p className="text-sm text-gray-700 whitespace-pre-wrap">{job.benefits}</p>
+                            </div>
+                          )}
+                        </div>
+                      </CardContent>
+                    </CollapsibleContent>
+                  </Collapsible>
+                </Card>
+              );
+            })}
           </div>
         )}
       </div>

@@ -25,11 +25,23 @@ interface UploadedFile {
 
 interface CompanyResumeUploadProps {
   onUploadComplete?: () => void;
+  preselectedJobId?: string;
+  isDialogOpen?: boolean;
+  onDialogOpenChange?: (open: boolean) => void;
+  showTrigger?: boolean;
 }
 
-const CompanyResumeUpload: React.FC<CompanyResumeUploadProps> = ({ onUploadComplete }) => {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [selectedJobId, setSelectedJobId] = useState<string>('');
+const CompanyResumeUpload: React.FC<CompanyResumeUploadProps> = ({ 
+  onUploadComplete, 
+  preselectedJobId, 
+  isDialogOpen: externalDialogOpen, 
+  onDialogOpenChange, 
+  showTrigger = true 
+}) => {
+  const [internalDialogOpen, setInternalDialogOpen] = useState(false);
+  const isDialogOpen = externalDialogOpen !== undefined ? externalDialogOpen : internalDialogOpen;
+  const setIsDialogOpen = onDialogOpenChange || setInternalDialogOpen;
+  const [selectedJobId, setSelectedJobId] = useState<string>(preselectedJobId || '');
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [overallProgress, setOverallProgress] = useState(0);
@@ -44,6 +56,14 @@ const CompanyResumeUpload: React.FC<CompanyResumeUploadProps> = ({ onUploadCompl
 
   const MAX_FILES = 10;
   const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
+  // Auto-open dialog when preselectedJobId is provided
+  useEffect(() => {
+    if (preselectedJobId && preselectedJobId !== selectedJobId) {
+      setSelectedJobId(preselectedJobId);
+      setIsDialogOpen(true);
+    }
+  }, [preselectedJobId, selectedJobId]);
 
   // Auto-close dialog when all uploads are completed or failed
   useEffect(() => {
@@ -409,13 +429,15 @@ const CompanyResumeUpload: React.FC<CompanyResumeUploadProps> = ({ onUploadCompl
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-      <DialogTrigger asChild>
-        <Button className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto">
-          <Upload className="h-4 w-4 mr-2" />
-          <span className="hidden sm:inline">Upload Resumes</span>
-          <span className="sm:hidden">Upload</span>
-        </Button>
-      </DialogTrigger>
+      {showTrigger && (
+        <DialogTrigger asChild>
+          <Button className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto">
+            <Upload className="h-4 w-4 mr-2" />
+            <span className="hidden sm:inline">Upload Resumes</span>
+            <span className="sm:hidden">Upload</span>
+          </Button>
+        </DialogTrigger>
+      )}
       <DialogContent className="sm:max-w-4xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl text-green-900">Upload Candidate Resumes</DialogTitle>
