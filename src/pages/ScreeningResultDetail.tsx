@@ -356,6 +356,28 @@ const ScreeningResultDetail = () => {
           {/* Right Column - Analysis Details */}
           <div className="lg:col-span-2 space-y-6">
             
+            {/* AI Analysis Justification Card - Moved to top */}
+            <Card className="shadow-lg border-0 bg-white">
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2 text-purple-700">
+                  <Brain className="w-5 h-5" />
+                  <span>AI Analysis Justification</span>
+                </CardTitle>
+                <CardDescription>
+                  Detailed reasoning behind the overall fit score
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="prose prose-sm max-w-none text-gray-700 leading-relaxed">
+                  {result.justification ? (
+                    <p>{result.justification}</p>
+                  ) : (
+                    <p className="text-gray-500 italic">No AI analysis justification available</p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+            
             {/* Strengths Card */}
             <Card className="shadow-lg border-0 bg-white">
               <CardHeader>
@@ -435,27 +457,6 @@ const ScreeningResultDetail = () => {
               </Card>
             </div>
 
-            {/* AI Analysis Justification */}
-            <Card className="shadow-lg border-0 bg-white">
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2 text-purple-700">
-                  <Brain className="w-5 h-5" />
-                  <span>AI Analysis Justification</span>
-                </CardTitle>
-                <CardDescription>
-                  Detailed reasoning behind the overall fit score
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="prose prose-sm max-w-none text-gray-700 leading-relaxed">
-                  {result.justification ? (
-                    <p>{result.justification}</p>
-                  ) : (
-                    <p className="text-gray-500 italic">No AI analysis justification available</p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
 
             {/* Voice Interview Section */}
             {(result.voice_screening_requested || result.interview_summary) && (
