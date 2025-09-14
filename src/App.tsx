@@ -26,6 +26,7 @@ import TestCollaboration from "./pages/TestCollaboration";
 import PointsPurchase from "./pages/PointsPurchase";
 import PointsHistory from "./pages/PointsHistory";
 import NotFound from "./pages/NotFound";
+import { ButtonAlignmentDemo } from "./components/ui/button-alignment-demo";
 import { VoiceInterviewService } from "./services/voiceInterviewService";
 
 const queryClient = new QueryClient();
@@ -70,6 +71,7 @@ const App = () => (
             <Route path="/interview/:screeningResultId/:applicationId" element={<VoiceInterview />} />
             <Route path="/invite/:token" element={<InviteAccept />} />
             <Route path="/test-collaboration" element={<TestCollaboration />} />
+            <Route path="/button-demo" element={<ButtonAlignmentDemo />} />
             <Route path="/points-purchase" element={<PointsPurchase />} />
             <Route path="/points-history" element={<PointsHistory />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

@@ -24,9 +24,9 @@ const actionButtonVariants = cva(
       width: {
         auto: "w-auto",
         full: "w-full",
-        fixed: "w-20 sm:w-24",
-        fixedLg: "w-28 sm:w-32 lg:w-36",
-        fixedXl: "w-20 sm:w-24 lg:w-28",
+        fixed: "w-24 sm:w-28",
+        fixedLg: "w-24 sm:w-28",
+        fixedXl: "w-24 sm:w-28",
       },
       state: {
         default: "",

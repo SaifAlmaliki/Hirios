@@ -116,51 +116,50 @@ const ScreeningResultActions: React.FC<ScreeningResultActionsProps> = ({
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-3 w-full lg:w-96 lg:justify-end">
-      {/* CV Button */}
-      <CVButton
-        resumeUrl={resumeUrl}
-        onDownload={handleResumeDownload}
-      />
-      
-      {/* Invite Button */}
-      <InviteButton
-        isRequestingInterview={isRequestingInterview}
-        isVoiceScreeningRequested={isVoiceScreeningRequested}
-        onClick={() => setShowConfirmDialog(true)}
-      />
-
-      {/* Link Button */}
-      <LinkButton
-        onClick={handleLinkCopy}
-      />
-
-      {/* View Details Button - Only show if enabled */}
-      {showViewDetails && (
-        <ViewDetailsButton
-          onClick={handleViewDetails}
+    <div className="w-full lg:w-96 lg:justify-end">
+      {/* Button Grid - Two rows with 3 buttons each */}
+      <div className="grid grid-cols-3 gap-3 items-center">
+        {/* First Row */}
+        <CVButton
+          resumeUrl={resumeUrl}
+          onDownload={handleResumeDownload}
         />
-      )}
+        
+        <InviteButton
+          isRequestingInterview={isRequestingInterview}
+          isVoiceScreeningRequested={isVoiceScreeningRequested}
+          onClick={() => setShowConfirmDialog(true)}
+        />
 
-      {/* Favorite Button */}
-      <FavoriteButton
-        isFavorite={isFavorite}
-        isPending={updateFavoriteMutation.isPending}
-        onClick={handleFavoriteToggle}
-      />
+        <LinkButton
+          onClick={handleLinkCopy}
+        />
 
-      {/* Dismiss Button */}
-      <DismissButton
-        isDismissed={isDismissed}
-        isPending={updateDismissMutation.isPending}
-        onClick={handleDismissToggle}
-      />
-      
-      {/* Details Toggle */}
-      <DetailsToggleButton
-        isExpanded={isExpanded}
-        onClick={onToggleExpansion}
-      />
+        {/* Second Row */}
+        {showViewDetails && (
+          <ViewDetailsButton
+            onClick={handleViewDetails}
+          />
+        )}
+
+        <FavoriteButton
+          isFavorite={isFavorite}
+          isPending={updateFavoriteMutation.isPending}
+          onClick={handleFavoriteToggle}
+        />
+
+        <DismissButton
+          isDismissed={isDismissed}
+          isPending={updateDismissMutation.isPending}
+          onClick={handleDismissToggle}
+        />
+        
+        {/* Details Toggle - Always in second row */}
+        <DetailsToggleButton
+          isExpanded={isExpanded}
+          onClick={onToggleExpansion}
+        />
+      </div>
 
       {/* Confirmation Dialog */}
       <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
