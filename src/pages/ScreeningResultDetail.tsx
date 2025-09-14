@@ -32,6 +32,7 @@ import { VoiceInterviewService } from '@/services/voiceInterviewService';
 import { useToast } from '@/hooks/use-toast';
 import ScreeningResultActions from '@/components/ScreeningResultActions';
 import NotesEditDialog from '@/components/NotesEditDialog';
+import { supabase } from '@/integrations/supabase/client';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -90,6 +91,45 @@ const ScreeningResultDetail = () => {
     setRequestingInterview(screeningResult.id);
     // Add voice screening logic here
     setTimeout(() => setRequestingInterview(null), 2000);
+  };
+
+  const handleResumeDownload = async () => {
+    if (!result?.resume_url) {
+      toast({
+        title: "Resume not available",
+        description: "No resume found for this candidate.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      // Extract file path from URL
+      const url = new URL(result.resume_url);
+      const pathParts = url.pathname.split('/');
+      const bucketIndex = pathParts.findIndex(part => part === 'company_uploads');
+      
+      if (bucketIndex !== -1 && bucketIndex < pathParts.length - 1) {
+        const filePath = pathParts.slice(bucketIndex + 1).join('/');
+        
+        // Generate fresh signed URL
+        const { data, error } = await supabase.storage
+          .from('company_uploads')
+          .createSignedUrl(filePath, 3600); // 1 hour expiry
+        
+        if (error) {
+          console.error('Error generating signed URL:', error);
+          window.open(result.resume_url, '_blank'); // Fallback to original URL
+        } else {
+          window.open(data.signedUrl, '_blank');
+        }
+      } else {
+        window.open(result.resume_url, '_blank'); // Fallback for other URL formats
+      }
+    } catch (error) {
+      console.error('Error handling resume download:', error);
+      window.open(result.resume_url, '_blank'); // Fallback
+    }
   };
 
   const getScoreColor = (score: number) => {
@@ -265,7 +305,7 @@ const ScreeningResultDetail = () => {
                   {result.resume_url && (
                     <Button
                       variant="outline"
-                      onClick={() => window.open(result.resume_url, '_blank')}
+                      onClick={handleResumeDownload}
                       className="flex items-center justify-center gap-2 border-green-300 text-green-600 hover:bg-green-50 w-full h-10"
                     >
                       <FileText className="h-4 w-4" />
