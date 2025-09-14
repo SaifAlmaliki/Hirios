@@ -89,11 +89,11 @@ const Navbar1: React.FC<Navbar1Props> = ({
   }
 
   return (
-    <div className="flex justify-center w-full py-6 px-4 fixed top-0 left-0 right-0 z-50 bg-gradient-to-br from-slate-50 to-blue-50">
-      <div className={`flex items-center justify-between px-6 py-3 bg-white rounded-full shadow-lg w-full ${getMaxWidthClass()} relative z-10`}>
+    <div className="flex justify-center w-full py-4 sm:py-6 px-4 fixed top-0 left-0 right-0 z-50 bg-gradient-to-br from-slate-50 to-blue-50">
+      <div className={`flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 bg-white rounded-full shadow-lg w-full ${getMaxWidthClass()} relative z-10`}>
         <div className="flex items-center">
           <motion.div
-            className="w-8 h-8 mr-6 cursor-pointer"
+            className="w-8 h-8 mr-3 sm:mr-6 cursor-pointer"
             initial={{ scale: 0.8 }}
             animate={{ scale: 1 }}
             whileHover={{ rotate: 10 }}
@@ -105,7 +105,7 @@ const Navbar1: React.FC<Navbar1Props> = ({
             </div>
           </motion.div>
           <motion.h1 
-            className="text-xl font-bold text-gray-900 cursor-pointer hover:text-blue-700"
+            className="text-lg sm:text-xl font-bold text-gray-900 cursor-pointer hover:text-blue-700"
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.3 }}
@@ -115,11 +115,86 @@ const Navbar1: React.FC<Navbar1Props> = ({
           </motion.h1>
         </div>
         
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-4">
+        {/* Tablet Navigation - Medium screens */}
+        <nav className="hidden md:flex lg:hidden items-center space-x-2">
           {user ? (
             <>
-              <span className="text-sm text-gray-600 hidden lg:inline">
+              {/* Points Badge */}
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.05 }}
+              >
+                <PointsBadge variant="default" />
+              </motion.div>
+              
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.1 }}
+                whileHover={{ scale: 1.05 }}
+              >
+                <button
+                  onClick={handleScreeningResults}
+                  className="flex items-center px-2 py-2 text-sm text-gray-900 hover:text-blue-600 transition-colors font-medium rounded-full hover:bg-blue-50"
+                >
+                  <Brain className="h-4 w-4 mr-1" />
+                  <span className="hidden sm:inline">AI Screening</span>
+                </button>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.15 }}
+                whileHover={{ scale: 1.05 }}
+              >
+                <button
+                  onClick={handlePointsPurchase}
+                  className="flex items-center px-2 py-2 text-sm text-gray-900 hover:text-purple-600 transition-colors font-medium rounded-full hover:bg-purple-50"
+                >
+                  <Coins className="h-4 w-4 mr-1" />
+                  <span className="hidden sm:inline">Buy Points</span>
+                </button>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.2 }}
+                whileHover={{ scale: 1.05 }}
+              >
+                <button
+                  onClick={handleSignOut}
+                  className="flex items-center px-2 py-2 text-sm text-gray-900 hover:text-red-600 transition-colors font-medium rounded-full hover:bg-red-50"
+                >
+                  <LogOut className="h-4 w-4 mr-1" />
+                  <span className="hidden sm:inline">Sign Out</span>
+                </button>
+              </motion.div>
+            </>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.3, delay: 0.2 }}
+              whileHover={{ scale: 1.05 }}
+            >
+              <button
+                onClick={handleSignIn}
+                className="inline-flex items-center justify-center px-4 py-2 text-sm text-white bg-black rounded-full hover:bg-gray-800 transition-colors"
+              >
+                Sign In
+              </button>
+            </motion.div>
+          )}
+        </nav>
+
+        {/* Desktop Navigation - Large screens */}
+        <nav className="hidden lg:flex items-center space-x-4">
+          {user ? (
+            <>
+              <span className="text-sm text-gray-600 hidden xl:inline">
                 {user.email}
               </span>
               

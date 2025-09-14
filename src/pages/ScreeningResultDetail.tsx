@@ -321,6 +321,36 @@ const ScreeningResultDetail = () => {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Company Notes Card - Moved from right column */}
+            <Card className="shadow-lg border-0 bg-white">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center space-x-2 text-gray-700">
+                    <FileText className="w-5 h-5" />
+                    <span>Company Notes</span>
+                  </CardTitle>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setIsNotesDialogOpen(true)}
+                    className="h-8 px-2 text-purple-600 hover:text-purple-700 hover:bg-purple-50"
+                  >
+                    <Edit3 className="h-3 w-3 mr-1" />
+                    Edit
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  {result.notes ? (
+                    <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">{result.notes}</p>
+                  ) : (
+                    <p className="text-gray-500 text-sm italic">No notes added yet. Click Edit to add notes about this candidate.</p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Right Column - Analysis Details */}
@@ -468,35 +498,6 @@ const ScreeningResultDetail = () => {
               </Card>
             )}
 
-            {/* Notes Section */}
-            <Card className="shadow-lg border-0 bg-white">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center space-x-2 text-gray-700">
-                    <FileText className="w-5 h-5" />
-                    <span>Company Notes</span>
-                  </CardTitle>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setIsNotesDialogOpen(true)}
-                    className="h-8 px-2 text-purple-600 hover:text-purple-700 hover:bg-purple-50"
-                  >
-                    <Edit3 className="h-3 w-3 mr-1" />
-                    Edit
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="bg-gray-50 rounded-lg p-4">
-                  {result.notes ? (
-                    <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">{result.notes}</p>
-                  ) : (
-                    <p className="text-gray-500 text-sm italic">No notes added yet. Click Edit to add notes about this candidate.</p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
           </div>
         </div>
       </div>
