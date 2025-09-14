@@ -28,19 +28,21 @@ import {
   Star,
   Brain,
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useScreeningResults, useAddNoteToScreeningResult, ScreeningResult } from '@/hooks/useScreeningResults';
 import { useCompanyJobs } from '@/hooks/useCompanyJobs';
 import ScreeningResultCard from '@/components/ScreeningResultCard';
 import Navbar from '@/components/Navbar';
+import CompanyResumeUpload from '@/components/CompanyResumeUpload';
 
 import { VoiceInterviewService } from '@/services/voiceInterviewService';
 
 const ScreeningResults = () => {
   // ALL HOOKS MUST BE CALLED FIRST - NO CONDITIONAL HOOKS
   const navigate = useNavigate();
+  const { jobId } = useParams<{ jobId?: string }>();
   const { user, loading, signOut } = useAuth();
   const { toast } = useToast();
   
@@ -48,6 +50,9 @@ const ScreeningResults = () => {
   const { data: screeningResults = [], isLoading, error } = useScreeningResults();
   const { data: companyJobs = [], isLoading: jobsLoading } = useCompanyJobs();
   const addNoteMutation = useAddNoteToScreeningResult();
+
+  // Get specific job details if jobId is provided
+  const currentJob = jobId ? companyJobs.find(job => job.id === jobId) : null;
 
   // State for filtering and sorting
   const [searchTerm, setSearchTerm] = useState('');
@@ -64,6 +69,9 @@ const ScreeningResults = () => {
   // State for voice interviews
   const [requestingInterview, setRequestingInterview] = useState<string | null>(null);
   const [voiceInterviewService] = useState(() => VoiceInterviewService.getInstance());
+  
+  // State for upload dialog
+  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
 
   // Filter and sort results - must be before any conditional returns
   const filteredAndSortedResults = useMemo(() => {
@@ -79,7 +87,9 @@ const ScreeningResults = () => {
         (scoreFilter === 'good' && (result.overall_fit || 0) >= 40 && (result.overall_fit || 0) <= 70) ||
         (scoreFilter === 'poor' && (result.overall_fit || 0) < 40);
 
-      const matchesJob = selectedJobId === 'all' || result.job_id === selectedJobId;
+      const matchesJob = jobId 
+        ? result.job_id === jobId 
+        : selectedJobId === 'all' || result.job_id === selectedJobId;
 
       return matchesSearch && matchesScore && matchesJob;
     });
@@ -226,34 +236,17 @@ const ScreeningResults = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      <Navbar title="AI Screening Results" />
+      <Navbar title={jobId ? "Screening Results" : "AI Screening Results"} />
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 md:py-8 pt-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 md:py-8 pt-32">
         <div className="space-y-6">
-          {/* Header */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">AI Screening Results</h1>
-              <p className="text-gray-600 mt-1">Comprehensive candidate analysis and insights</p>
-            </div>
-            <div className="flex gap-3">
-              <Button
-                onClick={handleExportPDF}
-                variant="outline"
-                className="flex items-center gap-2"
-              >
-                <Download className="h-4 w-4" />
-                Export PDF
-              </Button>
-            </div>
-          </div>
 
 
 
 
           {/* Combined Filters */}
-          <Card>
+          <Card className="mt-8">
             <CardHeader>
               <CardTitle className="text-lg flex items-center">
                 <Filter className="h-5 w-5 mr-2" />
@@ -261,33 +254,35 @@ const ScreeningResults = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                {/* Job Title Filter - 40% of space (2/5 columns) */}
-                <div className="col-span-1 lg:col-span-2 space-y-2">
-                  <Label htmlFor="job-filter">Job Title</Label>
-                  <Select value={selectedJobId} onValueChange={setSelectedJobId}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="All job titles" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Job Titles</SelectItem>
-                      {jobsLoading ? (
-                        <SelectItem value="loading" disabled>Loading jobs...</SelectItem>
-                      ) : companyJobs.length === 0 ? (
-                        <SelectItem value="no-jobs" disabled>No jobs posted yet</SelectItem>
-                      ) : (
-                        companyJobs.map((job) => {
-                          const resultCount = screeningResults.filter(result => result.job_id === job.id).length;
-                          return (
-                            <SelectItem key={job.id} value={job.id}>
-                              {job.title} ({resultCount} results)
-                            </SelectItem>
-                          );
-                        })
-                      )}
-                    </SelectContent>
-                  </Select>
-                </div>
+              <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 ${jobId ? 'lg:grid-cols-3' : 'lg:grid-cols-5'}`}>
+                {/* Job Title Filter - only show if not viewing specific job */}
+                {!jobId && (
+                  <div className="col-span-1 lg:col-span-2 space-y-2">
+                    <Label htmlFor="job-filter">Job Title</Label>
+                    <Select value={selectedJobId} onValueChange={setSelectedJobId}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="All job titles" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Job Titles</SelectItem>
+                        {jobsLoading ? (
+                          <SelectItem value="loading" disabled>Loading jobs...</SelectItem>
+                        ) : companyJobs.length === 0 ? (
+                          <SelectItem value="no-jobs" disabled>No jobs posted yet</SelectItem>
+                        ) : (
+                          companyJobs.map((job) => {
+                            const resultCount = screeningResults.filter(result => result.job_id === job.id).length;
+                            return (
+                              <SelectItem key={job.id} value={job.id}>
+                                {job.title} ({resultCount} results)
+                              </SelectItem>
+                            );
+                          })
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
                 
                 {/* Search Filter - 20% of space (1/5 column) */}
                 <div className="col-span-1 lg:col-span-1 space-y-2">
@@ -344,13 +339,37 @@ const ScreeningResults = () => {
                 <CardTitle className="text-lg">
                   Screening Results ({filteredAndSortedResults.length})
                 </CardTitle>
+                {jobId && currentJob && (
+                  <div className="text-right space-y-2">
+                    <p className="text-sm font-medium text-gray-900">{currentJob.title}</p>
+                    <div className="flex gap-2 justify-end">
+                      <Button
+                        onClick={() => setIsUploadDialogOpen(true)}
+                        className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-3 py-1 h-8 text-sm"
+                      >
+                        <FileText className="h-4 w-4" />
+                        Upload Resumes
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
             </CardHeader>
             <CardContent>
               {filteredAndSortedResults.length === 0 ? (
                 <div className="text-center py-8">
                   <Brain className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600">No screening results found matching your criteria.</p>
+                  <p className="text-gray-600">
+                    {jobId 
+                      ? `No screened resumes for ${currentJob?.title || 'this position'} yet.`
+                      : 'No screening results found matching your criteria.'
+                    }
+                  </p>
+                  {jobId && (
+                    <p className="text-sm text-gray-500 mt-2">
+                      Candidates will appear here once they apply and are screened for this position.
+                    </p>
+                  )}
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -410,6 +429,20 @@ const ScreeningResults = () => {
           </Dialog>
         </div>
       </div>
+
+      {/* Upload Resumes Dialog - only show for job-specific pages */}
+      {jobId && (
+        <CompanyResumeUpload 
+          preselectedJobId={jobId}
+          isDialogOpen={isUploadDialogOpen}
+          onDialogOpenChange={setIsUploadDialogOpen}
+          showTrigger={false}
+          onUploadComplete={() => {
+            // Refresh screening results after upload
+            window.location.reload();
+          }}
+        />
+      )}
     </div>
   );
 };

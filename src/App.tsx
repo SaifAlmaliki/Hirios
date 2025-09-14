@@ -66,6 +66,7 @@ const App = () => (
             <Route path="/contact-us" element={<ContactUs />} />
             <Route path="/screening-results" element={<ScreeningResults />} />
             <Route path="/screening-results/:id" element={<ScreeningResultDetail />} />
+            <Route path="/screening-results/job/:jobId" element={<ScreeningResults />} />
             <Route path="/interview/:screeningResultId/:applicationId" element={<VoiceInterview />} />
             <Route path="/invite/:token" element={<InviteAccept />} />
             <Route path="/test-collaboration" element={<TestCollaboration />} />
