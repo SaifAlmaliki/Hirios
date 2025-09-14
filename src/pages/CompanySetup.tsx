@@ -77,7 +77,17 @@ const CompanySetup = () => {
       
       if (data) {
         setHasProfile(true);
-        setCompanyData(data);
+        // Ensure all fields have string values, not null
+        setCompanyData({
+          company_name: data.company_name || '',
+          company_description: data.company_description || '',
+          company_website: data.company_website || '',
+          company_size: data.company_size || '',
+          industry: data.industry || '',
+          address: data.address || '',
+          phone: data.phone || '',
+          logo_url: data.logo_url || '',
+        });
       } else {
         // If no profile exists, create a basic one
         const { data: newProfile, error } = await supabase
@@ -92,7 +102,17 @@ const CompanySetup = () => {
         
         if (newProfile && !error) {
           setHasProfile(true);
-          setCompanyData(newProfile);
+          // Ensure all fields have string values, not null
+          setCompanyData({
+            company_name: newProfile.company_name || '',
+            company_description: newProfile.company_description || '',
+            company_website: newProfile.company_website || '',
+            company_size: newProfile.company_size || '',
+            industry: newProfile.industry || '',
+            address: newProfile.address || '',
+            phone: newProfile.phone || '',
+            logo_url: newProfile.logo_url || '',
+          });
         }
       }
     };

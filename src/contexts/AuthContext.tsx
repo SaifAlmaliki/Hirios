@@ -110,6 +110,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // If user was created successfully, the database trigger will automatically create the company profile
     // We just need to add welcome bonus points
     if (authData.user) {
+      console.log('✅ User created successfully:', authData.user.id);
+      
+      // Check if company profile was created by trigger
+      setTimeout(async () => {
+        try {
+          const { data: profile, error } = await supabase
+            .from('company_profiles')
+            .select('*')
+            .eq('user_id', authData.user!.id)
+            .maybeSingle();
+          
+          if (error) {
+            console.error('Error checking company profile:', error);
+          } else if (profile) {
+            console.log('✅ Company profile created by trigger:', profile);
+          } else {
+            console.log('⚠️ Company profile not found, trigger may not have worked');
+          }
+        } catch (err) {
+          console.error('Error checking company profile:', err);
+        }
+      }, 1000); // Wait 1 second for trigger to complete
+      
       try {
         // Give new user 25 free points
         await PointsService.addPoints(
