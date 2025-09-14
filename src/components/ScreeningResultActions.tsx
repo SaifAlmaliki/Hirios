@@ -1,15 +1,4 @@
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { 
-  FileText,
-  Mic,
-  ExternalLink,
-  ChevronDown,
-  ChevronUp,
-  Eye,
-  Star,
-  X
-} from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -25,6 +14,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import {
+  CVButton,
+  InviteButton,
+  LinkButton,
+  FavoriteButton,
+  DismissButton,
+  ViewDetailsButton,
+  DetailsToggleButton
+} from '@/components/ui/screening-action-buttons';
 
 interface ScreeningResultActionsProps {
   resultId: string;
@@ -61,186 +59,108 @@ const ScreeningResultActions: React.FC<ScreeningResultActionsProps> = ({
   const updateFavoriteMutation = useUpdateFavoriteStatus();
   const updateDismissMutation = useUpdateDismissStatus();
 
+  const handleResumeDownload = async () => {
+    try {
+      // Extract file path from URL
+      const url = new URL(resumeUrl!);
+      const pathParts = url.pathname.split('/');
+      const bucketIndex = pathParts.findIndex(part => part === 'company_uploads');
+      if (bucketIndex !== -1 && bucketIndex < pathParts.length - 1) {
+        const filePath = pathParts.slice(bucketIndex + 1).join('/');
+        
+        // Generate fresh signed URL
+        const { data, error } = await supabase.storage
+          .from('company_uploads')
+          .createSignedUrl(filePath, 3600); // 1 hour expiry
+        
+        if (error) {
+          console.error('Error generating signed URL:', error);
+          window.open(resumeUrl, '_blank'); // Fallback to original URL
+        } else {
+          window.open(data.signedUrl, '_blank');
+        }
+      } else {
+        window.open(resumeUrl, '_blank'); // Fallback for other URL formats
+      }
+    } catch (error) {
+      console.error('Error handling resume download:', error);
+      window.open(resumeUrl, '_blank'); // Fallback
+    }
+  };
+
+  const handleLinkCopy = () => {
+    const link = VoiceInterviewService.generateInterviewLink(resultId, applicationId || '', true);
+    VoiceInterviewService.copyInterviewLink(resultId, applicationId || '', true);
+    toast({
+      title: "Interview Link Copied",
+      description: "Direct interview link copied to clipboard (auto-start enabled)",
+    });
+  };
+
+  const handleFavoriteToggle = () => {
+    updateFavoriteMutation.mutate({ 
+      id: resultId, 
+      is_favorite: !isFavorite 
+    });
+  };
+
+  const handleDismissToggle = () => {
+    updateDismissMutation.mutate({ 
+      id: resultId, 
+      is_dismissed: !isDismissed 
+    });
+  };
+
+  const handleViewDetails = () => {
+    navigate(`/screening-results/${resultId}`);
+  };
+
   return (
     <div className="flex flex-wrap items-center gap-3 w-full lg:w-96 lg:justify-end">
-      {/* Resume Button - Responsive width */}
-      <div className="w-20 sm:w-24">
-        {resumeUrl && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={async () => {
-              try {
-                // Extract file path from URL
-                const url = new URL(resumeUrl);
-                const pathParts = url.pathname.split('/');
-                const bucketIndex = pathParts.findIndex(part => part === 'company_uploads');
-                if (bucketIndex !== -1 && bucketIndex < pathParts.length - 1) {
-                  const filePath = pathParts.slice(bucketIndex + 1).join('/');
-                  
-                  // Generate fresh signed URL
-                  const { data, error } = await supabase.storage
-                    .from('company_uploads')
-                    .createSignedUrl(filePath, 3600); // 1 hour expiry
-                  
-                  if (error) {
-                    console.error('Error generating signed URL:', error);
-                    window.open(resumeUrl, '_blank'); // Fallback to original URL
-                  } else {
-                    window.open(data.signedUrl, '_blank');
-                  }
-                } else {
-                  window.open(resumeUrl, '_blank'); // Fallback for other URL formats
-                }
-              } catch (error) {
-                console.error('Error handling resume download:', error);
-                window.open(resumeUrl, '_blank'); // Fallback
-              }
-            }}
-            className="flex items-center gap-2 border-green-300 text-green-600 hover:bg-green-50 text-xs sm:text-sm h-9 px-3 w-full"
-          >
-            <FileText className="h-4 w-4" />
-            <span className="hidden xs:inline">Resume</span>
-            <span className="xs:hidden">CV</span>
-          </Button>
-        )}
-      </div>
+      {/* CV Button */}
+      <CVButton
+        resumeUrl={resumeUrl}
+        onDownload={handleResumeDownload}
+      />
       
-      {/* Voice Interview Button - Responsive width */}
-      <div className="w-28 sm:w-32 lg:w-36">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setShowConfirmDialog(true)}
-          disabled={isRequestingInterview || isVoiceScreeningRequested}
-          className={`flex items-center gap-2 text-xs sm:text-sm h-9 px-3 w-full ${
-            isVoiceScreeningRequested 
-              ? 'border-green-300 text-green-600 hover:bg-green-50' 
-              : 'border-blue-300 text-blue-600 hover:bg-blue-50'
-          }`}
-        >
-          {isRequestingInterview ? (
-            <>
-              <Mic className="h-4 w-4 animate-spin" />
-              <span className="hidden sm:inline">Sending...</span>
-              <span className="sm:hidden">...</span>
-            </>
-          ) : isVoiceScreeningRequested ? (
-            <>
-              <Mic className="h-4 w-4" />
-              <span className="hidden sm:inline">Interview Sent</span>
-              <span className="sm:hidden">Sent</span>
-            </>
-          ) : (
-            <>
-              <Mic className="h-4 w-4" />
-              <span className="hidden xs:inline">Invite</span>
-              <span className="xs:hidden">Invite</span>
-            </>
-          )}
-        </Button>
-      </div>
+      {/* Invite Button */}
+      <InviteButton
+        isRequestingInterview={isRequestingInterview}
+        isVoiceScreeningRequested={isVoiceScreeningRequested}
+        onClick={() => setShowConfirmDialog(true)}
+      />
 
-      {/* Direct Interview Link - Responsive width */}
-      <div className="w-20 sm:w-24 lg:w-28">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => {
-            const link = VoiceInterviewService.generateInterviewLink(resultId, applicationId || '', true);
-            VoiceInterviewService.copyInterviewLink(resultId, applicationId || '', true);
-            toast({
-              title: "Interview Link Copied",
-              description: "Direct interview link copied to clipboard (auto-start enabled)",
-            });
-          }}
-          className="flex items-center gap-2 border-purple-300 text-purple-600 hover:bg-purple-50 text-xs sm:text-sm h-9 px-3 w-full"
-        >
-          <ExternalLink className="h-4 w-4" />
-          <span className="hidden xs:inline">Copy Link</span>
-          <span className="xs:hidden">Link</span>
-        </Button>
-      </div>
+      {/* Link Button */}
+      <LinkButton
+        onClick={handleLinkCopy}
+      />
 
       {/* View Details Button - Only show if enabled */}
       {showViewDetails && (
-        <div className="w-20 sm:w-24 lg:w-28">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => navigate(`/screening-results/${resultId}`)}
-            className="flex items-center gap-2 border-indigo-300 text-indigo-600 hover:bg-indigo-50 text-xs sm:text-sm h-9 px-3 w-full"
-          >
-            <Eye className="h-4 w-4" />
-            <span className="hidden xs:inline">View</span>
-            <span className="xs:hidden">View</span>
-          </Button>
-        </div>
+        <ViewDetailsButton
+          onClick={handleViewDetails}
+        />
       )}
 
-      {/* Favorite Button - Responsive width */}
-      <div className="w-20 sm:w-24">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => updateFavoriteMutation.mutate({ 
-            id: resultId, 
-            is_favorite: !isFavorite 
-          })}
-          disabled={updateFavoriteMutation.isPending}
-          className={`flex items-center gap-2 text-xs sm:text-sm h-9 px-3 w-full ${
-            isFavorite 
-              ? 'border-yellow-300 text-yellow-600 hover:bg-yellow-50 bg-yellow-50' 
-              : 'border-yellow-300 text-yellow-600 hover:bg-yellow-50'
-          }`}
-        >
-          <Star className={`h-4 w-4 ${isFavorite ? 'fill-current' : ''}`} />
-          <span className="hidden xs:inline">{isFavorite ? 'Fav' : 'Star'}</span>
-        </Button>
-      </div>
+      {/* Favorite Button */}
+      <FavoriteButton
+        isFavorite={isFavorite}
+        isPending={updateFavoriteMutation.isPending}
+        onClick={handleFavoriteToggle}
+      />
 
-      {/* Dismiss Button - Responsive width */}
-      <div className="w-20 sm:w-24">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => updateDismissMutation.mutate({ 
-            id: resultId, 
-            is_dismissed: !isDismissed 
-          })}
-          disabled={updateDismissMutation.isPending}
-          className={`flex items-center gap-2 text-xs sm:text-sm h-9 px-3 w-full ${
-            isDismissed 
-              ? 'border-red-300 text-red-600 hover:bg-red-50 bg-red-50' 
-              : 'border-red-300 text-red-600 hover:bg-red-50'
-          }`}
-        >
-          <X className="h-4 w-4" />
-          <span className="hidden xs:inline">{isDismissed ? 'Restore' : 'Dismiss'}</span>
-        </Button>
-      </div>
+      {/* Dismiss Button */}
+      <DismissButton
+        isDismissed={isDismissed}
+        isPending={updateDismissMutation.isPending}
+        onClick={handleDismissToggle}
+      />
       
-      {/* Details Toggle - Responsive width */}
-      <div className="w-16 sm:w-20 lg:w-24">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onToggleExpansion}
-          className="flex items-center gap-2 text-xs sm:text-sm h-9 px-3 w-full text-gray-600 hover:text-gray-900"
-        >
-          {isExpanded ? (
-            <>
-              <span className="hidden xs:inline">Less</span>
-              <ChevronUp className="h-4 w-4" />
-            </>
-          ) : (
-            <>
-              <span className="hidden xs:inline">Details</span>
-              <ChevronDown className="h-4 w-4" />
-            </>
-          )}
-        </Button>
-      </div>
+      {/* Details Toggle */}
+      <DetailsToggleButton
+        isExpanded={isExpanded}
+        onClick={onToggleExpansion}
+      />
 
       {/* Confirmation Dialog */}
       <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
