@@ -6,12 +6,15 @@ import {
   ExternalLink,
   ChevronDown,
   ChevronUp,
-  Eye
+  Eye,
+  Star,
+  X
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { VoiceInterviewService } from '@/services/voiceInterviewService';
+import { useUpdateFavoriteStatus, useUpdateDismissStatus } from '@/hooks/useScreeningResults';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,6 +36,8 @@ interface ScreeningResultActionsProps {
   onRequestVoiceScreening: () => void;
   onToggleExpansion: () => void;
   showViewDetails?: boolean; // Optional prop to show/hide view details button
+  isFavorite?: boolean;      // Add favorite status
+  isDismissed?: boolean;     // Add dismiss status
 }
 
 const ScreeningResultActions: React.FC<ScreeningResultActionsProps> = ({
@@ -44,11 +49,17 @@ const ScreeningResultActions: React.FC<ScreeningResultActionsProps> = ({
   isExpanded,
   onRequestVoiceScreening,
   onToggleExpansion,
-  showViewDetails = true
+  showViewDetails = true,
+  isFavorite = false,
+  isDismissed = false
 }) => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  
+  // Add mutation hooks
+  const updateFavoriteMutation = useUpdateFavoriteStatus();
+  const updateDismissMutation = useUpdateDismissStatus();
 
   return (
     <div className="flex flex-wrap items-center gap-3 w-full lg:w-96 lg:justify-end">
@@ -166,6 +177,48 @@ const ScreeningResultActions: React.FC<ScreeningResultActionsProps> = ({
           </Button>
         </div>
       )}
+
+      {/* Favorite Button - Responsive width */}
+      <div className="w-20 sm:w-24">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => updateFavoriteMutation.mutate({ 
+            id: resultId, 
+            is_favorite: !isFavorite 
+          })}
+          disabled={updateFavoriteMutation.isPending}
+          className={`flex items-center gap-2 text-xs sm:text-sm h-9 px-3 w-full ${
+            isFavorite 
+              ? 'border-yellow-300 text-yellow-600 hover:bg-yellow-50 bg-yellow-50' 
+              : 'border-yellow-300 text-yellow-600 hover:bg-yellow-50'
+          }`}
+        >
+          <Star className={`h-4 w-4 ${isFavorite ? 'fill-current' : ''}`} />
+          <span className="hidden xs:inline">{isFavorite ? 'Fav' : 'Star'}</span>
+        </Button>
+      </div>
+
+      {/* Dismiss Button - Responsive width */}
+      <div className="w-20 sm:w-24">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => updateDismissMutation.mutate({ 
+            id: resultId, 
+            is_dismissed: !isDismissed 
+          })}
+          disabled={updateDismissMutation.isPending}
+          className={`flex items-center gap-2 text-xs sm:text-sm h-9 px-3 w-full ${
+            isDismissed 
+              ? 'border-red-300 text-red-600 hover:bg-red-50 bg-red-50' 
+              : 'border-red-300 text-red-600 hover:bg-red-50'
+          }`}
+        >
+          <X className="h-4 w-4" />
+          <span className="hidden xs:inline">{isDismissed ? 'Restore' : 'Dismiss'}</span>
+        </Button>
+      </div>
       
       {/* Details Toggle - Responsive width */}
       <div className="w-16 sm:w-20 lg:w-24">

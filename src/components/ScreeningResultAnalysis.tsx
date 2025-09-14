@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { 
   TrendingUp,
   Mic,
-  StickyNote
+  StickyNote,
+  Edit3
 } from 'lucide-react';
+import NotesEditDialog from './NotesEditDialog';
 
 interface AnalysisSection {
   title: string;
@@ -23,6 +26,8 @@ interface ScreeningResultAnalysisProps {
   interviewCompletedAt?: string;
   voiceScreeningRequested?: boolean;
   notes?: string;
+  resultId?: string;
+  candidateName?: string;
 }
 
 const ScreeningResultAnalysis: React.FC<ScreeningResultAnalysisProps> = ({
@@ -34,8 +39,11 @@ const ScreeningResultAnalysis: React.FC<ScreeningResultAnalysisProps> = ({
   interviewSummary,
   interviewCompletedAt,
   voiceScreeningRequested,
-  notes
+  notes,
+  resultId,
+  candidateName
 }) => {
+  const [isNotesDialogOpen, setIsNotesDialogOpen] = useState(false);
   const getColorClasses = (color: string) => {
     switch (color) {
       case 'green':
@@ -141,12 +149,44 @@ const ScreeningResultAnalysis: React.FC<ScreeningResultAnalysisProps> = ({
         color: 'orange'
       })}
 
-      {notes && renderSection({
-        title: "Company Notes",
-        content: notes,
-        icon: <StickyNote className="h-4 w-4" />,
-        color: 'purple'
-      })}
+      {/* Company Notes Section with Edit Button */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <h4 className="font-semibold text-purple-700 flex items-center">
+            <StickyNote className="h-4 w-4 mr-2 text-purple-600" />
+            Company Notes
+          </h4>
+          {resultId && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsNotesDialogOpen(true)}
+              className="h-8 px-2 text-purple-600 hover:text-purple-700 hover:bg-purple-50"
+            >
+              <Edit3 className="h-3 w-3 mr-1" />
+              Edit
+            </Button>
+          )}
+        </div>
+        <div className="p-3 rounded-lg border text-purple-700 bg-purple-50 border-purple-200">
+          {notes ? (
+            <p className="text-sm text-gray-700 whitespace-pre-wrap">{notes}</p>
+          ) : (
+            <p className="text-sm text-gray-500 italic">No notes added yet. Click Edit to add notes about this candidate.</p>
+          )}
+        </div>
+      </div>
+
+      {/* Notes Edit Dialog */}
+      {resultId && candidateName && (
+        <NotesEditDialog
+          isOpen={isNotesDialogOpen}
+          onClose={() => setIsNotesDialogOpen(false)}
+          resultId={resultId}
+          currentNotes={notes || ''}
+          candidateName={candidateName}
+        />
+      )}
     </div>
   );
 };

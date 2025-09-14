@@ -60,6 +60,7 @@ const ScreeningResults = () => {
   const [sortOrder, setSortOrder] = useState('desc');
   const [selectedJobId, setSelectedJobId] = useState<string>('all');
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+  const [statusFilter, setStatusFilter] = useState('all'); // all, favorites, dismissed
   
   // State for notes
   const [noteDialogOpen, setNoteDialogOpen] = useState(false);
@@ -91,7 +92,11 @@ const ScreeningResults = () => {
         ? result.job_id === jobId 
         : selectedJobId === 'all' || result.job_id === selectedJobId;
 
-      return matchesSearch && matchesScore && matchesJob;
+      const matchesStatus = statusFilter === 'all' || 
+        (statusFilter === 'favorites' && result.is_favorite) ||
+        (statusFilter === 'dismissed' && result.is_dismissed);
+
+      return matchesSearch && matchesScore && matchesJob && matchesStatus;
     });
 
     // Sort results by score
@@ -107,7 +112,7 @@ const ScreeningResults = () => {
     });
 
     return filtered;
-  }, [screeningResults, searchTerm, scoreFilter, sortOrder, selectedJobId]);
+  }, [screeningResults, searchTerm, scoreFilter, sortOrder, selectedJobId, statusFilter, jobId]);
 
   // Redirect if not company user - THIS MUST BE AFTER ALL HOOKS
   React.useEffect(() => {
@@ -325,6 +330,21 @@ const ScreeningResults = () => {
                     <SelectContent>
                       <SelectItem value="desc">Highest First</SelectItem>
                       <SelectItem value="asc">Lowest First</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Status Filter - 20% of space (1/5 column) */}
+                <div className="col-span-1 lg:col-span-1 space-y-2">
+                  <Label htmlFor="status-filter">Status Filter</Label>
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="All candidates" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Candidates</SelectItem>
+                      <SelectItem value="favorites">Favorites Only</SelectItem>
+                      <SelectItem value="dismissed">Dismissed Only</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

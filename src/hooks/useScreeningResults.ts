@@ -26,6 +26,8 @@ export interface ScreeningResult {
   interview_summary?: string;
   interview_completed_at?: string;
   application_id?: string;  // Add application_id field
+  is_favorite?: boolean;    // Add favorite status
+  is_dismissed?: boolean;   // Add dismiss status
   // Job details from join
   job?: {
     id: string;
@@ -254,6 +256,88 @@ export const useUpdateCallStatus = () => {
       toast({
         title: "Error",
         description: "Failed to update call status. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+};
+
+export const useUpdateFavoriteStatus = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async ({ id, is_favorite }: { id: string; is_favorite: boolean }) => {
+      const { data, error } = await supabase
+        .from('screening_results')
+        .update({ 
+          is_favorite, 
+          updated_at: new Date().toISOString() 
+        })
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error updating favorite status:', error);
+        throw error;
+      }
+
+      return data as ScreeningResult;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['screening_results'] });
+      toast({
+        title: variables.is_favorite ? "Added to Favorites" : "Removed from Favorites",
+        description: `Candidate ${variables.is_favorite ? 'added to' : 'removed from'} favorites.`,
+      });
+    },
+    onError: (error) => {
+      console.error('Failed to update favorite status:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update favorite status. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+};
+
+export const useUpdateDismissStatus = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async ({ id, is_dismissed }: { id: string; is_dismissed: boolean }) => {
+      const { data, error } = await supabase
+        .from('screening_results')
+        .update({ 
+          is_dismissed, 
+          updated_at: new Date().toISOString() 
+        })
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error updating dismiss status:', error);
+        throw error;
+      }
+
+      return data as ScreeningResult;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['screening_results'] });
+      toast({
+        title: variables.is_dismissed ? "Candidate Dismissed" : "Candidate Restored",
+        description: `Candidate ${variables.is_dismissed ? 'dismissed' : 'restored'} successfully.`,
+      });
+    },
+    onError: (error) => {
+      console.error('Failed to update dismiss status:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update dismiss status. Please try again.",
         variant: "destructive",
       });
     },
