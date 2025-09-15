@@ -65,7 +65,6 @@ export type Database = {
           industry: string | null
           logo_url: string | null
           phone: string | null
-
           updated_at: string
           user_id: string | null
         }
