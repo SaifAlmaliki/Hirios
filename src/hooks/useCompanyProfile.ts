@@ -13,9 +13,9 @@ export interface CompanyProfile {
   address?: string;
   phone?: string;
   logo_url?: string;
-  subscription_status: string;
-  subscription_end_date?: string;
-  stripe_customer_id?: string;
+  subscription_plan?: string;
+  jobs_posted_this_month?: number;
+  last_job_count_reset?: string;
   created_at: string;
   updated_at: string;
 }

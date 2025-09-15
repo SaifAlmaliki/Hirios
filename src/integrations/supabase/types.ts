@@ -63,8 +63,11 @@ export type Database = {
           created_at: string
           id: string
           industry: string | null
+          jobs_posted_this_month: number | null
+          last_job_count_reset: string | null
           logo_url: string | null
           phone: string | null
+          subscription_plan: string | null
           updated_at: string
           user_id: string | null
         }
@@ -77,8 +80,11 @@ export type Database = {
           created_at?: string
           id?: string
           industry?: string | null
+          jobs_posted_this_month?: number | null
+          last_job_count_reset?: string | null
           logo_url?: string | null
           phone?: string | null
+          subscription_plan?: string | null
           updated_at?: string
           user_id?: string | null
         }
@@ -91,8 +97,11 @@ export type Database = {
           created_at?: string
           id?: string
           industry?: string | null
+          jobs_posted_this_month?: number | null
+          last_job_count_reset?: string | null
           logo_url?: string | null
           phone?: string | null
+          subscription_plan?: string | null
           updated_at?: string
           user_id?: string | null
         }

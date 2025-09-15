@@ -95,7 +95,7 @@ const CompanySetup = () => {
           .insert([{
             user_id: user!.id,
             company_name: 'My Company',
-            subscription_status: 'inactive'
+            subscription_plan: 'free'
           }])
           .select()
           .single();
