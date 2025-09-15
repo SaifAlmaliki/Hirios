@@ -12,36 +12,27 @@ export type Database = {
       applications: {
         Row: {
           created_at: string
-          email: string
-          full_name: string
           id: string
           job_id: string
-          phone: string
           resume_url: string | null
-          resume_text: string | null
-          status: string | null
+          original_filename: string | null
+          uploaded_by_user_id: string | null
         }
         Insert: {
           created_at?: string
-          email: string
-          full_name: string
           id?: string
           job_id: string
-          phone: string
           resume_url?: string | null
-          resume_text?: string | null
-          status?: string | null
+          original_filename?: string | null
+          uploaded_by_user_id?: string | null
         }
         Update: {
           created_at?: string
-          email?: string
-          full_name?: string
           id?: string
           job_id?: string
-          phone?: string
           resume_url?: string | null
-          resume_text?: string | null
-          status?: string | null
+          original_filename?: string | null
+          uploaded_by_user_id?: string | null
         }
         Relationships: [
           {

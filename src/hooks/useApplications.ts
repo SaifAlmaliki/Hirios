@@ -52,7 +52,6 @@ export const useCreateApplication = () => {
       console.log('📝 Creating application for job:', inputData.job_title);
       
       // Store application in database with resume URL from Supabase storage
-      // Using direct insert with minimal fields (type assertion needed until migration is applied)
       const { data, error } = await supabase
         .from('applications')
         .insert([{
@@ -60,7 +59,7 @@ export const useCreateApplication = () => {
           resume_url: inputData.resume_url || null,
           uploaded_by_user_id: inputData.uploaded_by_user_id || null,
           original_filename: inputData.original_filename || null
-        }] as any)
+        }])
         .select()
         .single();
 

@@ -227,7 +227,7 @@ const CompanyResumeUpload: React.FC<CompanyResumeUploadProps> = ({
         f.id === fileId ? { ...f, status: 'processing', progress: 50 } : f
       ));
 
-             // Create application record (type assertion needed until migration is applied)
+             // Create application record
        const { data: application, error: appError } = await supabase
          .from('applications')
          .insert([{
@@ -235,7 +235,7 @@ const CompanyResumeUpload: React.FC<CompanyResumeUploadProps> = ({
            resume_url: resumeUrl,
            uploaded_by_user_id: user?.id,
            original_filename: uploadedFile.file.name
-         }] as any)
+         }])
          .select()
          .single();
 
