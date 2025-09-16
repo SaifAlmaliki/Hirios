@@ -15,6 +15,7 @@ export type Database = {
           id: string
           job_id: string
           resume_url: string | null
+          resume_text: string | null
           original_filename: string | null
           uploaded_by_user_id: string | null
         }
@@ -23,6 +24,7 @@ export type Database = {
           id?: string
           job_id: string
           resume_url?: string | null
+          resume_text?: string | null
           original_filename?: string | null
           uploaded_by_user_id?: string | null
         }
@@ -31,6 +33,7 @@ export type Database = {
           id?: string
           job_id?: string
           resume_url?: string | null
+          resume_text?: string | null
           original_filename?: string | null
           uploaded_by_user_id?: string | null
         }
