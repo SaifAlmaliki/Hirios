@@ -2,66 +2,74 @@
 
 ## Overview
 
-Hirios is a comprehensive AI-powered job portal application that connects job seekers with companies through advanced screening and interview technology. Built on the Resynox platform, it provides a dual-interface platform where companies can post jobs, manage applications, and conduct AI-powered candidate screening and voice interviews, while job seekers can browse opportunities and apply for positions. The application features modern UI components with beautiful Aurora backgrounds, real-time data management, and integrated AI services for enhanced recruitment workflows.
+Hirios is a comprehensive AI-powered B2B recruitment platform designed exclusively for companies and recruiters. It provides advanced screening and interview technology to help companies manage their entire recruitment process. The platform enables companies to post jobs, manage applications, conduct AI-powered candidate screening and voice interviews, and collaborate with their hiring teams. The application features modern UI components with beautiful Aurora backgrounds, real-time data management, and integrated AI services for enhanced recruitment workflows.
 
 ## 🚀 Features
 
-### For Job Seekers
-- **Job Browsing**: View all available job postings with detailed information
-- **Advanced Job Search**: Filter jobs by location, employment type, and company
-- **Easy Application Process**: Apply to jobs with resume upload functionality
-- **Application Tracking**: Monitor application status and history
-- **Responsive Design**: Optimized for desktop and mobile devices
-- **Beautiful UI**: Modern Aurora background animations for enhanced user experience
-
-### For Companies
-- **Company Profile Management**: Complete company setup with branding and information
-- **Job Posting**: Create and manage job listings with detailed descriptions
-- **Application Management**: View and manage candidate applications
+### For Companies & Recruiters
+- **Company Profile Management**: Complete company setup with branding and subscription management
+- **Job Posting**: Create and manage job listings with monthly posting limits
+- **Application Management**: View and manage candidate applications with full-text search
 - **Dashboard Analytics**: Overview of job postings and application metrics
-- **Resume Management**: Access and review candidate resumes
+- **Resume Management**: Access and review candidate resumes with extracted text content
 - **AI Screening Results**: Review AI-generated candidate fit scores and insights
 - **Direct Interview Link**: Generate and copy candidate interview links
 - **Voice Interview (AI)**: Start AI-powered voice interviews for screened candidates
+- **Subscription Management**: Track subscription plans and monthly job posting limits
 - **Beautiful UI**: Modern Aurora background animations and glassmorphism design
 - **Premium features**: Marked as "Coming Soon" in UI
 
 ### Team Collaboration
-- **Screening Team Collaboration**: Invite hiring managers and recruiters to collaborate on job postings
+- **Job Collaboration System**: Invite hiring managers and recruiters to collaborate on specific job postings
 - **Shared Job Management**: Team members can edit, view, and manage specific job postings together
 - **Email-Based Invitations**: Seamlessly invite colleagues by email to join your hiring team
-- **Collaborative Screening Process**: Share screening results and insights with team members
+- **Role-Based Access**: Assign different roles (collaborator, etc.) to team members
 - **Per-Job Access Control**: Grant collaboration access on a per-job basis for focused teamwork
 - **Real-Time Collaboration**: Team members can work together on candidate evaluation and job management
+- **Invitation Tracking**: Track who invited whom and when for audit purposes
+
+### Points & Payment System
+- **Point Packages**: Pre-defined point packages available for purchase
+- **Transaction Tracking**: Complete history of all points earned and spent
+- **User Balance Management**: Real-time points balance tracking for each user
+- **Reference Linking**: Points transactions linked to specific actions (job postings, screenings, etc.)
+- **Flexible Pricing**: Support for different point packages with varying prices
+- **Transaction Types**: Categorized transactions (purchase, earned, spent, etc.)
+- **Audit Trail**: Complete audit trail for all points-related activities
+
+### AI & RAG System
+- **Vector Search**: AI-powered semantic search using embeddings
+- **Document Processing**: Store and process documents with metadata
+- **RAG Integration**: Retrieval-Augmented Generation for enhanced AI responses
+- **Embedding Storage**: Efficient storage of AI-generated embeddings
+- **Metadata Support**: Rich metadata storage for enhanced document context
 
 ### Core Features
-- **Dual User Types**: Separate interfaces for job seekers and companies
+- **B2B Focus**: Exclusively designed for companies and recruiters
 - **Real-time Updates**: Live data synchronization using React Query
-- **File Upload**: Secure resume storage using Supabase Storage
+- **File Upload & Processing**: Secure resume storage with automatic text extraction
+- **Full-text Search**: GIN-indexed resume text search for efficient candidate discovery
+- **Vector Search**: AI-powered semantic search using embeddings for document retrieval
+- **Subscription Management**: Track company subscription plans and monthly job posting limits
+- **Points System**: Complete points-based payment and transaction tracking
+- **AI Screening**: Comprehensive candidate evaluation with voice interview capabilities
+- **RAG Integration**: Retrieval-Augmented Generation for AI-powered document processing
 - **Responsive UI**: Modern design using shadcn/ui components with Aurora backgrounds
 - **Authentication**: Secure user management with Supabase Auth
 - **Team Collaboration**: Email-based invitation system for collaborative hiring
 - **Webhook Integration**: External workflow trigger for screening-related events
 - **Voice AI Integration**: ElevenLabs Realtime Conversations for interviews
-- **Resynox Platform**: Built on the Resynox development platform for enhanced productivity
 
-## 🚀 Resynox Platform Integration
-
-### About Resynox
-Hirios is built on the **Resynox platform**, an AI-powered development environment that enhances productivity and code quality. Resynox provides:
-
-- **AI-Powered Development**: Intelligent code generation and assistance
-- **Enhanced Productivity**: Streamlined development workflows
-- **Modern UI Components**: Access to cutting-edge design systems
-- **Real-time Collaboration**: Seamless team development experience
-- **Quality Assurance**: Built-in code quality and best practices
-
-### Current Development Status
-- ✅ **Core Application**: Fully functional job portal with dual user interfaces
+## 🚀 Development Status
+- ✅ **Core Application**: Fully functional B2B recruitment platform
 - ✅ **Authentication System**: Complete user management with Supabase Auth
-- ✅ **AI Screening**: Integrated AI-powered candidate screening
+- ✅ **AI Screening**: Integrated AI-powered candidate screening with comprehensive evaluation
 - ✅ **Voice Interviews**: ElevenLabs integration for AI voice interviews
 - ✅ **Team Collaboration**: Email-based invitation system for collaborative hiring
+- ✅ **Resume Processing**: Automatic text extraction and full-text search capabilities
+- ✅ **Subscription Management**: Company subscription plans and monthly job posting limits
+- ✅ **Points System**: Complete points-based payment and transaction tracking
+- ✅ **RAG Integration**: Vector search and AI-powered document processing
 - ✅ **Modern UI**: Beautiful Aurora backgrounds and glassmorphism design
 - ✅ **Responsive Design**: Optimized for all device types
 - ✅ **Aurora Backgrounds**: Animated gradient backgrounds across all pages
@@ -80,7 +88,6 @@ Hirios is built on the **Resynox platform**, an AI-powered development environme
 - **Tailwind CSS** for styling with Aurora animations
 - **Lucide React** for icons
 - **Framer Motion** for smooth animations
-- **Resynox Platform** for AI-powered development assistance
 
 ### UI/UX Design System
 - **Aurora Backgrounds**: Animated gradient backgrounds with flowing color transitions
@@ -116,57 +123,155 @@ Hirios is built on the **Resynox platform**, an AI-powered development environme
 
 ### Core Tables
 
-#### `profiles`
-- **Purpose**: Basic user information and user type identification
-- **Fields**:
-  - `id` (UUID, FK to auth.users)
-  - `email` (TEXT)
-  - `user_type` (TEXT: 'job_seeker' | 'company')
-  - `created_at`, `updated_at` (TIMESTAMPTZ)
-
 #### `company_profiles`
-- **Purpose**: Extended company information
+- **Purpose**: Company information and subscription management
 - **Fields**:
-  - `id` (UUID, Primary Key)
-  - `user_id` (UUID, FK to auth.users)
+  - `id` (UUID, Primary Key, Default: gen_random_uuid())
+  - `user_id` (UUID, FK to auth.users, Unique)
   - `company_name`, `company_description` (TEXT)
   - `company_website`, `company_size`, `industry` (TEXT)
   - `address`, `phone`, `logo_url` (TEXT)
-  - `created_at`, `updated_at` (TIMESTAMPTZ)
+  - `subscription_plan` (TEXT, Default: 'free')
+  - `jobs_posted_this_month` (INTEGER, Default: 0)
+  - `last_job_count_reset` (TIMESTAMPTZ, Default: now())
+  - `created_at` (TIMESTAMPTZ, Default: now())
+  - `updated_at` (TIMESTAMPTZ, Default: now())
 
 #### `jobs`
 - **Purpose**: Job postings created by companies
 - **Fields**:
-  - `id` (UUID, Primary Key)
+  - `id` (UUID, Primary Key, Default: gen_random_uuid())
   - `company_profile_id` (UUID, FK to company_profiles)
-  - `title`, `department`, `location` (TEXT, Required)
-  - `employment_type` (TEXT: full-time, part-time, contract, etc.)
-  - `description`, `requirements`, `benefits` (TEXT)
-  - `company`, `salary` (TEXT)
-  - `created_at`, `updated_at` (TIMESTAMPTZ)
+  - `title`, `description`, `requirements`, `responsibilities`, `benefits` (TEXT)
+  - `department` (TEXT, NOT NULL)
+  - `company` (TEXT, NOT NULL)
+  - `location` (TEXT)
+  - `employment_type` (TEXT, Default: 'full-time')
+  - `experience_level` (TEXT, Default: 'mid-level')
+  - `status` (TEXT, Default: 'active')
+  - `created_at` (TIMESTAMPTZ, Default: now())
+  - `updated_at` (TIMESTAMPTZ, Default: now())
 
 #### `applications`
-- **Purpose**: Job applications submitted by job seekers
+- **Purpose**: Job applications with resume storage and processing
 - **Fields**:
-  - `id` (UUID, Primary Key)
+  - `id` (UUID, Primary Key, Default: gen_random_uuid())
   - `job_id` (UUID, FK to jobs)
-  - `full_name`, `email`, `phone` (TEXT, Required)
-  - `resume_url` (TEXT, URL to stored resume)
+  - `resume_url` (TEXT, URL to stored resume file)
+  - `resume_text` (TEXT, Extracted text content from resume)
   - `status` (TEXT, Default: 'pending')
-  - `created_at` (TIMESTAMPTZ)
+  - `original_filename` (TEXT, Original resume filename)
+  - `uploaded_by_user_id` (UUID, FK to auth.users)
+  - `created_at` (TIMESTAMPTZ, Default: now())
+  - `updated_at` (TIMESTAMPTZ, Default: now())
+- **Indexes**:
+  - `idx_applications_job_id` (BTREE on job_id)
+  - `idx_applications_resume_text` (GIN on resume_text for full-text search)
+  - `idx_applications_uploaded_by_user_id` (BTREE on uploaded_by_user_id)
+  - `idx_applications_original_filename` (BTREE on original_filename)
 
 #### `screening_results`
-- **Purpose**: AI/automated screening results for applications
+- **Purpose**: AI-powered candidate screening and evaluation results
 - **Fields**:
-  - `id` (UUID, Primary Key)
-  - `name`, `email`, `phone_number`, `job_role` (TEXT)
-  - `resume` (TEXT, Resume content)
-  - `fit_score` (INTEGER, 0-100 score)
-  - `screening_result` (TEXT, Detailed analysis)
-  - `created_at`, `updated_at` (TIMESTAMPTZ)
+  - `id` (UUID, Primary Key, Default: gen_random_uuid())
+  - `job_id` (UUID, FK to jobs)
+  - `application_id` (UUID, FK to applications)
+  - `first_name`, `last_name` (TEXT, NOT NULL)
+  - `email` (TEXT, NOT NULL)
+  - `phone`, `home_address` (TEXT)
+  - `resume_url`, `resume_text` (TEXT)
+  - `overall_fit` (INTEGER, 0-100 score)
+  - `strengths`, `weaknesses`, `risk_factor`, `reward_factor` (TEXT)
+  - `justification`, `notes` (TEXT)
+  - `voice_screening_requested` (BOOLEAN, Default: false)
+  - `voice_screening_completed` (BOOLEAN, Default: false)
+  - `voice_screening_notes`, `interview_summary` (TEXT)
+  - `interview_completed_at` (TIMESTAMPTZ)
+  - `is_favorite`, `is_dismissed` (BOOLEAN, Default: false)
+  - `date` (TIMESTAMPTZ, NOT NULL, Default: now())
+  - `created_at` (TIMESTAMPTZ, NOT NULL, Default: now())
+  - `updated_at` (TIMESTAMPTZ, NOT NULL, Default: now())
+
+#### `job_collaborators`
+- **Purpose**: Team collaboration for job postings and management
+- **Fields**:
+  - `id` (UUID, Primary Key, Default: gen_random_uuid())
+  - `job_id` (UUID, FK to jobs)
+  - `user_id` (UUID, FK to auth.users)
+  - `invited_by` (UUID, FK to auth.users)
+  - `role` (TEXT, Default: 'collaborator')
+  - `created_at` (TIMESTAMPTZ, Default: now())
+  - `updated_at` (TIMESTAMPTZ, Default: now())
+- **Indexes**:
+  - `idx_job_collaborators_job_id` (BTREE on job_id)
+  - `idx_job_collaborators_user_id` (BTREE on user_id)
+
+#### `job_invitations`
+- **Purpose**: Email-based invitation system for job collaboration
+- **Fields**:
+  - `id` (UUID, Primary Key, Default: gen_random_uuid())
+  - `job_id` (UUID, FK to jobs)
+  - `invited_email` (TEXT)
+  - `invited_by` (UUID, FK to auth.users)
+  - `token` (TEXT, Default: gen_random_uuid()::text)
+  - `status` (TEXT, Default: 'pending')
+  - `expires_at` (TIMESTAMPTZ, Default: now() + '7 days'::interval)
+  - `created_at` (TIMESTAMPTZ, Default: now())
+  - `updated_at` (TIMESTAMPTZ, Default: now())
+
+### Points & Payment System
+
+#### `point_packages`
+- **Purpose**: Available point packages for purchase
+- **Fields**:
+  - `id` (UUID, Primary Key, Default: gen_random_uuid())
+  - `name` (TEXT)
+  - `points` (INTEGER)
+  - `price_cents` (INTEGER)
+  - `is_active` (BOOLEAN, Default: true)
+  - `created_at` (TIMESTAMPTZ, Default: now())
+
+#### `point_transactions`
+- **Purpose**: Points transaction history and tracking
+- **Fields**:
+  - `id` (UUID, Primary Key, Default: gen_random_uuid())
+  - `user_id` (UUID, FK to auth.users)
+  - `points` (INTEGER, positive for earned, negative for spent)
+  - `transaction_type` (TEXT)
+  - `description` (TEXT)
+  - `reference_id` (UUID, FK to related records)
+  - `created_at` (TIMESTAMPTZ, Default: now())
+
+#### `user_points`
+- **Purpose**: Current points balance for each user
+- **Fields**:
+  - `id` (UUID, Primary Key, Default: gen_random_uuid())
+  - `user_id` (UUID, FK to auth.users, Unique)
+  - `points_balance` (INTEGER, Default: 0)
+  - `created_at` (TIMESTAMPTZ, Default: now())
+  - `updated_at` (TIMESTAMPTZ, Default: now())
+
+### AI & RAG System
+
+#### `documents`
+- **Purpose**: Vector storage for RAG (Retrieval-Augmented Generation) functionality
+- **Fields**:
+  - `id` (BIGINT, Primary Key, Default: nextval('documents_id_seq'::regclass))
+  - `content` (TEXT)
+  - `metadata` (JSONB)
+  - `embedding` (VECTOR, User-defined type for AI embeddings)
 
 ### Storage Buckets
 - **`resumes`**: Public bucket for storing job application resumes (PDF files)
+
+### Key Features
+- **Full-text Search**: Applications table includes GIN index on `resume_text` for efficient text searching
+- **Vector Search**: Documents table supports AI-powered semantic search with embeddings
+- **Subscription Management**: Company profiles track subscription plans and monthly job posting limits
+- **Team Collaboration**: Job collaborators and invitations enable multi-user access to specific job postings
+- **Points System**: Complete points-based payment and transaction tracking system
+- **AI Screening**: Comprehensive screening results with voice interview capabilities
+- **Resume Processing**: Applications store both file URLs and extracted text content for AI processing
 
 ## 🔐 Authentication System
 
@@ -178,8 +283,8 @@ Hirios is built on the **Resynox platform**, an AI-powered development environme
 5. **Session Management**: Persistent sessions with automatic refresh
 
 ### User Types
-- **`job_seeker`**: Can browse jobs and submit applications
-- **`company`**: Can post jobs and manage applications
+- **`company`**: Can post jobs, manage applications, and conduct AI screening
+- **`recruiter`**: Can collaborate on job postings and manage candidate evaluations
 
 ### Security Features
 - **Row Level Security (RLS)**: Database-level security policies
@@ -192,11 +297,14 @@ Hirios is built on the **Resynox platform**, an AI-powered development environme
 interface AuthContextType {
   user: User | null;
   session: Session | null;
-  userType: string | null;
   loading: boolean;
-  signUp: (email: string, password: string, userType: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, companyData: CompanyData) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
+  resetPassword: (email: string) => Promise<{ error: any }>;
+  resendConfirmation: (email: string) => Promise<{ error: any }>;
+  updatePassword: (password: string) => Promise<{ error: any }>;
+  isEmailVerified: boolean;
 }
 ```
 
@@ -298,40 +406,80 @@ Hirios/
 
 Defined in `src/App.tsx` using React Router:
 
-- `/` → `HiriosLanding`
-- `/auth` → `Auth` (sign in/up)
+- `/` → `HiriosLanding` (marketing landing page)
+- `/auth` → `Auth` (company/recruiter sign in/up)
 - `/auth/confirm` → `AuthConfirm`
 - `/auth/reset-password` → `ResetPassword`
-- `/job-portal` → `JobPortal` (company or job seeker view)
+- `/job-portal` → `JobPortal` (company dashboard)
 - `/company-setup` → `CompanySetup`
-- `/screening-results` → `ScreeningResults` (company-only UI)
+- `/screening-results` → `ScreeningResults` (AI screening dashboard)
 - `/interview/:screeningResultId/:applicationId` → `VoiceInterview`
+- `/points-purchase` → `PointsPurchase`
+- `/points-history` → `PointsHistory`
+- `/invite-accept` → `InviteAccept` (collaboration invitations)
 - `*` → `NotFound`
 
 ## 🔄 Data Flow
 
 ### Job Posting Flow (Company)
-1. Company signs up and completes profile setup
+1. Company signs up and completes profile setup with subscription plan
 2. Company creates job posting through `CompanyView`
 3. Job data saved to `jobs` table with `company_profile_id`
-4. Real-time updates via React Query invalidation
+4. Monthly job posting counter tracked in `company_profiles`
+5. Real-time updates via React Query invalidation
 
-### Job Application Flow (Job Seeker)
-1. Job seeker browses jobs in `UserView`
-2. Selects job and fills application form
-3. Resume uploaded to Supabase Storage
-4. Application data saved to `applications` table
-5. Optional webhook triggered to external processing system
-6. AI screening results stored in `screening_results` (if configured)
+### Job Application Flow (External Candidates)
+1. External candidates apply through company job postings
+2. Resume uploaded to Supabase Storage with text extraction
+3. Application data saved to `applications` table with:
+   - Resume URL and extracted text content
+   - Original filename and uploader tracking
+   - Status set to 'pending'
+4. Optional webhook triggered to external processing system
+5. AI screening results stored in `screening_results` with:
+   - Comprehensive candidate evaluation
+   - Voice screening capabilities
+   - Interview tracking and notes
 
 ### Voice Interview Flow
 1. From `ScreeningResults`, a company can request a voice interview (sends webhook and marks record)
 2. A direct link can be generated/copied to invite the candidate
 3. On visit, `VoiceInterview` loads candidate/job data and starts a realtime AI conversation (with mic permission)
 
+### Team Collaboration Flow
+1. Company user invites collaborators via email to specific job postings
+2. Invitation data stored in `job_invitations` table with:
+   - Unique token for secure access
+   - 7-day expiration by default
+   - Status tracking (pending, accepted, expired)
+3. Collaborators receive email invitations to join the hiring team
+4. Upon acceptance, collaborators gain access to specific job postings
+5. Access control managed through `job_collaborators` table with role assignment
+6. All team members can view and manage applications for their assigned jobs
+7. Real-time collaboration updates via React Query invalidation
+
+### Points & Payment Flow
+1. Users can purchase point packages from `point_packages`
+2. Point transactions recorded in `point_transactions` with:
+   - Transaction type and description
+   - Reference to related actions (job posting, screening, etc.)
+   - Positive points for purchases, negative for usage
+3. User balance updated in `user_points` table
+4. Points can be spent on premium features like:
+   - Additional job postings
+   - AI screening services
+   - Voice interview features
+
+### RAG & AI Processing Flow
+1. Documents uploaded and processed for AI analysis
+2. Content and metadata stored in `documents` table
+3. AI embeddings generated and stored in `embedding` field
+4. Vector search enables semantic document retrieval
+5. RAG integration enhances AI responses with relevant context
+
 ### Authentication Flow
-1. User registration/login via Supabase Auth
-2. Profile creation with user type
+1. Company/recruiter registration/login via Supabase Auth
+2. Company profile creation with subscription plan and monthly limits
 3. Context state updates trigger UI changes
 4. Protected routes enforce authentication
 
@@ -428,7 +576,7 @@ The application is designed for deployment on modern hosting platforms:
 
 ## 📄 License
 
-This project is built on the Resynox platform and is part of the modern AI-powered development ecosystem.
+This project is part of the modern AI-powered development ecosystem.
 
 ## 🔗 External Integrations
 
@@ -459,4 +607,4 @@ For technical support or questions about the application:
 
 ---
 
-**Built with ❤️ using React, TypeScript, Supabase, shadcn/ui, and the Resynox platform**
+**Built with ❤️ using React, TypeScript, Supabase, and shadcn/ui**
