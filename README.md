@@ -12,6 +12,7 @@ Hirios is a comprehensive AI-powered B2B recruitment platform designed exclusive
 - **Application Management**: View and manage candidate applications with full-text search
 - **Dashboard Analytics**: Overview of job postings and application metrics
 - **Resume Management**: Access and review candidate resumes with extracted text content
+- **Resume Pool**: Centralized resume storage pool for managing company's resume collection
 - **AI Screening Results**: Review AI-generated candidate fit scores and insights
 - **Direct Interview Link**: Generate and copy candidate interview links
 - **Voice Interview (AI)**: Start AI-powered voice interviews for screened candidates
@@ -67,6 +68,7 @@ Hirios is a comprehensive AI-powered B2B recruitment platform designed exclusive
 - ✅ **Voice Interviews**: ElevenLabs integration for AI voice interviews
 - ✅ **Team Collaboration**: Email-based invitation system for collaborative hiring
 - ✅ **Resume Processing**: Automatic text extraction and full-text search capabilities
+- ✅ **Resume Pool**: Centralized resume storage and management system for companies
 - ✅ **Subscription Management**: Company subscription plans and monthly job posting limits
 - ✅ **Points System**: Complete points-based payment and transaction tracking
 - ✅ **RAG Integration**: Vector search and AI-powered document processing
@@ -169,6 +171,30 @@ Hirios is a comprehensive AI-powered B2B recruitment platform designed exclusive
   - `idx_applications_resume_text` (GIN on resume_text for full-text search)
   - `idx_applications_uploaded_by_user_id` (BTREE on uploaded_by_user_id)
   - `idx_applications_original_filename` (BTREE on original_filename)
+
+#### `resume_pool`
+- **Purpose**: Centralized resume storage pool for companies to manage their resume collection
+- **Fields**:
+  - `id` (UUID, Primary Key, Default: gen_random_uuid())
+  - `company_profile_id` (UUID, FK to company_profiles, NOT NULL)
+  - `original_filename` (TEXT, NOT NULL, Original resume filename)
+  - `storage_path` (TEXT, NOT NULL, Path to stored resume file in Supabase storage)
+  - `file_size` (INTEGER, NOT NULL, File size in bytes)
+  - `uploaded_by_user_id` (UUID, FK to auth.users, NOT NULL)
+  - `resume_text` (TEXT, NULL, Extracted text content from resume for AI processing)
+  - `created_at` (TIMESTAMPTZ, NOT NULL, Default: now())
+  - `updated_at` (TIMESTAMPTZ, NOT NULL, Default: now())
+- **Constraints**:
+  - `resume_pool_pkey` (Primary Key on id)
+  - `resume_pool_company_profile_id_fkey` (Foreign Key to company_profiles with CASCADE delete)
+  - `resume_pool_uploaded_by_user_id_fkey` (Foreign Key to auth.users with CASCADE delete)
+- **Indexes**:
+  - `idx_resume_pool_company_profile_id` (BTREE on company_profile_id)
+  - `idx_resume_pool_uploaded_by_user_id` (BTREE on uploaded_by_user_id)
+  - `idx_resume_pool_original_filename` (BTREE on original_filename)
+  - `idx_resume_pool_resume_text` (GIN on resume_text for full-text search)
+- **Triggers**:
+  - `trigger_update_resume_pool_updated_at` (Updates updated_at timestamp on row updates)
 
 #### `screening_results`
 - **Purpose**: AI-powered candidate screening and evaluation results
@@ -321,6 +347,9 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 # Screening Webhook (optional)
 VITE_SCREENING_WEBHOOK_URL=https://n8n.cognitechx.com/webhook-test/Hirios
 
+# Resume Pool Webhook (optional)
+VITE_WEBHOOK_RESUME_POOL_URL=https://n8n.cognitechx.com/
+
 # Voice Interview (ElevenLabs)
 VITE_ELEVENLABS_KEY=your_11labs_api_key
 VITE_AGENT_ID=your_agent_id
@@ -334,6 +363,7 @@ VITE_APP_DESCRIPTION=Job Portal Application
 - **`VITE_SUPABASE_URL`**: Your Supabase project URL
 - **`VITE_SUPABASE_ANON_KEY`**: Your Supabase anonymous key
 - **`VITE_SCREENING_WEBHOOK_URL`**: Optional: webhook endpoint for screening events
+- **`VITE_WEBHOOK_RESUME_POOL_URL`**: Optional: webhook endpoint for resume pool processing
 - **`VITE_ELEVENLABS_KEY`**: ElevenLabs API key for voice interviews
 - **`VITE_AGENT_ID`**: ElevenLabs Agent ID used for interviews
 - **`VITE_APP_NAME`**: Application name (optional)
@@ -364,7 +394,8 @@ Hirios/
 │   │   ├── UserView.tsx      # Job seeker interface
 │   │   ├── JobApplicationsView.tsx
 │   │   ├── ScreeningResultCard.tsx
-│   │   └── ScreeningResultActions.tsx
+│   │   ├── ScreeningResultActions.tsx
+│   │   └── ResumePoolUpload.tsx
 │   ├── contexts/            # React contexts
 │   │   └── AuthContext.tsx   # Authentication state
 │   ├── hooks/               # Custom React hooks
@@ -372,7 +403,8 @@ Hirios/
 │   │   ├── useApplications.ts # Application management
 │   │   ├── useCompanyJobs.ts # Company-specific jobs
 │   │   ├── useScreeningResults.ts
-│   │   └── useApplicationProcessing.ts
+│   │   ├── useApplicationProcessing.ts
+│   │   └── useResumePool.ts  # Resume pool management
 │   ├── integrations/        # External service integrations
 │   │   └── supabase/        # Supabase client and types
 │   ├── lib/                 # Utility functions
@@ -387,6 +419,7 @@ Hirios/
 │   │   ├── ScreeningResults.tsx # AI screening dashboard
 │   │   ├── ScreeningResultDetail.tsx # Detailed screening view
 │   │   ├── VoiceInterview.tsx   # AI voice interview page
+│   │   ├── ResumePool.tsx       # Resume pool management page
 │   │   └── NotFound.tsx      # 404 fallback
 │   ├── services/            # External API services
 │   │   ├── voiceInterviewService.ts # ElevenLabs + data aggregation
@@ -416,6 +449,7 @@ Defined in `src/App.tsx` using React Router:
 - `/interview/:screeningResultId/:applicationId` → `VoiceInterview`
 - `/points-purchase` → `PointsPurchase`
 - `/points-history` → `PointsHistory`
+- `/resume-pool` → `ResumePool` (centralized resume management)
 - `/invite-accept` → `InviteAccept` (collaboration invitations)
 - `*` → `NotFound`
 
@@ -469,6 +503,18 @@ Defined in `src/App.tsx` using React Router:
    - Additional job postings
    - AI screening services
    - Voice interview features
+
+### Resume Pool Flow
+1. Company users upload resumes to centralized pool via `/resume-pool` route
+2. Resumes stored in `company_uploads` storage bucket with organized folder structure
+3. Resume metadata saved to `resume_pool` table with:
+   - Company association and uploader tracking
+   - File size and storage path information
+   - Original filename preservation
+4. AI processing triggered via webhook for text extraction and analysis
+5. Extracted text content stored for full-text search capabilities
+6. Company can manage, search, download, and delete resumes from their pool
+7. Real-time updates via React Query for seamless user experience
 
 ### RAG & AI Processing Flow
 1. Documents uploaded and processed for AI analysis
@@ -585,6 +631,12 @@ This project is part of the modern AI-powered development ecosystem.
 - **Env Var**: `VITE_SCREENING_WEBHOOK_URL`
 - **Example**: `https://n8n.cognitechx.com/webhook-test/Hirios`
 - **Data**: Screening metadata (candidate, job, link) where applicable
+
+### Resume Pool Webhook Service
+- **Purpose**: Send resume pool data to external AI processing systems
+- **Env Var**: `VITE_WEBHOOK_RESUME_POOL_URL`
+- **Example**: `https://n8n.cognitechx.com/`
+- **Data**: Resume pool metadata (resume_id, filename, base64 content, company_id) for AI processing
 
 ### ElevenLabs Realtime
 - **Purpose**: Run AI-powered voice interviews
