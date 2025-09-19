@@ -25,6 +25,7 @@ import InviteAccept from "./pages/InviteAccept";
 import TestCollaboration from "./pages/TestCollaboration";
 import PointsPurchase from "./pages/PointsPurchase";
 import PointsHistory from "./pages/PointsHistory";
+import ResumePool from "./pages/ResumePool";
 import NotFound from "./pages/NotFound";
 import { ButtonAlignmentDemo } from "./components/ui/button-alignment-demo";
 import { VoiceInterviewService } from "./services/voiceInterviewService";
@@ -74,6 +75,7 @@ const App = () => (
             <Route path="/button-demo" element={<ButtonAlignmentDemo />} />
             <Route path="/points-purchase" element={<PointsPurchase />} />
             <Route path="/points-history" element={<PointsHistory />} />
+            <Route path="/resume-pool" element={<ResumePool />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

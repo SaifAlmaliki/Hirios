@@ -262,7 +262,7 @@ Hirios is a comprehensive AI-powered B2B recruitment platform designed exclusive
   - `embedding` (VECTOR, User-defined type for AI embeddings)
 
 ### Storage Buckets
-- **`resumes`**: Public bucket for storing job application resumes (PDF files)
+- **`company_uploads`**: Private bucket for storing company-uploaded resumes and job application resumes (PDF files)
 
 ### Key Features
 - **Full-text Search**: Applications table includes GIN index on `resume_text` for efficient text searching

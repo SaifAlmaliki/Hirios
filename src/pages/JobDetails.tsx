@@ -115,7 +115,7 @@ const JobDetails = () => {
       console.log('📄 Uploading resume:', file.name);
       
       const { data, error } = await supabase.storage
-        .from('resumes')
+        .from('company_uploads')
         .upload(filePath, file, {
           cacheControl: '3600',
           upsert: false
@@ -128,12 +128,17 @@ const JobDetails = () => {
 
       console.log('✅ Resume uploaded:', data.path);
       
-      // Get the public URL
-      const { data: urlData } = supabase.storage
-        .from('resumes')
-        .getPublicUrl(filePath);
+      // Get the signed URL for private bucket (valid for 1 hour)
+      const { data: urlData, error: urlError } = await supabase.storage
+        .from('company_uploads')
+        .createSignedUrl(filePath, 3600); // 1 hour expiry
 
-      return urlData.publicUrl;
+      if (urlError) {
+        console.error('❌ Error creating signed URL:', urlError);
+        throw urlError;
+      }
+
+      return urlData.signedUrl;
     } catch (error) {
       console.error('❌ Resume upload failed:', error);
       return null;

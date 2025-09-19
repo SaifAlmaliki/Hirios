@@ -468,6 +468,57 @@ export type Database = {
         }
         Relationships: []
       }
+      resume_pool: {
+        Row: {
+          id: string
+          company_profile_id: string
+          original_filename: string
+          storage_path: string
+          file_size: number
+          uploaded_by_user_id: string
+          resume_text: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          company_profile_id: string
+          original_filename: string
+          storage_path: string
+          file_size: number
+          uploaded_by_user_id: string
+          resume_text?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          company_profile_id?: string
+          original_filename?: string
+          storage_path?: string
+          file_size?: number
+          uploaded_by_user_id?: string
+          resume_text?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resume_pool_company_profile_id_fkey"
+            columns: ["company_profile_id"]
+            isOneToOne: false
+            referencedRelation: "company_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "resume_pool_uploaded_by_user_id_fkey"
+            columns: ["uploaded_by_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never
