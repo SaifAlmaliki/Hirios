@@ -322,18 +322,21 @@ const ResumePool = () => {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>Resumes ({filteredAndSortedResumes.length})</CardTitle>
-                {filteredAndSortedResumes.length > 0 && (
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      checked={allSelected}
-                      ref={(el) => {
-                        if (el) el.indeterminate = someSelected;
-                      }}
-                      onCheckedChange={handleSelectAll}
-                    />
-                    <span className="text-sm text-gray-600">Select All</span>
-                  </div>
-                )}
+                <div className="flex items-center space-x-3">
+                  {filteredAndSortedResumes.length > 0 && (
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        checked={allSelected}
+                        ref={(el) => {
+                          if (el) el.indeterminate = someSelected;
+                        }}
+                        onCheckedChange={handleSelectAll}
+                      />
+                      <span className="text-sm text-gray-600">Select All</span>
+                    </div>
+                  )}
+                  <ResumePoolUpload onUploadComplete={() => refetch()} showTrigger={true} />
+                </div>
               </div>
             </CardHeader>
             <CardContent>
