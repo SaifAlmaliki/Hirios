@@ -9,7 +9,7 @@ Hirios is a comprehensive AI-powered B2B recruitment platform designed exclusive
 ### For Companies & Recruiters
 - **Company Profile Management**: Complete company setup with branding and subscription management
 - **Job Posting**: Create and manage job listings with monthly posting limits
-- **Application Management**: View and manage candidate applications with full-text search
+- **Application Management**: View and manage uploaded resumes with full-text search
 - **Dashboard Analytics**: Overview of job postings and application metrics
 - **Resume Management**: Access and review candidate resumes with extracted text content
 - **Resume Pool**: Centralized resume storage pool for managing company's resume collection
@@ -462,18 +462,6 @@ Defined in `src/App.tsx` using React Router:
 4. Monthly job posting counter tracked in `company_profiles`
 5. Real-time updates via React Query invalidation
 
-### Job Application Flow (External Candidates)
-1. External candidates apply through company job postings
-2. Resume uploaded to Supabase Storage with text extraction
-3. Application data saved to `applications` table with:
-   - Resume URL and extracted text content
-   - Original filename and uploader tracking
-   - Status set to 'pending'
-4. Optional webhook triggered to external processing system
-5. AI screening results stored in `screening_results` with:
-   - Comprehensive candidate evaluation
-   - Voice screening capabilities
-   - Interview tracking and notes
 
 ### Voice Interview Flow
 1. From `ScreeningResults`, a company can request a voice interview (sends webhook and marks record)
@@ -506,15 +494,18 @@ Defined in `src/App.tsx` using React Router:
 
 ### Resume Pool Flow
 1. Company users upload resumes to centralized pool via `/resume-pool` route
-2. Resumes stored in `company_uploads` storage bucket with organized folder structure
-3. Resume metadata saved to `resume_pool` table with:
+2. Job applications also store resumes in the same centralized pool structure
+3. All resumes stored in `company_uploads` storage bucket with unified folder structure:
+   - Resume Pool: `resume_pool/company_id/pool/filename.pdf`
+   - Job Applications: `resume_pool/company_id/pool/filename.pdf` (same structure!)
+4. Resume metadata saved to respective tables (`resume_pool` or `applications`) with:
    - Company association and uploader tracking
    - File size and storage path information
    - Original filename preservation
-4. AI processing triggered via webhook for text extraction and analysis
-5. Extracted text content stored for full-text search capabilities
-6. Company can manage, search, download, and delete resumes from their pool
-7. Real-time updates via React Query for seamless user experience
+5. AI processing triggered via webhook for text extraction and analysis
+6. Extracted text content stored for full-text search capabilities
+7. Company can manage, search, download, and delete resumes from their unified pool
+8. Real-time updates via React Query for seamless user experience
 
 ### RAG & AI Processing Flow
 1. Documents uploaded and processed for AI analysis
