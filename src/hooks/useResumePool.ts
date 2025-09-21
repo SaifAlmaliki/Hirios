@@ -173,7 +173,28 @@ export const useDeleteResumeFromPool = () => {
 
   return useMutation({
     mutationFn: async ({ resumeId, storagePath }: { resumeId: string; storagePath: string }) => {
-      // Delete from storage
+      console.log('🗑️ Starting resume deletion process for:', resumeId);
+
+      // Step 1: Delete vector chunks from documents table
+      try {
+        console.log('🧹 Cleaning up vector chunks...');
+        const { error: vectorError } = await supabase
+          .from('documents')
+          .delete()
+          .eq('metadata->>file_id', resumeId);
+
+        if (vectorError) {
+          console.error('❌ Vector cleanup failed:', vectorError);
+          // Continue with other deletions even if vector cleanup fails
+        } else {
+          console.log('✅ Vector chunks cleaned up successfully');
+        }
+      } catch (error) {
+        console.error('❌ Vector cleanup error:', error);
+        // Continue with other deletions
+      }
+
+      // Step 2: Delete from storage
       const { error: storageError } = await supabase.storage
         .from('company_uploads')
         .remove([storagePath]);
@@ -181,9 +202,11 @@ export const useDeleteResumeFromPool = () => {
       if (storageError) {
         console.warn('⚠️ Storage deletion failed:', storageError);
         // Continue with database deletion even if storage fails
+      } else {
+        console.log('✅ Storage file deleted successfully');
       }
 
-      // Delete from database
+      // Step 3: Delete from database
       const { error: dbError } = await supabase
         .from('resume_pool')
         .delete()
@@ -193,6 +216,8 @@ export const useDeleteResumeFromPool = () => {
         console.error('❌ Database deletion error:', dbError);
         throw dbError;
       }
+
+      console.log('✅ Resume deletion completed successfully');
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['resumePool'] });
@@ -221,7 +246,28 @@ export const useBulkDeleteResumes = () => {
       const storagePaths = resumes.map(r => r.storagePath);
       const resumeIds = resumes.map(r => r.id);
 
-      // Delete from storage
+      console.log('🗑️ Starting bulk resume deletion process for:', resumeIds.length, 'resumes');
+
+      // Step 1: Delete vector chunks from documents table
+      try {
+        console.log('🧹 Cleaning up vector chunks for', resumeIds.length, 'resumes...');
+        const { error: vectorError } = await supabase
+          .from('documents')
+          .delete()
+          .in('metadata->>file_id', resumeIds);
+
+        if (vectorError) {
+          console.error('❌ Bulk vector cleanup failed:', vectorError);
+          // Continue with other deletions even if vector cleanup fails
+        } else {
+          console.log('✅ Vector chunks cleaned up successfully for', resumeIds.length, 'resumes');
+        }
+      } catch (error) {
+        console.error('❌ Bulk vector cleanup error:', error);
+        // Continue with other deletions
+      }
+
+      // Step 2: Delete from storage
       const { error: storageError } = await supabase.storage
         .from('company_uploads')
         .remove(storagePaths);
@@ -229,9 +275,11 @@ export const useBulkDeleteResumes = () => {
       if (storageError) {
         console.warn('⚠️ Bulk storage deletion failed:', storageError);
         // Continue with database deletion even if storage fails
+      } else {
+        console.log('✅ Storage files deleted successfully for', storagePaths.length, 'files');
       }
 
-      // Delete from database
+      // Step 3: Delete from database
       const { error: dbError } = await supabase
         .from('resume_pool')
         .delete()
@@ -241,6 +289,8 @@ export const useBulkDeleteResumes = () => {
         console.error('❌ Bulk database deletion error:', dbError);
         throw dbError;
       }
+
+      console.log('✅ Bulk resume deletion completed successfully for', resumeIds.length, 'resumes');
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['resumePool'] });

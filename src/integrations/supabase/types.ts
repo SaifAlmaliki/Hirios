@@ -519,6 +519,27 @@ export type Database = {
           }
         ]
       }
+      documents: {
+        Row: {
+          id: number
+          content: string | null
+          metadata: Json | null
+          embedding: unknown | null
+        }
+        Insert: {
+          id?: never
+          content?: string | null
+          metadata?: Json | null
+          embedding?: unknown | null
+        }
+        Update: {
+          id?: never
+          content?: string | null
+          metadata?: Json | null
+          embedding?: unknown | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
