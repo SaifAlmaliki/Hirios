@@ -32,7 +32,7 @@ import { VoiceInterviewService } from '@/services/voiceInterviewService';
 import { useToast } from '@/hooks/use-toast';
 import ScreeningResultActions from '@/components/ScreeningResultActions';
 import NotesEditDialog from '@/components/NotesEditDialog';
-import { supabase } from '@/integrations/supabase/client';
+import { downloadResume } from '@/lib/resumeUtils';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -103,33 +103,8 @@ const ScreeningResultDetail = () => {
       return;
     }
 
-    try {
-      // Extract file path from URL
-      const url = new URL(result.resume_url);
-      const pathParts = url.pathname.split('/');
-      const bucketIndex = pathParts.findIndex(part => part === 'company_uploads');
-      
-      if (bucketIndex !== -1 && bucketIndex < pathParts.length - 1) {
-        const filePath = pathParts.slice(bucketIndex + 1).join('/');
-        
-        // Generate fresh signed URL
-        const { data, error } = await supabase.storage
-          .from('company_uploads')
-          .createSignedUrl(filePath, 3600); // 1 hour expiry
-        
-        if (error) {
-          console.error('Error generating signed URL:', error);
-          window.open(result.resume_url, '_blank'); // Fallback to original URL
-        } else {
-          window.open(data.signedUrl, '_blank');
-        }
-      } else {
-        window.open(result.resume_url, '_blank'); // Fallback for other URL formats
-      }
-    } catch (error) {
-      console.error('Error handling resume download:', error);
-      window.open(result.resume_url, '_blank'); // Fallback
-    }
+    const filename = `${result.first_name} ${result.last_name}_Resume.pdf`;
+    await downloadResume(result.resume_url, filename);
   };
 
   const getScoreColor = (score: number) => {

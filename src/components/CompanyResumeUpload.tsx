@@ -170,7 +170,7 @@ const CompanyResumeUpload: React.FC<CompanyResumeUploadProps> = ({
     try {
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}_${file.name}`;
-      const filePath = `${companyId}/${jobId}/${fileName}`;
+      const filePath = `${companyId}/resumes/screening/${jobId}/${fileName}`;
 
       console.log('📄 Uploading company resume:', file.name);
       console.log('📁 File path:', filePath);

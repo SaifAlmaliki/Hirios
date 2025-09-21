@@ -20,7 +20,6 @@ import ContactUs from "./pages/ContactUs";
 import ScreeningResults from "./pages/ScreeningResults";
 import ScreeningResultDetail from "./pages/ScreeningResultDetail";
 import VoiceInterview from "./pages/VoiceInterview";
-import JobDetails from "./pages/JobDetails";
 import InviteAccept from "./pages/InviteAccept";
 import TestCollaboration from "./pages/TestCollaboration";
 import PointsPurchase from "./pages/PointsPurchase";
@@ -61,7 +60,6 @@ const App = () => (
             <Route path="/auth/confirm" element={<AuthConfirm />} />
             <Route path="/auth/reset-password" element={<ResetPassword />} />
             <Route path="/job-portal" element={<JobPortal />} />
-            <Route path="/job-details/:jobId" element={<JobDetails />} />
             <Route path="/company-setup" element={<CompanySetup />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms-of-service" element={<TermsOfService />} />

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { VoiceInterviewService } from '@/services/voiceInterviewService';
 import { useUpdateFavoriteStatus, useUpdateDismissStatus } from '@/hooks/useScreeningResults';
+import { downloadResume } from '@/lib/resumeUtils';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -60,31 +60,8 @@ const ScreeningResultActions: React.FC<ScreeningResultActionsProps> = ({
   const updateDismissMutation = useUpdateDismissStatus();
 
   const handleResumeDownload = async () => {
-    try {
-      // Extract file path from URL
-      const url = new URL(resumeUrl!);
-      const pathParts = url.pathname.split('/');
-      const bucketIndex = pathParts.findIndex(part => part === 'company_uploads');
-      if (bucketIndex !== -1 && bucketIndex < pathParts.length - 1) {
-        const filePath = pathParts.slice(bucketIndex + 1).join('/');
-        
-        // Generate fresh signed URL
-        const { data, error } = await supabase.storage
-          .from('company_uploads')
-          .createSignedUrl(filePath, 3600); // 1 hour expiry
-        
-        if (error) {
-          console.error('Error generating signed URL:', error);
-          window.open(resumeUrl, '_blank'); // Fallback to original URL
-        } else {
-          window.open(data.signedUrl, '_blank');
-        }
-      } else {
-        window.open(resumeUrl, '_blank'); // Fallback for other URL formats
-      }
-    } catch (error) {
-      console.error('Error handling resume download:', error);
-      window.open(resumeUrl, '_blank'); // Fallback
+    if (resumeUrl) {
+      await downloadResume(resumeUrl);
     }
   };
 

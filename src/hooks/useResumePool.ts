@@ -55,10 +55,10 @@ export const useUploadResumeToPool = () => {
         throw new Error('User or company profile not found');
       }
 
-      // Upload file to storage
+      // Upload file to storage with unified path structure
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}_${file.name}`;
-      const filePath = `resume_pool/${companyProfile.id}/${fileName}`;
+      const filePath = `${companyProfile.id}/resumes/pool/${fileName}`;
 
       console.log('📄 Uploading resume to pool:', file.name);
       console.log('📁 File path:', filePath);
@@ -265,10 +265,24 @@ export const useDownloadResume = () => {
 
   return useMutation({
     mutationFn: async ({ storagePath, filename }: { storagePath: string; filename: string }) => {
+      // Handle both old and new storage path formats
+      let filePath = storagePath;
+      
+      // If it's an old resume_pool path, convert to new format
+      if (storagePath.startsWith('resume_pool/')) {
+        // Extract company ID and filename from old path: resume_pool/{companyId}/{fileName}
+        const pathParts = storagePath.split('/');
+        if (pathParts.length >= 3) {
+          const companyId = pathParts[1];
+          const fileName = pathParts[2];
+          filePath = `${companyId}/resumes/pool/${fileName}`;
+        }
+      }
+      
       // Generate fresh signed URL
       const { data, error } = await supabase.storage
         .from('company_uploads')
-        .createSignedUrl(storagePath, 3600); // 1 hour expiry
+        .createSignedUrl(filePath, 3600); // 1 hour expiry
       
       if (error) {
         console.error('Error generating signed URL:', error);
