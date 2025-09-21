@@ -38,6 +38,7 @@ import ResumePoolUpload from '@/components/ResumePoolUpload';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import Navbar from '@/components/Navbar';
+import ResumePoolChat from '@/components/ResumePoolChat';
 
 const ResumePool = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -47,6 +48,7 @@ const ResumePool = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [resumeToDelete, setResumeToDelete] = useState<ResumePoolItem | null>(null);
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   const { data: resumes = [], isLoading, refetch } = useResumePool();
   const deleteResumeMutation = useDeleteResumeFromPool();
@@ -349,47 +351,49 @@ const ResumePool = () => {
                   {filteredAndSortedResumes.map((resume) => (
                     <div
                       key={resume.id}
-                      className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors"
+                      className="flex items-center justify-between p-3 sm:p-4 border rounded-lg hover:bg-gray-50 transition-colors"
                     >
-                      <div className="flex items-center space-x-4 flex-1">
+                      <div className="flex items-center space-x-2 sm:space-x-4 flex-1 min-w-0">
                         <Checkbox
                           checked={selectedResumes.includes(resume.id)}
                           onCheckedChange={(checked) => handleSelectResume(resume.id, checked as boolean)}
+                          className="flex-shrink-0"
                         />
-                        <FileText className="h-5 w-5 text-gray-500" />
+                        <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500 flex-shrink-0" />
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900 truncate">
+                          <p className="text-sm font-medium text-gray-900 truncate pr-2">
                             {resume.original_filename}
                           </p>
-                          <div className="flex items-center space-x-4 text-xs text-gray-500">
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-1 sm:space-y-0 text-xs text-gray-500 mt-1">
                             <span className="flex items-center">
-                              <Calendar className="h-3 w-3 mr-1" />
-                              {format(new Date(resume.created_at), 'MMM dd, yyyy')}
+                              <Calendar className="h-3 w-3 mr-1 flex-shrink-0" />
+                              <span className="truncate">{format(new Date(resume.created_at), 'MMM dd, yyyy')}</span>
                             </span>
                             <span className="flex items-center">
-                              <HardDrive className="h-3 w-3 mr-1" />
-                              {formatFileSize(resume.file_size)}
+                              <HardDrive className="h-3 w-3 mr-1 flex-shrink-0" />
+                              <span className="truncate">{formatFileSize(resume.file_size)}</span>
                             </span>
                             {resume.resume_text && (
-                              <Badge variant="secondary" className="text-xs">
+                              <Badge variant="secondary" className="text-xs w-fit">
                                 Text Extracted
                               </Badge>
                             )}
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => handleDownloadResume(resume)}
+                          className="h-8 w-8 p-0 sm:h-9 sm:w-9 sm:p-2"
                         >
-                          <Download className="h-4 w-4" />
+                          <Download className="h-3 w-3 sm:h-4 sm:w-4" />
                         </Button>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm">
-                              <MoreVertical className="h-4 w-4" />
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 sm:h-9 sm:w-9 sm:p-2">
+                              <MoreVertical className="h-3 w-3 sm:h-4 sm:w-4" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
@@ -457,6 +461,13 @@ const ResumePool = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* RAG Chat Interface */}
+      <ResumePoolChat
+        isOpen={isChatOpen}
+        onToggle={() => setIsChatOpen(!isChatOpen)}
+        resumePoolData={resumes}
+      />
     </div>
   );
 };
