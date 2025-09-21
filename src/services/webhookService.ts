@@ -33,7 +33,10 @@ interface ResumePoolWebhookData {
   uploaded_by_company: true;
 }
 
-const WEBHOOK_URL = import.meta.env.VITE_WEBHOOK_URL;
+// Use different webhook URLs for different purposes
+// Screening results use VITE_SCREENING_WEBHOOK_URL
+// Resume pool uploads use VITE_WEBHOOK_RESUME_POOL_URL
+const WEBHOOK_URL = import.meta.env.VITE_SCREENING_WEBHOOK_URL;
 const RESUME_POOL_WEBHOOK_URL = import.meta.env.VITE_WEBHOOK_RESUME_POOL_URL;
 
 const fileToBase64 = (file: File): Promise<string> => {
@@ -104,7 +107,7 @@ export const sendResumePoolToWebhook = async (data: ResumePoolWebhookData): Prom
   const webhookUrl = import.meta.env.VITE_WEBHOOK_RESUME_POOL_URL;
   
   if (!webhookUrl) {
-    console.warn('⚠️ No resume pool webhook URL configured');
+    console.warn('⚠️ No webhook URL configured');
     return false;
   }
 
@@ -120,20 +123,10 @@ export const sendResumePoolToWebhook = async (data: ResumePoolWebhookData): Prom
       uploaded_by_company: data.uploaded_by_company
     });
 
-    // Use CORS proxy for development if the URL doesn't support CORS
-    const isDevelopment = import.meta.env.DEV;
-    const finalUrl = isDevelopment && webhookUrl.includes('n8n.cognitechx.com') 
-      ? `https://cors-anywhere.herokuapp.com/${webhookUrl}`
-      : webhookUrl;
-
-    const response = await fetch(finalUrl, {
+    const response = await fetch(webhookUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        // Add CORS headers for the proxy
-        ...(isDevelopment && finalUrl.includes('cors-anywhere') && {
-          'X-Requested-With': 'XMLHttpRequest'
-        })
       },
       body: JSON.stringify(data)
     });

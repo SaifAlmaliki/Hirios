@@ -166,15 +166,22 @@ const ResumePoolUpload: React.FC<ResumePoolUploadProps> = ({
     setOverallProgress(0);
 
     try {
-      // Process files sequentially to avoid overwhelming the system
-      for (let i = 0; i < pendingFiles.length; i++) {
-        const file = pendingFiles[i];
-        await processFile(file);
-        
-        // Update overall progress
-        const progress = ((i + 1) / pendingFiles.length) * 100;
-        setOverallProgress(progress);
-      }
+      // Process files in parallel to trigger multiple n8n webhooks simultaneously
+      const uploadPromises = pendingFiles.map(async (file, index) => {
+        try {
+          await processFile(file);
+          
+          // Update overall progress
+          const progress = ((index + 1) / pendingFiles.length) * 100;
+          setOverallProgress(progress);
+        } catch (error) {
+          console.error(`Upload failed for ${file.name}:`, error);
+          // Don't throw here - let other uploads continue
+        }
+      });
+
+      // Wait for all uploads to complete (or fail)
+      await Promise.allSettled(uploadPromises);
 
       // Clear pending files
       setPendingFiles([]);

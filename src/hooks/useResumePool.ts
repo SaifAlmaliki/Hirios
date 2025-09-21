@@ -106,22 +106,41 @@ export const useUploadResumeToPool = () => {
         throw dbError;
       }
 
-                  // Send to webhook for AI processing
+                  // Send to webhook for AI processing using simplified logic
                   try {
                     const resumeBase64 = await fileToBase64(file);
 
-                    const webhookSuccess = await sendResumePoolToWebhook({
+                    // Prepare simplified webhook data (same pattern as screening results)
+                    const webhookData = {
                       resume_id: resumeData.id,
-                      resume_base64: resumeBase64,
                       resume_filename: file.name,
+                      resume_base64: resumeBase64,
                       company_id: companyProfile.id,
                       uploaded_at: new Date().toISOString(),
                       upload_source: 'resume_pool',
                       uploaded_by_company: true
-                    });
+                    };
 
-                    if (!webhookSuccess) {
-                      console.warn('⚠️ Webhook processing failed, but upload completed');
+                    console.log('📤 Webhook payload prepared:', webhookData);
+
+                    // Send webhook to n8n using resume pool specific URL
+                    const webhookUrl = import.meta.env.VITE_WEBHOOK_RESUME_POOL_URL;
+                    if (webhookUrl) {
+                      try {
+                        await fetch(webhookUrl, {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                          },
+                          body: JSON.stringify(webhookData)
+                        });
+                        console.log('✅ Resume pool webhook delivered successfully');
+                      } catch (webhookError) {
+                        console.error('Webhook error:', webhookError);
+                        // Don't fail the whole process if webhook fails
+                      }
+                    } else {
+                      console.warn('⚠️ No webhook URL configured');
                     }
                   } catch (webhookError) {
                     console.warn('⚠️ Webhook processing failed:', webhookError);
