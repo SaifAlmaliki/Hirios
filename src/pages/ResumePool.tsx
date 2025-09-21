@@ -281,34 +281,40 @@ const ResumePool = () => {
           {/* Bulk Actions */}
           {selectedResumes.length > 0 && (
             <Card className="mb-6">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
+              <CardContent className="p-3 sm:p-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
+                  <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
                     <span className="text-sm font-medium text-gray-700">
                       {selectedResumes.length} resume{selectedResumes.length !== 1 ? 's' : ''} selected
                     </span>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleBulkDownload}
-                    >
-                      <Download className="h-4 w-4 mr-2" />
-                      Download All
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleBulkDelete}
-                      className="text-red-600 hover:text-red-700"
-                    >
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Delete All
-                    </Button>
+                    <div className="flex flex-wrap gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleBulkDownload}
+                        className="text-xs sm:text-sm"
+                      >
+                        <Download className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                        <span className="hidden sm:inline">Download All</span>
+                        <span className="sm:hidden">Download</span>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleBulkDelete}
+                        className="text-red-600 hover:text-red-700 text-xs sm:text-sm"
+                      >
+                        <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                        <span className="hidden sm:inline">Delete All</span>
+                        <span className="sm:hidden">Delete</span>
+                      </Button>
+                    </div>
                   </div>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => setSelectedResumes([])}
+                    className="text-xs sm:text-sm self-start sm:self-auto"
                   >
                     Clear Selection
                   </Button>

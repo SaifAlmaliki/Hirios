@@ -247,7 +247,7 @@ const ResumePoolChat: React.FC<ResumePoolChatProps> = ({
       {/* Chat Toggle Button */}
       <Button
         onClick={onToggle}
-        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40 rounded-full shadow-lg h-10 sm:h-12 md:h-14 px-2 sm:px-3 md:px-6"
+        className="fixed bottom-4 right-2 sm:bottom-6 sm:right-6 z-40 rounded-full shadow-lg h-10 sm:h-12 md:h-14 px-2 sm:px-3 md:px-6 max-w-[calc(100vw-1rem)]"
         size="lg"
       >
         <MessageCircle className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 mr-1 sm:mr-2" />
