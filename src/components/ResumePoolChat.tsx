@@ -16,6 +16,17 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
+const RAG_WEBHOOK_URL = import.meta.env.VITE_RAG_RETRIVE;
+
+// Animated loading dots component
+const LoadingDots = () => (
+  <div className="flex items-center space-x-1">
+    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+  </div>
+);
+
 interface ChatMessage {
   id: string;
   type: 'user' | 'assistant';
@@ -26,6 +37,7 @@ interface ChatMessage {
     resumeUrl: string;
     filename: string;
   }>;
+  isLoading?: boolean;
 }
 
 interface ResumePoolChatProps {
@@ -88,8 +100,21 @@ const ResumePoolChat: React.FC<ResumePoolChatProps> = ({
     setIsLoading(true);
     setIsStreaming(true);
 
+    if (!RAG_WEBHOOK_URL) {
+      console.error('VITE_RAG_RETRIVE is not configured.');
+      toast({
+        title: "Configuration Error",
+        description: "RAG webhook URL is not set. Please check your environment variables.",
+        variant: "destructive",
+      });
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      const response = await fetch(import.meta.env.VITE_RAG_RETRIVE, {
+      console.log('📤 Sending RAG chat webhook for:', userMessage.content);
+      
+      const response = await fetch(RAG_WEBHOOK_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -103,9 +128,9 @@ const ResumePoolChat: React.FC<ResumePoolChatProps> = ({
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
-      // Handle streaming response
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
+      console.log('✅ RAG chat webhook delivered successfully');
+
+      // Handle response - try both streaming and direct JSON
       let assistantContent = '';
       let sources: Array<{ candidateName: string; resumeUrl: string; filename: string }> = [];
 
@@ -114,53 +139,74 @@ const ResumePoolChat: React.FC<ResumePoolChatProps> = ({
         type: 'assistant',
         content: '',
         timestamp: new Date(),
-        sources: []
+        sources: [],
+        isLoading: true
       };
 
       setMessages(prev => [...prev, assistantMessage]);
 
-      if (reader) {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
+      try {
+        // First, try to get the response as JSON (for non-streaming responses)
+        const responseText = await response.text();
+        console.log('📥 Raw response from webhook:', responseText);
 
-          const chunk = decoder.decode(value);
-          const lines = chunk.split('\n');
+        try {
+          // Try to parse as JSON array (n8n format)
+          const jsonResponse = JSON.parse(responseText);
+          console.log('📋 Parsed JSON response:', jsonResponse);
 
-          for (const line of lines) {
-            if (line.startsWith('data: ')) {
-              const data = line.slice(6);
-              if (data === '[DONE]') {
-                setIsStreaming(false);
-                break;
-              }
-
-              try {
-                const parsed = JSON.parse(data);
-                if (parsed.content) {
-                  assistantContent += parsed.content;
-                }
-                if (parsed.sources) {
-                  sources = parsed.sources;
-                }
-              } catch (e) {
-                // Handle non-JSON streaming content
-                assistantContent += data;
-              }
+          if (Array.isArray(jsonResponse) && jsonResponse.length > 0) {
+            // Handle n8n array format
+            const firstItem = jsonResponse[0];
+            if (firstItem.output) {
+              assistantContent = firstItem.output;
+            } else if (firstItem.content) {
+              assistantContent = firstItem.content;
+            } else if (typeof firstItem === 'string') {
+              assistantContent = firstItem;
             }
+          } else if (jsonResponse.output) {
+            assistantContent = jsonResponse.output;
+          } else if (jsonResponse.content) {
+            assistantContent = jsonResponse.content;
+          } else if (typeof jsonResponse === 'string') {
+            assistantContent = jsonResponse;
           }
 
-          // Update the assistant message with streaming content
+          // Extract sources if available
+          if (jsonResponse.sources) {
+            sources = jsonResponse.sources;
+          }
+
+        } catch (jsonError) {
+          console.log('📝 Response is not JSON, treating as plain text');
+          assistantContent = responseText;
+        }
+
+        // Update the assistant message with the content
+        if (assistantContent.trim()) {
           setMessages(prev => prev.map(msg => 
             msg.id === assistantMessage.id 
-              ? { ...msg, content: assistantContent, sources }
+              ? { ...msg, content: assistantContent, sources, isLoading: false }
+              : msg
+          ));
+        } else {
+          // If no content, show a fallback message
+          setMessages(prev => prev.map(msg => 
+            msg.id === assistantMessage.id 
+              ? { ...msg, content: "I received your question but didn't get a proper response. Please try again.", sources, isLoading: false }
               : msg
           ));
         }
+
+      } catch (error) {
+        console.error('❌ Error processing response:', error);
+        throw error;
       }
 
     } catch (error) {
-      console.error('RAG chat error:', error);
+      console.error('❌ RAG chat webhook failed:', error);
+      
       toast({
         title: "Chat Error",
         description: "Sorry, I couldn't process your question. Please try again.",
@@ -268,8 +314,15 @@ const ResumePoolChat: React.FC<ResumePoolChatProps> = ({
                         <User className="h-4 w-4 mt-0.5 flex-shrink-0" />
                       )}
                       <div className="flex-1">
-                        <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                        {isStreaming && message.type === 'assistant' && message.id === messages[messages.length - 1]?.id && (
+                        {message.isLoading ? (
+                          <div className="flex items-center space-x-2">
+                            <span className="text-sm">AI is thinking</span>
+                            <LoadingDots />
+                          </div>
+                        ) : (
+                          <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                        )}
+                        {isStreaming && message.type === 'assistant' && message.id === messages[messages.length - 1]?.id && !message.isLoading && (
                           <div className="flex items-center mt-2">
                             <Loader2 className="h-3 w-3 animate-spin mr-1" />
                             <span className="text-xs opacity-70">AI is thinking...</span>
@@ -314,10 +367,17 @@ const ResumePoolChat: React.FC<ResumePoolChatProps> = ({
                       key={index}
                       variant="outline"
                       size="sm"
-                      className="w-full text-left justify-start text-xs h-auto py-2 px-3"
+                      className="w-full text-left justify-start text-xs h-auto py-2 px-3 disabled:opacity-50"
                       onClick={() => handleSuggestedQuestion(question)}
+                      disabled={isLoading}
                     >
-                      {question}
+                      {isLoading ? (
+                        <div className="flex items-center space-x-1">
+                          <LoadingDots />
+                        </div>
+                      ) : (
+                        question
+                      )}
                     </Button>
                   ))}
                 </div>
@@ -335,14 +395,16 @@ const ResumePoolChat: React.FC<ResumePoolChatProps> = ({
                   disabled={isLoading}
                   className="flex-1 text-sm sm:text-base"
                 />
-                <Button
-                  onClick={handleSendMessage}
+                <Button 
+                  onClick={handleSendMessage} 
                   disabled={!inputValue.trim() || isLoading}
                   size="sm"
                   className="h-9 w-9 sm:h-10 sm:w-auto sm:px-3"
                 >
                   {isLoading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <div className="flex items-center space-x-1">
+                      <LoadingDots />
+                    </div>
                   ) : (
                     <Send className="h-4 w-4" />
                   )}
