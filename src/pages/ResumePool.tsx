@@ -37,6 +37,7 @@ import { useResumePool, useDeleteResumeFromPool, useBulkDeleteResumes, useDownlo
 import ResumePoolUpload from '@/components/ResumePoolUpload';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
+import Navbar from '@/components/Navbar';
 
 const ResumePool = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -173,10 +174,13 @@ const ResumePool = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
-        <div className="flex items-center space-x-2">
-          <RefreshCw className="h-6 w-6 animate-spin text-blue-600" />
-          <span className="text-lg text-gray-600">Loading resume pool...</span>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+        <Navbar title="Resume Pool" />
+        <div className="flex items-center justify-center pt-40">
+          <div className="flex items-center space-x-2">
+            <RefreshCw className="h-6 w-6 animate-spin text-blue-600" />
+            <span className="text-lg text-gray-600">Loading resume pool...</span>
+          </div>
         </div>
       </div>
     );
@@ -184,20 +188,10 @@ const ResumePool = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      <div className="container mx-auto px-4 py-8">
+      <Navbar title="Resume Pool" />
+      <div className="container mx-auto px-4 pt-32 pb-8">
         <div className="max-w-7xl mx-auto">
-          {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">Resume Pool</h1>
-              <p className="text-gray-600">
-                Centralized storage for all your company's resumes
-              </p>
-            </div>
-            <div className="mt-4 sm:mt-0">
-              <ResumePoolUpload onUploadComplete={() => refetch()} />
-            </div>
-          </div>
+          {/* Header - Removed title, description, and upload button */}
 
           {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
