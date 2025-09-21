@@ -191,7 +191,7 @@ const ResumePool = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       <Navbar title="Resume Pool" />
-      <div className="container mx-auto px-4 pt-32 pb-8">
+        <div className={`container mx-auto px-4 pt-32 pb-8 transition-all duration-300 ${isChatOpen ? 'sm:pr-[420px] md:pr-[520px] lg:pr-[620px] xl:pr-[720px]' : ''}`}>
         <div className="max-w-7xl mx-auto">
           {/* Header - Removed title, description, and upload button */}
 

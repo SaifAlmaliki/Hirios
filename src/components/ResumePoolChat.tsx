@@ -247,13 +247,13 @@ const ResumePoolChat: React.FC<ResumePoolChatProps> = ({
       {/* Chat Toggle Button */}
       <Button
         onClick={onToggle}
-        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40 rounded-full shadow-lg h-12 sm:h-14 px-3 sm:px-6"
+        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40 rounded-full shadow-lg h-10 sm:h-12 md:h-14 px-2 sm:px-3 md:px-6"
         size="lg"
       >
-        <MessageCircle className="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2" />
+        <MessageCircle className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 mr-1 sm:mr-2" />
         <span className="hidden sm:inline">AI Assistant</span>
         <span className="sm:hidden">AI</span>
-        <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2" />
+        <Sparkles className="h-2 w-2 sm:h-3 sm:w-3 md:h-4 md:w-4 ml-1 sm:ml-2" />
       </Button>
 
       {/* Chat Sidebar */}
@@ -266,7 +266,7 @@ const ResumePoolChat: React.FC<ResumePoolChatProps> = ({
           />
           
           {/* Sidebar */}
-          <div className="w-full sm:w-96 bg-white shadow-2xl flex flex-col h-full sm:h-auto">
+          <div className="w-full sm:w-[400px] md:w-[500px] lg:w-[600px] xl:w-[700px] bg-white shadow-2xl flex flex-col h-full">
             {/* Header */}
             <CardHeader className="border-b bg-gradient-to-r from-blue-50 to-purple-50">
               <div className="flex items-center justify-between">
@@ -293,14 +293,14 @@ const ResumePoolChat: React.FC<ResumePoolChatProps> = ({
             </CardHeader>
 
             {/* Messages */}
-            <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
+            <CardContent className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
               {messages.map((message) => (
                 <div
                   key={message.id}
                   className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
-                    className={`max-w-[80%] rounded-lg px-4 py-2 ${
+                    className={`max-w-[90%] sm:max-w-[85%] rounded-lg px-3 sm:px-4 py-2 ${
                       message.type === 'user'
                         ? 'bg-blue-600 text-white'
                         : 'bg-gray-100 text-gray-900'
@@ -359,7 +359,7 @@ const ResumePoolChat: React.FC<ResumePoolChatProps> = ({
 
             {/* Suggested Questions */}
             {messages.length <= 1 && (
-              <div className="p-4 border-t bg-gray-50">
+              <div className="p-3 sm:p-4 md:p-6 border-t bg-gray-50">
                 <p className="text-sm font-medium text-gray-700 mb-2">Try asking:</p>
                 <div className="space-y-2">
                   {suggestedQuestions.slice(0, 3).map((question, index) => (
@@ -385,7 +385,7 @@ const ResumePoolChat: React.FC<ResumePoolChatProps> = ({
             )}
 
             {/* Input */}
-            <div className="p-3 sm:p-4 border-t">
+            <div className="p-3 sm:p-4 md:p-6 border-t">
               <div className="flex space-x-2">
                 <Input
                   value={inputValue}
@@ -399,7 +399,7 @@ const ResumePoolChat: React.FC<ResumePoolChatProps> = ({
                   onClick={handleSendMessage} 
                   disabled={!inputValue.trim() || isLoading}
                   size="sm"
-                  className="h-9 w-9 sm:h-10 sm:w-auto sm:px-3"
+                  className="h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-auto md:px-3"
                 >
                   {isLoading ? (
                     <div className="flex items-center space-x-1">
