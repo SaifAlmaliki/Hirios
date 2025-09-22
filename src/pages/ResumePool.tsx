@@ -6,23 +6,13 @@ import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { 
   Search, 
-  Filter, 
   Download, 
   Trash2, 
   FileText, 
   Calendar,
-  User,
   HardDrive,
-  MoreVertical,
-  Eye,
   RefreshCw
 } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -35,6 +25,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useResumePool, useDeleteResumeFromPool, useBulkDeleteResumes, useDownloadResume, ResumePoolItem } from '@/hooks/useResumePool';
 import ResumePoolUpload from '@/components/ResumePoolUpload';
+import ResumeRow from '@/components/ResumeRow';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import Navbar from '@/components/Navbar';
@@ -58,10 +49,19 @@ const ResumePool = () => {
 
   // Filter and sort resumes
   const filteredAndSortedResumes = useMemo(() => {
-    let filtered = resumes.filter(resume =>
-      resume.original_filename.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (resume.resume_text && resume.resume_text.toLowerCase().includes(searchTerm.toLowerCase()))
-    );
+    let filtered = resumes.filter(resume => {
+      const searchLower = searchTerm.toLowerCase();
+      return (
+        resume.original_filename.toLowerCase().includes(searchLower) ||
+        (resume.resume_text && resume.resume_text.toLowerCase().includes(searchLower)) ||
+        (resume.first_name && resume.first_name.toLowerCase().includes(searchLower)) ||
+        (resume.last_name && resume.last_name.toLowerCase().includes(searchLower)) ||
+        (resume.email && resume.email.toLowerCase().includes(searchLower)) ||
+        (resume.phone && resume.phone.toLowerCase().includes(searchLower)) ||
+        (resume.home_address && resume.home_address.toLowerCase().includes(searchLower)) ||
+        (resume.skills && resume.skills.some(skill => skill.toLowerCase().includes(searchLower)))
+      );
+    });
 
     filtered.sort((a, b) => {
       let comparison = 0;
@@ -244,7 +244,7 @@ const ResumePool = () => {
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                     <Input
-                      placeholder="Search resumes by filename or content..."
+                      placeholder="Search by name, email, skills, or content..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       className="pl-10"
@@ -358,69 +358,14 @@ const ResumePool = () => {
               ) : (
                 <div className="space-y-2">
                   {filteredAndSortedResumes.map((resume) => (
-                    <div
+                    <ResumeRow
                       key={resume.id}
-                      className="flex items-center justify-between p-3 sm:p-4 border rounded-lg hover:bg-gray-50 transition-colors"
-                    >
-                      <div className="flex items-center space-x-2 sm:space-x-4 flex-1 min-w-0">
-                        <Checkbox
-                          checked={selectedResumes.includes(resume.id)}
-                          onCheckedChange={(checked) => handleSelectResume(resume.id, checked as boolean)}
-                          className="flex-shrink-0"
-                        />
-                        <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500 flex-shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900 truncate pr-2">
-                            {resume.original_filename}
-                          </p>
-                          <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-1 sm:space-y-0 text-xs text-gray-500 mt-1">
-                            <span className="flex items-center">
-                              <Calendar className="h-3 w-3 mr-1 flex-shrink-0" />
-                              <span className="truncate">{format(new Date(resume.created_at), 'MMM dd, yyyy')}</span>
-                            </span>
-                            <span className="flex items-center">
-                              <HardDrive className="h-3 w-3 mr-1 flex-shrink-0" />
-                              <span className="truncate">{formatFileSize(resume.file_size)}</span>
-                            </span>
-                            {resume.resume_text && (
-                              <Badge variant="secondary" className="text-xs w-fit">
-                                Text Extracted
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDownloadResume(resume)}
-                          className="h-8 w-8 p-0 sm:h-9 sm:w-9 sm:p-2"
-                        >
-                          <Download className="h-3 w-3 sm:h-4 sm:w-4" />
-                        </Button>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 sm:h-9 sm:w-9 sm:p-2">
-                              <MoreVertical className="h-3 w-3 sm:h-4 sm:w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => handleDownloadResume(resume)}>
-                              <Download className="h-4 w-4 mr-2" />
-                              Download
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => handleDeleteResume(resume)}
-                              className="text-red-600"
-                            >
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    </div>
+                      resume={resume}
+                      isSelected={selectedResumes.includes(resume.id)}
+                      onSelect={handleSelectResume}
+                      onDownload={handleDownloadResume}
+                      onDelete={handleDeleteResume}
+                    />
                   ))}
                 </div>
               )}

@@ -18,6 +18,7 @@ interface ScreeningResultHeaderProps {
   phone?: string;
   homeAddress?: string;
   overallFit: number;
+  skills?: string[];
 }
 
 const ScreeningResultHeader: React.FC<ScreeningResultHeaderProps> = ({
@@ -28,7 +29,8 @@ const ScreeningResultHeader: React.FC<ScreeningResultHeaderProps> = ({
   createdAt,
   phone,
   homeAddress,
-  overallFit
+  overallFit,
+  skills
 }) => {
   // Helper functions
   const getScoreColor = (score: number) => {
@@ -42,6 +44,7 @@ const ScreeningResultHeader: React.FC<ScreeningResultHeaderProps> = ({
     if (score >= 40) return 'Good';
     return 'Poor';
   };
+
 
   return (
     <div className="flex-1">
@@ -87,6 +90,24 @@ const ScreeningResultHeader: React.FC<ScreeningResultHeaderProps> = ({
           <span className="truncate" title={jobTitle || 'No job linked'}>{jobTitle || 'No job linked'}</span>
         </div>
       </div>
+      
+      {/* Skills Section */}
+      {skills && skills.length > 0 && (
+        <div className="mt-4">
+          <div className="flex flex-wrap gap-1">
+            {skills.map((skill, index) => (
+              <Badge
+                key={index}
+                variant="outline"
+                className="text-xs bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100"
+              >
+                {skill}
+              </Badge>
+            ))}
+          </div>
+        </div>
+      )}
+      
     </div>
   );
 };

@@ -59,6 +59,7 @@ const ScreeningResultCard: React.FC<ScreeningResultCardProps> = ({
             phone={result.phone}
             homeAddress={result.home_address}
             overallFit={result.overall_fit || 0}
+            skills={result.skills}
           />
 
           <ScreeningResultActions

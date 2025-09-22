@@ -28,6 +28,7 @@ export interface ScreeningResult {
   application_id?: string;  // Add application_id field
   is_favorite?: boolean;    // Add favorite status
   is_dismissed?: boolean;   // Add dismiss status
+  skills?: string[];        // Add skills array
   // Job details from join
   job?: {
     id: string;
@@ -108,6 +109,7 @@ export const useScreeningResults = () => {
         throw error;
       }
       
+      
       // Fetch resume URLs for each candidate
       const resultsWithResumes = await Promise.all(
         (data || []).map(async (result: any) => {
@@ -137,11 +139,13 @@ export const useScreeningResults = () => {
               console.warn('⚠️ No resume found for:', result.email, 'application_id:', result.application_id);
             }
             
-            return {
+            const processedResult = {
               ...result,
               resume_url: application?.resume_url || null,
               resume_text: application?.resume_text || null
             };
+            
+            return processedResult;
           } catch (error) {
             console.warn('⚠️ Error fetching resume for:', result.email, 'application_id:', result.application_id);
             return {

@@ -13,6 +13,12 @@ export type ResumePoolItem = {
   file_size: number;
   uploaded_by_user_id: string;
   resume_text: string | null;
+  first_name: string | null;
+  last_name: string | null;
+  email: string | null;
+  phone: string | null;
+  home_address: string | null;
+  skills: string[] | null;
   created_at: string;
   updated_at: string;
 };

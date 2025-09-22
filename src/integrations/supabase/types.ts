@@ -307,6 +307,7 @@ export type Database = {
           interview_summary: string | null
           interview_completed_at: string | null
           application_id: string | null
+          skills: string[] | null
         }
         Insert: {
           id?: string
@@ -330,6 +331,7 @@ export type Database = {
           interview_summary?: string | null
           interview_completed_at?: string | null
           application_id?: string | null
+          skills?: string[] | null
         }
         Update: {
           id?: string
@@ -353,6 +355,7 @@ export type Database = {
           interview_summary?: string | null
           interview_completed_at?: string | null
           application_id?: string | null
+          skills?: string[] | null
         }
         Relationships: [
           {
@@ -477,6 +480,12 @@ export type Database = {
           file_size: number
           uploaded_by_user_id: string
           resume_text: string | null
+          first_name: string | null
+          last_name: string | null
+          email: string | null
+          phone: string | null
+          home_address: string | null
+          skills: string[] | null
           created_at: string
           updated_at: string
         }
@@ -488,6 +497,12 @@ export type Database = {
           file_size: number
           uploaded_by_user_id: string
           resume_text?: string | null
+          first_name?: string | null
+          last_name?: string | null
+          email?: string | null
+          phone?: string | null
+          home_address?: string | null
+          skills?: string[] | null
           created_at?: string
           updated_at?: string
         }
@@ -499,6 +514,12 @@ export type Database = {
           file_size?: number
           uploaded_by_user_id?: string
           resume_text?: string | null
+          first_name?: string | null
+          last_name?: string | null
+          email?: string | null
+          phone?: string | null
+          home_address?: string | null
+          skills?: string[] | null
           created_at?: string
           updated_at?: string
         }
