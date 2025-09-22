@@ -11,6 +11,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import Navbar from '@/components/Navbar';
 
 const CompanySetup = () => {
   const { user, loading } = useAuth();
@@ -30,10 +31,13 @@ const CompanySetup = () => {
   // Show loading state while auth is being determined
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+        <Navbar title="Company Setup" />
+        <div className="flex items-center justify-center pt-32">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading...</p>
+          </div>
         </div>
       </div>
     );
@@ -42,14 +46,17 @@ const CompanySetup = () => {
   // Security check: Only allow companies to access this page
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-6xl mb-4">🚫</div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h1>
-          <p className="text-gray-600 mb-4">This page is only available for company accounts.</p>
-          <Button onClick={() => navigate('/')}>
-            Go to Landing Page
-          </Button>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+        <Navbar title="Company Setup" />
+        <div className="flex items-center justify-center pt-32">
+          <div className="text-center">
+            <div className="text-6xl mb-4">🚫</div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h1>
+            <p className="text-gray-600 mb-4">This page is only available for company accounts.</p>
+            <Button onClick={() => navigate('/')}>
+              Go to Landing Page
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -168,8 +175,9 @@ const CompanySetup = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
-      <div className="max-w-2xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <Navbar title="Company Setup" />
+      <div className="max-w-2xl mx-auto py-12 px-4 pt-32">
         <Card className="shadow-xl">
           <CardHeader className="text-center">
             <div className="mx-auto bg-blue-600 p-3 rounded-full w-fit mb-4">

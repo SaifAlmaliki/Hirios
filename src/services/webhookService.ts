@@ -23,14 +23,21 @@ interface ResumeWebhookData {
   };
 }
 
-const WEBHOOK_URL = import.meta.env.VITE_WEBHOOK_URL;
-
-// Validate environment variable
-if (!WEBHOOK_URL) {
-  throw new Error(
-    'Missing webhook URL environment variable. Please check your .env.local file and ensure VITE_WEBHOOK_URL is set.'
-  );
+interface ResumePoolWebhookData {
+  resume_id: string;
+  resume_base64: string;
+  resume_filename: string;
+  company_id: string;
+  uploaded_at: string;
+  upload_source: 'resume_pool';
+  uploaded_by_company: true;
 }
+
+// Use different webhook URLs for different purposes
+// Screening results use VITE_SCREENING_WEBHOOK_URL
+// Resume pool uploads use VITE_WEBHOOK_RESUME_POOL_URL
+const WEBHOOK_URL = import.meta.env.VITE_SCREENING_WEBHOOK_URL;
+const RESUME_POOL_WEBHOOK_URL = import.meta.env.VITE_WEBHOOK_RESUME_POOL_URL;
 
 const fileToBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -92,6 +99,48 @@ export const sendResumeToWebhook = async (data: ResumeWebhookData): Promise<bool
     return true;
   } catch (error) {
     console.error('❌ Resume webhook failed:', error);
+    return false;
+  }
+};
+
+export const sendResumePoolToWebhook = async (data: ResumePoolWebhookData): Promise<boolean> => {
+  const webhookUrl = import.meta.env.VITE_WEBHOOK_RESUME_POOL_URL;
+  
+  if (!webhookUrl) {
+    console.warn('⚠️ No webhook URL configured');
+    return false;
+  }
+
+  try {
+    console.log('📤 Sending resume pool webhook for:', data.resume_filename);
+    console.log('📋 Webhook payload:', {
+      resume_id: data.resume_id,
+      resume_filename: data.resume_filename,
+      resume_base64_length: data.resume_base64.length,
+      company_id: data.company_id,
+      uploaded_at: data.uploaded_at,
+      upload_source: data.upload_source,
+      uploaded_by_company: data.uploaded_by_company
+    });
+
+    const response = await fetch(webhookUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    console.log('✅ Resume pool webhook delivered successfully');
+    return true;
+  } catch (error) {
+    console.error('❌ Resume pool webhook failed:', error);
+    // Don't fail the upload if webhook fails - just log the error
+    console.warn('⚠️ Continuing with upload despite webhook failure');
     return false;
   }
 };
