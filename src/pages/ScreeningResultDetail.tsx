@@ -52,6 +52,26 @@ const ScreeningResultDetail = () => {
   const [requestingInterview, setRequestingInterview] = useState<string | null>(null);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isNotesDialogOpen, setIsNotesDialogOpen] = useState(false);
+
+  // Bullet point parsing function
+  const parseContentToBullets = (content: string) => {
+    // Split content into sentences, preserving all text
+    const sentences = content
+      .split(/(?<=[.!?])\s+/)
+      .map(s => s.trim())
+      .filter(s => s.length > 0);
+
+    // Create bullet points from sentences
+    const bullets: string[] = [];
+    
+    sentences.forEach((sentence) => {
+      if (sentence.length > 0) {
+        bullets.push(sentence);
+      }
+    });
+    
+    return bullets;
+  };
   
   // Add mutation hooks
   const updateFavoriteMutation = useUpdateFavoriteStatus();
@@ -383,13 +403,18 @@ const ScreeningResultDetail = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="prose prose-sm max-w-none text-gray-700 leading-relaxed">
-                  {result.justification ? (
-                    <p>{result.justification}</p>
-                  ) : (
-                    <p className="text-gray-500 italic">No AI analysis justification available</p>
-                  )}
-                </div>
+                {result.justification ? (
+                  <div className="space-y-2">
+                    {parseContentToBullets(result.justification).map((bullet, index) => (
+                      <div key={index} className="flex items-start">
+                        <span className="text-gray-600 mr-2 mt-1 flex-shrink-0">•</span>
+                        <span className="text-sm leading-relaxed text-gray-700">{bullet}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-500 italic">No AI analysis justification available</p>
+                )}
               </CardContent>
             </Card>
             
@@ -402,13 +427,18 @@ const ScreeningResultDetail = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="prose prose-sm max-w-none text-gray-700 leading-relaxed">
-                  {result.strengths ? (
-                    <p>{result.strengths}</p>
-                  ) : (
-                    <p className="text-gray-500 italic">No strengths analysis available</p>
-                  )}
-                </div>
+                {result.strengths ? (
+                  <div className="space-y-2">
+                    {parseContentToBullets(result.strengths).map((bullet, index) => (
+                      <div key={index} className="flex items-start">
+                        <span className="text-gray-600 mr-2 mt-1 flex-shrink-0">•</span>
+                        <span className="text-sm leading-relaxed text-gray-700">{bullet}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-500 italic">No strengths analysis available</p>
+                )}
               </CardContent>
             </Card>
 
@@ -421,13 +451,18 @@ const ScreeningResultDetail = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="prose prose-sm max-w-none text-gray-700 leading-relaxed">
-                  {result.weaknesses ? (
-                    <p>{result.weaknesses}</p>
-                  ) : (
-                    <p className="text-gray-500 italic">No areas for development identified</p>
-                  )}
-                </div>
+                {result.weaknesses ? (
+                  <div className="space-y-2">
+                    {parseContentToBullets(result.weaknesses).map((bullet, index) => (
+                      <div key={index} className="flex items-start">
+                        <span className="text-gray-600 mr-2 mt-1 flex-shrink-0">•</span>
+                        <span className="text-sm leading-relaxed text-gray-700">{bullet}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-500 italic">No areas for development identified</p>
+                )}
               </CardContent>
             </Card>
 
@@ -442,13 +477,18 @@ const ScreeningResultDetail = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="prose prose-sm max-w-none text-gray-700 leading-relaxed">
-                    {result.risk_factor ? (
-                      <p>{result.risk_factor}</p>
-                    ) : (
-                      <p className="text-gray-500 italic">No risk factors identified</p>
-                    )}
-                  </div>
+                  {result.risk_factor ? (
+                    <div className="space-y-2">
+                      {parseContentToBullets(result.risk_factor).map((bullet, index) => (
+                        <div key={index} className="flex items-start">
+                          <span className="text-gray-600 mr-2 mt-1 flex-shrink-0">•</span>
+                          <span className="text-sm leading-relaxed text-gray-700">{bullet}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500 italic">No risk factors identified</p>
+                  )}
                 </CardContent>
               </Card>
 
@@ -461,13 +501,18 @@ const ScreeningResultDetail = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="prose prose-sm max-w-none text-gray-700 leading-relaxed">
-                    {result.reward_factor ? (
-                      <p>{result.reward_factor}</p>
-                    ) : (
-                      <p className="text-gray-500 italic">No potential rewards identified</p>
-                    )}
-                  </div>
+                  {result.reward_factor ? (
+                    <div className="space-y-2">
+                      {parseContentToBullets(result.reward_factor).map((bullet, index) => (
+                        <div key={index} className="flex items-start">
+                          <span className="text-gray-600 mr-2 mt-1 flex-shrink-0">•</span>
+                          <span className="text-sm leading-relaxed text-gray-700">{bullet}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500 italic">No potential rewards identified</p>
+                  )}
                 </CardContent>
               </Card>
             </div>
@@ -506,7 +551,14 @@ const ScreeningResultDetail = () => {
                         )}
                       </div>
                       <div className="bg-gray-50 rounded-lg p-4">
-                        <p className="text-gray-700 text-sm leading-relaxed">{result.interview_summary}</p>
+                        <div className="space-y-2">
+                          {parseContentToBullets(result.interview_summary).map((bullet, index) => (
+                            <div key={index} className="flex items-start">
+                              <span className="text-gray-600 mr-2 mt-1 flex-shrink-0">•</span>
+                              <span className="text-sm leading-relaxed text-gray-700">{bullet}</span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   )}

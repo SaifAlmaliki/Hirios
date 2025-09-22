@@ -82,58 +82,89 @@ const ScreeningResultAnalysis: React.FC<ScreeningResultAnalysisProps> = ({
     }
   };
 
-  const renderSection = (section: AnalysisSection) => (
-    <div className="space-y-2">
-      <h4 className={`font-semibold flex items-center ${section.color === 'gray' ? 'text-gray-900' : `text-${section.color}-700`}`}>
-        {section.icon && <span className={`mr-2 ${getIconColor(section.color)}`}>{section.icon}</span>}
-        {section.title}
-      </h4>
-      <div className={`p-3 rounded-lg border ${getColorClasses(section.color)}`}>
-        <p className="text-sm text-gray-700">{section.content}</p>
+  const parseContentToBullets = (content: string) => {
+    // Split content into sentences, preserving all text
+    const sentences = content
+      .split(/(?<=[.!?])\s+/)
+      .map(s => s.trim())
+      .filter(s => s.length > 0);
+
+    // Create bullet points from sentences
+    const bullets: string[] = [];
+    
+    sentences.forEach((sentence) => {
+      if (sentence.length > 0) {
+        bullets.push(sentence);
+      }
+    });
+    
+    return bullets;
+  };
+
+  const renderSection = (section: AnalysisSection) => {
+    const bullets = parseContentToBullets(section.content);
+    
+    return (
+      <div className="space-y-3">
+        <h4 className={`text-lg font-semibold flex items-center ${section.color === 'gray' ? 'text-gray-900' : `text-${section.color}-700`}`}>
+          {section.icon && <span className={`mr-2 ${getIconColor(section.color)}`}>{section.icon}</span>}
+          {section.title}
+        </h4>
+        <div className={`p-4 rounded-lg border ${getColorClasses(section.color)}`}>
+          <div className="space-y-2">
+            {bullets.map((bullet, index) => (
+              <div key={index} className="flex items-start">
+                <span className="text-gray-600 mr-2 mt-1 flex-shrink-0">•</span>
+                <span className="text-sm leading-relaxed text-gray-700">{bullet}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {strengths && renderSection({
-          title: "Strengths",
-          content: strengths,
-          icon: <TrendingUp className="h-4 w-4" />,
-          color: 'green'
-        })}
-
-        {weaknesses && renderSection({
-          title: "Areas for Development",
-          content: weaknesses,
-          color: 'red'
-        })}
-
-        {riskFactor && renderSection({
-          title: "Risk Factors",
-          content: riskFactor,
-          color: 'orange'
-        })}
-
-        {rewardFactor && renderSection({
-          title: "Potential Rewards",
-          content: rewardFactor,
-          color: 'blue'
-        })}
-      </div>
-
+      {/* AI Analysis Justification - First Section */}
       {justification && renderSection({
         title: "AI Analysis Justification",
         content: justification,
         color: 'gray'
       })}
 
+      <div className="space-y-6">
+        {strengths && renderSection({
+          title: "Strengths",
+          content: strengths,
+          icon: <TrendingUp className="h-4 w-4" />,
+          color: 'gray'
+        })}
+
+        {weaknesses && renderSection({
+          title: "Areas for Development",
+          content: weaknesses,
+          color: 'gray'
+        })}
+
+        {riskFactor && renderSection({
+          title: "Risk Factors",
+          content: riskFactor,
+          color: 'gray'
+        })}
+
+        {rewardFactor && renderSection({
+          title: "Potential Rewards",
+          content: rewardFactor,
+          color: 'gray'
+        })}
+      </div>
+
       {interviewSummary && renderSection({
         title: "Voice Interview Summary",
         content: interviewSummary,
         icon: <Mic className="h-4 w-4" />,
-        color: 'blue'
+        color: 'gray'
       })}
 
       {interviewCompletedAt && (
@@ -146,14 +177,14 @@ const ScreeningResultAnalysis: React.FC<ScreeningResultAnalysisProps> = ({
         title: "Voice Screening Status",
         content: "Voice screening interview has been requested. Candidate will receive an email with the interview link.",
         icon: <Mic className="h-4 w-4" />,
-        color: 'orange'
+        color: 'gray'
       })}
 
       {/* Company Notes Section with Edit Button */}
-      <div className="space-y-2">
+      <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h4 className="font-semibold text-purple-700 flex items-center">
-            <StickyNote className="h-4 w-4 mr-2 text-purple-600" />
+          <h4 className="text-lg font-semibold text-gray-900 flex items-center">
+            <StickyNote className="h-4 w-4 mr-2 text-gray-600" />
             Company Notes
           </h4>
           {resultId && (
@@ -161,16 +192,16 @@ const ScreeningResultAnalysis: React.FC<ScreeningResultAnalysisProps> = ({
               variant="ghost"
               size="sm"
               onClick={() => setIsNotesDialogOpen(true)}
-              className="h-8 px-2 text-purple-600 hover:text-purple-700 hover:bg-purple-50"
+              className="h-8 px-2 text-gray-600 hover:text-gray-700 hover:bg-gray-50"
             >
               <Edit3 className="h-3 w-3 mr-1" />
               Edit
             </Button>
           )}
         </div>
-        <div className="p-3 rounded-lg border text-purple-700 bg-purple-50 border-purple-200">
+        <div className="p-4 rounded-lg border text-gray-700 bg-gray-50 border-gray-200">
           {notes ? (
-            <p className="text-sm text-gray-700 whitespace-pre-wrap">{notes}</p>
+            <p className="text-sm leading-relaxed text-gray-700 whitespace-pre-wrap">{notes}</p>
           ) : (
             <p className="text-sm text-gray-500 italic">No notes added yet. Click Edit to add notes about this candidate.</p>
           )}

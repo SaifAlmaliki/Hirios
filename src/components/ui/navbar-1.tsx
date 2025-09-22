@@ -94,23 +94,23 @@ const Navbar1: React.FC<Navbar1Props> = ({
   }
 
   return (
-    <div className="flex justify-center w-full py-4 sm:py-6 px-4 fixed top-0 left-0 right-0 z-50 bg-gradient-to-br from-slate-50 to-blue-50">
-      <div className={`flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 bg-white rounded-full shadow-lg w-full ${getMaxWidthClass()} relative z-10`}>
+    <div className="flex justify-center w-full py-2 px-4 fixed top-0 left-0 right-0 z-50 bg-gradient-to-br from-slate-50 to-blue-50">
+      <div className={`flex items-center justify-between px-4 py-2 bg-white rounded-full shadow-lg w-full ${getMaxWidthClass()} relative z-10`}>
         <div className="flex items-center">
           <motion.div
-            className="w-8 h-8 mr-3 sm:mr-6 cursor-pointer"
+            className="w-6 h-6 mr-2 sm:mr-4 cursor-pointer"
             initial={{ scale: 0.8 }}
             animate={{ scale: 1 }}
             whileHover={{ rotate: 10 }}
             transition={{ duration: 0.3 }}
             onClick={handleLogoClick}
           >
-            <div className="bg-blue-600 p-1.5 rounded-lg">
-              <Building2 className="h-5 w-5 text-white" />
+            <div className="bg-blue-600 p-1 rounded-lg">
+              <Building2 className="h-4 w-4 text-white" />
             </div>
           </motion.div>
           <motion.h1 
-            className="text-lg sm:text-xl font-bold text-gray-900 cursor-pointer hover:text-blue-700"
+            className="text-base sm:text-lg font-bold text-gray-900 cursor-pointer hover:text-blue-700"
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.3 }}
@@ -121,7 +121,7 @@ const Navbar1: React.FC<Navbar1Props> = ({
         </div>
         
         {/* Tablet Navigation - Medium screens */}
-        <nav className="hidden md:flex lg:hidden items-center space-x-2">
+        <nav className="hidden md:flex lg:hidden items-center space-x-1">
           {user ? (
             <>
               {/* Points Badge */}
@@ -141,7 +141,7 @@ const Navbar1: React.FC<Navbar1Props> = ({
               >
                 <button
                   onClick={handleScreeningResults}
-                  className="flex items-center px-2 py-2 text-sm text-gray-900 hover:text-blue-600 transition-colors font-medium rounded-full hover:bg-blue-50"
+                  className="flex items-center px-1.5 py-1 text-sm text-gray-900 hover:text-blue-600 transition-colors font-medium rounded-full hover:bg-blue-50"
                 >
                   <Brain className="h-4 w-4 mr-1" />
                   <span className="hidden sm:inline">AI Screening</span>
@@ -156,7 +156,7 @@ const Navbar1: React.FC<Navbar1Props> = ({
               >
                 <button
                   onClick={handlePointsPurchase}
-                  className="flex items-center px-2 py-2 text-sm text-gray-900 hover:text-purple-600 transition-colors font-medium rounded-full hover:bg-purple-50"
+                  className="flex items-center px-1.5 py-1 text-sm text-gray-900 hover:text-purple-600 transition-colors font-medium rounded-full hover:bg-purple-50"
                 >
                   <Coins className="h-4 w-4 mr-1" />
                   <span className="hidden sm:inline">Buy Points</span>
@@ -171,7 +171,7 @@ const Navbar1: React.FC<Navbar1Props> = ({
               >
                 <button
                   onClick={handleSignOut}
-                  className="flex items-center px-2 py-2 text-sm text-gray-900 hover:text-red-600 transition-colors font-medium rounded-full hover:bg-red-50"
+                  className="flex items-center px-1.5 py-1 text-sm text-gray-900 hover:text-red-600 transition-colors font-medium rounded-full hover:bg-red-50"
                 >
                   <LogOut className="h-4 w-4 mr-1" />
                   <span className="hidden sm:inline">Sign Out</span>
@@ -196,7 +196,7 @@ const Navbar1: React.FC<Navbar1Props> = ({
         </nav>
 
         {/* Desktop Navigation - Large screens */}
-        <nav className="hidden lg:flex items-center space-x-4">
+        <nav className="hidden lg:flex items-center space-x-2">
           {user ? (
             <>
               <span className="text-sm text-gray-600 hidden xl:inline">
@@ -220,7 +220,7 @@ const Navbar1: React.FC<Navbar1Props> = ({
               >
                 <button
                   onClick={handleCompanySetup}
-                  className="flex items-center px-3 py-2 text-sm text-gray-900 hover:text-blue-600 transition-colors font-medium rounded-full hover:bg-blue-50"
+                  className="flex items-center px-2 py-1 text-sm text-gray-900 hover:text-blue-600 transition-colors font-medium rounded-full hover:bg-blue-50"
                 >
                   <Settings className="h-4 w-4 mr-1" />
                   Setup
@@ -235,7 +235,7 @@ const Navbar1: React.FC<Navbar1Props> = ({
               >
                 <button
                   onClick={handleScreeningResults}
-                  className="flex items-center px-3 py-2 text-sm text-gray-900 hover:text-blue-600 transition-colors font-medium rounded-full hover:bg-blue-50"
+                  className="flex items-center px-2 py-1 text-sm text-gray-900 hover:text-blue-600 transition-colors font-medium rounded-full hover:bg-blue-50"
                 >
                   <Brain className="h-4 w-4 mr-1" />
                   AI Screening
@@ -250,7 +250,7 @@ const Navbar1: React.FC<Navbar1Props> = ({
               >
                 <button
                   onClick={handlePointsPurchase}
-                  className="flex items-center px-3 py-2 text-sm text-gray-900 hover:text-purple-600 transition-colors font-medium rounded-full hover:bg-purple-50"
+                  className="flex items-center px-2 py-1 text-sm text-gray-900 hover:text-purple-600 transition-colors font-medium rounded-full hover:bg-purple-50"
                 >
                   <Coins className="h-4 w-4 mr-1" />
                   Buy Points
@@ -265,7 +265,7 @@ const Navbar1: React.FC<Navbar1Props> = ({
               >
                 <button
                   onClick={handlePointsHistory}
-                  className="flex items-center px-3 py-2 text-sm text-gray-900 hover:text-green-600 transition-colors font-medium rounded-full hover:bg-green-50"
+                  className="flex items-center px-2 py-1 text-sm text-gray-900 hover:text-green-600 transition-colors font-medium rounded-full hover:bg-green-50"
                 >
                   <History className="h-4 w-4 mr-1" />
                   History
@@ -280,7 +280,7 @@ const Navbar1: React.FC<Navbar1Props> = ({
               >
                 <button
                   onClick={handleResumePool}
-                  className="flex items-center px-3 py-2 text-sm text-gray-900 hover:text-orange-600 transition-colors font-medium rounded-full hover:bg-orange-50"
+                  className="flex items-center px-2 py-1 text-sm text-gray-900 hover:text-orange-600 transition-colors font-medium rounded-full hover:bg-orange-50"
                 >
                   <FileText className="h-4 w-4 mr-1" />
                   Resume Pool
@@ -295,7 +295,7 @@ const Navbar1: React.FC<Navbar1Props> = ({
               >
                 <button
                   onClick={handleSignOut}
-                  className="flex items-center px-3 py-2 text-sm text-gray-900 hover:text-red-600 transition-colors font-medium rounded-full hover:bg-red-50"
+                  className="flex items-center px-2 py-1 text-sm text-gray-900 hover:text-red-600 transition-colors font-medium rounded-full hover:bg-red-50"
                 >
                   <LogOut className="h-4 w-4 mr-1" />
                   Sign Out
