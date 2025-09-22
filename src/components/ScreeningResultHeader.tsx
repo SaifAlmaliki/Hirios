@@ -99,7 +99,7 @@ const ScreeningResultHeader: React.FC<ScreeningResultHeaderProps> = ({
               <Badge
                 key={index}
                 variant="outline"
-                className="text-xs bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
+                className="text-xs bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100"
               >
                 {skill}
               </Badge>
