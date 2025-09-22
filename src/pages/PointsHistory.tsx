@@ -95,7 +95,7 @@ const PointsHistory = () => {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
         <Navbar title="Points History" />
         <div className="pt-32 pb-12 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-center h-64">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
             </div>
@@ -110,7 +110,7 @@ const PointsHistory = () => {
       <Navbar title="Points History" />
       
       <div className="pt-32 pb-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}

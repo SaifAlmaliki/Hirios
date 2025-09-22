@@ -177,7 +177,7 @@ const CompanySetup = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       <Navbar title="Company Setup" />
-      <div className="max-w-2xl mx-auto py-12 px-4 pt-32">
+      <div className="max-w-7xl mx-auto py-12 px-4 pt-32">
         <Card className="shadow-xl">
           <CardHeader className="text-center">
             <div className="mx-auto bg-blue-600 p-3 rounded-full w-fit mb-4">

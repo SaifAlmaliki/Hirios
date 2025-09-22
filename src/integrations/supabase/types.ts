@@ -307,6 +307,7 @@ export type Database = {
           interview_summary: string | null
           interview_completed_at: string | null
           application_id: string | null
+          skills: string[] | null
         }
         Insert: {
           id?: string
@@ -330,6 +331,7 @@ export type Database = {
           interview_summary?: string | null
           interview_completed_at?: string | null
           application_id?: string | null
+          skills?: string[] | null
         }
         Update: {
           id?: string
@@ -353,6 +355,7 @@ export type Database = {
           interview_summary?: string | null
           interview_completed_at?: string | null
           application_id?: string | null
+          skills?: string[] | null
         }
         Relationships: [
           {
