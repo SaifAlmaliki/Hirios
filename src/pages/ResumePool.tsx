@@ -353,7 +353,6 @@ const ResumePool = () => {
                   <p className="text-gray-600 mb-4">
                     {searchTerm ? 'Try adjusting your search terms.' : 'Upload your first resume to get started.'}
                   </p>
-                  {!searchTerm && <ResumePoolUpload onUploadComplete={() => refetch()} />}
                 </div>
               ) : (
                 <div className="space-y-2">
