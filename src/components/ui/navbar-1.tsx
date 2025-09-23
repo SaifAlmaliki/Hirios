@@ -40,7 +40,7 @@ const Navbar1: React.FC<Navbar1Props> = ({
   };
 
   const handleScreeningResults = () => {
-    navigate('/screening-results');
+    navigate('/job-portal');
     setIsOpen(false);
   };
 
@@ -124,19 +124,25 @@ const Navbar1: React.FC<Navbar1Props> = ({
         <nav className="hidden md:flex lg:hidden items-center space-x-1">
           {user ? (
             <>
-              {/* Points Badge */}
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.05 }}
-              >
-                <PointsBadge variant="default" />
-              </motion.div>
-              
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.1 }}
+                whileHover={{ scale: 1.05 }}
+              >
+                <button
+                  onClick={handleResumePool}
+                  className="flex items-center px-1.5 py-1 text-sm text-gray-900 hover:text-orange-600 transition-colors font-medium rounded-full hover:bg-orange-50"
+                >
+                  <FileText className="h-4 w-4 mr-1" />
+                  <span className="hidden sm:inline">Resume Pool</span>
+                </button>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.15 }}
                 whileHover={{ scale: 1.05 }}
               >
                 <button
@@ -148,18 +154,18 @@ const Navbar1: React.FC<Navbar1Props> = ({
                 </button>
               </motion.div>
 
+              {/* Clickable Points Badge */}
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.15 }}
+                transition={{ duration: 0.3, delay: 0.2 }}
                 whileHover={{ scale: 1.05 }}
               >
                 <button
                   onClick={handlePointsPurchase}
-                  className="flex items-center px-1.5 py-1 text-sm text-gray-900 hover:text-purple-600 transition-colors font-medium rounded-full hover:bg-purple-50"
+                  className="cursor-pointer"
                 >
-                  <Coins className="h-4 w-4 mr-1" />
-                  <span className="hidden sm:inline">Buy Points</span>
+                  <PointsBadge variant="default" />
                 </button>
               </motion.div>
 
@@ -203,19 +209,55 @@ const Navbar1: React.FC<Navbar1Props> = ({
                 {user.email}
               </span>
               
-              {/* Points Badge */}
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.05 }}
+                whileHover={{ scale: 1.05 }}
               >
-                <PointsBadge variant="default" />
+                <button
+                  onClick={handleResumePool}
+                  className="flex items-center px-2 py-1 text-sm text-gray-900 hover:text-orange-600 transition-colors font-medium rounded-full hover:bg-orange-50"
+                >
+                  <FileText className="h-4 w-4 mr-1" />
+                  Resume Pool
+                </button>
               </motion.div>
-              
+
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.1 }}
+                whileHover={{ scale: 1.05 }}
+              >
+                <button
+                  onClick={handleScreeningResults}
+                  className="flex items-center px-2 py-1 text-sm text-gray-900 hover:text-blue-600 transition-colors font-medium rounded-full hover:bg-blue-50"
+                >
+                  <Brain className="h-4 w-4 mr-1" />
+                  AI Screening
+                </button>
+              </motion.div>
+
+              {/* Clickable Points Badge */}
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.15 }}
+                whileHover={{ scale: 1.05 }}
+              >
+                <button
+                  onClick={handlePointsPurchase}
+                  className="cursor-pointer"
+                >
+                  <PointsBadge variant="default" />
+                </button>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.2 }}
                 whileHover={{ scale: 1.05 }}
               >
                 <button
@@ -230,37 +272,7 @@ const Navbar1: React.FC<Navbar1Props> = ({
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.15 }}
-                whileHover={{ scale: 1.05 }}
-              >
-                <button
-                  onClick={handleScreeningResults}
-                  className="flex items-center px-2 py-1 text-sm text-gray-900 hover:text-blue-600 transition-colors font-medium rounded-full hover:bg-blue-50"
-                >
-                  <Brain className="h-4 w-4 mr-1" />
-                  AI Screening
-                </button>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.2 }}
-                whileHover={{ scale: 1.05 }}
-              >
-                <button
-                  onClick={handlePointsPurchase}
-                  className="flex items-center px-2 py-1 text-sm text-gray-900 hover:text-purple-600 transition-colors font-medium rounded-full hover:bg-purple-50"
-                >
-                  <Coins className="h-4 w-4 mr-1" />
-                  Buy Points
-                </button>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.25 }}
+                transition={{ duration: 0.3, delay: 0.3 }}
                 whileHover={{ scale: 1.05 }}
               >
                 <button
@@ -269,21 +281,6 @@ const Navbar1: React.FC<Navbar1Props> = ({
                 >
                   <History className="h-4 w-4 mr-1" />
                   History
-                </button>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.3 }}
-                whileHover={{ scale: 1.05 }}
-              >
-                <button
-                  onClick={handleResumePool}
-                  className="flex items-center px-2 py-1 text-sm text-gray-900 hover:text-orange-600 transition-colors font-medium rounded-full hover:bg-orange-50"
-                >
-                  <FileText className="h-4 w-4 mr-1" />
-                  Resume Pool
                 </button>
               </motion.div>
 
@@ -360,7 +357,6 @@ const Navbar1: React.FC<Navbar1Props> = ({
                     className="text-center pb-4 border-b border-gray-200"
                   >
                     <p className="text-sm text-gray-600 mb-3">{user.email}</p>
-                    <PointsBadge variant="detailed" />
                   </motion.div>
 
                   <motion.div
@@ -370,11 +366,11 @@ const Navbar1: React.FC<Navbar1Props> = ({
                     exit={{ opacity: 0, x: 20 }}
                   >
                     <button
-                      onClick={handleCompanySetup}
+                      onClick={handleResumePool}
                       className="flex items-center w-full text-base text-gray-900 font-medium py-3"
                     >
-                      <Settings className="h-5 w-5 mr-3" />
-                      Setup
+                      <FileText className="h-5 w-5 mr-3" />
+                      Resume Pool
                     </button>
                   </motion.div>
 
@@ -404,7 +400,7 @@ const Navbar1: React.FC<Navbar1Props> = ({
                       className="flex items-center w-full text-base text-gray-900 font-medium py-3"
                     >
                       <Coins className="h-5 w-5 mr-3" />
-                      Buy Points
+                      <PointsBadge variant="detailed" />
                     </button>
                   </motion.div>
 
@@ -415,11 +411,11 @@ const Navbar1: React.FC<Navbar1Props> = ({
                     exit={{ opacity: 0, x: 20 }}
                   >
                     <button
-                      onClick={handlePointsHistory}
+                      onClick={handleCompanySetup}
                       className="flex items-center w-full text-base text-gray-900 font-medium py-3"
                     >
-                      <History className="h-5 w-5 mr-3" />
-                      Points History
+                      <Settings className="h-5 w-5 mr-3" />
+                      Setup
                     </button>
                   </motion.div>
 
@@ -430,11 +426,11 @@ const Navbar1: React.FC<Navbar1Props> = ({
                     exit={{ opacity: 0, x: 20 }}
                   >
                     <button
-                      onClick={handleResumePool}
+                      onClick={handlePointsHistory}
                       className="flex items-center w-full text-base text-gray-900 font-medium py-3"
                     >
-                      <FileText className="h-5 w-5 mr-3" />
-                      Resume Pool
+                      <History className="h-5 w-5 mr-3" />
+                      Points History
                     </button>
                   </motion.div>
 
