@@ -94,8 +94,8 @@ const ScreeningResultActions: React.FC<ScreeningResultActionsProps> = ({
 
   return (
     <div className="w-full lg:w-96 lg:justify-end">
-      {/* Button Grid - Three rows with 3 buttons each */}
-      <div className="grid grid-cols-3 gap-3 items-center">
+      {/* Button Grid - Responsive layout */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 items-center">
         {/* First Row */}
         <CVButton
           resumeUrl={resumeUrl}
@@ -137,9 +137,9 @@ const ScreeningResultActions: React.FC<ScreeningResultActionsProps> = ({
           onClick={onToggleExpansion}
         />
 
-        {/* Empty cells to maintain grid layout */}
-        <div></div>
-        <div></div>
+        {/* Empty cells to maintain grid layout on larger screens */}
+        <div className="hidden sm:block"></div>
+        <div className="hidden sm:block"></div>
       </div>
 
       {/* Confirmation Dialog */}

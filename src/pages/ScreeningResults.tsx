@@ -291,27 +291,29 @@ const ScreeningResults = () => {
           {/* Results Table */}
           <Card>
             <CardHeader>
-              <div className="flex justify-between items-center">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                 <CardTitle className="text-lg">
                   Screening Results ({filteredAndSortedResults.length})
                 </CardTitle>
                 {jobId && currentJob && (
-                  <div className="text-right space-y-2">
+                  <div className="flex flex-col sm:text-right space-y-2">
                     <p className="text-sm font-medium text-gray-900">{currentJob.title}</p>
-                    <div className="flex gap-2 justify-end">
+                    <div className="flex flex-col sm:flex-row gap-2 sm:justify-end">
                       <Button
                         onClick={() => setIsResumePoolDialogOpen(true)}
-                        className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 h-8 text-sm"
+                        className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 h-8 text-sm w-full sm:w-auto"
                       >
                         <FileText className="h-4 w-4" />
-                        From Pool
+                        <span className="hidden xs:inline">From Pool</span>
+                        <span className="xs:hidden">Pool</span>
                       </Button>
                       <Button
                         onClick={() => setIsUploadDialogOpen(true)}
-                        className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-3 py-1 h-8 text-sm"
+                        className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-3 py-1 h-8 text-sm w-full sm:w-auto"
                       >
                         <FileText className="h-4 w-4" />
-                        Upload New
+                        <span className="hidden xs:inline">Upload New</span>
+                        <span className="xs:hidden">Upload</span>
                       </Button>
                     </div>
                   </div>

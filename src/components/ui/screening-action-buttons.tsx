@@ -18,7 +18,7 @@ export const CVButton: React.FC<CVButtonProps> = ({
   if (!resumeUrl) return null
 
   return (
-    <div className="w-24 sm:w-28">
+    <div className="w-20 xs:w-24 sm:w-28">
       <ActionButton
         variant="cv"
         icon={FileText}
@@ -46,7 +46,7 @@ export const InviteButton: React.FC<InviteButtonProps> = ({
   className
 }) => {
   return (
-    <div className="w-24 sm:w-28">
+    <div className="w-20 xs:w-24 sm:w-28">
       <ActionButton
         variant="invite"
         icon={Mic}
@@ -73,7 +73,7 @@ export const LinkButton: React.FC<LinkButtonProps> = ({
   className 
 }) => {
   return (
-    <div className="w-24 sm:w-28">
+    <div className="w-20 xs:w-24 sm:w-28">
       <ActionButton
         variant="link"
         icon={ExternalLink}
@@ -101,7 +101,7 @@ export const FavoriteButton: React.FC<FavoriteButtonProps> = ({
   className
 }) => {
   return (
-    <div className="w-24 sm:w-28">
+    <div className="w-20 xs:w-24 sm:w-28">
       <ActionButton
         variant="favorite"
         icon={Star}
@@ -134,7 +134,7 @@ export const DismissButton: React.FC<DismissButtonProps> = ({
   className
 }) => {
   return (
-    <div className="w-24 sm:w-28">
+    <div className="w-20 xs:w-24 sm:w-28">
       <ActionButton
         variant="dismiss"
         icon={X}
@@ -160,7 +160,7 @@ export const ViewDetailsButton: React.FC<ViewDetailsButtonProps> = ({
   className 
 }) => {
   return (
-    <div className="w-24 sm:w-28">
+    <div className="w-20 xs:w-24 sm:w-28">
       <ActionButton
         variant="details"
         icon={Eye}
@@ -186,7 +186,7 @@ export const DetailsToggleButton: React.FC<DetailsToggleButtonProps> = ({
   className
 }) => {
   return (
-    <div className="w-24 sm:w-28">
+    <div className="w-20 xs:w-24 sm:w-28">
       <ActionButton
         variant="toggle"
         icon={isExpanded ? ChevronUp : ChevronDown}
