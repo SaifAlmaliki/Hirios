@@ -9,10 +9,8 @@ import { Upload, FileText, X, CheckCircle, AlertCircle, Loader2, Plus } from 'lu
 import { useToast } from '@/hooks/use-toast';
 import { useCompanyJobs } from '@/hooks/useCompanyJobs';
 import { useAuth } from '@/contexts/AuthContext';
-import { usePoints } from '@/hooks/usePoints';
 import { supabase } from '@/integrations/supabase/client';
 import { sendResumeToWebhook, fileToBase64 } from '@/services/webhookService';
-import { PointsValidationDialog } from '@/components/ui/PointsValidationDialog';
 
 interface UploadedFile {
   id: string;
@@ -45,14 +43,12 @@ const CompanyResumeUpload: React.FC<CompanyResumeUploadProps> = ({
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [overallProgress, setOverallProgress] = useState(0);
-  const [showPointsValidation, setShowPointsValidation] = useState(false);
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const { data: jobs = [] } = useCompanyJobs();
   const { user } = useAuth();
-  const { calculateScreeningPoints, hasEnoughPoints, deductPoints } = usePoints();
 
   const MAX_FILES = 10;
   const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
@@ -139,19 +135,9 @@ const CompanyResumeUpload: React.FC<CompanyResumeUploadProps> = ({
     }
 
     if (newFiles.length > 0) {
-      // Check points before adding files
-      const totalFiles = uploadedFiles.length + newFiles.length;
-      const requiredPoints = calculateScreeningPoints(totalFiles);
-      
-      if (!hasEnoughPoints(requiredPoints)) {
-        setPendingFiles(Array.from(files));
-        setShowPointsValidation(true);
-        return;
-      }
-      
       setUploadedFiles(prev => [...prev, ...newFiles]);
     }
-  }, [uploadedFiles.length, toast, calculateScreeningPoints, hasEnoughPoints]);
+  }, [uploadedFiles.length, toast]);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -593,29 +579,6 @@ const CompanyResumeUpload: React.FC<CompanyResumeUploadProps> = ({
         </div>
       </DialogContent>
       
-      {/* Points Validation Dialog */}
-      <PointsValidationDialog
-        isOpen={showPointsValidation}
-        onClose={() => {
-          setShowPointsValidation(false);
-          setPendingFiles([]);
-        }}
-        onConfirm={() => {
-          setShowPointsValidation(false);
-          // Add the pending files to uploaded files
-          const newFiles: UploadedFile[] = pendingFiles.map((file, index) => ({
-            id: `${Date.now()}-${index}`,
-            file,
-            status: 'pending',
-            progress: 0,
-          }));
-          setUploadedFiles(prev => [...prev, ...newFiles]);
-          setPendingFiles([]);
-        }}
-        requiredPoints={calculateScreeningPoints(uploadedFiles.length + pendingFiles.length)}
-        actionDescription={`Process ${uploadedFiles.length + pendingFiles.length} resume${uploadedFiles.length + pendingFiles.length !== 1 ? 's' : ''} for AI screening`}
-        isLoading={false}
-      />
     </Dialog>
   );
 };
