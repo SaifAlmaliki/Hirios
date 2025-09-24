@@ -18,6 +18,7 @@ export type Database = {
           resume_text: string | null
           original_filename: string | null
           uploaded_by_user_id: string | null
+          resume_pool_id: string | null
         }
         Insert: {
           created_at?: string
@@ -27,6 +28,7 @@ export type Database = {
           resume_text?: string | null
           original_filename?: string | null
           uploaded_by_user_id?: string | null
+          resume_pool_id?: string | null
         }
         Update: {
           created_at?: string
@@ -36,6 +38,7 @@ export type Database = {
           resume_text?: string | null
           original_filename?: string | null
           uploaded_by_user_id?: string | null
+          resume_pool_id?: string | null
         }
         Relationships: [
           {
@@ -45,6 +48,13 @@ export type Database = {
             referencedRelation: "jobs"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "applications_resume_pool_id_fkey"
+            columns: ["resume_pool_id"]
+            isOneToOne: false
+            referencedRelation: "resume_pool"
+            referencedColumns: ["id"]
+          }
         ]
       }
       company_profiles: {
@@ -534,6 +544,107 @@ export type Database = {
           {
             foreignKeyName: "resume_pool_uploaded_by_user_id_fkey"
             columns: ["uploaded_by_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      candidate_status: {
+        Row: {
+          id: string
+          resume_pool_id: string
+          job_id: string
+          status: string
+          updated_by_user_id: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          resume_pool_id: string
+          job_id: string
+          status?: string
+          updated_by_user_id: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          resume_pool_id?: string
+          job_id?: string
+          status?: string
+          updated_by_user_id?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "candidate_status_resume_pool_id_fkey"
+            columns: ["resume_pool_id"]
+            isOneToOne: false
+            referencedRelation: "resume_pool"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "candidate_status_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "candidate_status_updated_by_user_id_fkey"
+            columns: ["updated_by_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      candidate_comments: {
+        Row: {
+          id: string
+          resume_pool_id: string
+          job_id: string
+          comment: string
+          created_by_user_id: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          resume_pool_id: string
+          job_id: string
+          comment: string
+          created_by_user_id: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          resume_pool_id?: string
+          job_id?: string
+          comment?: string
+          created_by_user_id?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "candidate_comments_resume_pool_id_fkey"
+            columns: ["resume_pool_id"]
+            isOneToOne: false
+            referencedRelation: "resume_pool"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "candidate_comments_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "candidate_comments_created_by_user_id_fkey"
+            columns: ["created_by_user_id"]
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]

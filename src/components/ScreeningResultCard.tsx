@@ -60,6 +60,7 @@ const ScreeningResultCard: React.FC<ScreeningResultCardProps> = ({
             homeAddress={result.home_address}
             overallFit={result.overall_fit || 0}
             skills={result.skills}
+            status={result.status}
           />
 
           <ScreeningResultActions
@@ -92,13 +93,13 @@ const ScreeningResultCard: React.FC<ScreeningResultCardProps> = ({
               interviewSummary={result.interview_summary}
               interviewCompletedAt={result.interview_completed_at}
               voiceScreeningRequested={result.voice_screening_requested}
-              notes={result.notes}
               resultId={result.id}
               candidateName={`${result.first_name} ${result.last_name}`}
             />
           </CardContent>
         </CollapsibleContent>
       </Collapsible>
+
     </Card>
   );
 };
