@@ -5,14 +5,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Textarea } from '@/components/ui/textarea';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { 
   Filter, 
   Download, 
-  StickyNote,
   Search,
   Calendar,
   Briefcase,
@@ -31,7 +28,7 @@ import {
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { useScreeningResults, useAddNoteToScreeningResult, ScreeningResult } from '@/hooks/useScreeningResults';
+import { useScreeningResults, ScreeningResult } from '@/hooks/useScreeningResults';
 import { useCompanyJobs } from '@/hooks/useCompanyJobs';
 import ScreeningResultCard from '@/components/ScreeningResultCard';
 import Navbar from '@/components/Navbar';
@@ -50,7 +47,6 @@ const ScreeningResults = () => {
   // Data fetching
   const { data: screeningResults = [], isLoading, error } = useScreeningResults();
   const { data: companyJobs = [], isLoading: jobsLoading } = useCompanyJobs();
-  const addNoteMutation = useAddNoteToScreeningResult();
 
   // Get specific job details if jobId is provided
   const currentJob = jobId ? companyJobs.find(job => job.id === jobId) : null;
@@ -58,14 +54,9 @@ const ScreeningResults = () => {
   // State for filtering and sorting
   const [searchTerm, setSearchTerm] = useState('');
   const [scoreFilter, setScoreFilter] = useState('all');
-  const [sortOrder, setSortOrder] = useState('desc');
   const [selectedJobId, setSelectedJobId] = useState<string>('all');
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   
-  // State for notes
-  const [noteDialogOpen, setNoteDialogOpen] = useState(false);
-  const [selectedResult, setSelectedResult] = useState<ScreeningResult | null>(null);
-  const [noteText, setNoteText] = useState('');
   
   // State for voice interviews
   const [requestingInterview, setRequestingInterview] = useState<string | null>(null);
@@ -96,20 +87,15 @@ const ScreeningResults = () => {
       return matchesSearch && matchesScore && matchesJob;
     });
 
-    // Sort results by score
+    // Sort results by score (highest first by default)
     filtered.sort((a, b) => {
       const aValue = a.overall_fit || 0;
       const bValue = b.overall_fit || 0;
-
-      if (sortOrder === 'asc') {
-        return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
-      } else {
-        return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
-      }
+      return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
     });
 
     return filtered;
-  }, [screeningResults, searchTerm, scoreFilter, sortOrder, selectedJobId, jobId]);
+  }, [screeningResults, searchTerm, scoreFilter, selectedJobId, jobId]);
 
   // Redirect if not company user - THIS MUST BE AFTER ALL HOOKS
   React.useEffect(() => {
@@ -158,26 +144,6 @@ const ScreeningResults = () => {
     setExpandedRows(newExpanded);
   };
 
-  const handleAddNote = (result: ScreeningResult) => {
-    setSelectedResult(result);
-    setNoteText(result.notes || '');
-    setNoteDialogOpen(true);
-  };
-
-  const handleSaveNote = () => {
-    if (!selectedResult) return;
-    
-    addNoteMutation.mutate(
-      { id: selectedResult.id, notes: noteText },
-      {
-      onSuccess: () => {
-        setNoteDialogOpen(false);
-        setSelectedResult(null);
-        setNoteText('');
-        },
-      }
-    );
-  };
 
   const handleRequestVoiceScreening = async (result: ScreeningResult) => {
     setRequestingInterview(result.id);
@@ -256,10 +222,10 @@ const ScreeningResults = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 ${jobId ? 'lg:grid-cols-3' : 'lg:grid-cols-4'}`}>
+              <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 ${jobId ? 'lg:grid-cols-2' : 'lg:grid-cols-3'}`}>
                 {/* Job Title Filter - only show if not viewing specific job */}
                 {!jobId && (
-                  <div className="col-span-1 lg:col-span-2 space-y-2">
+                  <div className="col-span-1 lg:col-span-1 space-y-2">
                     <Label htmlFor="job-filter">Job Title</Label>
                     <Select value={selectedJobId} onValueChange={setSelectedJobId}>
                       <SelectTrigger>
@@ -317,19 +283,6 @@ const ScreeningResults = () => {
                   </Select>
                 </div>
 
-                {/* Sort Order - 20% of space (1/5 column) */}
-                <div className="col-span-1 lg:col-span-1 space-y-2">
-                  <Label htmlFor="sort-order">Sort Order</Label>
-                  <Select value={sortOrder} onValueChange={setSortOrder}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sort order..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="desc">Highest First</SelectItem>
-                      <SelectItem value="asc">Lowest First</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
 
               </div>
             </CardContent>
@@ -398,45 +351,6 @@ const ScreeningResults = () => {
             </CardContent>
           </Card>
 
-          {/* Add Note Dialog */}
-          <Dialog open={noteDialogOpen} onOpenChange={setNoteDialogOpen}>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle>
-                  {selectedResult?.notes ? 'Edit Note' : 'Add Note'}
-                </DialogTitle>
-                <DialogDescription>
-                  Add your notes about {selectedResult?.first_name} {selectedResult?.last_name}
-                </DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="note-text">Note</Label>
-                  <Textarea
-                    id="note-text"
-                    placeholder="Enter your notes about this candidate..."
-                    value={noteText}
-                    onChange={(e) => setNoteText(e.target.value)}
-                    rows={4}
-                  />
-                </div>
-                <div className="flex justify-end gap-2">
-                  <Button
-                    variant="outline"
-                    onClick={() => setNoteDialogOpen(false)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    onClick={handleSaveNote}
-                    disabled={addNoteMutation.isPending}
-                  >
-                    {addNoteMutation.isPending ? 'Saving...' : 'Save Note'}
-                  </Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
         </div>
       </div>
 

@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { CandidateStatus } from './useCandidateStatus';
 
 export interface ScreeningResult {
   id: string;
@@ -21,7 +22,6 @@ export interface ScreeningResult {
   created_at: string;
   updated_at: string;
   job_id?: string;
-  notes?: string;
   voice_screening_requested?: boolean;
   interview_summary?: string;
   interview_completed_at?: string;
@@ -39,6 +39,9 @@ export interface ScreeningResult {
   // Resume URL from applications table
   resume_url?: string;
   resume_text?: string;
+  resume_pool_id?: string;
+  // Status from candidate_status table
+  status?: CandidateStatus;
 }
 
 export const useScreeningResults = () => {
@@ -122,7 +125,7 @@ export const useScreeningResults = () => {
               // Use application_id for direct lookup
               const { data: appData, error: appErr } = await supabase
                 .from('applications')
-                .select('resume_url, resume_text')
+                .select('resume_url, resume_text, resume_pool_id')
                 .eq('id', result.application_id)
                 .maybeSingle();
               
@@ -139,10 +142,25 @@ export const useScreeningResults = () => {
               console.warn('⚠️ No resume found for:', result.email, 'application_id:', result.application_id);
             }
             
+            // Fetch candidate status if we have resume_pool_id and job_id
+            let candidateStatus = null;
+            if (application?.resume_pool_id && result.job_id) {
+              const { data: statusData } = await supabase
+                .from('candidate_status')
+                .select('status')
+                .eq('resume_pool_id', application.resume_pool_id)
+                .eq('job_id', result.job_id)
+                .maybeSingle();
+              
+              candidateStatus = statusData?.status || 'pending';
+            }
+
             const processedResult = {
               ...result,
               resume_url: application?.resume_url || null,
-              resume_text: application?.resume_text || null
+              resume_text: application?.resume_text || null,
+              resume_pool_id: application?.resume_pool_id || null,
+              status: candidateStatus || 'pending'
             };
             
             return processedResult;
@@ -151,7 +169,9 @@ export const useScreeningResults = () => {
             return {
               ...result,
               resume_url: null,
-              resume_text: null
+              resume_text: null,
+              resume_pool_id: null,
+              status: 'pending'
             };
           }
         })
@@ -172,43 +192,6 @@ export const useScreeningResults = () => {
 
 
 
-export const useAddNoteToScreeningResult = () => {
-  const queryClient = useQueryClient();
-  const { toast } = useToast();
-
-  return useMutation({
-    mutationFn: async ({ id, notes }: { id: string; notes: string }) => {
-      const { data, error } = await supabase
-        .from('screening_results')
-        .update({ notes, updated_at: new Date().toISOString() })
-        .eq('id', id)
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Error adding note to screening result:', error);
-        throw error;
-      }
-
-      return data as ScreeningResult;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['screening_results'] });
-      toast({
-        title: "Note Added",
-        description: "Your note has been saved successfully.",
-      });
-    },
-    onError: (error) => {
-      console.error('Failed to add note:', error);
-      toast({
-        title: "Error",
-        description: "Failed to save note. Please try again.",
-        variant: "destructive",
-      });
-    },
-  });
-};
 
 export const useUpdateCallStatus = () => {
   const queryClient = useQueryClient();

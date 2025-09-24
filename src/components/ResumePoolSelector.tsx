@@ -18,6 +18,8 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { useResumePool, ResumePoolItem } from '@/hooks/useResumePool';
+import { useResumePoolStatusBadges } from '@/hooks/useCandidateStatus';
+import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
@@ -55,6 +57,10 @@ const ResumePoolSelector: React.FC<ResumePoolSelectorProps> = ({
   const { data: resumes = [], isLoading } = useResumePool();
   const { toast } = useToast();
   const { user } = useAuth();
+
+  // Get status badges for all resumes in this job
+  const resumeIds = resumes.map(r => r.id);
+  const { data: statusBadges = {} } = useResumePoolStatusBadges(resumeIds, jobId);
 
   // Filter resumes based on search term
   const filteredResumes = useMemo(() => {
@@ -139,7 +145,8 @@ const ResumePoolSelector: React.FC<ResumePoolSelectorProps> = ({
           resume_url: resume.storage_path, // Use the storage path as URL
           uploaded_by_user_id: user?.id,
           original_filename: resume.original_filename,
-          resume_text: resume.resume_text
+          resume_text: resume.resume_text,
+          resume_pool_id: resume.id // Link to the resume pool item
         }])
         .select()
         .single();
@@ -405,10 +412,13 @@ const ResumePoolSelector: React.FC<ResumePoolSelectorProps> = ({
                             />
                             {processing ? getStatusIcon(processing.status) : <FileText className="h-5 w-5 text-gray-500 flex-shrink-0 mt-1" />}
                             <div className="flex-1 min-w-0">
-                              {/* Name/Title */}
-                              <p className="text-sm font-medium text-gray-900 mb-2">
-                                {getDisplayName(resume)}
-                              </p>
+                              {/* Name/Title and Status */}
+                              <div className="flex items-center gap-2 mb-2">
+                                <p className="text-sm font-medium text-gray-900">
+                                  {getDisplayName(resume)}
+                                </p>
+                                <StatusBadge status={statusBadges[resume.id] || 'pending'} />
+                              </div>
 
                               {/* Contact Information */}
                               <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-600 mb-2">

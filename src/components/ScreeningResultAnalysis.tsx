@@ -1,13 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { 
   TrendingUp,
-  Mic,
-  StickyNote,
-  Edit3
+  Mic
 } from 'lucide-react';
-import NotesEditDialog from './NotesEditDialog';
 
 interface AnalysisSection {
   title: string;
@@ -25,7 +21,6 @@ interface ScreeningResultAnalysisProps {
   interviewSummary?: string;
   interviewCompletedAt?: string;
   voiceScreeningRequested?: boolean;
-  notes?: string;
   resultId?: string;
   candidateName?: string;
 }
@@ -39,11 +34,9 @@ const ScreeningResultAnalysis: React.FC<ScreeningResultAnalysisProps> = ({
   interviewSummary,
   interviewCompletedAt,
   voiceScreeningRequested,
-  notes,
   resultId,
   candidateName
 }) => {
-  const [isNotesDialogOpen, setIsNotesDialogOpen] = useState(false);
   const getColorClasses = (color: string) => {
     switch (color) {
       case 'green':
@@ -180,44 +173,6 @@ const ScreeningResultAnalysis: React.FC<ScreeningResultAnalysisProps> = ({
         color: 'gray'
       })}
 
-      {/* Company Notes Section with Edit Button */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <h4 className="text-lg font-semibold text-gray-900 flex items-center">
-            <StickyNote className="h-4 w-4 mr-2 text-gray-600" />
-            Company Notes
-          </h4>
-          {resultId && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsNotesDialogOpen(true)}
-              className="h-8 px-2 text-gray-600 hover:text-gray-700 hover:bg-gray-50"
-            >
-              <Edit3 className="h-3 w-3 mr-1" />
-              Edit
-            </Button>
-          )}
-        </div>
-        <div className="p-4 rounded-lg border text-gray-700 bg-gray-50 border-gray-200">
-          {notes ? (
-            <p className="text-sm leading-relaxed text-gray-700 whitespace-pre-wrap">{notes}</p>
-          ) : (
-            <p className="text-sm text-gray-500 italic">No notes added yet. Click Edit to add notes about this candidate.</p>
-          )}
-        </div>
-      </div>
-
-      {/* Notes Edit Dialog */}
-      {resultId && candidateName && (
-        <NotesEditDialog
-          isOpen={isNotesDialogOpen}
-          onClose={() => setIsNotesDialogOpen(false)}
-          resultId={resultId}
-          currentNotes={notes || ''}
-          candidateName={candidateName}
-        />
-      )}
     </div>
   );
 };

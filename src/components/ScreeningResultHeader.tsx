@@ -1,5 +1,6 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
+import { StatusBadge } from '@/components/ui/StatusBadge';
 import { 
   User,
   Mail,
@@ -8,6 +9,7 @@ import {
   Mic,
   MapPin
 } from 'lucide-react';
+import { CandidateStatus } from '@/hooks/useCandidateStatus';
 
 interface ScreeningResultHeaderProps {
   firstName: string;
@@ -19,6 +21,7 @@ interface ScreeningResultHeaderProps {
   homeAddress?: string;
   overallFit: number;
   skills?: string[];
+  status?: CandidateStatus;
 }
 
 const ScreeningResultHeader: React.FC<ScreeningResultHeaderProps> = ({
@@ -30,7 +33,8 @@ const ScreeningResultHeader: React.FC<ScreeningResultHeaderProps> = ({
   phone,
   homeAddress,
   overallFit,
-  skills
+  skills,
+  status
 }) => {
   // Helper functions
   const getScoreColor = (score: number) => {
@@ -48,15 +52,18 @@ const ScreeningResultHeader: React.FC<ScreeningResultHeaderProps> = ({
 
   return (
     <div className="flex-1">
-      {/* Name and Score Row */}
+      {/* Name, Score and Status Row */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-4">
         <h3 className="text-lg font-semibold text-gray-900 flex items-center">
           <User className="h-5 w-5 mr-3 text-blue-600" />
           {firstName} {lastName}
         </h3>
-        <Badge className={`${getScoreColor(overallFit)} border-0 px-3 py-1 w-fit`}>
-          {overallFit}% - {getScoreLabel(overallFit)}
-        </Badge>
+        <div className="flex items-center gap-2">
+          <Badge className={`${getScoreColor(overallFit)} border-0 px-3 py-1 w-fit`}>
+            {overallFit}% - {getScoreLabel(overallFit)}
+          </Badge>
+          <StatusBadge status={status || 'pending'} />
+        </div>
       </div>
       
       {/* Contact Information Grid - Mobile Responsive */}

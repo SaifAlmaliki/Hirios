@@ -23,15 +23,14 @@ import {
   ExternalLink,
   Star,
   Download,
-  X,
-  Edit3
+  X
 } from 'lucide-react';
 import { useScreeningResults, useUpdateFavoriteStatus, useUpdateDismissStatus, ScreeningResult } from '@/hooks/useScreeningResults';
 import { useAuth } from '@/contexts/AuthContext';
 import { VoiceInterviewService } from '@/services/voiceInterviewService';
 import { useToast } from '@/hooks/use-toast';
 import ScreeningResultActions from '@/components/ScreeningResultActions';
-import NotesEditDialog from '@/components/NotesEditDialog';
+import InlineCandidateStatusManager from '@/components/InlineCandidateStatusManager';
 import { downloadResume } from '@/lib/resumeUtils';
 import {
   AlertDialog,
@@ -51,7 +50,6 @@ const ScreeningResultDetail = () => {
   const { toast } = useToast();
   const [requestingInterview, setRequestingInterview] = useState<string | null>(null);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-  const [isNotesDialogOpen, setIsNotesDialogOpen] = useState(false);
 
   // Bullet point parsing function
   const parseContentToBullets = (content: string) => {
@@ -264,30 +262,15 @@ const ScreeningResultDetail = () => {
               </CardContent>
             </Card>
 
-            {/* Overall Score Card */}
-            <Card className="shadow-lg border-0 bg-white">
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2 text-sm sm:text-base">
-                  <Brain className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
-                  <span>Overall Fit Score</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center space-y-3 sm:space-y-4">
-                  <div className={`text-3xl sm:text-4xl font-bold ${getScoreColor(result.overall_fit || 0)}`}>
-                    {result.overall_fit}%
-                  </div>
-                  <Progress 
-                    value={result.overall_fit || 0} 
-                    className="h-2 sm:h-3"
-                  />
-                  <Badge className={`${getScoreBadgeColor(result.overall_fit || 0)} text-xs sm:text-sm px-2 sm:px-3 py-1`}>
-                    {result.overall_fit && result.overall_fit > 70 ? 'Excellent' : 
-                     result.overall_fit && result.overall_fit >= 40 ? 'Good' : 'Poor'}
-                  </Badge>
-                </div>
-              </CardContent>
-            </Card>
+            {/* Enhanced Status Management Card */}
+            {result.resume_pool_id && result.job_id && (
+              <InlineCandidateStatusManager
+                resumePoolId={result.resume_pool_id}
+                jobId={result.job_id}
+                candidateName={`${result.first_name} ${result.last_name}`}
+                candidateEmail={result.email}
+              />
+            )}
 
             {/* Actions Card */}
             <Card className="shadow-lg border-0 bg-white">
@@ -357,35 +340,6 @@ const ScreeningResultDetail = () => {
               </CardContent>
             </Card>
 
-            {/* Company Notes Card - Moved from right column */}
-            <Card className="shadow-lg border-0 bg-white">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center space-x-2 text-gray-700">
-                    <FileText className="w-5 h-5" />
-                    <span>Company Notes</span>
-                  </CardTitle>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setIsNotesDialogOpen(true)}
-                    className="h-8 px-2 text-purple-600 hover:text-purple-700 hover:bg-purple-50"
-                  >
-                    <Edit3 className="h-3 w-3 mr-1" />
-                    Edit
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="bg-gray-50 rounded-lg p-4">
-                  {result.notes ? (
-                    <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">{result.notes}</p>
-                  ) : (
-                    <p className="text-gray-500 text-sm italic">No notes added yet. Click Edit to add notes about this candidate.</p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
           </div>
 
           {/* Right Column - Analysis Details */}
@@ -589,14 +543,6 @@ const ScreeningResultDetail = () => {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Notes Edit Dialog */}
-      <NotesEditDialog
-        isOpen={isNotesDialogOpen}
-        onClose={() => setIsNotesDialogOpen(false)}
-        resultId={result.id}
-        currentNotes={result.notes || ''}
-        candidateName={`${result.first_name} ${result.last_name}`}
-      />
     </div>
   );
 };

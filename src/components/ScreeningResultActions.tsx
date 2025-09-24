@@ -94,7 +94,7 @@ const ScreeningResultActions: React.FC<ScreeningResultActionsProps> = ({
 
   return (
     <div className="w-full lg:w-96 lg:justify-end">
-      {/* Button Grid - Two rows with 3 buttons each */}
+      {/* Button Grid - Three rows with 3 buttons each */}
       <div className="grid grid-cols-3 gap-3 items-center">
         {/* First Row */}
         <CVButton
@@ -131,11 +131,15 @@ const ScreeningResultActions: React.FC<ScreeningResultActionsProps> = ({
           onClick={handleDismissToggle}
         />
         
-        {/* Details Toggle - Always in second row */}
+        {/* Third Row */}
         <DetailsToggleButton
           isExpanded={isExpanded}
           onClick={onToggleExpansion}
         />
+
+        {/* Empty cells to maintain grid layout */}
+        <div></div>
+        <div></div>
       </div>
 
       {/* Confirmation Dialog */}
