@@ -18,8 +18,8 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { useResumePool, ResumePoolItem } from '@/hooks/useResumePool';
-import { useResumePoolStatusBadges } from '@/hooks/useCandidateStatus';
-import { StatusBadge } from '@/components/ui/StatusBadge';
+import { useGlobalResumePoolStatusBadges } from '@/hooks/useCandidateStatus';
+import { GlobalStatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
@@ -58,9 +58,9 @@ const ResumePoolSelector: React.FC<ResumePoolSelectorProps> = ({
   const { toast } = useToast();
   const { user } = useAuth();
 
-  // Get status badges for all resumes in this job
+  // Get global status badges for all resumes across all jobs
   const resumeIds = resumes.map(r => r.id);
-  const { data: statusBadges = {} } = useResumePoolStatusBadges(resumeIds, jobId);
+  const { data: globalStatusBadges = {} } = useGlobalResumePoolStatusBadges(resumeIds);
 
   // Filter resumes based on search term
   const filteredResumes = useMemo(() => {
@@ -413,11 +413,29 @@ const ResumePoolSelector: React.FC<ResumePoolSelectorProps> = ({
                             {processing ? getStatusIcon(processing.status) : <FileText className="h-5 w-5 text-gray-500 flex-shrink-0 mt-1" />}
                             <div className="flex-1 min-w-0">
                               {/* Name/Title and Status */}
-                              <div className="flex items-center gap-2 mb-2">
-                                <p className="text-sm font-medium text-gray-900">
+                              <div className="flex items-start gap-2 mb-2">
+                                <p className="text-sm font-medium text-gray-900 flex-shrink-0">
                                   {getDisplayName(resume)}
                                 </p>
-                                <StatusBadge status={statusBadges[resume.id] || 'pending'} />
+                                <div className="flex-shrink-0">
+                                  {globalStatusBadges[resume.id] ? (
+                                    <GlobalStatusBadge 
+                                      globalStatus={globalStatusBadges[resume.id]} 
+                                      maxDisplay={2}
+                                      className="text-xs"
+                                    />
+                                  ) : (
+                                    <GlobalStatusBadge 
+                                      globalStatus={{
+                                        resume_pool_id: resume.id,
+                                        statuses: [],
+                                        highest_priority_status: 'pending'
+                                      }} 
+                                      maxDisplay={2}
+                                      className="text-xs"
+                                    />
+                                  )}
+                                </div>
                               </div>
 
                               {/* Contact Information */}
@@ -445,7 +463,7 @@ const ResumePoolSelector: React.FC<ResumePoolSelectorProps> = ({
                               {/* Skills */}
                               {resume.skills && resume.skills.length > 0 && (
                                 <div className="flex flex-wrap gap-1 mb-2">
-                                  {resume.skills.slice(0, 5).map((skill, index) => (
+                                  {resume.skills.map((skill, index) => (
                                     <Badge
                                       key={index}
                                       variant="outline"
@@ -454,11 +472,6 @@ const ResumePoolSelector: React.FC<ResumePoolSelectorProps> = ({
                                       {skill}
                                     </Badge>
                                   ))}
-                                  {resume.skills.length > 5 && (
-                                    <Badge variant="outline" className="text-xs">
-                                      +{resume.skills.length - 5} more
-                                    </Badge>
-                                  )}
                                 </div>
                               )}
 

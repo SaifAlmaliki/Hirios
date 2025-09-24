@@ -1,6 +1,6 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
-import { CandidateStatus } from '@/hooks/useCandidateStatus';
+import { CandidateStatus, GlobalCandidateStatus } from '@/hooks/useCandidateStatus';
 import { 
   Clock, 
   Eye, 
@@ -18,6 +18,12 @@ import {
 interface StatusBadgeProps {
   status: CandidateStatus;
   className?: string;
+}
+
+interface GlobalStatusBadgeProps {
+  globalStatus: GlobalCandidateStatus;
+  className?: string;
+  maxDisplay?: number; // Maximum number of statuses to display
 }
 
 const statusConfig = {
@@ -101,6 +107,50 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, className = ''
       <Icon className="h-3 w-3" />
       {config.label}
     </Badge>
+  );
+};
+
+// New component for displaying global status with job titles
+export const GlobalStatusBadge: React.FC<GlobalStatusBadgeProps> = ({ 
+  globalStatus, 
+  className = '', 
+  maxDisplay = 2 
+}) => {
+  if (!globalStatus.statuses || globalStatus.statuses.length === 0) {
+    return <StatusBadge status="pending" className={className} />;
+  }
+
+  const displayStatuses = globalStatus.statuses.slice(0, maxDisplay);
+  const hasMore = globalStatus.statuses.length > maxDisplay;
+
+  return (
+    <div className={`flex flex-wrap gap-1 w-fit ${className}`}>
+      {displayStatuses.map((statusInfo, index) => {
+        const config = statusConfig[statusInfo.status];
+        const Icon = config.icon;
+        
+        return (
+          <Badge 
+            key={`${statusInfo.job_id}-${statusInfo.status}`}
+            variant={config.variant}
+            className={`${config.className} flex items-center gap-1 text-xs font-medium whitespace-nowrap`}
+            title={`${config.label} for ${statusInfo.job_title}`}
+          >
+            <Icon className="h-3 w-3" />
+            {config.label} - {statusInfo.job_title}
+          </Badge>
+        );
+      })}
+      {hasMore && (
+        <Badge 
+          variant="secondary"
+          className="bg-gray-100 text-gray-600 hover:bg-gray-200 flex items-center gap-1 text-xs font-medium whitespace-nowrap"
+          title={`${globalStatus.statuses.length - maxDisplay} more statuses`}
+        >
+          +{globalStatus.statuses.length - maxDisplay} more
+        </Badge>
+      )}
+    </div>
   );
 };
 
