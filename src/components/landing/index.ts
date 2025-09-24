@@ -6,6 +6,3 @@ export { default as ContactCTA } from './ContactCTA';
 export { default as FAQ } from './FAQ';
 export { default as FinalCTA } from './FinalCTA';
 export { default as Footer } from './Footer';
-export { default as PricingSection } from './PricingSection';
-export { default as PricingCard } from './PricingCard';
-export { default as HowPointsWork } from './HowPointsWork';

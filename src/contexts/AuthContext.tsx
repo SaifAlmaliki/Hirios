@@ -2,7 +2,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { PointsService } from '@/services/pointsService';
 
 interface CompanyData {
   company_name: string;
@@ -108,7 +107,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     // If user was created successfully, the database trigger will automatically create the company profile
-    // We just need to add welcome bonus points
     if (authData.user) {
       console.log('✅ User created successfully:', authData.user.id);
       
@@ -132,20 +130,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           console.error('Error checking company profile:', err);
         }
       }, 1000); // Wait 1 second for trigger to complete
-      
-      try {
-        // Give new user 25 free points
-        await PointsService.addPoints(
-          authData.user.id,
-          25,
-          'bonus',
-          'Welcome bonus - 25 free points for new users'
-        );
-        console.log('✅ Welcome bonus points added for new user');
-      } catch (pointsError) {
-        console.error('Error adding welcome bonus points:', pointsError);
-        // Don't fail the signup if points addition fails
-      }
     }
     
     return { error: null };

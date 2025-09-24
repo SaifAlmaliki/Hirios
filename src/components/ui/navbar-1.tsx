@@ -3,10 +3,9 @@
 import * as React from "react"
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Menu, X, Building2, Settings, Brain, LogOut, Coins, History, FileText } from "lucide-react"
+import { Menu, X, Building2, Settings, Brain, LogOut, FileText } from "lucide-react"
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { PointsBadge } from '@/components/ui/PointsBadge';
 
 interface Navbar1Props {
   title?: string;
@@ -44,15 +43,6 @@ const Navbar1: React.FC<Navbar1Props> = ({
     setIsOpen(false);
   };
 
-  const handlePointsPurchase = () => {
-    navigate('/points-purchase');
-    setIsOpen(false);
-  };
-
-  const handlePointsHistory = () => {
-    navigate('/points-history');
-    setIsOpen(false);
-  };
 
   const handleResumePool = () => {
     navigate('/resume-pool');
@@ -154,20 +144,6 @@ const Navbar1: React.FC<Navbar1Props> = ({
                 </button>
               </motion.div>
 
-              {/* Clickable Points Badge */}
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.2 }}
-                whileHover={{ scale: 1.05 }}
-              >
-                <button
-                  onClick={handlePointsPurchase}
-                  className="cursor-pointer"
-                >
-                  <PointsBadge variant="default" />
-                </button>
-              </motion.div>
 
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
@@ -239,19 +215,12 @@ const Navbar1: React.FC<Navbar1Props> = ({
                 </button>
               </motion.div>
 
-              {/* Clickable Points Badge */}
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.15 }}
                 whileHover={{ scale: 1.05 }}
               >
-                <button
-                  onClick={handlePointsPurchase}
-                  className="cursor-pointer"
-                >
-                  <PointsBadge variant="default" />
-                </button>
               </motion.div>
 
               <motion.div
@@ -275,13 +244,6 @@ const Navbar1: React.FC<Navbar1Props> = ({
                 transition={{ duration: 0.3, delay: 0.3 }}
                 whileHover={{ scale: 1.05 }}
               >
-                <button
-                  onClick={handlePointsHistory}
-                  className="flex items-center px-2 py-1 text-sm text-gray-900 hover:text-green-600 transition-colors font-medium rounded-full hover:bg-green-50"
-                >
-                  <History className="h-4 w-4 mr-1" />
-                  History
-                </button>
               </motion.div>
 
               <motion.div
@@ -395,13 +357,6 @@ const Navbar1: React.FC<Navbar1Props> = ({
                     transition={{ delay: 0.35 }}
                     exit={{ opacity: 0, x: 20 }}
                   >
-                    <button
-                      onClick={handlePointsPurchase}
-                      className="flex items-center w-full text-base text-gray-900 font-medium py-3"
-                    >
-                      <Coins className="h-5 w-5 mr-3" />
-                      <PointsBadge variant="detailed" />
-                    </button>
                   </motion.div>
 
                   <motion.div
@@ -425,13 +380,6 @@ const Navbar1: React.FC<Navbar1Props> = ({
                     transition={{ delay: 0.45 }}
                     exit={{ opacity: 0, x: 20 }}
                   >
-                    <button
-                      onClick={handlePointsHistory}
-                      className="flex items-center w-full text-base text-gray-900 font-medium py-3"
-                    >
-                      <History className="h-5 w-5 mr-3" />
-                      Points History
-                    </button>
                   </motion.div>
 
                   <motion.div
