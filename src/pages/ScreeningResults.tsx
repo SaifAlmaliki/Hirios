@@ -300,18 +300,18 @@ const ScreeningResults = () => {
                     <p className="text-sm font-medium text-gray-900">{currentJob.title}</p>
                     <div className="flex gap-2 justify-end">
                       <Button
-                        onClick={() => setIsUploadDialogOpen(true)}
-                        className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-3 py-1 h-8 text-sm"
-                      >
-                        <FileText className="h-4 w-4" />
-                        Upload New
-                      </Button>
-                      <Button
                         onClick={() => setIsResumePoolDialogOpen(true)}
                         className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 h-8 text-sm"
                       >
                         <FileText className="h-4 w-4" />
                         From Pool
+                      </Button>
+                      <Button
+                        onClick={() => setIsUploadDialogOpen(true)}
+                        className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-3 py-1 h-8 text-sm"
+                      >
+                        <FileText className="h-4 w-4" />
+                        Upload New
                       </Button>
                     </div>
                   </div>
