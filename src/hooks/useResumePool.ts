@@ -181,26 +181,7 @@ export const useDeleteResumeFromPool = () => {
     mutationFn: async ({ resumeId, storagePath }: { resumeId: string; storagePath: string }) => {
       console.log('🗑️ Starting resume deletion process for:', resumeId);
 
-      // Step 1: Delete vector chunks from documents table
-      try {
-        console.log('🧹 Cleaning up vector chunks...');
-        const { error: vectorError } = await supabase
-          .from('documents')
-          .delete()
-          .eq('metadata->>file_id', resumeId);
-
-        if (vectorError) {
-          console.error('❌ Vector cleanup failed:', vectorError);
-          // Continue with other deletions even if vector cleanup fails
-        } else {
-          console.log('✅ Vector chunks cleaned up successfully');
-        }
-      } catch (error) {
-        console.error('❌ Vector cleanup error:', error);
-        // Continue with other deletions
-      }
-
-      // Step 2: Delete from storage
+      // Step 1: Delete from storage
       const { error: storageError } = await supabase.storage
         .from('company_uploads')
         .remove([storagePath]);
@@ -212,7 +193,7 @@ export const useDeleteResumeFromPool = () => {
         console.log('✅ Storage file deleted successfully');
       }
 
-      // Step 3: Delete from database
+      // Step 2: Delete from database
       const { error: dbError } = await supabase
         .from('resume_pool')
         .delete()
@@ -254,26 +235,7 @@ export const useBulkDeleteResumes = () => {
 
       console.log('🗑️ Starting bulk resume deletion process for:', resumeIds.length, 'resumes');
 
-      // Step 1: Delete vector chunks from documents table
-      try {
-        console.log('🧹 Cleaning up vector chunks for', resumeIds.length, 'resumes...');
-        const { error: vectorError } = await supabase
-          .from('documents')
-          .delete()
-          .in('metadata->>file_id', resumeIds);
-
-        if (vectorError) {
-          console.error('❌ Bulk vector cleanup failed:', vectorError);
-          // Continue with other deletions even if vector cleanup fails
-        } else {
-          console.log('✅ Vector chunks cleaned up successfully for', resumeIds.length, 'resumes');
-        }
-      } catch (error) {
-        console.error('❌ Bulk vector cleanup error:', error);
-        // Continue with other deletions
-      }
-
-      // Step 2: Delete from storage
+      // Step 1: Delete from storage
       const { error: storageError } = await supabase.storage
         .from('company_uploads')
         .remove(storagePaths);
@@ -285,7 +247,7 @@ export const useBulkDeleteResumes = () => {
         console.log('✅ Storage files deleted successfully for', storagePaths.length, 'files');
       }
 
-      // Step 3: Delete from database
+      // Step 2: Delete from database
       const { error: dbError } = await supabase
         .from('resume_pool')
         .delete()

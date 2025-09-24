@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -204,6 +205,8 @@ const CompanyView: React.FC = () => {
   const [editingJob, setEditingJob] = useState<any>(null);
   const [detailViewJob, setDetailViewJob] = useState<any>(null);
   const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set());
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [jobToDelete, setJobToDelete] = useState<{ id: string; title: string } | null>(null);
   
   // Use company-specific jobs hook instead of all jobs
   const { data: jobs = [], isLoading: jobsLoading } = useCompanyJobs();
@@ -317,9 +320,16 @@ const CompanyView: React.FC = () => {
     setIsEditDialogOpen(true);
   };
 
-  const handleDeleteJob = (jobId: string) => {
-    if (window.confirm('Are you sure you want to delete this job posting? This action cannot be undone.')) {
-      deleteJobMutation.mutate(jobId);
+  const handleDeleteJob = (jobId: string, jobTitle: string) => {
+    setJobToDelete({ id: jobId, title: jobTitle });
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDeleteJob = () => {
+    if (jobToDelete) {
+      deleteJobMutation.mutate(jobToDelete.id);
+      setDeleteDialogOpen(false);
+      setJobToDelete(null);
     }
   };
 
@@ -482,7 +492,7 @@ const CompanyView: React.FC = () => {
                               size="sm"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleDeleteJob(job.id);
+                                handleDeleteJob(job.id, job.title);
                               }}
                               className="text-red-600 hover:text-red-800 hover:bg-red-50 p-1"
                               disabled={deleteJobMutation.isPending}
@@ -760,6 +770,28 @@ const CompanyView: React.FC = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Job Posting</AlertDialogTitle>
+            <AlertDialogDescription className="text-gray-700">
+              Are you sure you want to delete "{jobToDelete?.title}"? This action cannot be undone and will remove all associated data including applications and screening results.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteJob}
+              className="bg-red-600 hover:bg-red-700 text-white"
+              disabled={deleteJobMutation.isPending}
+            >
+              {deleteJobMutation.isPending ? 'Deleting...' : 'Delete Job'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
