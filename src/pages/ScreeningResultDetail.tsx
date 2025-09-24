@@ -96,9 +96,9 @@ const ScreeningResultDetail = () => {
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Screening Result Not Found</h2>
           <p className="text-gray-600 mb-6">The screening result you're looking for doesn't exist or you don't have permission to view it.</p>
-          <Button onClick={() => navigate('/screening-results')} className="bg-blue-600 hover:bg-blue-700">
+          <Button onClick={() => navigate('/job-portal')} className="bg-blue-600 hover:bg-blue-700">
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Screening Results
+            Back to Job Portal
           </Button>
         </div>
       </div>
@@ -151,8 +151,8 @@ const ScreeningResultDetail = () => {
                   if (result.job_id) {
                     navigate(`/screening-results/job/${result.job_id}`);
                   } else {
-                    // Fallback to general screening results if no job_id
-                    navigate('/screening-results');
+                    // Fallback to job portal if no job_id
+                    navigate('/job-portal');
                   }
                 }}
                 className="hover:bg-gray-100 flex-shrink-0"
