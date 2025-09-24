@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Menu, X, Building2, Settings, Brain, LogOut, FileText, Mail } from "lucide-react"
+import { Menu, X, Building2, Settings, Brain, LogOut, FileText } from "lucide-react"
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -49,10 +49,6 @@ const Navbar1: React.FC<Navbar1Props> = ({
     setIsOpen(false);
   };
 
-  const handleEmailProcessing = () => {
-    navigate('/email-processing');
-    setIsOpen(false);
-  };
 
   const handleSignIn = () => {
     navigate('/auth');
@@ -134,20 +130,6 @@ const Navbar1: React.FC<Navbar1Props> = ({
                 </button>
               </motion.div>
 
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.15 }}
-                whileHover={{ scale: 1.05 }}
-              >
-                <button
-                  onClick={handleEmailProcessing}
-                  className="flex items-center px-1.5 py-1 text-sm text-gray-900 hover:text-green-600 transition-colors font-medium rounded-full hover:bg-green-50"
-                >
-                  <Mail className="h-4 w-4 mr-1" />
-                  <span className="hidden sm:inline">Email</span>
-                </button>
-              </motion.div>
 
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
@@ -220,20 +202,6 @@ const Navbar1: React.FC<Navbar1Props> = ({
                 </button>
               </motion.div>
 
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.1 }}
-                whileHover={{ scale: 1.05 }}
-              >
-                <button
-                  onClick={handleEmailProcessing}
-                  className="flex items-center px-2 py-1 text-sm text-gray-900 hover:text-green-600 transition-colors font-medium rounded-full hover:bg-green-50"
-                >
-                  <Mail className="h-4 w-4 mr-1" />
-                  Email Processing
-                </button>
-              </motion.div>
 
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
@@ -371,20 +339,6 @@ const Navbar1: React.FC<Navbar1Props> = ({
                     </button>
                   </motion.div>
 
-                  <motion.div
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.3 }}
-                    exit={{ opacity: 0, x: 20 }}
-                  >
-                    <button
-                      onClick={handleEmailProcessing}
-                      className="flex items-center w-full text-base text-gray-900 font-medium py-3"
-                    >
-                      <Mail className="h-5 w-5 mr-3" />
-                      Email Processing
-                    </button>
-                  </motion.div>
 
                   <motion.div
                     initial={{ opacity: 0, x: 20 }}

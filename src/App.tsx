@@ -23,7 +23,6 @@ import VoiceInterview from "./pages/VoiceInterview";
 import InviteAccept from "./pages/InviteAccept";
 import TestCollaboration from "./pages/TestCollaboration";
 import ResumePool from "./pages/ResumePool";
-import EmailProcessing from "./pages/EmailProcessing";
 import NotFound from "./pages/NotFound";
 import { ButtonAlignmentDemo } from "./components/ui/button-alignment-demo";
 import { VoiceInterviewService } from "./services/voiceInterviewService";
@@ -71,7 +70,6 @@ const App = () => (
             <Route path="/test-collaboration" element={<TestCollaboration />} />
             <Route path="/button-demo" element={<ButtonAlignmentDemo />} />
             <Route path="/resume-pool" element={<ResumePool />} />
-            <Route path="/email-processing" element={<EmailProcessing />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

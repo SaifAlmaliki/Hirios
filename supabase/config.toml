@@ -292,5 +292,3 @@ redirect_uri = ""
 url = ""
 
 # Note: Cron jobs and edge function configurations are managed through the Supabase dashboard
-# For the email processing cron job, you'll need to set it up manually in the Supabase dashboard
-# or use a different scheduling solution like GitHub Actions or external cron services
