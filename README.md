@@ -277,22 +277,12 @@ Hirios is a comprehensive AI-powered B2B recruitment platform designed exclusive
   - `created_at` (TIMESTAMPTZ, Default: now())
   - `updated_at` (TIMESTAMPTZ, Default: now())
 
-### AI & RAG System
-
-#### `documents`
-- **Purpose**: Vector storage for RAG (Retrieval-Augmented Generation) functionality
-- **Fields**:
-  - `id` (BIGINT, Primary Key, Default: nextval('documents_id_seq'::regclass))
-  - `content` (TEXT)
-  - `metadata` (JSONB)
-  - `embedding` (VECTOR, User-defined type for AI embeddings)
 
 ### Storage Buckets
 - **`company_uploads`**: Private bucket for storing company-uploaded resumes and job application resumes (PDF files)
 
 ### Key Features
 - **Full-text Search**: Applications table includes GIN index on `resume_text` for efficient text searching
-- **Vector Search**: Documents table supports AI-powered semantic search with embeddings
 - **Subscription Management**: Company profiles track subscription plans and monthly job posting limits
 - **Team Collaboration**: Job collaborators and invitations enable multi-user access to specific job postings
 - **Points System**: Complete points-based payment and transaction tracking system

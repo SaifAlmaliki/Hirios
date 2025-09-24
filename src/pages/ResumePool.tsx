@@ -29,7 +29,6 @@ import ResumeRow from '@/components/ResumeRow';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import Navbar from '@/components/Navbar';
-import ResumePoolChat from '@/components/ResumePoolChat';
 
 const ResumePool = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -39,7 +38,6 @@ const ResumePool = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [resumeToDelete, setResumeToDelete] = useState<ResumePoolItem | null>(null);
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
-  const [isChatOpen, setIsChatOpen] = useState(false);
 
   const { data: resumes = [], isLoading, refetch } = useResumePool();
   const deleteResumeMutation = useDeleteResumeFromPool();
@@ -191,7 +189,7 @@ const ResumePool = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       <Navbar title="Resume Pool" />
-        <div className={`container mx-auto px-4 pt-32 pb-8 transition-all duration-300 ${isChatOpen ? 'sm:pr-[420px] md:pr-[520px] lg:pr-[620px] xl:pr-[720px]' : ''}`}>
+        <div className="container mx-auto px-4 pt-32 pb-8">
         <div className="max-w-7xl mx-auto">
           {/* Header - Removed title, description, and upload button */}
 
@@ -334,7 +332,7 @@ const ResumePool = () => {
                       <Checkbox
                         checked={allSelected}
                         ref={(el) => {
-                          if (el) el.indeterminate = someSelected;
+                          if (el) (el as any).indeterminate = someSelected;
                         }}
                         onCheckedChange={handleSelectAll}
                       />
@@ -415,12 +413,6 @@ const ResumePool = () => {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* RAG Chat Interface */}
-      <ResumePoolChat
-        isOpen={isChatOpen}
-        onToggle={() => setIsChatOpen(!isChatOpen)}
-        resumePoolData={resumes}
-      />
     </div>
   );
 };
