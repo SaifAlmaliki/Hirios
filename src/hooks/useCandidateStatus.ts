@@ -300,3 +300,110 @@ export const useResumePoolStatusBadges = (resumePoolIds: string[], jobId: string
     enabled: !!user && resumePoolIds.length > 0 && !!jobId,
   });
 };
+
+// Status priority order (highest to lowest)
+const STATUS_PRIORITY: Record<CandidateStatus, number> = {
+  'offer_sent': 1,
+  'accepted': 2,
+  'first_interview': 3,
+  'second_interview': 4,
+  'interview_scheduled': 5,
+  'shortlisted': 6,
+  'screened': 7,
+  'pending': 8,
+  'rejected': 9,
+  'blocked': 10,
+  'withdrawn': 11,
+};
+
+export interface GlobalCandidateStatus {
+  resume_pool_id: string;
+  statuses: Array<{
+    status: CandidateStatus;
+    job_title: string;
+    job_id: string;
+    updated_at: string;
+  }>;
+  highest_priority_status: CandidateStatus;
+}
+
+// Hook to get global status badges for resume pool (across all jobs)
+export const useGlobalResumePoolStatusBadges = (resumePoolIds: string[]) => {
+  const { user } = useAuth();
+
+  return useQuery({
+    queryKey: ['global_resume_pool_status_badges', resumePoolIds],
+    queryFn: async () => {
+      if (!user || !resumePoolIds.length) {
+        return {};
+      }
+
+      const { data, error } = await supabase
+        .from('candidate_status')
+        .select(`
+          resume_pool_id,
+          status,
+          updated_at,
+          job:jobs (
+            id,
+            title
+          )
+        `)
+        .in('resume_pool_id', resumePoolIds)
+        .order('updated_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching global status badges:', error);
+        throw error;
+      }
+
+      // Group by resume_pool_id and process statuses
+      const statusMap: Record<string, GlobalCandidateStatus> = {};
+      
+      data?.forEach((item) => {
+        const resumePoolId = item.resume_pool_id;
+        const status = item.status as CandidateStatus;
+        const jobTitle = item.job?.title || 'Unknown Job';
+        const jobId = item.job?.id || '';
+        const updatedAt = item.updated_at;
+
+        if (!statusMap[resumePoolId]) {
+          statusMap[resumePoolId] = {
+            resume_pool_id: resumePoolId,
+            statuses: [],
+            highest_priority_status: 'pending',
+          };
+        }
+
+        statusMap[resumePoolId].statuses.push({
+          status,
+          job_title: jobTitle,
+          job_id: jobId,
+          updated_at: updatedAt,
+        });
+      });
+
+      // Sort statuses by priority and determine highest priority status
+      Object.values(statusMap).forEach((candidateStatus) => {
+        // Sort statuses by priority (highest first)
+        candidateStatus.statuses.sort((a, b) => {
+          const priorityA = STATUS_PRIORITY[a.status];
+          const priorityB = STATUS_PRIORITY[b.status];
+          if (priorityA !== priorityB) {
+            return priorityA - priorityB; // Lower number = higher priority
+          }
+          // If same priority, sort by most recent
+          return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
+        });
+
+        // Set highest priority status
+        if (candidateStatus.statuses.length > 0) {
+          candidateStatus.highest_priority_status = candidateStatus.statuses[0].status;
+        }
+      });
+
+      return statusMap;
+    },
+    enabled: !!user && resumePoolIds.length > 0,
+  });
+};

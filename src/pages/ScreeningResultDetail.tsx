@@ -146,7 +146,15 @@ const ScreeningResultDetail = () => {
             <div className="flex items-center space-x-2 sm:space-x-4 min-w-0 flex-1">
               <Button 
                 variant="ghost" 
-                onClick={() => navigate('/screening-results')}
+                onClick={() => {
+                  // Navigate back to the specific job's results if job_id is available
+                  if (result.job_id) {
+                    navigate(`/screening-results/job/${result.job_id}`);
+                  } else {
+                    // Fallback to general screening results if no job_id
+                    navigate('/screening-results');
+                  }
+                }}
                 className="hover:bg-gray-100 flex-shrink-0"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
