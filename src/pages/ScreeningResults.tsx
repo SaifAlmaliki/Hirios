@@ -36,6 +36,7 @@ import { useCompanyJobs } from '@/hooks/useCompanyJobs';
 import ScreeningResultCard from '@/components/ScreeningResultCard';
 import Navbar from '@/components/Navbar';
 import CompanyResumeUpload from '@/components/CompanyResumeUpload';
+import ResumePoolSelector from '@/components/ResumePoolSelector';
 
 import { VoiceInterviewService } from '@/services/voiceInterviewService';
 
@@ -60,7 +61,6 @@ const ScreeningResults = () => {
   const [sortOrder, setSortOrder] = useState('desc');
   const [selectedJobId, setSelectedJobId] = useState<string>('all');
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
-  const [statusFilter, setStatusFilter] = useState('all'); // all, favorites, dismissed
   
   // State for notes
   const [noteDialogOpen, setNoteDialogOpen] = useState(false);
@@ -71,8 +71,9 @@ const ScreeningResults = () => {
   const [requestingInterview, setRequestingInterview] = useState<string | null>(null);
   const [voiceInterviewService] = useState(() => VoiceInterviewService.getInstance());
   
-  // State for upload dialog
+  // State for upload dialogs
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
+  const [isResumePoolDialogOpen, setIsResumePoolDialogOpen] = useState(false);
 
   // Filter and sort results - must be before any conditional returns
   const filteredAndSortedResults = useMemo(() => {
@@ -92,11 +93,7 @@ const ScreeningResults = () => {
         ? result.job_id === jobId 
         : selectedJobId === 'all' || result.job_id === selectedJobId;
 
-      const matchesStatus = statusFilter === 'all' || 
-        (statusFilter === 'favorites' && result.is_favorite) ||
-        (statusFilter === 'dismissed' && result.is_dismissed);
-
-      return matchesSearch && matchesScore && matchesJob && matchesStatus;
+      return matchesSearch && matchesScore && matchesJob;
     });
 
     // Sort results by score
@@ -112,7 +109,7 @@ const ScreeningResults = () => {
     });
 
     return filtered;
-  }, [screeningResults, searchTerm, scoreFilter, sortOrder, selectedJobId, statusFilter, jobId]);
+  }, [screeningResults, searchTerm, scoreFilter, sortOrder, selectedJobId, jobId]);
 
   // Redirect if not company user - THIS MUST BE AFTER ALL HOOKS
   React.useEffect(() => {
@@ -259,7 +256,7 @@ const ScreeningResults = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 ${jobId ? 'lg:grid-cols-3' : 'lg:grid-cols-5'}`}>
+              <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 ${jobId ? 'lg:grid-cols-3' : 'lg:grid-cols-4'}`}>
                 {/* Job Title Filter - only show if not viewing specific job */}
                 {!jobId && (
                   <div className="col-span-1 lg:col-span-2 space-y-2">
@@ -334,20 +331,6 @@ const ScreeningResults = () => {
                   </Select>
                 </div>
 
-                {/* Status Filter - 20% of space (1/5 column) */}
-                <div className="col-span-1 lg:col-span-1 space-y-2">
-                  <Label htmlFor="status-filter">Status Filter</Label>
-                  <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="All candidates" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Candidates</SelectItem>
-                      <SelectItem value="favorites">Favorites Only</SelectItem>
-                      <SelectItem value="dismissed">Dismissed Only</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
               </div>
             </CardContent>
           </Card>
@@ -368,7 +351,14 @@ const ScreeningResults = () => {
                         className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-3 py-1 h-8 text-sm"
                       >
                         <FileText className="h-4 w-4" />
-                        Upload Resumes
+                        Upload New
+                      </Button>
+                      <Button
+                        onClick={() => setIsResumePoolDialogOpen(true)}
+                        className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 h-8 text-sm"
+                      >
+                        <FileText className="h-4 w-4" />
+                        From Pool
                       </Button>
                     </div>
                   </div>
@@ -451,17 +441,29 @@ const ScreeningResults = () => {
       </div>
 
       {/* Upload Resumes Dialog - only show for job-specific pages */}
-      {jobId && (
-        <CompanyResumeUpload 
-          preselectedJobId={jobId}
-          isDialogOpen={isUploadDialogOpen}
-          onDialogOpenChange={setIsUploadDialogOpen}
-          showTrigger={false}
-          onUploadComplete={() => {
-            // Refresh screening results after upload
-            window.location.reload();
-          }}
-        />
+      {jobId && currentJob && (
+        <>
+          <CompanyResumeUpload 
+            preselectedJobId={jobId}
+            isDialogOpen={isUploadDialogOpen}
+            onDialogOpenChange={setIsUploadDialogOpen}
+            showTrigger={false}
+            onUploadComplete={() => {
+              // Refresh screening results after upload
+              window.location.reload();
+            }}
+          />
+          <ResumePoolSelector
+            jobId={jobId}
+            job={currentJob}
+            isDialogOpen={isResumePoolDialogOpen}
+            onDialogOpenChange={setIsResumePoolDialogOpen}
+            onSelectionComplete={() => {
+              // Refresh screening results after selection
+              window.location.reload();
+            }}
+          />
+        </>
       )}
     </div>
   );
