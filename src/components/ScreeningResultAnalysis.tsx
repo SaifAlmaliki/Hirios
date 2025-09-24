@@ -76,18 +76,47 @@ const ScreeningResultAnalysis: React.FC<ScreeningResultAnalysisProps> = ({
   };
 
   const parseContentToBullets = (content: string) => {
-    // Split content into sentences, preserving all text
-    const sentences = content
+    // Common abbreviations that should not end sentences
+    const abbreviations = [
+      'M.Sc.', 'B.Sc.', 'Ph.D.', 'M.D.', 'B.A.', 'M.A.', 'B.Eng.', 'M.Eng.',
+      'B.Tech.', 'M.Tech.', 'B.Com.', 'M.Com.', 'B.B.A.', 'M.B.A.',
+      'LL.B.', 'LL.M.', 'J.D.', 'D.D.S.', 'D.V.M.', 'D.O.', 'D.P.T.',
+      'R.N.', 'L.P.N.', 'C.N.A.', 'P.A.', 'N.P.', 'C.R.N.A.',
+      'A.A.', 'A.S.', 'A.A.S.', 'B.S.', 'M.S.', 'Ed.D.', 'Psy.D.',
+      'Inc.', 'Ltd.', 'Corp.', 'Co.', 'LLC.', 'LLP.', 'P.C.',
+      'St.', 'Ave.', 'Blvd.', 'Rd.', 'Dr.', 'Prof.', 'Sr.', 'Jr.',
+      'vs.', 'etc.', 'i.e.', 'e.g.', 'a.m.', 'p.m.', 'U.S.', 'U.K.',
+      'A.I.', 'M.L.', 'D.L.', 'C.V.', 'R&D', 'IT', 'HR', 'CEO', 'CTO', 'CFO'
+    ];
+    
+    // First, protect abbreviations by replacing them with placeholders
+    let protectedContent = content;
+    const abbreviationMap: { [key: string]: string } = {};
+    
+    abbreviations.forEach((abbr, index) => {
+      const placeholder = `__ABBR_${index}__`;
+      abbreviationMap[placeholder] = abbr;
+      // Use case-insensitive replacement
+      const regex = new RegExp(abbr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+      protectedContent = protectedContent.replace(regex, placeholder);
+    });
+    
+    // Now split on sentence boundaries
+    const sentences = protectedContent
       .split(/(?<=[.!?])\s+/)
       .map(s => s.trim())
       .filter(s => s.length > 0);
-
-    // Create bullet points from sentences
+    
+    // Restore abbreviations in each sentence
     const bullets: string[] = [];
     
     sentences.forEach((sentence) => {
       if (sentence.length > 0) {
-        bullets.push(sentence);
+        let restoredSentence = sentence;
+        Object.entries(abbreviationMap).forEach(([placeholder, abbr]) => {
+          restoredSentence = restoredSentence.replace(new RegExp(placeholder, 'g'), abbr);
+        });
+        bullets.push(restoredSentence);
       }
     });
     
