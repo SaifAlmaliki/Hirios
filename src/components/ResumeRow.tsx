@@ -54,7 +54,7 @@ const ResumeRow: React.FC<ResumeRowProps> = ({
 
   return (
     <div className="border rounded-lg hover:bg-gray-50 transition-colors p-3 sm:p-4">
-      <div className="flex items-start justify-between">
+      <div className="flex items-start justify-between gap-2">
         <div className="flex items-start space-x-2 sm:space-x-4 flex-1 min-w-0">
           <Checkbox
             checked={isSelected}
@@ -64,7 +64,7 @@ const ResumeRow: React.FC<ResumeRowProps> = ({
           <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500 flex-shrink-0 mt-1" />
           <div className="flex-1 min-w-0">
             {/* Name/Title */}
-            <p className="text-sm font-medium text-gray-900 mb-2">
+            <p className="text-sm font-medium text-gray-900 mb-2 truncate" title={getDisplayName()}>
               {getDisplayName()}
             </p>
 
@@ -125,18 +125,19 @@ const ResumeRow: React.FC<ResumeRowProps> = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
+        <div className="flex items-center space-x-1 flex-shrink-0">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => onDownload(resume)}
             className="h-8 w-8 p-0 sm:h-9 sm:w-9 sm:p-2"
+            title="Download resume"
           >
             <Download className="h-3 w-3 sm:h-4 sm:w-4" />
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-8 w-8 p-0 sm:h-9 sm:w-9 sm:p-2">
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0 sm:h-9 sm:w-9 sm:p-2" title="More actions">
                 <MoreVertical className="h-3 w-3 sm:h-4 sm:w-4" />
               </Button>
             </DropdownMenuTrigger>

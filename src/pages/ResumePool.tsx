@@ -194,38 +194,38 @@ const ResumePool = () => {
           {/* Header - Removed title, description, and upload button */}
 
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
             <Card>
-              <CardContent className="p-6">
+              <CardContent className="p-4 sm:p-6">
                 <div className="flex items-center">
-                  <FileText className="h-8 w-8 text-blue-600" />
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">Total Resumes</p>
-                    <p className="text-2xl font-bold text-gray-900">{resumes.length}</p>
+                  <FileText className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600 flex-shrink-0" />
+                  <div className="ml-3 sm:ml-4 min-w-0">
+                    <p className="text-xs sm:text-sm font-medium text-gray-600">Total Resumes</p>
+                    <p className="text-lg sm:text-2xl font-bold text-gray-900">{resumes.length}</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
             <Card>
-              <CardContent className="p-6">
+              <CardContent className="p-4 sm:p-6">
                 <div className="flex items-center">
-                  <HardDrive className="h-8 w-8 text-green-600" />
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">Total Size</p>
-                    <p className="text-2xl font-bold text-gray-900">
+                  <HardDrive className="h-6 w-6 sm:h-8 sm:w-8 text-green-600 flex-shrink-0" />
+                  <div className="ml-3 sm:ml-4 min-w-0">
+                    <p className="text-xs sm:text-sm font-medium text-gray-600">Total Size</p>
+                    <p className="text-lg sm:text-2xl font-bold text-gray-900 truncate">
                       {formatFileSize(calculateTotalSize())}
                     </p>
                   </div>
                 </div>
               </CardContent>
             </Card>
-            <Card>
-              <CardContent className="p-6">
+            <Card className="sm:col-span-2 lg:col-span-1">
+              <CardContent className="p-4 sm:p-6">
                 <div className="flex items-center">
-                  <Calendar className="h-8 w-8 text-purple-600" />
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">Latest Upload</p>
-                    <p className="text-sm font-bold text-gray-900">
+                  <Calendar className="h-6 w-6 sm:h-8 sm:w-8 text-purple-600 flex-shrink-0" />
+                  <div className="ml-3 sm:ml-4 min-w-0">
+                    <p className="text-xs sm:text-sm font-medium text-gray-600">Latest Upload</p>
+                    <p className="text-xs sm:text-sm font-bold text-gray-900 truncate">
                       {resumes.length > 0 ? format(new Date(resumes[0].created_at), 'MMM dd, yyyy') : 'None'}
                     </p>
                   </div>
@@ -236,8 +236,8 @@ const ResumePool = () => {
 
           {/* Search and Filters */}
           <Card className="mb-6">
-            <CardContent className="p-6">
-              <div className="flex flex-col sm:flex-row gap-4">
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex flex-col gap-4">
                 <div className="flex-1">
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -249,11 +249,12 @@ const ResumePool = () => {
                     />
                   </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   <Button
                     variant={sortBy === 'name' ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => handleSort('name')}
+                    className="flex-shrink-0"
                   >
                     Name {sortBy === 'name' && (sortOrder === 'asc' ? '↑' : '↓')}
                   </Button>
@@ -261,6 +262,7 @@ const ResumePool = () => {
                     variant={sortBy === 'date' ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => handleSort('date')}
+                    className="flex-shrink-0"
                   >
                     Date {sortBy === 'date' && (sortOrder === 'asc' ? '↑' : '↓')}
                   </Button>
@@ -268,6 +270,7 @@ const ResumePool = () => {
                     variant={sortBy === 'size' ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => handleSort('size')}
+                    className="flex-shrink-0"
                   >
                     Size {sortBy === 'size' && (sortOrder === 'asc' ? '↑' : '↓')}
                   </Button>
@@ -324,9 +327,9 @@ const ResumePool = () => {
           {/* Resume List */}
           <Card>
             <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle>Resumes ({filteredAndSortedResumes.length})</CardTitle>
-                <div className="flex items-center space-x-3">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <CardTitle className="text-lg sm:text-xl">Resumes ({filteredAndSortedResumes.length})</CardTitle>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                   {filteredAndSortedResumes.length > 0 && (
                     <div className="flex items-center space-x-2">
                       <Checkbox
@@ -336,7 +339,7 @@ const ResumePool = () => {
                         }}
                         onCheckedChange={handleSelectAll}
                       />
-                      <span className="text-sm text-gray-600">Select All</span>
+                      <span className="text-sm text-gray-600 whitespace-nowrap">Select All</span>
                     </div>
                   )}
                   <ResumePoolUpload onUploadComplete={() => refetch()} showTrigger={true} />
