@@ -1,6 +1,7 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { StatusBadge } from '@/components/ui/StatusBadge';
+import { normalizeSkills } from '@/lib/skillsUtils';
 import { 
   User,
   Mail,
@@ -99,21 +100,24 @@ const ScreeningResultHeader: React.FC<ScreeningResultHeaderProps> = ({
       </div>
       
       {/* Skills Section */}
-      {skills && skills.length > 0 && (
-        <div className="mt-4">
-          <div className="flex flex-wrap gap-1">
-            {skills.map((skill, index) => (
-              <Badge
-                key={index}
-                variant="outline"
-                className="text-xs bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100"
-              >
-                {skill}
-              </Badge>
-            ))}
+      {(() => {
+        const normalizedSkills = normalizeSkills(skills);
+        return normalizedSkills.length > 0 && (
+          <div className="mt-4">
+            <div className="flex flex-wrap gap-1">
+              {normalizedSkills.map((skill, index) => (
+                <Badge
+                  key={index}
+                  variant="outline"
+                  className="text-xs bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100"
+                >
+                  {skill}
+                </Badge>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
       
     </div>
   );

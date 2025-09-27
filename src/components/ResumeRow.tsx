@@ -21,6 +21,7 @@ import {
 import { ResumePoolItem } from '@/hooks/useResumePool';
 import { GlobalStatusBadge } from '@/components/ui/StatusBadge';
 import { GlobalCandidateStatus } from '@/hooks/useCandidateStatus';
+import { normalizeSkills } from '@/lib/skillsUtils';
 import { format } from 'date-fns';
 
 interface ResumeRowProps {
@@ -116,19 +117,22 @@ const ResumeRow: React.FC<ResumeRowProps> = ({
             </div>
 
             {/* Skills */}
-            {resume.skills && resume.skills.length > 0 && (
-              <div className="flex flex-wrap gap-1 mb-2">
-                {resume.skills.map((skill, index) => (
-                  <Badge
-                    key={index}
-                    variant="outline"
-                          className="text-xs bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100"
-                  >
-                    {skill}
-                  </Badge>
-                ))}
-              </div>
-            )}
+            {(() => {
+              const normalizedSkills = normalizeSkills(resume.skills);
+              return normalizedSkills.length > 0 && (
+                <div className="flex flex-wrap gap-1 mb-2">
+                  {normalizedSkills.map((skill, index) => (
+                    <Badge
+                      key={index}
+                      variant="outline"
+                      className="text-xs bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100"
+                    >
+                      {skill}
+                    </Badge>
+                  ))}
+                </div>
+              );
+            })()}
 
             {/* Basic Info */}
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-500">
