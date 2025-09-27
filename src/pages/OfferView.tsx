@@ -25,6 +25,16 @@ const OfferView = () => {
   const { data: offer, isLoading: offerLoading, error } = useJobOfferById(id || '');
   const downloadOfferMutation = useDownloadOffer();
 
+  // Debug logging
+  React.useEffect(() => {
+    console.log('🔍 OfferView Debug:', {
+      offerId: id,
+      isLoading: offerLoading,
+      hasOffer: !!offer,
+      error: error?.message
+    });
+  }, [id, offerLoading, offer, error]);
+
   useEffect(() => {
     setIsLoading(offerLoading);
   }, [offerLoading]);
@@ -70,9 +80,19 @@ const OfferView = () => {
         <div className="text-center max-w-md mx-auto p-6">
           <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Offer Not Found</h1>
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-600 mb-4">
             The job offer you're looking for could not be found or may have expired.
           </p>
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4 text-left">
+              <p className="text-sm text-red-800">
+                <strong>Error:</strong> {error.message}
+              </p>
+              <p className="text-xs text-red-600 mt-2">
+                <strong>Offer ID:</strong> {id}
+              </p>
+            </div>
+          )}
           <Button onClick={() => navigate('/')} variant="outline">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Go Home

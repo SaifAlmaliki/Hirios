@@ -341,6 +341,11 @@ export const useSendJobOffer = () => {
 
       console.log('📤 Webhook payload prepared:', webhookData);
       console.log('🔗 N8N Webhook URL:', n8nWebhookUrl);
+      console.log('🌐 Offer Link Generated:', webhookData.offer_link);
+      console.log('🔧 Environment Variables:', {
+        VITE_SITE_URL: import.meta.env.VITE_SITE_URL,
+        offerId: data.id
+      });
 
       const emailResponse = await fetch(n8nWebhookUrl, {
         method: 'POST',

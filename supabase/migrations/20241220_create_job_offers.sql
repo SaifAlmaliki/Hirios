@@ -94,6 +94,10 @@ CREATE POLICY "Users can update job offers for their company jobs" ON job_offers
         )
     );
 
+-- Allow public access to job offers by ID (for candidates to view offers)
+CREATE POLICY "Public can view job offers by ID" ON job_offers
+    FOR SELECT USING (true);
+
 -- Note: Using existing candidate_comments RLS policies
 
 -- Function to automatically set expiry date when offer is created
