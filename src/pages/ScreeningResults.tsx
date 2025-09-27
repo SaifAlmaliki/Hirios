@@ -32,7 +32,6 @@ import { useScreeningResults, ScreeningResult } from '@/hooks/useScreeningResult
 import { useCompanyJobs } from '@/hooks/useCompanyJobs';
 import ScreeningResultCard from '@/components/ScreeningResultCard';
 import Navbar from '@/components/Navbar';
-import CompanyResumeUpload from '@/components/CompanyResumeUpload';
 import ResumePoolSelector from '@/components/ResumePoolSelector';
 
 import { VoiceInterviewService } from '@/services/voiceInterviewService';
@@ -63,7 +62,6 @@ const ScreeningResults = () => {
   const [voiceInterviewService] = useState(() => VoiceInterviewService.getInstance());
   
   // State for upload dialogs
-  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
   const [isResumePoolDialogOpen, setIsResumePoolDialogOpen] = useState(false);
 
   // Filter and sort results - must be before any conditional returns
@@ -298,22 +296,14 @@ const ScreeningResults = () => {
                 {jobId && currentJob && (
                   <div className="flex flex-col sm:text-right space-y-2">
                     <p className="text-sm font-medium text-gray-900">{currentJob.title}</p>
-                    <div className="flex flex-col sm:flex-row gap-2 sm:justify-end">
+                    <div className="flex justify-end">
                       <Button
                         onClick={() => setIsResumePoolDialogOpen(true)}
-                        className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 h-8 text-sm w-full sm:w-auto"
+                        className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 h-8 text-sm w-auto"
                       >
                         <FileText className="h-4 w-4" />
                         <span className="hidden xs:inline">From Pool</span>
                         <span className="xs:hidden">Pool</span>
-                      </Button>
-                      <Button
-                        onClick={() => setIsUploadDialogOpen(true)}
-                        className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-3 py-1 h-8 text-sm w-full sm:w-auto"
-                      >
-                        <FileText className="h-4 w-4" />
-                        <span className="hidden xs:inline">Upload New</span>
-                        <span className="xs:hidden">Upload</span>
                       </Button>
                     </div>
                   </div>
@@ -358,28 +348,16 @@ const ScreeningResults = () => {
 
       {/* Upload Resumes Dialog - only show for job-specific pages */}
       {jobId && currentJob && (
-        <>
-          <CompanyResumeUpload 
-            preselectedJobId={jobId}
-            isDialogOpen={isUploadDialogOpen}
-            onDialogOpenChange={setIsUploadDialogOpen}
-            showTrigger={false}
-            onUploadComplete={() => {
-              // Refresh screening results after upload
-              window.location.reload();
-            }}
-          />
-          <ResumePoolSelector
-            jobId={jobId}
-            job={currentJob}
-            isDialogOpen={isResumePoolDialogOpen}
-            onDialogOpenChange={setIsResumePoolDialogOpen}
-            onSelectionComplete={() => {
-              // Refresh screening results after selection
-              window.location.reload();
-            }}
-          />
-        </>
+        <ResumePoolSelector
+          jobId={jobId}
+          job={currentJob}
+          isDialogOpen={isResumePoolDialogOpen}
+          onDialogOpenChange={setIsResumePoolDialogOpen}
+          onSelectionComplete={() => {
+            // Refresh screening results after selection
+            window.location.reload();
+          }}
+        />
       )}
     </div>
   );

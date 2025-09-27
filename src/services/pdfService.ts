@@ -50,7 +50,7 @@ export const uploadOfferPDF = async (
   const { supabase } = await import('@/integrations/supabase/client');
   
   // Use the same bucket structure as resumes: {companyId}/offers/{fileName}
-  const bucketName = 'resumes';
+  const bucketName = 'company_uploads';
   const filePath = `${companyId}/offers/${fileName}`;
 
   console.log(`Uploading offer PDF to: ${bucketName}/${filePath}`);

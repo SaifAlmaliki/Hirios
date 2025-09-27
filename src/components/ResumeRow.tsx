@@ -19,6 +19,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { ResumePoolItem } from '@/hooks/useResumePool';
+import { GlobalStatusBadge } from '@/components/ui/StatusBadge';
+import { GlobalCandidateStatus } from '@/hooks/useCandidateStatus';
 import { format } from 'date-fns';
 
 interface ResumeRowProps {
@@ -27,6 +29,7 @@ interface ResumeRowProps {
   onSelect: (resumeId: string, checked: boolean) => void;
   onDownload: (resume: ResumePoolItem) => void;
   onDelete: (resume: ResumePoolItem) => void;
+  globalStatus?: GlobalCandidateStatus;
 }
 
 const ResumeRow: React.FC<ResumeRowProps> = ({
@@ -34,7 +37,8 @@ const ResumeRow: React.FC<ResumeRowProps> = ({
   isSelected,
   onSelect,
   onDownload,
-  onDelete
+  onDelete,
+  globalStatus
 }) => {
 
   const formatFileSize = (bytes: number) => {
@@ -63,10 +67,31 @@ const ResumeRow: React.FC<ResumeRowProps> = ({
           />
           <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500 flex-shrink-0 mt-1" />
           <div className="flex-1 min-w-0">
-            {/* Name/Title */}
-            <p className="text-sm font-medium text-gray-900 mb-2 truncate" title={getDisplayName()}>
-              {getDisplayName()}
-            </p>
+            {/* Name/Title and Status */}
+            <div className="flex items-start gap-2 mb-2">
+              <p className="text-sm font-medium text-gray-900 truncate" title={getDisplayName()}>
+                {getDisplayName()}
+              </p>
+              <div className="flex-shrink-0">
+                {globalStatus ? (
+                  <GlobalStatusBadge 
+                    globalStatus={globalStatus} 
+                    maxDisplay={2}
+                    className="text-xs"
+                  />
+                ) : (
+                  <GlobalStatusBadge 
+                    globalStatus={{
+                      resume_pool_id: resume.id,
+                      statuses: [],
+                      highest_priority_status: 'pending'
+                    }} 
+                    maxDisplay={2}
+                    className="text-xs"
+                  />
+                )}
+              </div>
+            </div>
 
             {/* Contact Information */}
             <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-600 mb-2">
