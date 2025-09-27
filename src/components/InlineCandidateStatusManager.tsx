@@ -38,6 +38,7 @@ interface InlineCandidateStatusManagerProps {
   companyAddress?: string;
   companyPhone?: string;
   logoUrl?: string;
+  companyId?: string;
 }
 
 export const InlineCandidateStatusManager: React.FC<InlineCandidateStatusManagerProps> = ({
@@ -49,7 +50,8 @@ export const InlineCandidateStatusManager: React.FC<InlineCandidateStatusManager
   companyName,
   companyAddress,
   companyPhone,
-  logoUrl
+  logoUrl,
+  companyId
 }) => {
   const [newComment, setNewComment] = useState('');
   const [showComments, setShowComments] = useState(true);
@@ -318,6 +320,7 @@ export const InlineCandidateStatusManager: React.FC<InlineCandidateStatusManager
           companyAddress={companyAddress}
           companyPhone={companyPhone}
           logoUrl={logoUrl}
+          companyId={companyId}
         />
       )}
     </Card>

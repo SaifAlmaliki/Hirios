@@ -56,6 +56,42 @@ export const useJobOffer = (resumePoolId: string, jobId: string) => {
   });
 };
 
+// Hook to get a job offer by offer ID
+export const useJobOfferById = (offerId: string) => {
+  return useQuery({
+    queryKey: ['job-offer-by-id', offerId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('job_offers')
+        .select(`
+          *,
+          resume_pool:resume_pool_id (
+            id,
+            first_name,
+            last_name,
+            email
+          ),
+          job:job_id (
+            id,
+            title,
+            company,
+            department
+          )
+        `)
+        .eq('id', offerId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching job offer by ID:', error);
+        throw error;
+      }
+
+      return data as JobOfferWithDetails;
+    },
+    enabled: !!offerId,
+  });
+};
+
 // Hook to get all job offers for a company
 export const useJobOffers = (filters?: {
   jobId?: string;
@@ -275,34 +311,45 @@ export const useSendJobOffer = () => {
         throw error;
       }
 
-      // Trigger email webhook to n8n
-      const emailResponse = await fetch('/api/send-offer-email', {
+      // Trigger email webhook to n8n directly
+      const n8nWebhookUrl = import.meta.env.VITE_OFFER_EMAIL_WEBHOOK_URL;
+      
+      if (!n8nWebhookUrl) {
+        throw new Error('N8N webhook URL not configured');
+      }
+
+      const webhookData = {
+        candidate_name: `${data.resume_pool.first_name} ${data.resume_pool.last_name}`,
+        candidate_email: data.resume_pool.email,
+        job_title: data.job.title,
+        company_name: data.job.company,
+        salary_amount: data.salary_amount,
+        salary_currency: data.salary_currency,
+        bonus_amount: data.bonus_amount,
+        bonus_description: data.bonus_description,
+        benefits: data.benefits,
+        reports_to: data.reports_to,
+        insurance_details: data.insurance_details,
+        offer_date: data.offer_date,
+        expiry_date: data.expiry_date,
+        offer_link: `${import.meta.env.VITE_SITE_URL || 'https://hirios.com'}/offer/${data.id}`,
+        pdf_url: data.pdf_file_url,
+        recruiter_email: import.meta.env.VITE_RECRUITER_EMAIL || 'hr@company.com',
+        cc_emails: data.email_cc_addresses || [],
+      };
+
+      const emailResponse = await fetch(n8nWebhookUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          offerId: data.id,
-          candidateEmail: data.resume_pool.email,
-          candidateName: `${data.resume_pool.first_name} ${data.resume_pool.last_name}`,
-          jobTitle: data.job.title,
-          companyName: data.job.company,
-          salaryAmount: data.salary_amount,
-          salaryCurrency: data.salary_currency,
-          bonusAmount: data.bonus_amount,
-          bonusDescription: data.bonus_description,
-          benefits: data.benefits,
-          reportsTo: data.reports_to,
-          insuranceDetails: data.insurance_details,
-          offerDate: data.offer_date,
-          expiryDate: data.expiry_date,
-          pdfUrl: data.pdf_file_url,
-          ccEmails: data.email_cc_addresses,
-        }),
+        body: JSON.stringify(webhookData),
       });
 
       if (!emailResponse.ok) {
-        throw new Error('Failed to send offer email');
+        const errorText = await emailResponse.text();
+        console.error('N8N webhook error:', errorText);
+        throw new Error('Failed to send offer email via webhook');
       }
 
       return data;

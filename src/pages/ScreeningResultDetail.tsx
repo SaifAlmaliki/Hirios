@@ -313,6 +313,7 @@ const ScreeningResultDetail = () => {
                 companyAddress={companyProfile?.address}
                 companyPhone={companyProfile?.phone}
                 logoUrl={companyProfile?.logo_url}
+                companyId={companyProfile?.id}
               />
             )}
 

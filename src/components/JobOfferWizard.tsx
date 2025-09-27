@@ -45,6 +45,7 @@ interface JobOfferWizardProps {
   companyAddress?: string;
   companyPhone?: string;
   logoUrl?: string;
+  companyId?: string;
 }
 
 const STEPS = [
@@ -66,6 +67,7 @@ export const JobOfferWizard: React.FC<JobOfferWizardProps> = ({
   companyAddress,
   companyPhone,
   logoUrl,
+  companyId,
 }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<OfferFormData>({
@@ -166,7 +168,7 @@ export const JobOfferWizard: React.FC<JobOfferWizardProps> = ({
         offer_id: offerId,
       };
 
-      const { fileUrl } = await generateAndUploadOfferPDF(pdfData);
+      const { fileUrl } = await generateAndUploadOfferPDF(pdfData, companyId || 'default');
 
       // Send offer
       await sendOfferMutation.mutateAsync({

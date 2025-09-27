@@ -141,11 +141,15 @@ export const OfferPDFDocument: React.FC<OfferPDFDocumentProps> = ({ data }) => {
 
   // Format date
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
+    try {
+      return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+    } catch {
+      return 'Invalid Date';
+    }
   };
 
   return (
@@ -155,11 +159,11 @@ export const OfferPDFDocument: React.FC<OfferPDFDocumentProps> = ({ data }) => {
         <View style={styles.header}>
           <View style={styles.logo} />
           <View style={styles.companyInfo}>
-            <Text style={styles.companyName}>{data.company_name}</Text>
-            {data.company_address && (
+            <Text style={styles.companyName}>{data.company_name || 'Company Name'}</Text>
+            {data.company_address && data.company_address.trim() && data.company_address.trim().length > 0 && (
               <Text style={styles.companyAddress}>{data.company_address}</Text>
             )}
-            {data.company_phone && (
+            {data.company_phone && data.company_phone.trim() && data.company_phone.trim().length > 0 && (
               <Text style={styles.companyAddress}>{data.company_phone}</Text>
             )}
           </View>
@@ -170,9 +174,9 @@ export const OfferPDFDocument: React.FC<OfferPDFDocumentProps> = ({ data }) => {
 
         {/* Candidate Information */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Dear {data.candidate_name},</Text>
+          <Text style={styles.sectionTitle}>Dear {data.candidate_name || 'Candidate'},</Text>
           <Text style={styles.content}>
-            We are pleased to offer you the position of <Text style={styles.highlight}>{data.job_title}</Text> at {data.company_name}. 
+            We are pleased to offer you the position of <Text style={styles.highlight}>{data.job_title || 'Position'}</Text> at {data.company_name || 'our company'}. 
             We are excited about the possibility of you joining our team and contributing to our continued success.
           </Text>
         </View>
@@ -199,10 +203,10 @@ export const OfferPDFDocument: React.FC<OfferPDFDocumentProps> = ({ data }) => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Position Details</Text>
           <Text style={styles.content}>
-            <Text style={styles.highlight}>Position:</Text> {data.job_title}
+            <Text style={styles.highlight}>Position:</Text> {data.job_title || 'Position'}
           </Text>
           <Text style={styles.content}>
-            <Text style={styles.highlight}>Reports to:</Text> {data.reports_to}
+            <Text style={styles.highlight}>Reports to:</Text> {data.reports_to || 'To be determined'}
           </Text>
           <Text style={styles.content}>
             <Text style={styles.highlight}>Start Date:</Text> To be discussed
@@ -212,8 +216,8 @@ export const OfferPDFDocument: React.FC<OfferPDFDocumentProps> = ({ data }) => {
         {/* Benefits */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Benefits & Compensation</Text>
-          <Text style={styles.content}>{data.benefits}</Text>
-          {data.insurance_details && (
+          <Text style={styles.content}>{data.benefits || 'Standard company benefits apply'}</Text>
+          {data.insurance_details && data.insurance_details.trim() && data.insurance_details.trim().length > 0 && (
             <Text style={styles.content}>
               <Text style={styles.highlight}>Insurance:</Text> {data.insurance_details}
             </Text>
