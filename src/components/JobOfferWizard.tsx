@@ -89,6 +89,26 @@ export const JobOfferWizard: React.FC<JobOfferWizardProps> = ({
   const sendOfferMutation = useSendJobOffer();
   const { data: existingOffer } = useJobOffer(resumePoolId, jobId);
 
+  // Pre-populate form with existing offer data when editing
+  React.useEffect(() => {
+    if (existingOffer) {
+      setFormData({
+        salary_amount: existingOffer.salary_amount || 0,
+        salary_currency: existingOffer.salary_currency || 'USD',
+        bonus_amount: existingOffer.bonus_amount || undefined,
+        bonus_description: existingOffer.bonus_description || '',
+        benefits: existingOffer.benefits || '',
+        reports_to: existingOffer.reports_to || '',
+        insurance_details: existingOffer.insurance_details || '',
+        expiry_period_days: existingOffer.expiry_date 
+          ? Math.ceil((new Date(existingOffer.expiry_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
+          : 14,
+        email_cc_addresses: existingOffer.email_cc_addresses || [],
+      });
+      setCcEmailsInput((existingOffer.email_cc_addresses || []).join(', '));
+    }
+  }, [existingOffer]);
+
   const updateFormData = (updates: Partial<OfferFormData>) => {
     setFormData(prev => ({ ...prev, ...updates }));
   };
@@ -177,8 +197,8 @@ export const JobOfferWizard: React.FC<JobOfferWizardProps> = ({
       });
 
       toast({
-        title: 'Offer Sent Successfully',
-        description: `Job offer has been sent to ${candidateName}`,
+        title: existingOffer ? 'Offer Updated Successfully' : 'Offer Sent Successfully',
+        description: `Job offer has been ${existingOffer ? 'updated and resent' : 'sent'} to ${candidateName}`,
       });
 
       onClose();
@@ -417,10 +437,10 @@ export const JobOfferWizard: React.FC<JobOfferWizardProps> = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            Create Job Offer
+            {existingOffer ? 'Edit Job Offer' : 'Create Job Offer'}
           </DialogTitle>
           <DialogDescription>
-            Create and send a job offer to {candidateName} for the {jobTitle} position
+            {existingOffer ? 'Update and resend' : 'Create and send'} a job offer to {candidateName} for the {jobTitle} position
           </DialogDescription>
         </DialogHeader>
 
@@ -502,7 +522,7 @@ export const JobOfferWizard: React.FC<JobOfferWizardProps> = ({
                 ) : (
                   <>
                     <Send className="h-4 w-4" />
-                    Send Offer
+                    {existingOffer ? 'Update & Resend Offer' : 'Send Offer'}
                   </>
                 )}
               </Button>

@@ -210,17 +210,28 @@ export const CandidateStatusManager: React.FC<CandidateStatusManagerProps> = ({
                       )}
                       <p><strong>Expires:</strong> {format(new Date(jobOffer.expiry_date), 'MMM dd, yyyy')}</p>
                     </div>
-                    {jobOffer.pdf_file_url && (
+                    <div className="flex gap-2">
+                      {jobOffer.pdf_file_url && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => window.open(jobOffer.pdf_file_url, '_blank')}
+                          className="flex items-center gap-2"
+                        >
+                          <FileText className="h-4 w-4" />
+                          View Offer PDF
+                        </Button>
+                      )}
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => window.open(jobOffer.pdf_file_url, '_blank')}
+                        onClick={() => setShowOfferWizard(true)}
                         className="flex items-center gap-2"
                       >
-                        <FileText className="h-4 w-4" />
-                        View Offer PDF
+                        <Edit3 className="h-4 w-4" />
+                        Edit Offer
                       </Button>
-                    )}
+                    </div>
                   </div>
                 ) : (
                   <div className="space-y-3">
