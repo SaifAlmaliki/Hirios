@@ -1,4 +1,4 @@
-import { renderToBuffer } from '@react-pdf/renderer';
+import { pdf } from '@react-pdf/renderer';
 import { OfferPDFData } from '@/types/jobOffers';
 import React from 'react';
 
@@ -6,8 +6,7 @@ import React from 'react';
 export const generateOfferPDF = async (data: OfferPDFData): Promise<Blob> => {
   const { OfferPDFDocument } = await import('@/components/OfferPDFDocument');
   const doc = React.createElement(OfferPDFDocument, { data });
-  const buffer = await renderToBuffer(doc as any);
-  return new Blob([new Uint8Array(buffer)], { type: 'application/pdf' });
+  return await pdf(doc as any).toBlob();
 };
 
 // Upload PDF to Supabase Storage

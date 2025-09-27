@@ -337,6 +337,7 @@ export const JobOfferWizard: React.FC<JobOfferWizardProps> = ({
               <h4 className="font-semibold text-blue-900 mb-2">Offer Summary</h4>
               <div className="space-y-2 text-sm">
                 <p><strong>Candidate:</strong> {candidateName}</p>
+                <p><strong>Email:</strong> {candidateEmail}</p>
                 <p><strong>Position:</strong> {jobTitle}</p>
                 <p><strong>Company:</strong> {companyName}</p>
                 <p><strong>Salary:</strong> {formData.salary_currency} {formData.salary_amount?.toLocaleString()}</p>

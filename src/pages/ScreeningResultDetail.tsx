@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { useScreeningResults, useUpdateFavoriteStatus, useUpdateDismissStatus, ScreeningResult } from '@/hooks/useScreeningResults';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCompanyProfile } from '@/hooks/useCompanyProfile';
 import { VoiceInterviewService } from '@/services/voiceInterviewService';
 import { useToast } from '@/hooks/use-toast';
 import ScreeningResultActions from '@/components/ScreeningResultActions';
@@ -105,6 +106,7 @@ const ScreeningResultDetail = () => {
   const updateDismissMutation = useUpdateDismissStatus();
   
   const { data: screeningResults, isLoading, error } = useScreeningResults();
+  const { data: companyProfile } = useCompanyProfile();
   
   const result = screeningResults?.find(r => r.id === id);
 
@@ -306,6 +308,11 @@ const ScreeningResultDetail = () => {
                 jobId={result.job_id}
                 candidateName={`${result.first_name} ${result.last_name}`}
                 candidateEmail={result.email}
+                jobTitle={result.job?.title}
+                companyName={companyProfile?.company_name || result.job?.company}
+                companyAddress={companyProfile?.address}
+                companyPhone={companyProfile?.phone}
+                logoUrl={companyProfile?.logo_url}
               />
             )}
 
