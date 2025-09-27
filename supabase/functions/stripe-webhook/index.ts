@@ -58,29 +58,17 @@ serve(async (req) => {
         
         // Extract metadata
         const userId = session.metadata?.userId
-        const packageId = session.metadata?.packageId
-        const points = parseInt(session.metadata?.points || '0')
         
-        if (!userId || !packageId || !points) {
-          console.error('❌ Missing metadata in session:', session.metadata)
-          return new Response('Missing metadata', { status: 400 })
+        if (!userId) {
+          console.error('❌ Missing userId in session metadata:', session.metadata)
+          return new Response('Missing userId', { status: 400 })
         }
 
-        // Add points to user account
-        const { data: addPointsResult, error: addPointsError } = await supabaseClient.rpc('add_points', {
-          target_user_id: userId,
-          points_to_add: points,
-          transaction_type: 'purchase',
-          description: `Purchased ${points} points via Stripe (Session: ${session.id})`,
-          reference_id: session.id
-        })
-
-        if (addPointsError) {
-          console.error('❌ Failed to add points:', addPointsError)
-          return new Response('Failed to add points', { status: 500 })
-        }
-
-        console.log('✅ Points added successfully:', points, 'for user:', userId)
+        // TODO: Add your custom logic here for handling successful payments
+        // For example, you might want to update user subscription status, 
+        // send confirmation emails, or trigger other business logic
+        
+        console.log('✅ Payment processed successfully for user:', userId)
         break
       }
 

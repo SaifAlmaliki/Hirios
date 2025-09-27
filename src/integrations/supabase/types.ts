@@ -384,103 +384,6 @@ export type Database = {
           }
         ]
       }
-      user_points: {
-        Row: {
-          id: string
-          user_id: string
-          points_balance: number
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          user_id: string
-          points_balance?: number
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          user_id?: string
-          points_balance?: number
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_points_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      point_transactions: {
-        Row: {
-          id: string
-          user_id: string
-          transaction_type: string
-          points: number
-          description: string
-          reference_id: string | null
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          user_id: string
-          transaction_type: string
-          points: number
-          description: string
-          reference_id?: string | null
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          user_id?: string
-          transaction_type?: string
-          points?: number
-          description?: string
-          reference_id?: string | null
-          created_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "point_transactions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      point_packages: {
-        Row: {
-          id: string
-          name: string
-          points: number
-          price_cents: number
-          is_active: boolean
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          name: string
-          points: number
-          price_cents: number
-          is_active?: boolean
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          name?: string
-          points?: number
-          price_cents?: number
-          is_active?: boolean
-          created_at?: string
-        }
-        Relationships: []
-      }
       resume_pool: {
         Row: {
           id: string
@@ -651,37 +554,111 @@ export type Database = {
           }
         ]
       }
+      job_offers: {
+        Row: {
+          id: string
+          resume_pool_id: string
+          job_id: string
+          salary_amount: number
+          salary_currency: string
+          bonus_amount: number | null
+          bonus_description: string | null
+          benefits: string
+          reports_to: string
+          insurance_details: string | null
+          offer_status: string
+          offer_date: string
+          expiry_date: string
+          expiry_period_days: number
+          pdf_file_path: string | null
+          pdf_file_url: string | null
+          email_cc_addresses: string[] | null
+          created_by_user_id: string
+          sent_at: string | null
+          responded_at: string | null
+          response_comment: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          resume_pool_id: string
+          job_id: string
+          salary_amount: number
+          salary_currency?: string
+          bonus_amount?: number | null
+          bonus_description?: string | null
+          benefits: string
+          reports_to: string
+          insurance_details?: string | null
+          offer_status?: string
+          offer_date?: string
+          expiry_date?: string
+          expiry_period_days?: number
+          pdf_file_path?: string | null
+          pdf_file_url?: string | null
+          email_cc_addresses?: string[] | null
+          created_by_user_id: string
+          sent_at?: string | null
+          responded_at?: string | null
+          response_comment?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          resume_pool_id?: string
+          job_id?: string
+          salary_amount?: number
+          salary_currency?: string
+          bonus_amount?: number | null
+          bonus_description?: string | null
+          benefits?: string
+          reports_to?: string
+          insurance_details?: string | null
+          offer_status?: string
+          offer_date?: string
+          expiry_date?: string
+          expiry_period_days?: number
+          pdf_file_path?: string | null
+          pdf_file_url?: string | null
+          email_cc_addresses?: string[] | null
+          created_by_user_id?: string
+          sent_at?: string | null
+          responded_at?: string | null
+          response_comment?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_offers_resume_pool_id_fkey"
+            columns: ["resume_pool_id"]
+            isOneToOne: false
+            referencedRelation: "resume_pool"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_offers_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_offers_created_by_user_id_fkey"
+            columns: ["created_by_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      add_points: {
-        Args: {
-          target_user_id: string
-          points_to_add: number
-          transaction_type: string
-          description: string
-          reference_id?: string | null
-        }
-        Returns: boolean
-      }
-      deduct_points: {
-        Args: {
-          target_user_id: string
-          points_to_deduct: number
-          transaction_type: string
-          description: string
-          reference_id?: string | null
-        }
-        Returns: boolean
-      }
-      get_user_points: {
-        Args: {
-          target_user_id: string
-        }
-        Returns: number
-      }
     }
     Enums: {
       [_ in never]: never

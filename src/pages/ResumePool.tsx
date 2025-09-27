@@ -24,6 +24,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useResumePool, useDeleteResumeFromPool, useBulkDeleteResumes, useDownloadResume, ResumePoolItem } from '@/hooks/useResumePool';
+import { useGlobalResumePoolStatusBadges } from '@/hooks/useCandidateStatus';
 import ResumePoolUpload from '@/components/ResumePoolUpload';
 import ResumeRow from '@/components/ResumeRow';
 import { useToast } from '@/hooks/use-toast';
@@ -44,6 +45,10 @@ const ResumePool = () => {
   const bulkDeleteMutation = useBulkDeleteResumes();
   const downloadResumeMutation = useDownloadResume();
   const { toast } = useToast();
+
+  // Get global status badges for all resumes across all jobs
+  const resumeIds = resumes.map(r => r.id);
+  const { data: globalStatusBadges = {} } = useGlobalResumePoolStatusBadges(resumeIds);
 
   // Filter and sort resumes
   const filteredAndSortedResumes = useMemo(() => {
@@ -365,6 +370,7 @@ const ResumePool = () => {
                       onSelect={handleSelectResume}
                       onDownload={handleDownloadResume}
                       onDelete={handleDeleteResume}
+                      globalStatus={globalStatusBadges[resume.id]}
                     />
                   ))}
                 </div>

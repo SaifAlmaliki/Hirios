@@ -12,7 +12,9 @@ import {
   Calendar,
   ChevronDown,
   ChevronUp,
-  Edit3
+  Edit3,
+  Gift,
+  FileText
 } from 'lucide-react';
 import { 
   useCandidateStatus, 
@@ -21,7 +23,10 @@ import {
   useAddCandidateComment,
   CandidateStatus 
 } from '@/hooks/useCandidateStatus';
+import { useJobOffer } from '@/hooks/useJobOffers';
+import { useDownloadOffer } from '@/hooks/useDownload';
 import { StatusBadge } from '@/components/ui/StatusBadge';
+import { JobOfferWizard } from '@/components/JobOfferWizard';
 import { format } from 'date-fns';
 
 interface InlineCandidateStatusManagerProps {
@@ -29,25 +34,40 @@ interface InlineCandidateStatusManagerProps {
   jobId: string;
   candidateName: string;
   candidateEmail: string;
+  jobTitle?: string;
+  companyName?: string;
+  companyAddress?: string;
+  companyPhone?: string;
+  logoUrl?: string;
+  companyId?: string;
 }
 
 export const InlineCandidateStatusManager: React.FC<InlineCandidateStatusManagerProps> = ({
   resumePoolId,
   jobId,
   candidateName,
-  candidateEmail
+  candidateEmail,
+  jobTitle,
+  companyName,
+  companyAddress,
+  companyPhone,
+  logoUrl,
+  companyId
 }) => {
   const [newComment, setNewComment] = useState('');
   const [showComments, setShowComments] = useState(true);
   const [isEditingStatus, setIsEditingStatus] = useState(false);
+  const [showOfferWizard, setShowOfferWizard] = useState(false);
 
   // Fetch current status and comments
   const { data: currentStatus, isLoading: statusLoading } = useCandidateStatus(resumePoolId, jobId);
   const { data: comments, isLoading: commentsLoading } = useCandidateComments(resumePoolId, jobId);
+  const { data: jobOffer } = useJobOffer(resumePoolId, jobId);
 
   // Mutations
   const updateStatusMutation = useUpdateCandidateStatus();
   const addCommentMutation = useAddCandidateComment();
+  const downloadOfferMutation = useDownloadOffer();
 
   const handleStatusChange = (newStatus: CandidateStatus) => {
     updateStatusMutation.mutate({
@@ -73,6 +93,30 @@ export const InlineCandidateStatusManager: React.FC<InlineCandidateStatusManager
         setNewComment('');
       }
     });
+  };
+
+  const handleDownloadOffer = (offer: any) => {
+    if (!offer.pdf_file_url) return;
+    
+    // Extract filename from the offer data
+    const candidateName = `${offer.resume_pool?.first_name || 'Candidate'}_${offer.resume_pool?.last_name || 'Name'}`;
+    const jobTitle = offer.job?.title?.replace(/\s+/g, '_') || 'Position';
+    const filename = `Job_Offer_${candidateName}_${jobTitle}.pdf`;
+    
+    // Extract storage path from the PDF URL
+    // The URL format is: https://...supabase.co/storage/v1/object/public/company_uploads/{path}
+    const urlParts = offer.pdf_file_url.split('/company_uploads/');
+    const storagePath = urlParts.length > 1 ? urlParts[1] : '';
+    
+    if (storagePath) {
+      downloadOfferMutation.mutate({
+        storagePath,
+        filename
+      });
+    } else {
+      // Fallback: open the URL directly
+      window.open(offer.pdf_file_url, '_blank');
+    }
   };
 
   const statusOptions: { value: CandidateStatus; label: string }[] = [
@@ -146,6 +190,77 @@ export const InlineCandidateStatusManager: React.FC<InlineCandidateStatusManager
             </div>
           )}
         </div>
+
+        {/* Job Offer Section */}
+        {currentStatus?.status === 'accepted' && (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h4 className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <Gift className="h-4 w-4" />
+                Job Offer
+              </h4>
+            </div>
+
+            {jobOffer ? (
+              <div className="space-y-3 p-3 bg-gray-50 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <Badge variant={jobOffer.offer_status === 'sent' ? 'default' : 'secondary'}>
+                    {jobOffer.offer_status}
+                  </Badge>
+                  <span className="text-xs text-gray-500">
+                    {jobOffer.offer_status === 'sent' 
+                      ? `Sent ${format(new Date(jobOffer.sent_at!), 'MMM dd, yyyy')}`
+                      : `Created ${format(new Date(jobOffer.created_at), 'MMM dd, yyyy')}`
+                    }
+                  </span>
+                </div>
+                <div className="text-xs text-gray-700">
+                  <p><strong>Salary:</strong> {jobOffer.salary_currency} {jobOffer.salary_amount.toLocaleString()}</p>
+                  {jobOffer.bonus_amount && (
+                    <p><strong>Bonus:</strong> {jobOffer.salary_currency} {jobOffer.bonus_amount.toLocaleString()}</p>
+                  )}
+                  <p><strong>Expires:</strong> {format(new Date(jobOffer.expiry_date), 'MMM dd, yyyy')}</p>
+                </div>
+                <div className="flex gap-2">
+                  {jobOffer.pdf_file_url && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleDownloadOffer(jobOffer)}
+                      className="flex items-center gap-2 text-xs"
+                    >
+                      <FileText className="h-3 w-3" />
+                      View PDF
+                    </Button>
+                  )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowOfferWizard(true)}
+                    className="flex items-center gap-2 text-xs"
+                  >
+                    <Edit3 className="h-3 w-3" />
+                    Edit Offer
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-3 p-3 bg-blue-50 rounded-lg">
+                <p className="text-xs text-blue-700">
+                  This candidate has been accepted. Create a job offer to proceed.
+                </p>
+                <Button
+                  onClick={() => setShowOfferWizard(true)}
+                  size="sm"
+                  className="flex items-center gap-2 text-xs"
+                >
+                  <Gift className="h-3 w-3" />
+                  Create Offer
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Comments Section */}
         <div className="space-y-3">
@@ -227,6 +342,24 @@ export const InlineCandidateStatusManager: React.FC<InlineCandidateStatusManager
           )}
         </div>
       </CardContent>
+
+      {/* Job Offer Wizard */}
+      {showOfferWizard && (
+        <JobOfferWizard
+          isOpen={showOfferWizard}
+          onClose={() => setShowOfferWizard(false)}
+          resumePoolId={resumePoolId}
+          jobId={jobId}
+          candidateName={candidateName}
+          candidateEmail={candidateEmail}
+          jobTitle={jobTitle || 'Position'}
+          companyName={companyName || 'Company'}
+          companyAddress={companyAddress}
+          companyPhone={companyPhone}
+          logoUrl={logoUrl}
+          companyId={companyId}
+        />
+      )}
     </Card>
   );
 };

@@ -20,6 +20,7 @@ import {
 import { useResumePool, ResumePoolItem } from '@/hooks/useResumePool';
 import { useGlobalResumePoolStatusBadges } from '@/hooks/useCandidateStatus';
 import { GlobalStatusBadge } from '@/components/ui/StatusBadge';
+import { normalizeSkills } from '@/lib/skillsUtils';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
@@ -461,19 +462,22 @@ const ResumePoolSelector: React.FC<ResumePoolSelectorProps> = ({
                               </div>
 
                               {/* Skills */}
-                              {resume.skills && resume.skills.length > 0 && (
-                                <div className="flex flex-wrap gap-1 mb-2">
-                                  {resume.skills.map((skill, index) => (
-                                    <Badge
-                                      key={index}
-                                      variant="outline"
-                                      className="text-xs bg-gray-50 text-gray-700 border-gray-200"
-                                    >
-                                      {skill}
-                                    </Badge>
-                                  ))}
-                                </div>
-                              )}
+                              {(() => {
+                                const normalizedSkills = normalizeSkills(resume.skills);
+                                return normalizedSkills.length > 0 && (
+                                  <div className="flex flex-wrap gap-1 mb-2">
+                                    {normalizedSkills.map((skill, index) => (
+                                      <Badge
+                                        key={index}
+                                        variant="outline"
+                                        className="text-xs bg-gray-50 text-gray-700 border-gray-200"
+                                      >
+                                        {skill}
+                                      </Badge>
+                                    ))}
+                                  </div>
+                                );
+                              })()}
 
                               {/* Basic Info */}
                               <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-500">

@@ -12,7 +12,9 @@ import {
   User, 
   Calendar,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  FileText,
+  Gift
 } from 'lucide-react';
 import { 
   useCandidateStatus, 
@@ -21,7 +23,10 @@ import {
   useAddCandidateComment,
   CandidateStatus 
 } from '@/hooks/useCandidateStatus';
+import { useJobOffer } from '@/hooks/useJobOffers';
+import { useDownloadOffer } from '@/hooks/useDownload';
 import { StatusBadge } from '@/components/ui/StatusBadge';
+import { JobOfferWizard } from '@/components/JobOfferWizard';
 import { format } from 'date-fns';
 
 interface CandidateStatusManagerProps {
@@ -29,6 +34,11 @@ interface CandidateStatusManagerProps {
   jobId: string;
   candidateName: string;
   candidateEmail: string;
+  jobTitle?: string;
+  companyName?: string;
+  companyAddress?: string;
+  companyPhone?: string;
+  logoUrl?: string;
   trigger?: React.ReactNode;
 }
 
@@ -37,19 +47,27 @@ export const CandidateStatusManager: React.FC<CandidateStatusManagerProps> = ({
   jobId,
   candidateName,
   candidateEmail,
+  jobTitle,
+  companyName,
+  companyAddress,
+  companyPhone,
+  logoUrl,
   trigger
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [newComment, setNewComment] = useState('');
   const [showComments, setShowComments] = useState(false);
+  const [showOfferWizard, setShowOfferWizard] = useState(false);
 
   // Fetch current status and comments
   const { data: currentStatus, isLoading: statusLoading } = useCandidateStatus(resumePoolId, jobId);
   const { data: comments, isLoading: commentsLoading } = useCandidateComments(resumePoolId, jobId);
+  const { data: jobOffer } = useJobOffer(resumePoolId, jobId);
 
   // Mutations
   const updateStatusMutation = useUpdateCandidateStatus();
   const addCommentMutation = useAddCandidateComment();
+  const downloadOfferMutation = useDownloadOffer();
 
   const handleStatusChange = (newStatus: CandidateStatus) => {
     updateStatusMutation.mutate({
@@ -71,6 +89,30 @@ export const CandidateStatusManager: React.FC<CandidateStatusManagerProps> = ({
         setNewComment('');
       }
     });
+  };
+
+  const handleDownloadOffer = (offer: any) => {
+    if (!offer.pdf_file_url) return;
+    
+    // Extract filename from the offer data
+    const candidateName = `${offer.resume_pool?.first_name || 'Candidate'}_${offer.resume_pool?.last_name || 'Name'}`;
+    const jobTitle = offer.job?.title?.replace(/\s+/g, '_') || 'Position';
+    const filename = `Job_Offer_${candidateName}_${jobTitle}.pdf`;
+    
+    // Extract storage path from the PDF URL
+    // The URL format is: https://...supabase.co/storage/v1/object/public/company_uploads/{path}
+    const urlParts = offer.pdf_file_url.split('/company_uploads/');
+    const storagePath = urlParts.length > 1 ? urlParts[1] : '';
+    
+    if (storagePath) {
+      downloadOfferMutation.mutate({
+        storagePath,
+        filename
+      });
+    } else {
+      // Fallback: open the URL directly
+      window.open(offer.pdf_file_url, '_blank');
+    }
   };
 
   const statusOptions: { value: CandidateStatus; label: string }[] = [
@@ -164,6 +206,77 @@ export const CandidateStatusManager: React.FC<CandidateStatusManagerProps> = ({
             </CardContent>
           </Card>
 
+          {/* Job Offer Section */}
+          {currentStatus?.status === 'accepted' && (
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Gift className="h-4 w-4" />
+                  Job Offer
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {jobOffer ? (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Badge variant={jobOffer.offer_status === 'sent' ? 'default' : 'secondary'}>
+                        {jobOffer.offer_status}
+                      </Badge>
+                      <span className="text-sm text-gray-500">
+                        {jobOffer.offer_status === 'sent' 
+                          ? `Sent ${format(new Date(jobOffer.sent_at!), 'MMM dd, yyyy')}`
+                          : `Created ${format(new Date(jobOffer.created_at), 'MMM dd, yyyy')}`
+                        }
+                      </span>
+                    </div>
+                    <div className="text-sm text-gray-700">
+                      <p><strong>Salary:</strong> {jobOffer.salary_currency} {jobOffer.salary_amount.toLocaleString()}</p>
+                      {jobOffer.bonus_amount && (
+                        <p><strong>Bonus:</strong> {jobOffer.salary_currency} {jobOffer.bonus_amount.toLocaleString()}</p>
+                      )}
+                      <p><strong>Expires:</strong> {format(new Date(jobOffer.expiry_date), 'MMM dd, yyyy')}</p>
+                    </div>
+                    <div className="flex gap-2">
+                      {jobOffer.pdf_file_url && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDownloadOffer(jobOffer)}
+                          className="flex items-center gap-2"
+                        >
+                          <FileText className="h-4 w-4" />
+                          View Offer PDF
+                        </Button>
+                      )}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowOfferWizard(true)}
+                        className="flex items-center gap-2"
+                      >
+                        <Edit3 className="h-4 w-4" />
+                        Edit Offer
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <p className="text-sm text-gray-600">
+                      This candidate has been accepted. Create a job offer to proceed with the hiring process.
+                    </p>
+                    <Button
+                      onClick={() => setShowOfferWizard(true)}
+                      className="flex items-center gap-2"
+                    >
+                      <Gift className="h-4 w-4" />
+                      Create Job Offer
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
           {/* Comments Section */}
           <Card>
             <CardHeader className="pb-3">
@@ -248,6 +361,23 @@ export const CandidateStatusManager: React.FC<CandidateStatusManagerProps> = ({
           </Card>
         </div>
       </DialogContent>
+
+      {/* Job Offer Wizard */}
+      {showOfferWizard && (
+        <JobOfferWizard
+          isOpen={showOfferWizard}
+          onClose={() => setShowOfferWizard(false)}
+          resumePoolId={resumePoolId}
+          jobId={jobId}
+          candidateName={candidateName}
+          candidateEmail={candidateEmail}
+          jobTitle={jobTitle || 'Position'}
+          companyName={companyName || 'Company'}
+          companyAddress={companyAddress}
+          companyPhone={companyPhone}
+          logoUrl={logoUrl}
+        />
+      )}
     </Dialog>
   );
 };
