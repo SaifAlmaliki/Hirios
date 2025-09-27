@@ -651,6 +651,106 @@ export type Database = {
           }
         ]
       }
+      job_offers: {
+        Row: {
+          id: string
+          resume_pool_id: string
+          job_id: string
+          salary_amount: number
+          salary_currency: string
+          bonus_amount: number | null
+          bonus_description: string | null
+          benefits: string
+          reports_to: string
+          insurance_details: string | null
+          offer_status: string
+          offer_date: string
+          expiry_date: string
+          expiry_period_days: number
+          pdf_file_path: string | null
+          pdf_file_url: string | null
+          email_cc_addresses: string[] | null
+          created_by_user_id: string
+          sent_at: string | null
+          responded_at: string | null
+          response_comment: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          resume_pool_id: string
+          job_id: string
+          salary_amount: number
+          salary_currency?: string
+          bonus_amount?: number | null
+          bonus_description?: string | null
+          benefits: string
+          reports_to: string
+          insurance_details?: string | null
+          offer_status?: string
+          offer_date?: string
+          expiry_date?: string
+          expiry_period_days?: number
+          pdf_file_path?: string | null
+          pdf_file_url?: string | null
+          email_cc_addresses?: string[] | null
+          created_by_user_id: string
+          sent_at?: string | null
+          responded_at?: string | null
+          response_comment?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          resume_pool_id?: string
+          job_id?: string
+          salary_amount?: number
+          salary_currency?: string
+          bonus_amount?: number | null
+          bonus_description?: string | null
+          benefits?: string
+          reports_to?: string
+          insurance_details?: string | null
+          offer_status?: string
+          offer_date?: string
+          expiry_date?: string
+          expiry_period_days?: number
+          pdf_file_path?: string | null
+          pdf_file_url?: string | null
+          email_cc_addresses?: string[] | null
+          created_by_user_id?: string
+          sent_at?: string | null
+          responded_at?: string | null
+          response_comment?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_offers_resume_pool_id_fkey"
+            columns: ["resume_pool_id"]
+            isOneToOne: false
+            referencedRelation: "resume_pool"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_offers_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_offers_created_by_user_id_fkey"
+            columns: ["created_by_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never
