@@ -427,15 +427,94 @@ FOR EACH ROW
 EXECUTE FUNCTION set_offer_expiry_date();
 ```
 
-## Recovery Instructions
+## Current Migration Files
 
-### Step 1: Create Database
+Your project now has the following migration files in `supabase/migrations/`:
+
+1. **`20250127000000_initial_schema.sql`** - Complete database schema including:
+   - All 10 tables with proper relationships
+   - All functions and triggers
+   - All RLS policies
+   - All indexes and constraints
+
+2. **`20250927182836_remove_points_system.sql`** - Removes points system:
+   - Drops `add_points()`, `deduct_points()`, `get_user_points()` functions
+   - Drops `user_points` and `point_transactions` tables (if they existed)
+
+**Note**: These migration files were created using `supabase db dump --schema public --file supabase/migrations/20250127000000_initial_schema.sql --linked`, which requires **Docker Desktop to be running**.
+
+## Deployment to New Supabase Project
+
+### Method 1: Using Supabase CLI (Recommended)
+
+This is the **professional and recommended approach** for deploying to a new Supabase project.
+
+#### Prerequisites
+- Supabase CLI installed
+- New empty Supabase project created
+- Project reference ID from your new Supabase dashboard
+- **Docker Desktop running** (required for `supabase db dump`, `supabase db push`, and `supabase db diff` commands)
+
+#### Step 1: Initialize New Project
+```bash
+# Create a new directory for your project
+mkdir hirios-new-project
+cd hirios-new-project
+
+# Initialize Supabase in the new directory
+supabase init
+
+# Link to your new Supabase project
+supabase link --project-ref YOUR_NEW_PROJECT_REF_ID
+```
+
+#### Step 2: Copy Migration Files
+Copy the migration files from your current project to the new project:
+```bash
+# Copy migrations directory
+cp -r /path/to/current/hirios/supabase/migrations ./supabase/
+
+# Copy functions directory
+cp -r /path/to/current/hirios/supabase/functions ./supabase/
+
+# Copy config.toml (update database version if needed)
+cp /path/to/current/hirios/supabase/config.toml ./supabase/
+```
+
+#### Step 3: Apply Migrations
+```bash
+# Apply all migrations to the new project
+supabase db push
+
+# Verify the deployment
+supabase db diff --schema public
+```
+
+#### Step 4: Deploy Edge Functions
+```bash
+# Deploy all functions
+supabase functions deploy send-invitation-email
+supabase functions deploy process-email-resumes
+supabase functions deploy check-expired-offers
+```
+
+#### Step 5: Generate Types
+```bash
+# Generate TypeScript types for the new project
+supabase gen types typescript --linked > src/integrations/supabase/types.ts
+```
+
+### Method 2: Manual Database Creation (Alternative)
+
+If you prefer to create the database manually or need to understand the schema structure:
+
+#### Step 1: Create Database
 ```sql
 -- Create the database (if not exists)
 CREATE DATABASE hirios;
 ```
 
-### Step 2: Enable Extensions
+#### Step 2: Enable Extensions
 ```sql
 -- Enable required extensions
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -559,8 +638,61 @@ CREATE POLICY "Users can update own company profile" ON company_profiles
 - Test full-text search functionality
 - Validate foreign key constraints
 
+## Quick Deployment Checklist
+
+### For New Supabase Project Deployment:
+
+- [ ] **Create new Supabase project** in dashboard
+- [ ] **Get project reference ID** from project settings
+- [ ] **Initialize new project** with `supabase init`
+- [ ] **Link to new project** with `supabase link --project-ref <ID>`
+- [ ] **Copy migration files** from current project
+- [ ] **Copy functions directory** from current project
+- [ ] **Copy config.toml** (update database version if needed)
+- [ ] **Apply migrations** with `supabase db push`
+- [ ] **Deploy Edge Functions** with `supabase functions deploy`
+- [ ] **Generate TypeScript types** with `supabase gen types typescript --linked`
+- [ ] **Test database connection** and verify all tables exist
+- [ ] **Test Edge Functions** are working correctly
+
+### Migration Files Available:
+- ✅ `20250127000000_initial_schema.sql` - Complete schema
+- ✅ `20250927182836_remove_points_system.sql` - Points system removal
+
+### Edge Functions Available:
+- ✅ `send-invitation-email` - Email invitation system
+- ✅ `process-email-resumes` - Email resume processing
+- ✅ `check-expired-offers` - Offer expiry management
+
+### Troubleshooting
+
+#### Docker Desktop Issues
+If you encounter Docker-related errors:
+```bash
+# Error: "Docker Desktop is a prerequisite for local development"
+# Solution: Install and start Docker Desktop
+
+# Alternative: Use the existing migration files
+# The migration files are already created and ready to use
+# No need to run supabase db dump again
+```
+
+#### Migration Application Issues
+If `supabase db push` fails:
+```bash
+# Check if Docker is running
+docker --version
+
+# Verify project is linked
+supabase status
+
+# Check migration files exist
+ls supabase/migrations/
+```
+
 ---
 
 **Last Updated**: January 2025
 **Schema Version**: 1.0
 **Database**: PostgreSQL (Supabase)
+**Migration System**: Supabase CLI
