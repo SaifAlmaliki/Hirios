@@ -29,14 +29,11 @@ Hirios is a comprehensive AI-powered B2B recruitment platform designed exclusive
 - **Real-Time Collaboration**: Team members can work together on candidate evaluation and job management
 - **Invitation Tracking**: Track who invited whom and when for audit purposes
 
-### Points & Payment System
-- **Point Packages**: Pre-defined point packages available for purchase
-- **Transaction Tracking**: Complete history of all points earned and spent
-- **User Balance Management**: Real-time points balance tracking for each user
-- **Reference Linking**: Points transactions linked to specific actions (job postings, screenings, etc.)
-- **Flexible Pricing**: Support for different point packages with varying prices
-- **Transaction Types**: Categorized transactions (purchase, earned, spent, etc.)
-- **Audit Trail**: Complete audit trail for all points-related activities
+### Payment System
+- **Flexible Pricing**: Custom pricing options based on company needs and volume
+- **Stripe Integration**: Secure payment processing with Stripe
+- **Subscription Management**: Track company subscription plans and usage
+- **Audit Trail**: Complete audit trail for all payment-related activities
 
 ### AI & RAG System
 - **Vector Search**: AI-powered semantic search using embeddings
@@ -52,7 +49,7 @@ Hirios is a comprehensive AI-powered B2B recruitment platform designed exclusive
 - **Full-text Search**: GIN-indexed resume text search for efficient candidate discovery
 - **Vector Search**: AI-powered semantic search using embeddings for document retrieval
 - **Subscription Management**: Track company subscription plans and monthly job posting limits
-- **Points System**: Complete points-based payment and transaction tracking
+- **Payment System**: Flexible pricing with Stripe integration
 - **AI Screening**: Comprehensive candidate evaluation with voice interview capabilities
 - **RAG Integration**: Retrieval-Augmented Generation for AI-powered document processing
 - **Responsive UI**: Modern design using shadcn/ui components with Aurora backgrounds
@@ -245,37 +242,9 @@ Hirios is a comprehensive AI-powered B2B recruitment platform designed exclusive
   - `created_at` (TIMESTAMPTZ, Default: now())
   - `updated_at` (TIMESTAMPTZ, Default: now())
 
-### Points & Payment System
+### Payment System
 
-#### `point_packages`
-- **Purpose**: Available point packages for purchase
-- **Fields**:
-  - `id` (UUID, Primary Key, Default: gen_random_uuid())
-  - `name` (TEXT)
-  - `points` (INTEGER)
-  - `price_cents` (INTEGER)
-  - `is_active` (BOOLEAN, Default: true)
-  - `created_at` (TIMESTAMPTZ, Default: now())
-
-#### `point_transactions`
-- **Purpose**: Points transaction history and tracking
-- **Fields**:
-  - `id` (UUID, Primary Key, Default: gen_random_uuid())
-  - `user_id` (UUID, FK to auth.users)
-  - `points` (INTEGER, positive for earned, negative for spent)
-  - `transaction_type` (TEXT)
-  - `description` (TEXT)
-  - `reference_id` (UUID, FK to related records)
-  - `created_at` (TIMESTAMPTZ, Default: now())
-
-#### `user_points`
-- **Purpose**: Current points balance for each user
-- **Fields**:
-  - `id` (UUID, Primary Key, Default: gen_random_uuid())
-  - `user_id` (UUID, FK to auth.users, Unique)
-  - `points_balance` (INTEGER, Default: 0)
-  - `created_at` (TIMESTAMPTZ, Default: now())
-  - `updated_at` (TIMESTAMPTZ, Default: now())
+The application uses Stripe for payment processing with flexible pricing options based on company needs and usage volume.
 
 
 ### Storage Buckets
@@ -285,7 +254,7 @@ Hirios is a comprehensive AI-powered B2B recruitment platform designed exclusive
 - **Full-text Search**: Applications table includes GIN index on `resume_text` for efficient text searching
 - **Subscription Management**: Company profiles track subscription plans and monthly job posting limits
 - **Team Collaboration**: Job collaborators and invitations enable multi-user access to specific job postings
-- **Points System**: Complete points-based payment and transaction tracking system
+- **Payment System**: Flexible pricing with Stripe integration system
 - **AI Screening**: Comprehensive screening results with voice interview capabilities
 - **Resume Processing**: Applications store both file URLs and extracted text content for AI processing
 
@@ -437,8 +406,8 @@ Defined in `src/App.tsx` using React Router:
 - `/company-setup` → `CompanySetup`
 - `/screening-results` → `ScreeningResults` (AI screening dashboard)
 - `/interview/:screeningResultId/:applicationId` → `VoiceInterview`
-- `/points-purchase` → `PointsPurchase`
-- `/points-history` → `PointsHistory`
+- `/payment-success` → Payment success page
+- `/payment-canceled` → Payment canceled page
 - `/resume-pool` → `ResumePool` (centralized resume management)
 - `/invite-accept` → `InviteAccept` (collaboration invitations)
 - `*` → `NotFound`
@@ -470,17 +439,11 @@ Defined in `src/App.tsx` using React Router:
 6. All team members can view and manage applications for their assigned jobs
 7. Real-time collaboration updates via React Query invalidation
 
-### Points & Payment Flow
-1. Users can purchase point packages from `point_packages`
-2. Point transactions recorded in `point_transactions` with:
-   - Transaction type and description
-   - Reference to related actions (job posting, screening, etc.)
-   - Positive points for purchases, negative for usage
-3. User balance updated in `user_points` table
-4. Points can be spent on premium features like:
-   - Additional job postings
-   - AI screening services
-   - Voice interview features
+### Payment Flow
+1. Users can initiate payments through Stripe checkout sessions
+2. Payment processing handled by Stripe webhooks
+3. Successful payments trigger custom business logic
+4. Payment history and subscription management through Stripe dashboard
 
 ### Resume Pool Flow
 1. Company users upload resumes to centralized pool via `/resume-pool` route

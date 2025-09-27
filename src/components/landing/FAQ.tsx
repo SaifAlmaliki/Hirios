@@ -17,7 +17,7 @@ const FAQ = () => {
   const faqData = [
     {
       question: "How does the pricing work?",
-      answer: "Hirios uses a point-based system perfect for B2B companies. it's pay-per-use: 1 point per resume screening and 2 points per voice interview. Companies purchase credit points and can buy more anytime. This flexible model means you only pay for what you use, making it cost-effective for any company size."
+      answer: "Hirios offers flexible pricing options perfect for B2B companies. Contact us for custom pricing based on your company's hiring needs and volume. We provide transparent, scalable pricing that grows with your business."
     },
     {
       question: "How does AI screening work?",
@@ -25,7 +25,7 @@ const FAQ = () => {
     },
     {
       question: "What file formats and integrations do you support?",
-      answer: "We support PDF resume uploads and are open to integrating with enterprise ATS systems like Workday and Greenhouse. You can bulk upload resumes from LinkedIn job posts with one simple step. There's no limit on the number of resumes you can process - you're only charged based on usage (1 point per resume)."
+      answer: "We support PDF resume uploads and are open to integrating with enterprise ATS systems like Workday and Greenhouse. You can bulk upload resumes from LinkedIn job posts with one simple step. Contact us to discuss volume limits and processing capabilities for your specific needs."
     },
     {
       question: "How accurate is the AI and can it handle different languages?",

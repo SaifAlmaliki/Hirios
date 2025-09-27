@@ -44,9 +44,9 @@ serve(async (req) => {
     }
 
     // Parse request body
-    const { packageId, points, priceId } = await req.json()
+    const { priceId } = await req.json()
 
-    if (!packageId || !points || !priceId) {
+    if (!priceId) {
       return new Response(
         JSON.stringify({ error: 'Missing required fields' }), 
         { 
@@ -64,21 +64,17 @@ serve(async (req) => {
         quantity: 1,
       }],
       mode: 'payment',
-      success_url: `${Deno.env.get('SITE_URL')}/points-purchase?success=true&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${Deno.env.get('SITE_URL')}/points-purchase?canceled=true`,
+      success_url: `${Deno.env.get('SITE_URL')}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${Deno.env.get('SITE_URL')}/payment-canceled`,
       customer_email: user.email,
       metadata: {
         userId: user.id,
-        packageId,
-        points: points.toString(),
         priceId: priceId,
       },
       // Add webhook URL for processing payment completion
       payment_intent_data: {
         metadata: {
           userId: user.id,
-          packageId,
-          points: points.toString(),
         }
       }
     })

@@ -384,103 +384,6 @@ export type Database = {
           }
         ]
       }
-      user_points: {
-        Row: {
-          id: string
-          user_id: string
-          points_balance: number
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          user_id: string
-          points_balance?: number
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          user_id?: string
-          points_balance?: number
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_points_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      point_transactions: {
-        Row: {
-          id: string
-          user_id: string
-          transaction_type: string
-          points: number
-          description: string
-          reference_id: string | null
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          user_id: string
-          transaction_type: string
-          points: number
-          description: string
-          reference_id?: string | null
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          user_id?: string
-          transaction_type?: string
-          points?: number
-          description?: string
-          reference_id?: string | null
-          created_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "point_transactions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      point_packages: {
-        Row: {
-          id: string
-          name: string
-          points: number
-          price_cents: number
-          is_active: boolean
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          name: string
-          points: number
-          price_cents: number
-          is_active?: boolean
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          name?: string
-          points?: number
-          price_cents?: number
-          is_active?: boolean
-          created_at?: string
-        }
-        Relationships: []
-      }
       resume_pool: {
         Row: {
           id: string
@@ -756,32 +659,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      add_points: {
-        Args: {
-          target_user_id: string
-          points_to_add: number
-          transaction_type: string
-          description: string
-          reference_id?: string | null
-        }
-        Returns: boolean
-      }
-      deduct_points: {
-        Args: {
-          target_user_id: string
-          points_to_deduct: number
-          transaction_type: string
-          description: string
-          reference_id?: string | null
-        }
-        Returns: boolean
-      }
-      get_user_points: {
-        Args: {
-          target_user_id: string
-        }
-        Returns: number
-      }
     }
     Enums: {
       [_ in never]: never
