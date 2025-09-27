@@ -14,6 +14,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { useJobOfferById } from '@/hooks/useJobOffers';
+import { useDownloadOffer } from '@/hooks/useDownload';
 import { format } from 'date-fns';
 
 const OfferView = () => {
@@ -22,10 +23,35 @@ const OfferView = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const { data: offer, isLoading: offerLoading, error } = useJobOfferById(id || '');
+  const downloadOfferMutation = useDownloadOffer();
 
   useEffect(() => {
     setIsLoading(offerLoading);
   }, [offerLoading]);
+
+  const handleDownloadOffer = () => {
+    if (!offer?.pdf_file_url) return;
+    
+    // Extract filename from the offer data
+    const candidateName = `${offer.resume_pool?.first_name || 'Candidate'}_${offer.resume_pool?.last_name || 'Name'}`;
+    const jobTitle = offer.job?.title?.replace(/\s+/g, '_') || 'Position';
+    const filename = `Job_Offer_${candidateName}_${jobTitle}.pdf`;
+    
+    // Extract storage path from the PDF URL
+    // The URL format is: https://...supabase.co/storage/v1/object/public/company_uploads/{path}
+    const urlParts = offer.pdf_file_url.split('/company_uploads/');
+    const storagePath = urlParts.length > 1 ? urlParts[1] : '';
+    
+    if (storagePath) {
+      downloadOfferMutation.mutate({
+        storagePath,
+        filename
+      });
+    } else {
+      // Fallback: open the URL directly
+      window.open(offer.pdf_file_url, '_blank');
+    }
+  };
 
   if (isLoading) {
     return (
@@ -206,7 +232,7 @@ const OfferView = () => {
               </CardHeader>
               <CardContent className="space-y-3">
                 <Button 
-                  onClick={handleDownloadPDF}
+                  onClick={handleDownloadOffer}
                   className="w-full"
                   disabled={!offer.pdf_file_url}
                 >

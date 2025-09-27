@@ -23,6 +23,7 @@ import {
   useSendJobOffer,
   useJobOffer 
 } from '@/hooks/useJobOffers';
+import { generateOfferPDF } from '@/services/pdfService';
 import { 
   OfferFormData, 
   CURRENCY_OPTIONS, 
@@ -129,6 +130,55 @@ export const JobOfferWizard: React.FC<JobOfferWizardProps> = ({
     setCcEmailsInput(value);
     const emails = value.split(',').map(email => email.trim()).filter(email => email);
     updateFormData({ email_cc_addresses: emails });
+  };
+
+  const handlePreviewPDF = async () => {
+    try {
+      const expiryDate = new Date(Date.now() + formData.expiry_period_days * 24 * 60 * 60 * 1000);
+      
+      // Prepare offer data for PDF generation
+      const offerData = {
+        candidate_name: candidateName,
+        candidate_email: candidateEmail,
+        job_title: jobTitle,
+        company_name: companyName,
+        company_address: companyAddress || '',
+        company_phone: companyPhone || '',
+        salary_amount: formData.salary_amount,
+        salary_currency: formData.salary_currency,
+        bonus_amount: formData.bonus_amount || 0,
+        bonus_description: formData.bonus_description || '',
+        benefits: formData.benefits,
+        reports_to: formData.reports_to,
+        insurance_details: formData.insurance_details || '',
+        expiry_date: expiryDate.toISOString(),
+        offer_date: new Date().toISOString(),
+      };
+
+      // Generate PDF blob
+      const pdfBlob = await generateOfferPDF(offerData);
+      
+      // Create object URL and open in new tab
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+      window.open(pdfUrl, '_blank');
+      
+      // Clean up the object URL after a delay
+      setTimeout(() => {
+        URL.revokeObjectURL(pdfUrl);
+      }, 1000);
+
+      toast({
+        title: 'PDF Preview Generated',
+        description: 'The offer PDF has been opened in a new tab for preview.',
+      });
+    } catch (error) {
+      console.error('Error generating PDF preview:', error);
+      toast({
+        title: 'Preview Failed',
+        description: 'Failed to generate PDF preview. Please try again.',
+        variant: 'destructive',
+      });
+    }
   };
 
   const handleSubmit = async () => {
@@ -356,7 +406,18 @@ export const JobOfferWizard: React.FC<JobOfferWizardProps> = ({
         return (
           <div className="space-y-6">
             <div className="bg-blue-50 p-4 rounded-lg">
-              <h4 className="font-semibold text-blue-900 mb-2">Offer Summary</h4>
+              <div className="flex items-center justify-between mb-2">
+                <h4 className="font-semibold text-blue-900">Offer Summary</h4>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handlePreviewPDF}
+                  className="flex items-center gap-2 text-blue-700 border-blue-300 hover:bg-blue-100"
+                >
+                  <FileText className="h-4 w-4" />
+                  Preview PDF
+                </Button>
+              </div>
               <div className="space-y-2 text-sm">
                 <p><strong>Candidate:</strong> {candidateName}</p>
                 <p><strong>Email:</strong> {candidateEmail}</p>

@@ -219,7 +219,7 @@ export const OfferPDFDocument: React.FC<OfferPDFDocumentProps> = ({ data }) => {
           <Text style={styles.content}>{data.benefits || 'Standard company benefits apply'}</Text>
           {data.insurance_details && data.insurance_details.trim() && data.insurance_details.trim().length > 0 && (
             <Text style={styles.content}>
-              <Text style={styles.highlight}>Insurance:</Text> {data.insurance_details}
+              <Text style={styles.highlight}>Insurance:</Text> {data.insurance_details || 'Standard insurance coverage'}
             </Text>
           )}
         </View>

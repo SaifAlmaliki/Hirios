@@ -278,51 +278,5 @@ export const useBulkDeleteResumes = () => {
   });
 };
 
-export const useDownloadResume = () => {
-  const { toast } = useToast();
-
-  return useMutation({
-    mutationFn: async ({ storagePath, filename }: { storagePath: string; filename: string }) => {
-      // Handle both old and new storage path formats
-      let filePath = storagePath;
-      
-      // If it's an old resume_pool path, convert to new format
-      if (storagePath.startsWith('resume_pool/')) {
-        // Extract company ID and filename from old path: resume_pool/{companyId}/{fileName}
-        const pathParts = storagePath.split('/');
-        if (pathParts.length >= 3) {
-          const companyId = pathParts[1];
-          const fileName = pathParts[2];
-          filePath = `${companyId}/resumes/pool/${fileName}`;
-        }
-      }
-      
-      // Generate fresh signed URL
-      const { data, error } = await supabase.storage
-        .from('company_uploads')
-        .createSignedUrl(filePath, 3600); // 1 hour expiry
-      
-      if (error) {
-        console.error('Error generating signed URL:', error);
-        throw error;
-      }
-      
-      // Create a temporary link and trigger download
-      const link = document.createElement('a');
-      link.href = data.signedUrl;
-      link.download = filename;
-      link.target = '_blank';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    },
-    onError: (error: any) => {
-      console.error('❌ Resume download failed:', error);
-      toast({
-        title: "Download failed",
-        description: error.message || "Failed to download resume. Please try again.",
-        variant: "destructive",
-      });
-    },
-  });
-};
+// Re-export the new download hook for backward compatibility
+export { useDownloadResume } from './useDownload';

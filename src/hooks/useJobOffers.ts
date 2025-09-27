@@ -312,6 +312,7 @@ export const useSendJobOffer = () => {
       }
 
       // Trigger email webhook to n8n directly
+      console.log('📧 Preparing to send offer email...');
       const n8nWebhookUrl = import.meta.env.VITE_OFFER_EMAIL_WEBHOOK_URL;
       
       if (!n8nWebhookUrl) {
@@ -338,6 +339,9 @@ export const useSendJobOffer = () => {
         cc_emails: data.email_cc_addresses || [],
       };
 
+      console.log('📤 Webhook payload prepared:', webhookData);
+      console.log('🔗 N8N Webhook URL:', n8nWebhookUrl);
+
       const emailResponse = await fetch(n8nWebhookUrl, {
         method: 'POST',
         headers: {
@@ -348,9 +352,11 @@ export const useSendJobOffer = () => {
 
       if (!emailResponse.ok) {
         const errorText = await emailResponse.text();
-        console.error('N8N webhook error:', errorText);
+        console.error('❌ N8N webhook error:', errorText);
         throw new Error('Failed to send offer email via webhook');
       }
+
+      console.log('✅ Offer email sent successfully via N8N webhook');
 
       return data;
     },

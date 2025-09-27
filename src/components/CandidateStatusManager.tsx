@@ -24,6 +24,7 @@ import {
   CandidateStatus 
 } from '@/hooks/useCandidateStatus';
 import { useJobOffer } from '@/hooks/useJobOffers';
+import { useDownloadOffer } from '@/hooks/useDownload';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { JobOfferWizard } from '@/components/JobOfferWizard';
 import { format } from 'date-fns';
@@ -66,6 +67,7 @@ export const CandidateStatusManager: React.FC<CandidateStatusManagerProps> = ({
   // Mutations
   const updateStatusMutation = useUpdateCandidateStatus();
   const addCommentMutation = useAddCandidateComment();
+  const downloadOfferMutation = useDownloadOffer();
 
   const handleStatusChange = (newStatus: CandidateStatus) => {
     updateStatusMutation.mutate({
@@ -87,6 +89,30 @@ export const CandidateStatusManager: React.FC<CandidateStatusManagerProps> = ({
         setNewComment('');
       }
     });
+  };
+
+  const handleDownloadOffer = (offer: any) => {
+    if (!offer.pdf_file_url) return;
+    
+    // Extract filename from the offer data
+    const candidateName = `${offer.resume_pool?.first_name || 'Candidate'}_${offer.resume_pool?.last_name || 'Name'}`;
+    const jobTitle = offer.job?.title?.replace(/\s+/g, '_') || 'Position';
+    const filename = `Job_Offer_${candidateName}_${jobTitle}.pdf`;
+    
+    // Extract storage path from the PDF URL
+    // The URL format is: https://...supabase.co/storage/v1/object/public/company_uploads/{path}
+    const urlParts = offer.pdf_file_url.split('/company_uploads/');
+    const storagePath = urlParts.length > 1 ? urlParts[1] : '';
+    
+    if (storagePath) {
+      downloadOfferMutation.mutate({
+        storagePath,
+        filename
+      });
+    } else {
+      // Fallback: open the URL directly
+      window.open(offer.pdf_file_url, '_blank');
+    }
   };
 
   const statusOptions: { value: CandidateStatus; label: string }[] = [
@@ -215,7 +241,7 @@ export const CandidateStatusManager: React.FC<CandidateStatusManagerProps> = ({
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => window.open(jobOffer.pdf_file_url, '_blank')}
+                          onClick={() => handleDownloadOffer(jobOffer)}
                           className="flex items-center gap-2"
                         >
                           <FileText className="h-4 w-4" />

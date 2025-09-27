@@ -67,13 +67,18 @@ export const uploadOfferPDF = async (
     throw error;
   }
 
-  // Get public URL
-  const { data: urlData } = supabase.storage
+  // Get signed URL (valid for 1 hour) since company_uploads is a private bucket
+  const { data: urlData, error: urlError } = await supabase.storage
     .from(bucketName)
-    .getPublicUrl(filePath);
+    .createSignedUrl(filePath, 3600); // 1 hour expiry
 
-  console.log('PDF uploaded successfully:', urlData.publicUrl);
-  return urlData.publicUrl;
+  if (urlError) {
+    console.error('Error creating signed URL:', urlError);
+    throw urlError;
+  }
+
+  console.log('PDF uploaded successfully:', urlData.signedUrl);
+  return urlData.signedUrl;
 };
 
 // Generate and upload offer PDF
@@ -81,28 +86,42 @@ export const generateAndUploadOfferPDF = async (
   offerData: OfferPDFData,
   companyId: string
 ): Promise<{ filePath: string; fileUrl: string; pdfBlob: Blob }> => {
+  console.log('🎯 Starting offer PDF generation and upload process');
+  console.log('👤 Candidate:', offerData.candidate_name);
+  console.log('💼 Position:', offerData.job_title);
+  console.log('🏢 Company ID:', companyId);
+  
   // Generate PDF blob
+  console.log('📄 Generating PDF document...');
   const pdfBlob = await generateOfferPDF(offerData);
+  console.log('✅ PDF generated successfully, size:', pdfBlob.size, 'bytes');
   
   // Create filename
   const fileName = `offer_${offerData.candidate_name?.replace(/\s+/g, '_') || 'candidate'}_${offerData.job_title?.replace(/\s+/g, '_') || 'position'}_${new Date().toISOString().split('T')[0]}.pdf`;
+  const filePath = `${companyId}/offers/${fileName}`;
+  
+  console.log('📁 File path:', filePath);
   
   try {
     // Upload to storage with proper company folder structure
+    console.log('☁️ Uploading to Supabase storage...');
     const fileUrl = await uploadOfferPDF(pdfBlob, fileName, companyId);
+    console.log('✅ Offer PDF uploaded successfully');
+    console.log('🔗 File URL:', fileUrl);
     
     return {
-      filePath: `${companyId}/offers/${fileName}`,
+      filePath,
       fileUrl,
       pdfBlob,
     };
   } catch (error) {
-    console.warn('Storage upload failed, using base64 fallback:', error);
+    console.warn('⚠️ Storage upload failed, using base64 fallback:', error);
     // Fallback to base64 if storage fails
     const fileUrl = `data:application/pdf;base64,${await blobToBase64(pdfBlob)}`;
+    console.log('🔄 Using base64 fallback URL');
     
     return {
-      filePath: `${companyId}/offers/${fileName}`,
+      filePath,
       fileUrl,
       pdfBlob,
     };
