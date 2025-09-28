@@ -49,7 +49,7 @@ export const AuroraHero = () => {
           </span>
         </h1>
         <p className="my-6 max-w-2xl text-center text-base leading-relaxed md:text-xl md:leading-relaxed text-gray-300">
-          Upload a job description and resumes—our AI analyzes fit, ranks candidates, and explains why. No more manual screening.
+          Upload a job description and resumes—our AI analyzes fit, ranks candidates, and explains why. Build your talent database with intelligent skill tagging and track every candidate's journey. No more manual screening.
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
@@ -87,7 +87,7 @@ export const AuroraHero = () => {
         </div>
 
         {/* Feature highlights */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-12 max-w-4xl">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-12 max-w-6xl">
           <div className="text-center">
             <div className="bg-blue-600/20 p-3 rounded-full w-fit mx-auto mb-3">
               <Brain className="h-6 w-6 text-blue-400" />
@@ -105,11 +105,19 @@ export const AuroraHero = () => {
           </div>
           
           <div className="text-center">
+            <div className="bg-cyan-600/20 p-3 rounded-full w-fit mx-auto mb-3">
+              <FiArrowRight className="h-6 w-6 text-cyan-400" />
+            </div>
+            <h3 className="text-sm font-semibold mb-2">Talent Database</h3>
+            <p className="text-xs text-gray-400">Never lose a good candidate - search by AI-extracted skills</p>
+          </div>
+          
+          <div className="text-center">
             <div className="bg-green-600/20 p-3 rounded-full w-fit mx-auto mb-3">
               <FiArrowRight className="h-6 w-6 text-green-400" />
             </div>
-            <h3 className="text-sm font-semibold mb-2">Easy Integration</h3>
-            <p className="text-xs text-gray-400">Works with your existing hiring workflow</p>
+            <h3 className="text-sm font-semibold mb-2">Journey Tracking</h3>
+            <p className="text-xs text-gray-400">Track every candidate from application to decision</p>
           </div>
         </div>
       </div>

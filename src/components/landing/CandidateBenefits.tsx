@@ -4,7 +4,10 @@ import {
   Target,
   TrendingUp,
   CheckCircle,
-  Upload
+  Upload,
+  Database,
+  Tag,
+  BarChart3
 } from 'lucide-react';
 
 const CandidateBenefits = () => {
@@ -69,6 +72,51 @@ const CandidateBenefits = () => {
             <p className="text-gray-300 text-sm">
               AI-powered voice interviews with detailed summaries and insights for top candidates to make final decisions.
             </p>
+          </div>
+        </div>
+
+        {/* Additional Benefits Section */}
+        <div className="mt-12">
+          <h3 className="text-2xl font-bold text-white mb-8 text-center">
+            Complete Hiring Ecosystem Benefits
+          </h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-gray-800/50 rounded-lg p-6 shadow-sm border border-gray-700/50">
+              <div className="flex items-center mb-4">
+                <div className="bg-cyan-600/20 p-2 rounded-full mr-3 border border-cyan-600/30">
+                  <Database className="h-6 w-6 text-cyan-400" />
+                </div>
+                <h4 className="font-semibold text-white">Talent Database</h4>
+              </div>
+              <p className="text-gray-300 text-sm">
+                Never lose a good candidate again. All resumes are stored in your talent database with AI-extracted skills for easy searching and future opportunities.
+              </p>
+            </div>
+
+            <div className="bg-gray-800/50 rounded-lg p-6 shadow-sm border border-gray-700/50">
+              <div className="flex items-center mb-4">
+                <div className="bg-purple-600/20 p-2 rounded-full mr-3 border border-purple-600/30">
+                  <Tag className="h-6 w-6 text-purple-400" />
+                </div>
+                <h4 className="font-semibold text-white">Intelligent Skill Tagging</h4>
+              </div>
+              <p className="text-gray-300 text-sm">
+                AI automatically extracts and tags skills from every resume. Save 5+ hours per week on manual labeling while getting more accurate skill categorization.
+              </p>
+            </div>
+
+            <div className="bg-gray-800/50 rounded-lg p-6 shadow-sm border border-gray-700/50">
+              <div className="flex items-center mb-4">
+                <div className="bg-orange-600/20 p-2 rounded-full mr-3 border border-orange-600/30">
+                  <BarChart3 className="h-6 w-6 text-orange-400" />
+                </div>
+                <h4 className="font-semibold text-white">Candidate Journey Tracking</h4>
+              </div>
+              <p className="text-gray-300 text-sm">
+                Track every candidate's progress from application to final decision. Get complete visibility and organization for your entire hiring team with real-time status updates.
+              </p>
+            </div>
           </div>
         </div>
       </div>
