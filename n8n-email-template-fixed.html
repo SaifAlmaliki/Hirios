@@ -3,275 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Job Offer - {{$json.body.company_name}}</title>
-    <style>
-        body {
-            font-family: 'Arial', 'Helvetica', sans-serif;
-            line-height: 1.6;
-            color: #333333;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #ffffff;
-        }
-        .container {
-            background-color: white;
-            border: 1px solid #e0e0e0;
-            padding: 40px;
-        }
-        .header {
-            text-align: center;
-            border-bottom: 2px solid #333333;
-            padding-bottom: 20px;
-            margin-bottom: 30px;
-        }
-        .logo {
-            width: 60px;
-            height: 60px;
-            background-color: #333333;
-            margin: 0 auto 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 18px;
-            font-weight: bold;
-        }
-        .company-name {
-            font-size: 22px;
-            font-weight: bold;
-            color: #333333;
-            margin-bottom: 5px;
-        }
-        .greeting {
-            font-size: 16px;
-            color: #333333;
-            margin-bottom: 20px;
-        }
-        .offer-details {
-            background-color: #f9f9f9;
-            border: 1px solid #e0e0e0;
-            padding: 25px;
-            margin: 20px 0;
-        }
-        .salary-highlight {
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-            color: #333333;
-            margin-bottom: 10px;
-        }
-        .details-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin: 20px 0;
-        }
-        .detail-item {
-            padding: 12px;
-            background-color: white;
-            border: 1px solid #e0e0e0;
-        }
-        .detail-label {
-            font-weight: bold;
-            color: #333333;
-            font-size: 14px;
-        }
-        .detail-value {
-            color: #666666;
-            font-size: 14px;
-            margin-top: 5px;
-        }
-        .benefits-section {
-            background-color: #f9f9f9;
-            border: 1px solid #e0e0e0;
-            padding: 25px;
-            margin: 20px 0;
-        }
-        .benefits-title {
-            font-weight: bold;
-            color: #333333;
-            margin-bottom: 10px;
-        }
-        .benefits-list {
-            color: #666666;
-            line-height: 1.8;
-        }
-        .cta-section {
-            text-align: center;
-            margin: 30px 0;
-        }
-        .cta-button {
-            display: inline-block;
-            background-color: #333333;
-            color: white;
-            padding: 12px 25px;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 14px;
-            margin: 10px;
-        }
-        .cta-button:hover {
-            background-color: #555555;
-        }
-        .expiry-notice {
-            background-color: #f9f9f9;
-            border: 1px solid #e0e0e0;
-            padding: 15px;
-            text-align: center;
-            margin: 20px 0;
-        }
-        .expiry-text {
-            color: #333333;
-            font-weight: bold;
-        }
-        .footer {
-            text-align: center;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #e0e0e0;
-            color: #666666;
-            font-size: 12px;
-        }
-        .attachment-notice {
-            background-color: #f9f9f9;
-            border: 1px solid #e0e0e0;
-            padding: 15px;
-            margin: 20px 0;
-            text-align: center;
-        }
-        .attachment-text {
-            color: #333333;
-            font-weight: bold;
-        }
-        .bonus-section {
-            margin-top: 15px;
-        }
-        .insurance-section {
-            margin-top: 15px;
-        }
-    </style>
+    <title>Job Offer - {{ $json.body.company_name }}</title>
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <div class="logo">{{$json.body.company_name}}</div>
-            <div class="company-name">{{$json.body.company_name}}</div>
-        </div>
+    <p>Dear {{ $json.body.candidate_name }},</p>
 
-        <!-- Greeting -->
-        <div class="greeting">
-            Dear {{$json.body.candidate_name}},
-        </div>
+    <p>We are thrilled to extend a job offer for the position of <strong>{{ $json.body.job_title }}</strong> at {{ $json.body.company_name }}. After careful consideration of your qualifications and our discussions, we believe you would be an excellent addition to our team.</p>
 
-        <!-- Main Message -->
-        <p>
-            We are thrilled to extend a job offer for the position of <strong>{{$json.body.job_title}}</strong> at {{$json.body.company_name}}. 
-            After careful consideration of your qualifications and our discussions, we believe you would be an excellent addition to our team.
-        </p>
+    <p><strong>Offer Details:</strong></p>
+    <p>Annual Base Salary: {{ $json.body.salary_currency }} {{ $json.body.salary_amount }}</p>
+    <p>Position: {{ $json.body.job_title }}</p>
+    <p>Reports to: {{ $json.body.reports_to }}</p>
+    <p>Offer Date: {{ $json.body.offer_date }}</p>
+    <p>Expires: {{ $json.body.expiry_date }}</p>
+    <p>Bonus: {{ $json.body.salary_currency }} {{ $json.body.bonus_amount || '0' }}{{ $json.body.bonus_description ? ' - ' + $json.body.bonus_description : '' }}</p>
 
-        <!-- Offer Details -->
-        <div class="offer-details">
-            <div class="salary-highlight">
-                {{$json.body.salary_currency}} {{$json.body.salary_amount}}
-            </div>
-            <div style="text-align: center; color: #6b7280; margin-bottom: 20px;">
-                Annual Base Salary
-            </div>
+    <p><strong>Benefits & Perks:</strong></p>
+    <p>{{ $json.body.benefits }}</p>
 
-            <div class="details-grid">
-                <div class="detail-item">
-                    <div class="detail-label">Position</div>
-                    <div class="detail-value">{{$json.body.job_title}}</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">Reports to</div>
-                    <div class="detail-value">{{$json.body.reports_to}}</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">Offer Date</div>
-                    <div class="detail-value">{{$json.body.offer_date}}</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">Expires</div>
-                    <div class="detail-value">{{$json.body.expiry_date}}</div>
-                </div>
-            </div>
+    <p><strong>Insurance Coverage:</strong></p>
+    <p>{{ $json.body.insurance_details || 'Standard company insurance coverage applies' }}</p>
 
-            <!-- Bonus Section - Always show, but will be empty if no bonus -->
-            <div class="bonus-section">
-                <div class="detail-item">
-                    <div class="detail-label">Bonus</div>
-                    <div class="detail-value">
-                        {{$json.body.salary_currency}} {{$json.body.bonus_amount || '0'}}
-                        {{$json.body.bonus_description ? ' - ' + $json.body.bonus_description : ''}}
-                    </div>
-                </div>
-            </div>
-        </div>
+    <p>📎 A detailed offer letter is attached to this email as a PDF document.</p>
 
-        <!-- Benefits Section -->
-        <div class="benefits-section">
-            <div class="benefits-title">Benefits & Perks</div>
-            <div class="benefits-list">{{$json.body.benefits}}</div>
-            
-            <!-- Insurance Section - Always show, but will be empty if no insurance details -->
-            <div class="insurance-section">
-                <div class="benefits-title">Insurance Coverage</div>
-                <div class="benefits-list">{{$json.body.insurance_details || 'Standard company insurance coverage applies'}}</div>
-            </div>
-        </div>
+    <p>To view the complete offer details and respond, please click the link below:</p>
+    <p><a href="{{ $json.body.offer_link }}">View Complete Offer</a></p>
 
-        <!-- PDF Attachment Notice -->
-        <div class="attachment-notice">
-            <div class="attachment-text">
-                📎 A detailed offer letter is attached to this email as a PDF document.
-            </div>
-        </div>
+    <p>⚠️ This offer expires on {{ $json.body.expiry_date }}. Please respond by this date.</p>
 
-        <!-- Call to Action -->
-        <div class="cta-section">
-            <p>To view the complete offer details and respond, please click the button below:</p>
-            <a href="{{$json.body.offer_link}}" class="cta-button">View Complete Offer</a>
-        </div>
+    <p><strong>Next Steps:</strong></p>
+    <ol>
+        <li>Review the attached offer letter and all terms carefully</li>
+        <li>Contact us if you have any questions about the offer</li>
+        <li>Respond to this offer by {{ $json.body.expiry_date }}</li>
+        <li>Upon acceptance, we'll coordinate your start date and onboarding</li>
+    </ol>
 
-        <!-- Expiry Notice -->
-        <div class="expiry-notice">
-            <div class="expiry-text">
-                ⚠️ This offer expires on {{$json.body.expiry_date}}. Please respond by this date.
-            </div>
-        </div>
+    <p><strong>Questions?</strong></p>
+    <p>If you have any questions about this offer or need clarification on any terms, please don't hesitate to contact our HR team at {{ $json.body.recruiter_email }}.</p>
 
-        <!-- Next Steps -->
-        <div style="margin: 30px 0;">
-            <h3 style="color: #374151; margin-bottom: 15px;">Next Steps</h3>
-            <ol style="color: #6b7280; line-height: 1.8;">
-                <li>Review the attached offer letter and all terms carefully</li>
-                <li>Contact us if you have any questions about the offer</li>
-                <li>Respond to this offer by {{$json.body.expiry_date}}</li>
-                <li>Upon acceptance, we'll coordinate your start date and onboarding</li>
-            </ol>
-        </div>
+    <p>This is a confidential job offer letter. Please do not share this document with unauthorized parties.</p>
 
-        <!-- Contact Information -->
-        <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <h3 style="color: #374151; margin-bottom: 15px;">Questions?</h3>
-            <p style="color: #6b7280; margin: 0;">
-                If you have any questions about this offer or need clarification on any terms, 
-                please don't hesitate to contact our HR team at {{$json.body.recruiter_email}}.
-            </p>
-        </div>
+    <p>We look forward to welcoming you to the {{ $json.body.company_name }} team!</p>
 
-        <!-- Footer -->
-        <div class="footer">
-            <p>
-                This is a confidential job offer letter. Please do not share this document with unauthorized parties.
-            </p>
-            <p style="margin-top: 10px;">
-                We look forward to welcoming you to the {{$json.body.company_name}} team!
-            </p>
-        </div>
-    </div>
+    <p>Sincerely,</p>
+    <p>{{ $json.body.company_name }} Hiring Team</p>
 </body>
 </html>
