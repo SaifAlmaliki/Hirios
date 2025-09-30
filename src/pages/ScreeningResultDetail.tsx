@@ -25,7 +25,7 @@ import {
   Download,
   X
 } from 'lucide-react';
-import { useScreeningResults, useUpdateFavoriteStatus, useUpdateDismissStatus, ScreeningResult } from '@/hooks/useScreeningResults';
+import { useScreeningResults, useUpdateFavoriteStatus, ScreeningResult } from '@/hooks/useScreeningResults';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCompanyProfile } from '@/hooks/useCompanyProfile';
 import { VoiceInterviewService } from '@/services/voiceInterviewService';
@@ -103,7 +103,6 @@ const ScreeningResultDetail = () => {
   
   // Add mutation hooks
   const updateFavoriteMutation = useUpdateFavoriteStatus();
-  const updateDismissMutation = useUpdateDismissStatus();
   
   const { data: screeningResults, isLoading, error } = useScreeningResults();
   const { data: companyProfile } = useCompanyProfile();
@@ -218,24 +217,6 @@ const ScreeningResultDetail = () => {
                 <span className="hidden sm:inline">{result.is_favorite ? 'Favorited' : 'Favorite'}</span>
               </Button>
 
-              {/* Dismiss Button */}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => updateDismissMutation.mutate({ 
-                  id: result.id, 
-                  is_dismissed: !result.is_dismissed 
-                })}
-                disabled={updateDismissMutation.isPending}
-                className={`flex items-center gap-1 sm:gap-2 ${
-                  result.is_dismissed 
-                    ? 'border-red-300 text-red-600 hover:bg-red-50 bg-red-50' 
-                    : 'border-red-300 text-red-600 hover:bg-red-50'
-                }`}
-              >
-                <X className="h-4 w-4" />
-                <span className="hidden sm:inline">{result.is_dismissed ? 'Restore' : 'Dismiss'}</span>
-              </Button>
 
               <Badge className={`${getScoreBadgeColor(result.overall_fit || 0)} font-semibold text-xs sm:text-sm`}>
                 {result.overall_fit}% Fit
