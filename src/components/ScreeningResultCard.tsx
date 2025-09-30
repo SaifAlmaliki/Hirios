@@ -39,7 +39,7 @@ const ScreeningResultCard: React.FC<ScreeningResultCardProps> = ({
   return (
     <Card 
       className={`border-l-4 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer ${
-        result.is_dismissed 
+        result.is_rejected 
           ? 'border-l-red-500 bg-gray-50 opacity-75 hover:bg-gray-100' 
           : result.is_favorite 
             ? 'border-l-yellow-500 bg-yellow-50 hover:bg-yellow-100' 
@@ -74,7 +74,11 @@ const ScreeningResultCard: React.FC<ScreeningResultCardProps> = ({
             onToggleExpansion={() => onToggleExpansion(result.id)}
             showViewDetails={false}
             isFavorite={result.is_favorite || false}
-            isDismissed={result.is_dismissed || false}
+            isRejected={result.is_rejected || false}
+            candidateName={`${result.first_name} ${result.last_name}`}
+            candidateEmail={result.email}
+            jobTitle={result.job?.title || ''}
+            companyName={result.job?.company || ''}
           />
         </div>
 
