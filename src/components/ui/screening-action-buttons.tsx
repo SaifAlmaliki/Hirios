@@ -1,5 +1,5 @@
 import React from "react"
-import { FileText, Mic, ExternalLink, Star, X, Eye, ChevronDown, ChevronUp } from "lucide-react"
+import { FileText, Mic, ExternalLink, Star, Eye, ChevronDown, ChevronUp, UserX } from "lucide-react"
 import { ActionButton } from "./action-button"
 import { cn } from "@/lib/utils"
 
@@ -119,16 +119,16 @@ export const FavoriteButton: React.FC<FavoriteButtonProps> = ({
   )
 }
 
-// Dismiss Button Component
-interface DismissButtonProps {
-  isDismissed: boolean
+// Reject Button Component
+interface RejectButtonProps {
+  isRejected: boolean
   isPending: boolean
   onClick: () => void
   className?: string
 }
 
-export const DismissButton: React.FC<DismissButtonProps> = ({
-  isDismissed,
+export const RejectButton: React.FC<RejectButtonProps> = ({
+  isRejected,
   isPending,
   onClick,
   className
@@ -136,13 +136,14 @@ export const DismissButton: React.FC<DismissButtonProps> = ({
   return (
     <div className="w-20 xs:w-24 sm:w-28">
       <ActionButton
-        variant="dismiss"
-        icon={X}
+        variant="reject"
+        icon={UserX}
         onClick={onClick}
         loading={isPending}
-        active={isDismissed}
-        text={isDismissed ? "Restore" : "Dismiss"}
-        shortText={isDismissed ? "Restore" : "Dismiss"}
+        active={isRejected}
+        text={isRejected ? "Rejected" : "Reject"}
+        shortText={isRejected ? "Rejected" : "Reject"}
+        disabled={isRejected}
         className={className}
       />
     </div>

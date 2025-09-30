@@ -145,4 +145,58 @@ export const sendResumePoolToWebhook = async (data: ResumePoolWebhookData): Prom
   }
 };
 
+// Reject candidate webhook data interface
+export interface RejectCandidateWebhookData {
+  candidate_name: string;
+  candidate_email: string;
+  job_title: string;
+  company_name: string;
+  rejection_reason?: string;
+  rejected_at: string;
+  screening_result_id: string;
+  application_id?: string;
+}
+
+// Send reject candidate webhook to n8n
+export const sendRejectCandidateWebhook = async (data: RejectCandidateWebhookData): Promise<boolean> => {
+  const webhookUrl = import.meta.env.VITE_REJECT_EMAIL_WEBHOOK_URL;
+  
+  if (!webhookUrl) {
+    console.warn('⚠️ No reject email webhook URL configured');
+    return false;
+  }
+  
+  try {
+    console.log('📤 Sending reject candidate webhook for:', data.candidate_name);
+    console.log('📋 Webhook payload:', {
+      candidate_name: data.candidate_name,
+      candidate_email: data.candidate_email,
+      job_title: data.job_title,
+      company_name: data.company_name,
+      rejection_reason: data.rejection_reason,
+      rejected_at: data.rejected_at,
+      screening_result_id: data.screening_result_id,
+      application_id: data.application_id
+    });
+
+    const response = await fetch(webhookUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    console.log('✅ Reject candidate webhook delivered successfully');
+    return true;
+  } catch (error) {
+    console.error('❌ Reject candidate webhook failed:', error);
+    return false;
+  }
+};
+
 export { fileToBase64 };

@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { CandidateStatus } from './useCandidateStatus';
+import { sendRejectCandidateWebhook, RejectCandidateWebhookData } from '@/services/webhookService';
 
 export interface ScreeningResult {
   id: string;
@@ -27,7 +28,8 @@ export interface ScreeningResult {
   interview_completed_at?: string;
   application_id?: string;  // Add application_id field
   is_favorite?: boolean;    // Add favorite status
-  is_dismissed?: boolean;   // Add dismiss status
+  is_rejected?: boolean;    // Add rejected status
+  rejected_at?: string;     // Add rejection timestamp
   skills?: string[];        // Add skills array
   // Job details from join
   job?: {
@@ -290,41 +292,82 @@ export const useUpdateFavoriteStatus = () => {
   });
 };
 
-export const useUpdateDismissStatus = () => {
+
+export const useRejectCandidate = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async ({ id, is_dismissed }: { id: string; is_dismissed: boolean }) => {
-      const { data, error } = await supabase
+    mutationFn: async ({ 
+      id, 
+      first_name, 
+      last_name, 
+      email, 
+      job_title, 
+      company_name, 
+      application_id,
+      rejection_reason 
+    }: { 
+      id: string; 
+      first_name: string;
+      last_name: string;
+      email: string;
+      job_title: string;
+      company_name: string;
+      application_id?: string;
+      rejection_reason?: string;
+    }) => {
+      // First, update the database to mark as rejected
+      const { data: updatedResult, error: updateError } = await supabase
         .from('screening_results')
         .update({ 
-          is_dismissed, 
+          is_rejected: true,
+          rejected_at: new Date().toISOString(),
           updated_at: new Date().toISOString() 
         })
         .eq('id', id)
         .select()
         .single();
 
-      if (error) {
-        console.error('Error updating dismiss status:', error);
-        throw error;
+      if (updateError) {
+        console.error('Error updating reject status:', updateError);
+        throw updateError;
       }
 
-      return data as ScreeningResult;
+      // Prepare webhook data
+      const webhookData: RejectCandidateWebhookData = {
+        candidate_name: `${first_name} ${last_name}`,
+        candidate_email: email,
+        job_title: job_title,
+        company_name: company_name,
+        rejection_reason: rejection_reason || 'Not a good fit for the position',
+        rejected_at: new Date().toISOString(),
+        screening_result_id: id,
+        application_id: application_id
+      };
+
+      // Send webhook to n8n
+      const webhookSuccess = await sendRejectCandidateWebhook(webhookData);
+      
+      if (!webhookSuccess) {
+        console.warn('Webhook failed but database was updated');
+        // Don't throw error here - database update succeeded
+      }
+
+      return updatedResult as ScreeningResult;
     },
-    onSuccess: (_, variables) => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['screening_results'] });
       toast({
-        title: variables.is_dismissed ? "Candidate Dismissed" : "Candidate Restored",
-        description: `Candidate ${variables.is_dismissed ? 'dismissed' : 'restored'} successfully.`,
+        title: "Candidate Rejected",
+        description: `Rejection email sent to ${data.first_name} ${data.last_name}`,
       });
     },
     onError: (error) => {
-      console.error('Failed to update dismiss status:', error);
+      console.error('Failed to reject candidate:', error);
       toast({
         title: "Error",
-        description: "Failed to update dismiss status. Please try again.",
+        description: "Failed to reject candidate. Please try again.",
         variant: "destructive",
       });
     },

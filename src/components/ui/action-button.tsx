@@ -12,7 +12,7 @@ const actionButtonVariants = cva(
         invite: "border border-blue-300 bg-background text-blue-600 hover:bg-blue-50 hover:border-blue-400 shadow-sm",
         link: "border border-purple-300 bg-background text-purple-600 hover:bg-purple-50 hover:border-purple-400 shadow-sm",
         favorite: "border border-yellow-300 bg-background text-yellow-600 hover:bg-yellow-50 hover:border-yellow-400 shadow-sm",
-        dismiss: "border border-red-300 bg-background text-red-600 hover:bg-red-50 hover:border-red-400 shadow-sm",
+        reject: "border border-red-300 bg-background text-red-600 hover:bg-red-50 hover:border-red-400 shadow-sm",
         details: "border border-indigo-300 bg-background text-indigo-600 hover:bg-indigo-50 hover:border-indigo-400 shadow-sm",
         toggle: "border-0 bg-transparent text-gray-600 hover:bg-gray-100 hover:text-gray-900 shadow-none",
       },

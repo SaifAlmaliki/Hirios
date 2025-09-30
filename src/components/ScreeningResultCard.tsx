@@ -74,7 +74,11 @@ const ScreeningResultCard: React.FC<ScreeningResultCardProps> = ({
             onToggleExpansion={() => onToggleExpansion(result.id)}
             showViewDetails={false}
             isFavorite={result.is_favorite || false}
-            isDismissed={result.is_dismissed || false}
+            isRejected={result.is_rejected || false}
+            candidateName={`${result.first_name} ${result.last_name}`}
+            candidateEmail={result.email}
+            jobTitle={result.job?.title || ''}
+            companyName={result.job?.company || ''}
           />
         </div>
 

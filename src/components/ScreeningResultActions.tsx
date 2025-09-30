@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { VoiceInterviewService } from '@/services/voiceInterviewService';
-import { useUpdateFavoriteStatus, useUpdateDismissStatus } from '@/hooks/useScreeningResults';
+import { useUpdateFavoriteStatus, useRejectCandidate } from '@/hooks/useScreeningResults';
 import { downloadResume } from '@/lib/resumeUtils';
 import {
   AlertDialog,
@@ -19,7 +19,7 @@ import {
   InviteButton,
   LinkButton,
   FavoriteButton,
-  DismissButton,
+  RejectButton,
   ViewDetailsButton,
   DetailsToggleButton
 } from '@/components/ui/screening-action-buttons';
@@ -35,7 +35,11 @@ interface ScreeningResultActionsProps {
   onToggleExpansion: () => void;
   showViewDetails?: boolean; // Optional prop to show/hide view details button
   isFavorite?: boolean;      // Add favorite status
-  isDismissed?: boolean;     // Add dismiss status
+  isRejected?: boolean;      // Add rejected status
+  candidateName?: string;    // Add candidate name for rejection
+  candidateEmail?: string;   // Add candidate email for rejection
+  jobTitle?: string;         // Add job title for rejection
+  companyName?: string;      // Add company name for rejection
 }
 
 const ScreeningResultActions: React.FC<ScreeningResultActionsProps> = ({
@@ -49,15 +53,20 @@ const ScreeningResultActions: React.FC<ScreeningResultActionsProps> = ({
   onToggleExpansion,
   showViewDetails = true,
   isFavorite = false,
-  isDismissed = false
+  isRejected = false,
+  candidateName = '',
+  candidateEmail = '',
+  jobTitle = '',
+  companyName = ''
 }) => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [showRejectDialog, setShowRejectDialog] = useState(false);
   
   // Add mutation hooks
   const updateFavoriteMutation = useUpdateFavoriteStatus();
-  const updateDismissMutation = useUpdateDismissStatus();
+  const rejectCandidateMutation = useRejectCandidate();
 
   const handleResumeDownload = async () => {
     if (resumeUrl) {
@@ -81,15 +90,36 @@ const ScreeningResultActions: React.FC<ScreeningResultActionsProps> = ({
     });
   };
 
-  const handleDismissToggle = () => {
-    updateDismissMutation.mutate({ 
-      id: resultId, 
-      is_dismissed: !isDismissed 
-    });
-  };
 
   const handleViewDetails = () => {
     navigate(`/screening-results/${resultId}`);
+  };
+
+  const handleRejectCandidate = () => {
+    if (!candidateName || !candidateEmail || !jobTitle || !companyName) {
+      toast({
+        title: "Error",
+        description: "Missing candidate information for rejection.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const [firstName, ...lastNameParts] = candidateName.split(' ');
+    const lastName = lastNameParts.join(' ');
+
+    rejectCandidateMutation.mutate({
+      id: resultId,
+      first_name: firstName,
+      last_name: lastName,
+      email: candidateEmail,
+      job_title: jobTitle,
+      company_name: companyName,
+      application_id: applicationId,
+      rejection_reason: 'Not a good fit for the position'
+    });
+
+    setShowRejectDialog(false);
   };
 
   return (
@@ -125,10 +155,10 @@ const ScreeningResultActions: React.FC<ScreeningResultActionsProps> = ({
           onClick={handleFavoriteToggle}
         />
 
-        <DismissButton
-          isDismissed={isDismissed}
-          isPending={updateDismissMutation.isPending}
-          onClick={handleDismissToggle}
+        <RejectButton
+          isRejected={isRejected}
+          isPending={rejectCandidateMutation.isPending}
+          onClick={() => setShowRejectDialog(true)}
         />
         
         {/* Third Row */}
@@ -156,6 +186,25 @@ const ScreeningResultActions: React.FC<ScreeningResultActionsProps> = ({
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={onRequestVoiceScreening}>
               Send Invitation
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Reject Candidate Dialog */}
+      <AlertDialog open={showRejectDialog} onOpenChange={setShowRejectDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Reject Candidate</AlertDialogTitle>
+            <AlertDialogDescription>
+              You are about to reject this candidate and send them a rejection email. 
+              This action will notify the candidate that they are not a good fit for the position.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleRejectCandidate}>
+              Reject Candidate
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
