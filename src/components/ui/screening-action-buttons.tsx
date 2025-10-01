@@ -1,5 +1,5 @@
 import React from "react"
-import { FileText, Mic, ExternalLink, Star, Eye, ChevronDown, ChevronUp, UserX } from "lucide-react"
+import { FileText, Mic, ExternalLink, Star, Eye, ChevronDown, ChevronUp, UserX, CalendarClock } from "lucide-react"
 import { ActionButton } from "./action-button"
 import { cn } from "@/lib/utils"
 
@@ -194,6 +194,30 @@ export const DetailsToggleButton: React.FC<DetailsToggleButtonProps> = ({
         onClick={onClick}
         text={isExpanded ? "Less" : "Details"}
         shortText={isExpanded ? "Less" : "Details"}
+        className={className}
+      />
+    </div>
+  )
+}
+
+// Schedule Interview Button Component
+interface ScheduleInterviewButtonProps {
+  onClick: () => void
+  className?: string
+}
+
+export const ScheduleInterviewButton: React.FC<ScheduleInterviewButtonProps> = ({ 
+  onClick, 
+  className 
+}) => {
+  return (
+    <div className="w-20 xs:w-24 sm:w-28">
+      <ActionButton
+        variant="invite"
+        icon={CalendarClock}
+        onClick={onClick}
+        text="Schedule"
+        shortText="Schedule"
         className={className}
       />
     </div>

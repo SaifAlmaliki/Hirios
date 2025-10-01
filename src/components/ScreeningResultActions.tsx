@@ -21,13 +21,15 @@ import {
   FavoriteButton,
   RejectButton,
   ViewDetailsButton,
-  DetailsToggleButton
+  DetailsToggleButton,
+  ScheduleInterviewButton
 } from '@/components/ui/screening-action-buttons';
 
 interface ScreeningResultActionsProps {
   resultId: string;
   applicationId?: string;  // Add applicationId prop
   resumePoolId?: string;   // Add resumePoolId to fetch resume from resume_pool
+  jobId?: string;          // Add jobId for interview scheduling
   isRequestingInterview: boolean;
   isVoiceScreeningRequested: boolean;
   isExpanded: boolean;
@@ -40,12 +42,14 @@ interface ScreeningResultActionsProps {
   candidateEmail?: string;   // Add candidate email for rejection
   jobTitle?: string;         // Add job title for rejection
   companyName?: string;      // Add company name for rejection
+  onScheduleInterview?: () => void; // Add callback for schedule interview
 }
 
 const ScreeningResultActions: React.FC<ScreeningResultActionsProps> = ({
   resultId,
   applicationId,  // Add to destructuring
   resumePoolId,
+  jobId,
   isRequestingInterview,
   isVoiceScreeningRequested,
   isExpanded,
@@ -57,7 +61,8 @@ const ScreeningResultActions: React.FC<ScreeningResultActionsProps> = ({
   candidateName = '',
   candidateEmail = '',
   jobTitle = '',
-  companyName = ''
+  companyName = '',
+  onScheduleInterview
 }) => {
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -182,13 +187,18 @@ const ScreeningResultActions: React.FC<ScreeningResultActionsProps> = ({
         />
         
         {/* Third Row */}
+        {onScheduleInterview && applicationId && jobId && (
+          <ScheduleInterviewButton
+            onClick={onScheduleInterview}
+          />
+        )}
+        
         <DetailsToggleButton
           isExpanded={isExpanded}
           onClick={onToggleExpansion}
         />
 
         {/* Empty cells to maintain grid layout on larger screens */}
-        <div className="hidden sm:block"></div>
         <div className="hidden sm:block"></div>
       </div>
 

@@ -24,6 +24,7 @@ import InviteAccept from "./pages/InviteAccept";
 import TestCollaboration from "./pages/TestCollaboration";
 import ResumePool from "./pages/ResumePool";
 import OfferView from "./pages/OfferView";
+import InterviewVote from "./pages/InterviewVote";
 import NotFound from "./pages/NotFound";
 import { ButtonAlignmentDemo } from "./components/ui/button-alignment-demo";
 import { VoiceInterviewService } from "./services/voiceInterviewService";
@@ -67,6 +68,7 @@ const App = () => (
             <Route path="/screening-results/job/:jobId" element={<ScreeningResults />} />
             <Route path="/interview/:screeningResultId/:applicationId" element={<VoiceInterview />} />
             <Route path="/invite/:token" element={<InviteAccept />} />
+            <Route path="/interview-vote/:voteToken" element={<InterviewVote />} />
             <Route path="/test-collaboration" element={<TestCollaboration />} />
             <Route path="/button-demo" element={<ButtonAlignmentDemo />} />
             <Route path="/resume-pool" element={<ResumePool />} />

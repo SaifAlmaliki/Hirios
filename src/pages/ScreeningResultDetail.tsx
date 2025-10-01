@@ -32,6 +32,7 @@ import { VoiceInterviewService } from '@/services/voiceInterviewService';
 import { useToast } from '@/hooks/use-toast';
 import ScreeningResultActions from '@/components/ScreeningResultActions';
 import InlineCandidateStatusManager from '@/components/InlineCandidateStatusManager';
+import InterviewAvailabilityMatrix from '@/components/InterviewAvailabilityMatrix';
 import { downloadResume } from '@/lib/resumeUtils';
 import {
   AlertDialog,
@@ -559,6 +560,19 @@ const ScreeningResultDetail = () => {
                       </div>
                     </div>
                   )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Interview Scheduling Section */}
+            {result.application_id && (
+              <Card className="shadow-lg border-0 bg-white">
+                <CardHeader>
+                  <CardTitle className="text-lg sm:text-xl">Interview Scheduling</CardTitle>
+                  <CardDescription>Coordinate interview times with participants</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <InterviewAvailabilityMatrix applicationId={result.application_id} />
                 </CardContent>
               </Card>
             )}
