@@ -18,7 +18,6 @@ import {
   CVButton,
   InviteButton,
   LinkButton,
-  FavoriteButton,
   RejectButton,
   ViewDetailsButton,
   DetailsToggleButton
@@ -27,7 +26,7 @@ import {
 interface ScreeningResultActionsProps {
   resultId: string;
   applicationId?: string;  // Add applicationId prop
-  resumeUrl?: string;
+  resumePoolId?: string;   // Add resumePoolId to fetch resume from resume_pool
   isRequestingInterview: boolean;
   isVoiceScreeningRequested: boolean;
   isExpanded: boolean;
@@ -45,7 +44,7 @@ interface ScreeningResultActionsProps {
 const ScreeningResultActions: React.FC<ScreeningResultActionsProps> = ({
   resultId,
   applicationId,  // Add to destructuring
-  resumeUrl,
+  resumePoolId,
   isRequestingInterview,
   isVoiceScreeningRequested,
   isExpanded,
@@ -63,10 +62,30 @@ const ScreeningResultActions: React.FC<ScreeningResultActionsProps> = ({
   const navigate = useNavigate();
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [showRejectDialog, setShowRejectDialog] = useState(false);
+  const [resumeUrl, setResumeUrl] = useState<string | null>(null);
   
   // Add mutation hooks
   const updateFavoriteMutation = useUpdateFavoriteStatus();
   const rejectCandidateMutation = useRejectCandidate();
+
+  // Fetch resume URL from resume_pool
+  React.useEffect(() => {
+    const fetchResumeUrl = async () => {
+      if (resumePoolId) {
+        const { supabase } = await import("@/integrations/supabase/client");
+        const { data } = await supabase
+          .from('resume_pool')
+          .select('storage_path')
+          .eq('id', resumePoolId)
+          .single();
+        
+        if (data?.storage_path) {
+          setResumeUrl(data.storage_path);
+        }
+      }
+    };
+    fetchResumeUrl();
+  }, [resumePoolId]);
 
   const handleResumeDownload = async () => {
     if (resumeUrl) {

@@ -38,9 +38,7 @@ export interface ScreeningResult {
     company: string;
     department: string;
   };
-  // Resume URL from applications table
-  resume_url?: string;
-  resume_text?: string;
+  // Resume pool ID from applications table
   resume_pool_id?: string;
   // Status from candidate_status table
   status?: CandidateStatus;
@@ -127,7 +125,7 @@ export const useScreeningResults = () => {
               // Use application_id for direct lookup
               const { data: appData, error: appErr } = await supabase
                 .from('applications')
-                .select('resume_url, resume_text, resume_pool_id')
+                .select('resume_pool_id')
                 .eq('id', result.application_id)
                 .maybeSingle();
               
@@ -159,8 +157,6 @@ export const useScreeningResults = () => {
 
             const processedResult = {
               ...result,
-              resume_url: application?.resume_url || null,
-              resume_text: application?.resume_text || null,
               resume_pool_id: application?.resume_pool_id || null,
               status: candidateStatus || 'pending'
             };
@@ -170,8 +166,6 @@ export const useScreeningResults = () => {
             console.warn('⚠️ Error fetching resume for:', result.email, 'application_id:', result.application_id);
             return {
               ...result,
-              resume_url: null,
-              resume_text: null,
               resume_pool_id: null,
               status: 'pending'
             };

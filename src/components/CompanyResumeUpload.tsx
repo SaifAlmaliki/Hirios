@@ -152,7 +152,7 @@ const CompanyResumeUpload: React.FC<CompanyResumeUploadProps> = ({
     setUploadedFiles(prev => prev.filter(f => f.id !== fileId));
   };
 
-  const uploadFileToStorage = async (file: File, companyId: string, jobId: string): Promise<string | null> => {
+  const uploadFileToStorage = async (file: File, companyId: string, jobId: string): Promise<{ signedUrl: string; storagePath: string } | null> => {
     try {
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}_${file.name}`;
@@ -186,7 +186,7 @@ const CompanyResumeUpload: React.FC<CompanyResumeUploadProps> = ({
       }
 
       console.log('🔗 Generated signed URL:', urlData.signedUrl);
-      return urlData.signedUrl;
+      return { signedUrl: urlData.signedUrl, storagePath: filePath };
     } catch (error) {
       console.error('❌ Company resume upload failed:', error);
       return null;
@@ -203,8 +203,8 @@ const CompanyResumeUpload: React.FC<CompanyResumeUploadProps> = ({
       ));
 
       // Upload to storage
-      const resumeUrl = await uploadFileToStorage(uploadedFile.file, companyId, jobId);
-      if (!resumeUrl) {
+      const uploadResult = await uploadFileToStorage(uploadedFile.file, companyId, jobId);
+      if (!uploadResult) {
         throw new Error('Failed to upload file to storage');
       }
 
@@ -213,17 +213,34 @@ const CompanyResumeUpload: React.FC<CompanyResumeUploadProps> = ({
         f.id === fileId ? { ...f, status: 'processing', progress: 50 } : f
       ));
 
-             // Create application record
-       const { data: application, error: appError } = await supabase
-         .from('applications')
-         .insert([{
-           job_id: jobId,
-           resume_url: resumeUrl,
-           uploaded_by_user_id: user?.id,
-           original_filename: uploadedFile.file.name
-         }])
-         .select()
-         .single();
+      // Create resume_pool record first
+      const { data: resumePoolRecord, error: poolError } = await supabase
+        .from('resume_pool')
+        .insert([{
+          company_profile_id: companyId,
+          original_filename: uploadedFile.file.name,
+          storage_path: uploadResult.storagePath,
+          file_size: uploadedFile.file.size,
+          uploaded_by_user_id: user?.id
+        }])
+        .select()
+        .single();
+
+      if (poolError || !resumePoolRecord) {
+        throw new Error(`Failed to create resume pool record: ${poolError?.message}`);
+      }
+
+      // Create application record
+      const { data: application, error: appError } = await supabase
+        .from('applications')
+        .insert([{
+          job_id: jobId,
+          resume_pool_id: resumePoolRecord.id,
+          uploaded_by_user_id: user?.id,
+          original_filename: uploadedFile.file.name
+        }])
+        .select()
+        .single();
 
       if (appError) {
         throw new Error(`Failed to create application: ${appError.message}`);

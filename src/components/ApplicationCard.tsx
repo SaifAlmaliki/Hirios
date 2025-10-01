@@ -15,10 +15,31 @@ interface ApplicationCardProps {
 }
 
 const ApplicationCard: React.FC<ApplicationCardProps> = ({ application, screeningResult, getStatusColor }) => {
+  const [resumeUrl, setResumeUrl] = React.useState<string | null>(null);
+
+  // Fetch resume URL from resume_pool
+  React.useEffect(() => {
+    const fetchResumeUrl = async () => {
+      if (application.resume_pool_id) {
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { data } = await supabase
+          .from('resume_pool')
+          .select('storage_path')
+          .eq('id', application.resume_pool_id)
+          .single();
+        
+        if (data?.storage_path) {
+          setResumeUrl(data.storage_path);
+        }
+      }
+    };
+    fetchResumeUrl();
+  }, [application.resume_pool_id]);
+
   const handleDownloadResume = async () => {
-    if (application.resume_url) {
+    if (resumeUrl) {
       const filename = `${screeningResult ? `${screeningResult.first_name} ${screeningResult.last_name}` : application.original_filename || 'Resume'}_Resume.pdf`;
-      await downloadResume(application.resume_url, filename);
+      await downloadResume(resumeUrl, filename);
     }
   };
 
@@ -110,7 +131,7 @@ const ApplicationCard: React.FC<ApplicationCardProps> = ({ application, screenin
             </Button>
           )}
           
-          {application.resume_url && (
+          {resumeUrl && (
             <Button 
               variant="outline" 
               size="sm"

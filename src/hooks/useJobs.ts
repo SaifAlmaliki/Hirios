@@ -187,73 +187,10 @@ export const useDeleteJob = () => {
     mutationFn: async (jobId: string) => {
       console.log('🗑️ Starting job deletion process for job:', jobId);
       
-      // Step 1: Delete associated screening results first
-      console.log('🧹 Cleaning up screening results for job:', jobId);
-      const { error: screeningError, count: screeningCount } = await supabase
-        .from('screening_results')
-        .delete()
-        .eq('job_id', jobId)
-        .select('*');
+      // Note: screening_results and applications will cascade delete automatically via foreign key constraints
+      console.log('🧹 Job deletion will cascade to screening_results and applications');
 
-      if (screeningError) {
-        console.error('❌ Screening results cleanup failed:', screeningError);
-        throw new Error(`Failed to delete associated screening results: ${screeningError.message}`);
-      }
-
-      console.log(`✅ Deleted ${screeningCount || 0} screening results for job:`, jobId);
-
-      // Step 2: Delete associated applications and their storage files
-      console.log('🧹 Cleaning up applications for job:', jobId);
-      
-      // First, get all applications to clean up their storage files
-      const { data: applications, error: fetchAppsError } = await supabase
-        .from('applications')
-        .select('id, resume_url')
-        .eq('job_id', jobId);
-
-      if (fetchAppsError) {
-        console.error('❌ Failed to fetch applications for cleanup:', fetchAppsError);
-        throw new Error(`Failed to fetch applications for cleanup: ${fetchAppsError.message}`);
-      }
-
-      // Clean up storage files for each application
-      if (applications && applications.length > 0) {
-        console.log(`🧹 Cleaning up storage files for ${applications.length} applications`);
-        
-        for (const app of applications) {
-          // Clean up storage file
-          const storagePath = app.resume_url;
-          if (storagePath) {
-            try {
-              const { error: storageError } = await supabase.storage
-                .from('company_uploads')
-                .remove([storagePath]);
-
-              if (storageError) {
-                console.warn('⚠️ Storage cleanup failed for application:', app.id, storageError);
-              }
-            } catch (error) {
-              console.warn('⚠️ Storage cleanup error for application:', app.id, error);
-            }
-          }
-        }
-      }
-
-      // Now delete the applications from database
-      const { error: applicationsError, count: applicationsCount } = await supabase
-        .from('applications')
-        .delete()
-        .eq('job_id', jobId)
-        .select('*');
-
-      if (applicationsError) {
-        console.error('❌ Applications cleanup failed:', applicationsError);
-        throw new Error(`Failed to delete associated applications: ${applicationsError.message}`);
-      }
-
-      console.log(`✅ Deleted ${applicationsCount || 0} applications and their storage files for job:`, jobId);
-
-      // Step 3: Delete associated job collaborators
+      // Step 1: Delete associated job collaborators
       console.log('🧹 Cleaning up job collaborators for job:', jobId);
       const { error: collaboratorsError, count: collaboratorsCount } = await supabase
         .from('job_collaborators')
