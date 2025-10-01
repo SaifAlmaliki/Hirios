@@ -9,7 +9,7 @@ import { Job } from './useJobs';
 export interface Application {
   id: string;
   job_id: string;
-  resume_url?: string;
+  resume_pool_id: string;
   created_at: string;
   uploaded_by_user_id?: string;
   original_filename?: string;

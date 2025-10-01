@@ -143,11 +143,9 @@ const ResumePoolSelector: React.FC<ResumePoolSelectorProps> = ({
         .from('applications')
         .insert([{
           job_id: jobId,
-          resume_url: resume.storage_path, // Use the storage path as URL
+          resume_pool_id: resume.id, // Link to the resume pool item
           uploaded_by_user_id: user?.id,
-          original_filename: resume.original_filename,
-          resume_text: resume.resume_text,
-          resume_pool_id: resume.id // Link to the resume pool item
+          original_filename: resume.original_filename
         }])
         .select()
         .single();

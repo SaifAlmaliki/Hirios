@@ -66,7 +66,7 @@ const ScreeningResultCard: React.FC<ScreeningResultCardProps> = ({
           <ScreeningResultActions
             resultId={result.id}
             applicationId={result.application_id}
-            resumeUrl={result.resume_url}
+            resumePoolId={result.resume_pool_id}
             isRequestingInterview={isRequestingInterview}
             isVoiceScreeningRequested={result.voice_screening_requested || false}
             isExpanded={isExpanded}
@@ -84,7 +84,6 @@ const ScreeningResultCard: React.FC<ScreeningResultCardProps> = ({
 
         <ScreeningResultProgress score={result.overall_fit || 0} />
       </CardHeader>
-
       <Collapsible open={isExpanded}>
         <CollapsibleContent>
           <CardContent className="pt-0 pb-6">

@@ -142,7 +142,7 @@ const ScreeningResultDetail = () => {
   };
 
   const handleResumeDownload = async () => {
-    if (!result?.resume_url) {
+    if (!result?.resume_pool_id) {
       toast({
         title: "Resume not available",
         description: "No resume found for this candidate.",
@@ -151,8 +151,25 @@ const ScreeningResultDetail = () => {
       return;
     }
 
+    // Fetch resume URL from resume_pool
+    const { supabase } = await import('@/integrations/supabase/client');
+    const { data } = await supabase
+      .from('resume_pool')
+      .select('storage_path')
+      .eq('id', result.resume_pool_id)
+      .single();
+    
+    if (!data?.storage_path) {
+      toast({
+        title: "Resume not available",
+        description: "Could not retrieve resume file.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const filename = `${result.first_name} ${result.last_name}_Resume.pdf`;
-    await downloadResume(result.resume_url, filename);
+    await downloadResume(data.storage_path, filename);
   };
 
   const getScoreColor = (score: number) => {
@@ -306,7 +323,7 @@ const ScreeningResultDetail = () => {
               <CardContent>
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-3">
                   {/* Resume Button */}
-                  {result.resume_url && (
+                  {result.resume_pool_id && (
                     <Button
                       variant="outline"
                       onClick={handleResumeDownload}
