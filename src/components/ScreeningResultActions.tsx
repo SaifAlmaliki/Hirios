@@ -18,6 +18,7 @@ import {
   CVButton,
   InviteButton,
   LinkButton,
+  FavoriteButton,
   RejectButton,
   ViewDetailsButton,
   DetailsToggleButton
