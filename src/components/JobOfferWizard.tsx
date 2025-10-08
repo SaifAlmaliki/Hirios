@@ -107,8 +107,8 @@ export const JobOfferWizard: React.FC<JobOfferWizardProps> = ({
           ? Math.ceil((new Date(existingOffer.expiry_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
           : 14,
         email_cc_addresses: existingOffer.email_cc_addresses || [],
-        start_date: (existingOffer as any).start_date || '',
-        end_date: (existingOffer as any).end_date || '',
+        start_date: existingOffer.start_date || '',
+        end_date: existingOffer.end_date || '',
       });
       setCcEmailsInput((existingOffer.email_cc_addresses || []).join(', '));
     }
@@ -223,6 +223,8 @@ export const JobOfferWizard: React.FC<JobOfferWizardProps> = ({
           offer_status: 'draft',
           created_by_user_id: 'current-user', // This should be replaced with actual user ID
           expiry_date: new Date(Date.now() + formData.expiry_period_days * 24 * 60 * 60 * 1000).toISOString(),
+          start_date: formData.start_date,
+          end_date: formData.end_date || null,
         });
         offerId = newOffer.id;
       }

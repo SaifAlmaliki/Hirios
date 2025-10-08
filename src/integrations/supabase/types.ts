@@ -295,6 +295,7 @@ export type Database = {
           created_at: string
           created_by_user_id: string
           email_cc_addresses: string[] | null
+          end_date: string | null
           expiry_date: string
           expiry_period_days: number
           id: string
@@ -311,6 +312,7 @@ export type Database = {
           salary_amount: number
           salary_currency: string
           sent_at: string | null
+          start_date: string
           updated_at: string
         }
         Insert: {
@@ -320,6 +322,7 @@ export type Database = {
           created_at?: string
           created_by_user_id: string
           email_cc_addresses?: string[] | null
+          end_date?: string | null
           expiry_date: string
           expiry_period_days?: number
           id?: string
@@ -336,6 +339,7 @@ export type Database = {
           salary_amount: number
           salary_currency?: string
           sent_at?: string | null
+          start_date?: string
           updated_at?: string
         }
         Update: {
@@ -345,6 +349,7 @@ export type Database = {
           created_at?: string
           created_by_user_id?: string
           email_cc_addresses?: string[] | null
+          end_date?: string | null
           expiry_date?: string
           expiry_period_days?: number
           id?: string
@@ -361,6 +366,7 @@ export type Database = {
           salary_amount?: number
           salary_currency?: string
           sent_at?: string | null
+          start_date?: string
           updated_at?: string
         }
         Relationships: [

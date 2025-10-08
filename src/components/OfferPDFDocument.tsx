@@ -136,7 +136,14 @@ export const OfferPDFDocument: React.FC<OfferPDFDocumentProps> = ({ data }) => {
   // Format date
   const formatDate = (dateString: string) => {
     try {
-      return new Date(dateString).toLocaleDateString('en-US', {
+      if (!dateString || dateString.trim() === '') {
+        return 'Invalid Date';
+      }
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        return 'Invalid Date';
+      }
+      return date.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
@@ -211,15 +218,15 @@ export const OfferPDFDocument: React.FC<OfferPDFDocumentProps> = ({ data }) => {
             <Text style={styles.boldText}>Reports to:</Text> {data.reports_to || 'To be determined'}
           </Text>
           <Text style={styles.content}>
-            <Text style={styles.boldText}>Start Date:</Text> {formatDate(data.start_date)}
+            <Text style={styles.boldText}>Start Date:</Text> {data.start_date ? formatDate(data.start_date) : 'To be determined'}
           </Text>
-          {data.end_date && (
+          {data.end_date && data.end_date.trim() && (
             <Text style={styles.content}>
               <Text style={styles.boldText}>Contract End Date:</Text> {formatDate(data.end_date)}
             </Text>
           )}
           <Text style={styles.content}>
-            <Text style={styles.boldText}>Employment Type:</Text> {data.end_date ? 'Contract' : 'Full-time'}
+            <Text style={styles.boldText}>Employment Type:</Text> {data.end_date && data.end_date.trim() ? 'Contract' : 'Full-time'}
           </Text>
         </View>
 
