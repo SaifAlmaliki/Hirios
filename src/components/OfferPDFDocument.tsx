@@ -2,7 +2,7 @@ import React from 'react';
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 import { OfferPDFData } from '@/types/jobOffers';
 
-// Define styles for the PDF
+// Define styles for the PDF - Professional, no color coding
 const styles = StyleSheet.create({
   page: {
     flexDirection: 'column',
@@ -15,14 +15,15 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 30,
-    borderBottom: '2 solid #2563eb',
+    borderBottom: '2 solid #000000',
     paddingBottom: 20,
   },
   logo: {
     width: 80,
     height: 80,
-    backgroundColor: '#2563eb',
+    backgroundColor: '#f5f5f5',
     borderRadius: 8,
+    border: '1 solid #d1d5db',
   },
   companyInfo: {
     flexDirection: 'column',
@@ -31,60 +32,59 @@ const styles = StyleSheet.create({
   companyName: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#1f2937',
+    color: '#000000',
     marginBottom: 5,
   },
   companyAddress: {
     fontSize: 10,
-    color: '#6b7280',
+    color: '#4b5563',
     textAlign: 'right',
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#1f2937',
+    color: '#000000',
     textAlign: 'center',
     marginBottom: 30,
   },
   section: {
-    marginBottom: 20,
+    marginBottom: 15,
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#374151',
-    marginBottom: 10,
-    borderBottom: '1 solid #e5e7eb',
-    paddingBottom: 5,
-  },
-  content: {
-    fontSize: 12,
-    color: '#374151',
-    lineHeight: 1.5,
-    marginBottom: 8,
-  },
-  highlight: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#1f2937',
+    color: '#000000',
+    marginBottom: 8,
+    borderBottom: '1 solid #d1d5db',
+    paddingBottom: 3,
+  },
+  content: {
+    fontSize: 11,
+    color: '#374151',
+    lineHeight: 1.5,
+    marginBottom: 6,
+  },
+  boldText: {
+    fontWeight: 'bold',
+    color: '#000000',
   },
   salarySection: {
-    backgroundColor: '#f8fafc',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 20,
+    backgroundColor: '#f9fafb',
+    border: '1 solid #d1d5db',
+    padding: 12,
+    borderRadius: 4,
+    marginBottom: 15,
+  },
+  salaryItem: {
+    fontSize: 11,
+    color: '#374151',
+    lineHeight: 1.5,
+    marginBottom: 6,
   },
   salaryAmount: {
-    fontSize: 24,
+    fontSize: 11,
     fontWeight: 'bold',
-    color: '#059669',
-    textAlign: 'center',
-    marginBottom: 5,
-  },
-  salaryDetails: {
-    fontSize: 12,
-    color: '#374151',
-    textAlign: 'center',
+    color: '#000000',
   },
   footer: {
     position: 'absolute',
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 10,
     color: '#6b7280',
-    borderTop: '1 solid #e5e7eb',
+    borderTop: '1 solid #d1d5db',
     paddingTop: 15,
   },
   signatureSection: {
@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   signatureLine: {
-    borderBottom: '1 solid #374151',
+    borderBottom: '1 solid #000000',
     width: 200,
     marginBottom: 5,
   },
@@ -111,18 +111,12 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: '#6b7280',
   },
-  expiryNotice: {
-    backgroundColor: '#fef3c7',
-    border: '1 solid #f59e0b',
-    borderRadius: 8,
-    padding: 15,
-    marginTop: 20,
-  },
-  expiryText: {
-    fontSize: 12,
-    color: '#92400e',
-    textAlign: 'center',
-    fontWeight: 'bold',
+  // New professional styles
+  offerDate: {
+    fontSize: 11,
+    color: '#6b7280',
+    textAlign: 'right',
+    marginBottom: 20,
   },
 });
 
@@ -142,7 +136,14 @@ export const OfferPDFDocument: React.FC<OfferPDFDocumentProps> = ({ data }) => {
   // Format date
   const formatDate = (dateString: string) => {
     try {
-      return new Date(dateString).toLocaleDateString('en-US', {
+      if (!dateString || dateString.trim() === '') {
+        return 'Invalid Date';
+      }
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        return 'Invalid Date';
+      }
+      return date.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
@@ -169,57 +170,73 @@ export const OfferPDFDocument: React.FC<OfferPDFDocumentProps> = ({ data }) => {
           </View>
         </View>
 
+        {/* Offer Date */}
+        <Text style={styles.offerDate}>
+          Offer Date: {formatDate(data.offer_date)}
+        </Text>
+
         {/* Title */}
-        <Text style={styles.title}>Job Offer Letter</Text>
+        <Text style={styles.title}>Employment Offer Letter</Text>
 
-        {/* Candidate Information */}
+        {/* Salutation */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Dear {data.candidate_name || 'Candidate'},</Text>
           <Text style={styles.content}>
-            We are pleased to offer you the position of <Text style={styles.highlight}>{data.job_title || 'Position'}</Text> at {data.company_name || 'our company'}. 
-            We are excited about the possibility of you joining our team and contributing to our continued success.
+            Dear {data.candidate_name || 'Candidate'},
+          </Text>
+          <Text style={styles.content}>
+            We are pleased to extend an offer of employment for the position of <Text style={styles.boldText}>{data.job_title || 'Position'}</Text> at {data.company_name || 'our company'}. 
+            We are confident that your skills and experience will make a valuable contribution to our team.
           </Text>
         </View>
 
-        {/* Salary Section */}
+        {/* Compensation Section */}
         <View style={styles.salarySection}>
-          <Text style={styles.salaryAmount}>
-            {formatCurrency(data.salary_amount, data.salary_currency)}
+          <Text style={styles.sectionTitle}>Compensation Package</Text>
+          <Text style={styles.salaryItem}>
+            <Text style={styles.boldText}>Annual Base Salary:</Text> <Text style={styles.salaryAmount}>{formatCurrency(data.salary_amount, data.salary_currency)}</Text>
           </Text>
-          <Text style={styles.salaryDetails}>Annual Base Salary</Text>
-          {data.bonus_amount && (
-            <>
-              <Text style={styles.salaryAmount}>
-                {formatCurrency(data.bonus_amount, data.salary_currency)}
-              </Text>
-              <Text style={styles.salaryDetails}>
-                {data.bonus_description || 'Performance Bonus'}
-              </Text>
-            </>
+          {data.bonus_amount && data.bonus_amount > 0 && (
+            <Text style={styles.salaryItem}>
+              <Text style={styles.boldText}>{data.bonus_description || 'Performance Bonus'}:</Text> <Text style={styles.salaryAmount}>{formatCurrency(data.bonus_amount, data.salary_currency)}</Text>
+            </Text>
           )}
+          <Text style={styles.salaryItem}>
+            <Text style={styles.boldText}>Payment Schedule:</Text> Monthly
+          </Text>
         </View>
 
-        {/* Job Details */}
+        {/* Position Details */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Position Details</Text>
           <Text style={styles.content}>
-            <Text style={styles.highlight}>Position:</Text> {data.job_title || 'Position'}
+            <Text style={styles.boldText}>Job Title:</Text> {data.job_title || 'Position'}
           </Text>
           <Text style={styles.content}>
-            <Text style={styles.highlight}>Reports to:</Text> {data.reports_to || 'To be determined'}
+            <Text style={styles.boldText}>Department:</Text> To be determined
           </Text>
           <Text style={styles.content}>
-            <Text style={styles.highlight}>Start Date:</Text> To be discussed
+            <Text style={styles.boldText}>Reports to:</Text> {data.reports_to || 'To be determined'}
+          </Text>
+          <Text style={styles.content}>
+            <Text style={styles.boldText}>Start Date:</Text> {data.start_date ? formatDate(data.start_date) : 'To be determined'}
+          </Text>
+          {data.end_date && data.end_date.trim() && (
+            <Text style={styles.content}>
+              <Text style={styles.boldText}>Contract End Date:</Text> {formatDate(data.end_date)}
+            </Text>
+          )}
+          <Text style={styles.content}>
+            <Text style={styles.boldText}>Employment Type:</Text> {data.end_date && data.end_date.trim() ? 'Contract' : 'Full-time'}
           </Text>
         </View>
 
-        {/* Benefits */}
+        {/* Benefits & Perks */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Benefits & Compensation</Text>
+          <Text style={styles.sectionTitle}>Benefits & Perks</Text>
           <Text style={styles.content}>{data.benefits || 'Standard company benefits apply'}</Text>
           {data.insurance_details && data.insurance_details.trim() && data.insurance_details.trim().length > 0 && (
             <Text style={styles.content}>
-              <Text style={styles.highlight}>Insurance:</Text> {data.insurance_details || 'Standard insurance coverage'}
+              <Text style={styles.boldText}>Insurance Details:</Text> {data.insurance_details}
             </Text>
           )}
         </View>
@@ -228,21 +245,15 @@ export const OfferPDFDocument: React.FC<OfferPDFDocumentProps> = ({ data }) => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Terms and Conditions</Text>
           <Text style={styles.content}>
-            This offer is contingent upon successful completion of background checks and reference verification. 
-            The terms and conditions of employment will be governed by our standard employment agreement.
+            This offer is contingent upon successful completion of background checks, reference verification, and any required pre-employment screenings. 
+            The terms and conditions of employment will be governed by our standard employment agreement, which will be provided upon acceptance of this offer.
           </Text>
           <Text style={styles.content}>
-            This offer is valid until <Text style={styles.highlight}>{formatDate(data.expiry_date)}</Text>. 
-            Please respond to this offer by this date to confirm your acceptance.
+            This offer is valid until <Text style={styles.boldText}>{formatDate(data.expiry_date)}</Text>. 
+            Please respond to this offer by this date to confirm your acceptance. If you have any questions or need clarification on any aspect of this offer, please do not hesitate to contact us.
           </Text>
         </View>
 
-        {/* Expiry Notice */}
-        <View style={styles.expiryNotice}>
-          <Text style={styles.expiryText}>
-            ⚠️ This offer expires on {formatDate(data.expiry_date)}
-          </Text>
-        </View>
 
         {/* Signature Section */}
         <View style={styles.signatureSection}>
@@ -260,8 +271,8 @@ export const OfferPDFDocument: React.FC<OfferPDFDocumentProps> = ({ data }) => {
 
         {/* Footer */}
         <Text style={styles.footer}>
-          This is a confidential job offer letter. Please do not share this document with unauthorized parties.
-          For questions regarding this offer, please contact our HR department.
+          This is a confidential employment offer letter. Please do not share this document with unauthorized parties.
+          For questions regarding this offer, please contact our Human Resources department.
         </Text>
       </Page>
     </Document>

@@ -14,6 +14,7 @@
     <p>Annual Base Salary: {{ $json.body.salary_currency }} {{ $json.body.salary_amount }}</p>
     <p>Position: {{ $json.body.job_title }}</p>
     <p>Reports to: {{ $json.body.reports_to }}</p>
+    <p>Start Date: {{ $json.body.start_date }}</p>
     <p>Offer Date: {{ $json.body.offer_date }}</p>
     <p>Expires: {{ $json.body.expiry_date }}</p>
     <p>Bonus: {{ $json.body.salary_currency }} {{ $json.body.bonus_amount || '0' }}{{ $json.body.bonus_description ? ' - ' + $json.body.bonus_description : '' }}</p>
@@ -26,8 +27,8 @@
 
     <p>📎 A detailed offer letter is attached to this email as a PDF document.</p>
 
-    <p>To view the complete offer details and respond, please click the link below:</p>
-    <p><a href="{{ $json.body.offer_link }}">View Complete Offer</a></p>
+    <p>To download the complete offer letter, please click the link below:</p>
+    <p><a href="{{ $json.body.offer_link }}">Download Offer Letter</a></p>
 
     <p>⚠️ This offer expires on {{ $json.body.expiry_date }}. Please respond by this date.</p>
 
