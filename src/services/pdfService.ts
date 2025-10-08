@@ -64,6 +64,13 @@ export const uploadOfferPDF = async (
 
   if (error) {
     console.error('Error uploading PDF:', error);
+    console.error('Upload details:', {
+      bucketName,
+      filePath,
+      fileName,
+      error: error.message,
+      statusCode: error.statusCode
+    });
     throw error;
   }
 

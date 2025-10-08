@@ -47,6 +47,30 @@ const OfferView = () => {
     const jobTitle = offer.job?.title?.replace(/\s+/g, '_') || 'Position';
     const filename = `Job_Offer_${candidateName}_${jobTitle}.pdf`;
     
+    // Check if it's a base64 data URL (fallback from storage failure)
+    if (offer.pdf_file_url.startsWith('data:application/pdf;base64,')) {
+      // Handle base64 PDF download
+      const base64Data = offer.pdf_file_url.split(',')[1];
+      const byteCharacters = atob(base64Data);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: 'application/pdf' });
+      
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      return;
+    }
+    
     // Extract storage path from the PDF URL
     // The URL format is: https://...supabase.co/storage/v1/object/public/company_uploads/{path}
     const urlParts = offer.pdf_file_url.split('/company_uploads/');

@@ -101,6 +101,8 @@ export interface OfferEmailData {
   insurance_details?: string;
   offer_date: string;
   expiry_date: string;
+  start_date: string;
+  end_date?: string;
   offer_link: string;
   pdf_url: string;
   recruiter_email: string;
