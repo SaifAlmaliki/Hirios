@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Download, Mail, Phone, User, Calendar, Upload, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { Application } from '../hooks/useApplications';
 import { ScreeningResult } from '../hooks/useScreeningResults';
-import { downloadResume } from '@/lib/resumeUtils';
+import { useDownloadResume } from '@/hooks/useDownload';
 
 interface ApplicationCardProps {
   application: Application;
@@ -15,31 +15,38 @@ interface ApplicationCardProps {
 }
 
 const ApplicationCard: React.FC<ApplicationCardProps> = ({ application, screeningResult, getStatusColor }) => {
-  const [resumeUrl, setResumeUrl] = React.useState<string | null>(null);
+  const [resumeData, setResumeData] = React.useState<{storage_path: string, original_filename: string} | null>(null);
+  const downloadResumeMutation = useDownloadResume();
 
-  // Fetch resume URL from resume_pool
+  // Fetch resume data from resume_pool
   React.useEffect(() => {
-    const fetchResumeUrl = async () => {
+    const fetchResumeData = async () => {
       if (application.resume_pool_id) {
         const { supabase } = await import('@/integrations/supabase/client');
         const { data } = await supabase
           .from('resume_pool')
-          .select('storage_path')
+          .select('storage_path, original_filename')
           .eq('id', application.resume_pool_id)
           .single();
         
         if (data?.storage_path) {
-          setResumeUrl(data.storage_path);
+          setResumeData({
+            storage_path: data.storage_path,
+            original_filename: data.original_filename
+          });
         }
       }
     };
-    fetchResumeUrl();
+    fetchResumeData();
   }, [application.resume_pool_id]);
 
   const handleDownloadResume = async () => {
-    if (resumeUrl) {
-      const filename = `${screeningResult ? `${screeningResult.first_name} ${screeningResult.last_name}` : application.original_filename || 'Resume'}_Resume.pdf`;
-      await downloadResume(resumeUrl, filename);
+    if (resumeData) {
+      const filename = resumeData.original_filename || `${screeningResult ? `${screeningResult.first_name} ${screeningResult.last_name}` : 'Resume'}_Resume.pdf`;
+      downloadResumeMutation.mutate({
+        storagePath: resumeData.storage_path,
+        filename: filename
+      });
     }
   };
 
@@ -131,7 +138,7 @@ const ApplicationCard: React.FC<ApplicationCardProps> = ({ application, screenin
             </Button>
           )}
           
-          {resumeUrl && (
+          {resumeData && (
             <Button 
               variant="outline" 
               size="sm"

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { VoiceInterviewService } from '@/services/voiceInterviewService';
 import { useUpdateFavoriteStatus, useRejectCandidate } from '@/hooks/useScreeningResults';
-import { downloadResume } from '@/lib/resumeUtils';
+import { useDownloadResume } from '@/hooks/useDownload';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -68,34 +68,41 @@ const ScreeningResultActions: React.FC<ScreeningResultActionsProps> = ({
   const navigate = useNavigate();
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [showRejectDialog, setShowRejectDialog] = useState(false);
-  const [resumeUrl, setResumeUrl] = useState<string | null>(null);
+  const [resumeData, setResumeData] = useState<{storage_path: string, original_filename: string} | null>(null);
   
   // Add mutation hooks
   const updateFavoriteMutation = useUpdateFavoriteStatus();
   const rejectCandidateMutation = useRejectCandidate();
+  const downloadResumeMutation = useDownloadResume();
 
-  // Fetch resume URL from resume_pool
+  // Fetch resume data from resume_pool
   React.useEffect(() => {
-    const fetchResumeUrl = async () => {
+    const fetchResumeData = async () => {
       if (resumePoolId) {
         const { supabase } = await import("@/integrations/supabase/client");
         const { data } = await supabase
           .from('resume_pool')
-          .select('storage_path')
+          .select('storage_path, original_filename')
           .eq('id', resumePoolId)
           .single();
         
         if (data?.storage_path) {
-          setResumeUrl(data.storage_path);
+          setResumeData({
+            storage_path: data.storage_path,
+            original_filename: data.original_filename
+          });
         }
       }
     };
-    fetchResumeUrl();
+    fetchResumeData();
   }, [resumePoolId]);
 
   const handleResumeDownload = async () => {
-    if (resumeUrl) {
-      await downloadResume(resumeUrl);
+    if (resumeData) {
+      downloadResumeMutation.mutate({
+        storagePath: resumeData.storage_path,
+        filename: resumeData.original_filename
+      });
     }
   };
 
@@ -153,7 +160,7 @@ const ScreeningResultActions: React.FC<ScreeningResultActionsProps> = ({
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 items-center">
         {/* First Row */}
         <CVButton
-          resumeUrl={resumeUrl}
+          resumeUrl={resumeData?.storage_path}
           onDownload={handleResumeDownload}
         />
         

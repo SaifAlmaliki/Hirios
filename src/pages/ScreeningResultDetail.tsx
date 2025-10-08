@@ -33,7 +33,7 @@ import { useToast } from '@/hooks/use-toast';
 import ScreeningResultActions from '@/components/ScreeningResultActions';
 import InlineCandidateStatusManager from '@/components/InlineCandidateStatusManager';
 import InterviewAvailabilityMatrix from '@/components/InterviewAvailabilityMatrix';
-import { downloadResume } from '@/lib/resumeUtils';
+import { useDownloadResume } from '@/hooks/useDownload';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -52,6 +52,7 @@ const ScreeningResultDetail = () => {
   const { toast } = useToast();
   const [requestingInterview, setRequestingInterview] = useState<string | null>(null);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const downloadResumeMutation = useDownloadResume();
 
   // Bullet point parsing function
   const parseContentToBullets = (content: string) => {
@@ -152,11 +153,11 @@ const ScreeningResultDetail = () => {
       return;
     }
 
-    // Fetch resume URL from resume_pool
+    // Fetch resume data from resume_pool
     const { supabase } = await import('@/integrations/supabase/client');
     const { data } = await supabase
       .from('resume_pool')
-      .select('storage_path')
+      .select('storage_path, original_filename')
       .eq('id', result.resume_pool_id)
       .single();
     
@@ -169,8 +170,14 @@ const ScreeningResultDetail = () => {
       return;
     }
 
-    const filename = `${result.first_name} ${result.last_name}_Resume.pdf`;
-    await downloadResume(data.storage_path, filename);
+    // Use the original filename if available, otherwise generate one
+    const filename = data.original_filename || `${result.first_name} ${result.last_name}_Resume.pdf`;
+    
+    // Use the new download service
+    downloadResumeMutation.mutate({
+      storagePath: data.storage_path,
+      filename: filename
+    });
   };
 
   const getScoreColor = (score: number) => {
