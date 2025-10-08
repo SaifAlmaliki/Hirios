@@ -490,6 +490,10 @@ export const JobOfferWizard: React.FC<JobOfferWizardProps> = ({
                   <p><strong>Bonus:</strong> {formData.salary_currency} {formData.bonus_amount.toLocaleString()}</p>
                 )}
                 <p><strong>Reports to:</strong> {formData.reports_to}</p>
+                <p><strong>Start Date:</strong> {formData.start_date ? format(new Date(formData.start_date), 'MMM dd, yyyy') : 'Not set'}</p>
+                {formData.end_date && (
+                  <p><strong>Contract End Date:</strong> {format(new Date(formData.end_date), 'MMM dd, yyyy')}</p>
+                )}
                 <p><strong>Expires:</strong> {format(expiryDate, 'MMM dd, yyyy')}</p>
               </div>
             </div>
