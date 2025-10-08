@@ -335,7 +335,7 @@ export const useSendJobOffer = () => {
         expiry_date: data.expiry_date,
         start_date: data.start_date,
         end_date: data.end_date,
-        offer_link: `${import.meta.env.VITE_SITE_URL || 'https://hirios.com'}/api/offer/${data.id}`,
+        offer_link: `${import.meta.env.VITE_SITE_URL || 'https://hirios.com'}/download-offer/${data.id}`,
         pdf_url: data.pdf_file_url,
         recruiter_email: import.meta.env.VITE_RECRUITER_EMAIL || 'hr@company.com',
         cc_emails: data.email_cc_addresses || [],

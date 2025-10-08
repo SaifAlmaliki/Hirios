@@ -28,6 +28,7 @@ import NotFound from "./pages/NotFound";
 import { ButtonAlignmentDemo } from "./components/ui/button-alignment-demo";
 import { VoiceInterviewService } from "./services/voiceInterviewService";
 import OfferDownload from "./pages/OfferDownload";
+import TestRoute from "./pages/TestRoute";
 
 const queryClient = new QueryClient();
 
@@ -47,38 +48,46 @@ const RouteCleanup = () => {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <RouteCleanup />
-          <Routes>
-            <Route path="/" element={<HiriosLanding />} />
-            <Route path="/job-portal-old" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/auth/confirm" element={<AuthConfirm />} />
-            <Route path="/auth/reset-password" element={<ResetPassword />} />
-            <Route path="/job-portal" element={<JobPortal />} />
-            <Route path="/company-setup" element={<CompanySetup />} />
-            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-            <Route path="/terms-of-service" element={<TermsOfService />} />
-            <Route path="/contact-us" element={<ContactUs />} />
-            <Route path="/screening-results/:id" element={<ScreeningResultDetail />} />
-            <Route path="/screening-results/job/:jobId" element={<ScreeningResults />} />
-            <Route path="/interview/:screeningResultId/:applicationId" element={<VoiceInterview />} />
-            <Route path="/invite/:token" element={<InviteAccept />} />
-            <Route path="/interview-vote/:voteToken" element={<InterviewVote />} />
-            <Route path="/test-collaboration" element={<TestCollaboration />} />
-            <Route path="/button-demo" element={<ButtonAlignmentDemo />} />
-            <Route path="/resume-pool" element={<ResumePool />} />
-            <Route path="/offer-download/:id" element={<OfferDownload />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </AuthProvider>
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <RouteCleanup />
+        <Routes>
+          {/* Public routes - no authentication required */}
+          <Route path="/" element={<HiriosLanding />} />
+          <Route path="/job-portal-old" element={<Index />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms-of-service" element={<TermsOfService />} />
+          <Route path="/contact-us" element={<ContactUs />} />
+          <Route path="/invite/:token" element={<InviteAccept />} />
+          <Route path="/interview-vote/:voteToken" element={<InterviewVote />} />
+          <Route path="/offer-download/:id" element={<OfferDownload />} />
+          <Route path="/download-offer/:id" element={<OfferDownload />} />
+          <Route path="/test-route/:id" element={<TestRoute />} />
+          
+          {/* Routes that need AuthProvider context */}
+          <Route path="/*" element={
+            <AuthProvider>
+              <Routes>
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/auth/confirm" element={<AuthConfirm />} />
+                <Route path="/auth/reset-password" element={<ResetPassword />} />
+                <Route path="/job-portal" element={<JobPortal />} />
+                <Route path="/company-setup" element={<CompanySetup />} />
+                <Route path="/screening-results/:id" element={<ScreeningResultDetail />} />
+                <Route path="/screening-results/job/:jobId" element={<ScreeningResults />} />
+                <Route path="/interview/:screeningResultId/:applicationId" element={<VoiceInterview />} />
+                <Route path="/test-collaboration" element={<TestCollaboration />} />
+                <Route path="/button-demo" element={<ButtonAlignmentDemo />} />
+                <Route path="/resume-pool" element={<ResumePool />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </AuthProvider>
+          } />
+        </Routes>
+      </BrowserRouter>
+    </TooltipProvider>
   </QueryClientProvider>
 );
 

@@ -8,7 +8,10 @@ export default function OfferDownload() {
   const [status, setStatus] = useState<'loading' | 'downloading' | 'error'>('loading');
   const [error, setError] = useState<string>('');
 
+  console.log('OfferDownload component rendered with ID:', id);
+
   useEffect(() => {
+    console.log('OfferDownload component mounted with ID:', id);
     if (!id) {
       setError('Invalid offer ID');
       setStatus('error');
