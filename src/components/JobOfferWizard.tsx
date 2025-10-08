@@ -33,6 +33,7 @@ import {
 import { generateAndUploadOfferPDF } from '@/services/pdfService';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
+import { supabase } from '@/integrations/supabase/client';
 
 interface JobOfferWizardProps {
   isOpen: boolean;
@@ -204,7 +205,32 @@ export const JobOfferWizard: React.FC<JobOfferWizardProps> = ({
       let offerId: string;
 
       if (existingOffer) {
-        // Update existing offer
+        // Update existing offer with new data
+        const updateData = {
+          salary_amount: formData.salary_amount,
+          salary_currency: formData.salary_currency,
+          bonus_amount: formData.bonus_amount,
+          bonus_description: formData.bonus_description,
+          benefits: formData.benefits,
+          reports_to: formData.reports_to,
+          insurance_details: formData.insurance_details,
+          expiry_period_days: formData.expiry_period_days,
+          email_cc_addresses: formData.email_cc_addresses,
+          expiry_date: new Date(Date.now() + formData.expiry_period_days * 24 * 60 * 60 * 1000).toISOString(),
+          start_date: formData.start_date,
+          end_date: formData.end_date || null,
+        };
+        
+        const { error: updateError } = await supabase
+          .from('job_offers')
+          .update(updateData)
+          .eq('id', existingOffer.id);
+          
+        if (updateError) {
+          console.error('Error updating offer:', updateError);
+          throw updateError;
+        }
+        
         offerId = existingOffer.id;
       } else {
         // Create new offer

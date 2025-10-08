@@ -14,16 +14,18 @@ export const generateOfferPDF = async (data: OfferPDFData): Promise<Blob> => {
     candidate_email: data.candidate_email?.trim() || 'candidate@example.com',
     job_title: data.job_title?.trim() || 'Position',
     company_name: data.company_name?.trim() || 'Company',
-    company_address: data.company_address?.trim() || '',
-    company_phone: data.company_phone?.trim() || '',
+    company_address: data.company_address?.trim() || 'Not provided',
+    company_phone: data.company_phone?.trim() || 'Not provided',
     reports_to: data.reports_to?.trim() || 'To be determined',
     benefits: data.benefits?.trim() || 'Standard company benefits apply',
-    insurance_details: data.insurance_details?.trim() || '',
+    insurance_details: data.insurance_details?.trim() || 'Not provided',
     salary_currency: data.salary_currency || 'USD',
     salary_amount: data.salary_amount || 0,
     bonus_amount: data.bonus_amount || 0,
-    bonus_description: data.bonus_description?.trim() || '',
+    bonus_description: data.bonus_description?.trim() || 'Performance Bonus',
     expiry_date: data.expiry_date || new Date().toISOString(),
+    start_date: data.start_date?.trim() || new Date().toISOString().split('T')[0],
+    end_date: data.end_date?.trim() || undefined,
   };
   
   console.log('Cleaned PDF Data:', cleanData);
