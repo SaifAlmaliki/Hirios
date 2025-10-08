@@ -60,6 +60,8 @@ export interface OfferFormData {
   insurance_details?: string;
   expiry_period_days: number;
   email_cc_addresses?: string[];
+  start_date: string;
+  end_date?: string;
 }
 
 // PDF generation types
@@ -79,6 +81,8 @@ export interface OfferPDFData {
   insurance_details?: string;
   offer_date: string;
   expiry_date: string;
+  start_date: string;
+  end_date?: string;
   offer_id: string;
 }
 

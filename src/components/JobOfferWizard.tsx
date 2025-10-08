@@ -81,6 +81,8 @@ export const JobOfferWizard: React.FC<JobOfferWizardProps> = ({
     insurance_details: '',
     expiry_period_days: 14,
     email_cc_addresses: [],
+    start_date: '',
+    end_date: '',
   });
   const [ccEmailsInput, setCcEmailsInput] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -105,6 +107,8 @@ export const JobOfferWizard: React.FC<JobOfferWizardProps> = ({
           ? Math.ceil((new Date(existingOffer.expiry_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
           : 14,
         email_cc_addresses: existingOffer.email_cc_addresses || [],
+        start_date: (existingOffer as any).start_date || '',
+        end_date: (existingOffer as any).end_date || '',
       });
       setCcEmailsInput((existingOffer.email_cc_addresses || []).join(', '));
     }
@@ -153,6 +157,9 @@ export const JobOfferWizard: React.FC<JobOfferWizardProps> = ({
         insurance_details: formData.insurance_details || '',
         expiry_date: expiryDate.toISOString(),
         offer_date: new Date().toISOString(),
+        start_date: formData.start_date,
+        end_date: formData.end_date,
+        offer_id: 'preview',
       };
 
       // Generate PDF blob
@@ -182,7 +189,7 @@ export const JobOfferWizard: React.FC<JobOfferWizardProps> = ({
   };
 
   const handleSubmit = async () => {
-    if (!formData.salary_amount || !formData.benefits || !formData.reports_to) {
+    if (!formData.salary_amount || !formData.benefits || !formData.reports_to || !formData.start_date) {
       toast({
         title: 'Validation Error',
         description: 'Please fill in all required fields',
@@ -214,6 +221,8 @@ export const JobOfferWizard: React.FC<JobOfferWizardProps> = ({
           expiry_period_days: formData.expiry_period_days,
           email_cc_addresses: formData.email_cc_addresses,
           offer_status: 'draft',
+          created_by_user_id: 'current-user', // This should be replaced with actual user ID
+          expiry_date: new Date(Date.now() + formData.expiry_period_days * 24 * 60 * 60 * 1000).toISOString(),
         });
         offerId = newOffer.id;
       }
@@ -235,6 +244,8 @@ export const JobOfferWizard: React.FC<JobOfferWizardProps> = ({
         insurance_details: formData.insurance_details,
         offer_date: new Date().toISOString().split('T')[0],
         expiry_date: new Date(Date.now() + formData.expiry_period_days * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        start_date: formData.start_date,
+        end_date: formData.end_date,
         offer_id: offerId,
       };
 
@@ -367,6 +378,29 @@ export const JobOfferWizard: React.FC<JobOfferWizardProps> = ({
             </div>
 
             <div className="space-y-2">
+              <Label htmlFor="start_date">Start Date *</Label>
+              <Input
+                id="start_date"
+                type="date"
+                value={formData.start_date}
+                onChange={(e) => updateFormData({ start_date: e.target.value })}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="end_date">Contract End Date (Optional)</Label>
+              <Input
+                id="end_date"
+                type="date"
+                value={formData.end_date || ''}
+                onChange={(e) => updateFormData({ end_date: e.target.value || undefined })}
+              />
+              <p className="text-sm text-gray-500">
+                Leave empty for permanent employment
+              </p>
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="expiry_period">Offer Expiry Period</Label>
               <Select
                 value={formData.expiry_period_days.toString()}
@@ -481,7 +515,7 @@ export const JobOfferWizard: React.FC<JobOfferWizardProps> = ({
       case 2:
         return formData.benefits.trim().length > 0;
       case 3:
-        return formData.reports_to.trim().length > 0;
+        return formData.reports_to.trim().length > 0 && formData.start_date.trim().length > 0;
       case 4:
         return true;
       default:
