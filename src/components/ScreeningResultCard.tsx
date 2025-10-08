@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
 import { useNavigate } from 'react-router-dom';
@@ -7,6 +7,7 @@ import ScreeningResultHeader from './ScreeningResultHeader';
 import ScreeningResultActions from './ScreeningResultActions';
 import ScreeningResultProgress from './ScreeningResultProgress';
 import ScreeningResultAnalysis from './ScreeningResultAnalysis';
+import InterviewSchedulingDialog from './InterviewSchedulingDialog';
 
 interface ScreeningResultCardProps {
   result: ScreeningResult;
@@ -23,6 +24,7 @@ const ScreeningResultCard: React.FC<ScreeningResultCardProps> = ({
   expandedRows,
   onToggleExpansion
 }) => {
+  const [showSchedulingDialog, setShowSchedulingDialog] = useState(false);
   const isExpanded = expandedRows.has(result.id);
   const isRequestingInterview = requestingInterview === result.id;
   const navigate = useNavigate();
@@ -37,6 +39,7 @@ const ScreeningResultCard: React.FC<ScreeningResultCardProps> = ({
   };
 
   return (
+    <>
     <Card 
       className={`border-l-4 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer ${
         result.is_rejected 
@@ -67,6 +70,7 @@ const ScreeningResultCard: React.FC<ScreeningResultCardProps> = ({
             resultId={result.id}
             applicationId={result.application_id}
             resumePoolId={result.resume_pool_id}
+            jobId={result.job_id}
             isRequestingInterview={isRequestingInterview}
             isVoiceScreeningRequested={result.voice_screening_requested || false}
             isExpanded={isExpanded}
@@ -79,6 +83,7 @@ const ScreeningResultCard: React.FC<ScreeningResultCardProps> = ({
             candidateEmail={result.email}
             jobTitle={result.job?.title || ''}
             companyName={result.job?.company || ''}
+            onScheduleInterview={() => setShowSchedulingDialog(true)}
           />
         </div>
 
@@ -102,8 +107,19 @@ const ScreeningResultCard: React.FC<ScreeningResultCardProps> = ({
           </CardContent>
         </CollapsibleContent>
       </Collapsible>
-
     </Card>
+
+    {/* Interview Scheduling Dialog - Rendered outside Card to prevent click propagation */}
+    {result.application_id && result.job_id && (
+      <InterviewSchedulingDialog
+        isOpen={showSchedulingDialog}
+        onClose={() => setShowSchedulingDialog(false)}
+        applicationId={result.application_id}
+        jobId={result.job_id}
+        candidateName={`${result.first_name} ${result.last_name}`}
+      />
+    )}
+    </>
   );
 };
 

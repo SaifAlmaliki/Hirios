@@ -380,6 +380,187 @@ export type Database = {
           },
         ]
       }
+      interview_schedules: {
+        Row: {
+          id: string
+          application_id: string
+          job_id: string
+          created_by_user_id: string
+          interview_duration_minutes: number
+          timezone: string
+          status: string
+          scheduled_start_time: string | null
+          scheduled_end_time: string | null
+          confirmed_at: string | null
+          confirmed_by_user_id: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          application_id: string
+          job_id: string
+          created_by_user_id: string
+          interview_duration_minutes: number
+          timezone?: string
+          status?: string
+          scheduled_start_time?: string | null
+          scheduled_end_time?: string | null
+          confirmed_at?: string | null
+          confirmed_by_user_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          application_id?: string
+          job_id?: string
+          created_by_user_id?: string
+          interview_duration_minutes?: number
+          timezone?: string
+          status?: string
+          scheduled_start_time?: string | null
+          scheduled_end_time?: string | null
+          confirmed_at?: string | null
+          confirmed_by_user_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "interview_schedules_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "applications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "interview_schedules_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      interview_time_slots: {
+        Row: {
+          id: string
+          interview_schedule_id: string
+          start_time: string
+          end_time: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          interview_schedule_id: string
+          start_time: string
+          end_time: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          interview_schedule_id?: string
+          start_time?: string
+          end_time?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "interview_time_slots_interview_schedule_id_fkey"
+            columns: ["interview_schedule_id"]
+            isOneToOne: false
+            referencedRelation: "interview_schedules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      interview_participants: {
+        Row: {
+          id: string
+          interview_schedule_id: string
+          email: string
+          name: string
+          timezone: string
+          vote_token: string
+          has_responded: boolean
+          responded_at: string | null
+          added_as_collaborator: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          interview_schedule_id: string
+          email: string
+          name: string
+          timezone?: string
+          vote_token?: string
+          has_responded?: boolean
+          responded_at?: string | null
+          added_as_collaborator?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          interview_schedule_id?: string
+          email?: string
+          name?: string
+          timezone?: string
+          vote_token?: string
+          has_responded?: boolean
+          responded_at?: string | null
+          added_as_collaborator?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "interview_participants_interview_schedule_id_fkey"
+            columns: ["interview_schedule_id"]
+            isOneToOne: false
+            referencedRelation: "interview_schedules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      interview_availability_votes: {
+        Row: {
+          id: string
+          interview_participant_id: string
+          interview_time_slot_id: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          interview_participant_id: string
+          interview_time_slot_id: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          interview_participant_id?: string
+          interview_time_slot_id?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "interview_availability_votes_interview_participant_id_fkey"
+            columns: ["interview_participant_id"]
+            isOneToOne: false
+            referencedRelation: "interview_participants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "interview_availability_votes_interview_time_slot_id_fkey"
+            columns: ["interview_time_slot_id"]
+            isOneToOne: false
+            referencedRelation: "interview_time_slots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       jobs: {
         Row: {
           benefits: string | null

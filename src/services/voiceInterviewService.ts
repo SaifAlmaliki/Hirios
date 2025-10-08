@@ -313,14 +313,32 @@ export class VoiceInterviewService {
       }
 
       // Get resume data using the specific application ID
+      // After migration, resume data is accessed via: applications -> resume_pool_id -> resume_pool -> resume_text
       const { data: application } = await supabase
         .from('applications')
-        .select('resume_text, id')
+        .select(`
+          id,
+          resume_pool_id,
+          resume_pool:resume_pool_id (
+            id,
+            resume_text
+          )
+        `)
         .eq('id', targetApplicationId)
         .single();
 
       if (!application) {
-        console.error('❌ Failed to fetch application data');
+        console.error('❌ Failed to fetch application data for application ID:', targetApplicationId);
+        return null;
+      }
+
+      if (!application.resume_pool_id) {
+        console.error('❌ Application has no resume_pool_id:', application);
+        return null;
+      }
+
+      if (!(application as any).resume_pool) {
+        console.error('❌ Failed to fetch resume_pool data for resume_pool_id:', application.resume_pool_id);
         return null;
       }
 
@@ -331,7 +349,7 @@ export class VoiceInterviewService {
         full_name: `${result.first_name} ${result.last_name}`,
         job_requirements: job?.requirements || '',
         job_description: `${job?.description || ''}\n\nKey Responsibilities:\n${job?.responsibilities || ''}`,
-        resume: application?.resume_text || 'Resume content will be available after database configuration is completed.',
+        resume: (application as any)?.resume_pool?.resume_text || 'Resume content will be available after database configuration is completed.',
         screening_result_id: screeningResultId,
         job_id: result.job_id,
         application_id: targetApplicationId,
@@ -339,6 +357,9 @@ export class VoiceInterviewService {
       };
 
       console.log('✅ Interview data ready for:', interviewData.full_name);
+      console.log('📋 Resume text length:', interviewData.resume.length);
+      console.log('🔗 Application ID:', targetApplicationId);
+      console.log('📁 Resume Pool ID:', application.resume_pool_id);
       return interviewData;
 
     } catch (error) {

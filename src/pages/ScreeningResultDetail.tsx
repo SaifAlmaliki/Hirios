@@ -32,7 +32,8 @@ import { VoiceInterviewService } from '@/services/voiceInterviewService';
 import { useToast } from '@/hooks/use-toast';
 import ScreeningResultActions from '@/components/ScreeningResultActions';
 import InlineCandidateStatusManager from '@/components/InlineCandidateStatusManager';
-import { downloadResume } from '@/lib/resumeUtils';
+import InterviewAvailabilityMatrix from '@/components/InterviewAvailabilityMatrix';
+import { useDownloadResume } from '@/hooks/useDownload';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -51,6 +52,7 @@ const ScreeningResultDetail = () => {
   const { toast } = useToast();
   const [requestingInterview, setRequestingInterview] = useState<string | null>(null);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const downloadResumeMutation = useDownloadResume();
 
   // Bullet point parsing function
   const parseContentToBullets = (content: string) => {
@@ -151,11 +153,11 @@ const ScreeningResultDetail = () => {
       return;
     }
 
-    // Fetch resume URL from resume_pool
+    // Fetch resume data from resume_pool
     const { supabase } = await import('@/integrations/supabase/client');
     const { data } = await supabase
       .from('resume_pool')
-      .select('storage_path')
+      .select('storage_path, original_filename')
       .eq('id', result.resume_pool_id)
       .single();
     
@@ -168,8 +170,14 @@ const ScreeningResultDetail = () => {
       return;
     }
 
-    const filename = `${result.first_name} ${result.last_name}_Resume.pdf`;
-    await downloadResume(data.storage_path, filename);
+    // Use the original filename if available, otherwise generate one
+    const filename = data.original_filename || `${result.first_name} ${result.last_name}_Resume.pdf`;
+    
+    // Use the new download service
+    downloadResumeMutation.mutate({
+      storagePath: data.storage_path,
+      filename: filename
+    });
   };
 
   const getScoreColor = (score: number) => {
@@ -559,6 +567,19 @@ const ScreeningResultDetail = () => {
                       </div>
                     </div>
                   )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Interview Scheduling Section */}
+            {result.application_id && (
+              <Card className="shadow-lg border-0 bg-white">
+                <CardHeader>
+                  <CardTitle className="text-lg sm:text-xl">Interview Scheduling</CardTitle>
+                  <CardDescription>Coordinate interview times with participants</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <InterviewAvailabilityMatrix applicationId={result.application_id} />
                 </CardContent>
               </Card>
             )}
