@@ -46,6 +46,34 @@ const ResumePoolUpload: React.FC<ResumePoolUploadProps> = ({
 
   const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
+  // Reset state when dialog opens to prevent showing stale progress bar
+  useEffect(() => {
+    if (isDialogOpen) {
+      // Check if there's stale localStorage data
+      const storageKey = 'resume_pool_upload_progress';
+      const progressData = localStorage.getItem(storageKey);
+      
+      if (progressData) {
+        try {
+          const { timestamp, duration = 30000 } = JSON.parse(progressData);
+          const elapsed = Date.now() - timestamp;
+          
+          // If the progress period has expired, clear it
+          if (elapsed > duration) {
+            localStorage.removeItem(storageKey);
+            // Ensure state is clean
+            setShowProgressBar(false);
+            setUploadedFiles([]);
+            setUploadedCount(0);
+          }
+        } catch (e) {
+          console.error('Error parsing progress data:', e);
+          localStorage.removeItem(storageKey);
+        }
+      }
+    }
+  }, [isDialogOpen]);
+
   // Show progress bar when all uploads are completed or failed
   useEffect(() => {
     if (uploadedFiles.length > 0 && uploadedFiles.every(f => f.status === 'completed' || f.status === 'failed')) {
@@ -249,8 +277,29 @@ const ResumePoolUpload: React.FC<ResumePoolUploadProps> = ({
     window.location.reload();
   };
 
+  const handleDialogOpenChange = (open: boolean) => {
+    if (!open) {
+      // If closing while progress bar is showing, clear the localStorage
+      if (showProgressBar) {
+        localStorage.removeItem('resume_pool_upload_progress');
+        // Reset state
+        setShowProgressBar(false);
+        setUploadedFiles([]);
+        setPendingFiles([]);
+        setOverallProgress(0);
+        setUploadedCount(0);
+      }
+      
+      // Prevent closing if currently uploading or showing progress bar
+      if (isUploading || showProgressBar) {
+        return;
+      }
+    }
+    setIsDialogOpen(open);
+  };
+
   return (
-    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+    <Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
       {showTrigger && (
         <DialogTrigger asChild>
           <Button className="bg-green-600 hover:bg-green-700 text-white">
@@ -260,7 +309,21 @@ const ResumePoolUpload: React.FC<ResumePoolUploadProps> = ({
         </DialogTrigger>
       )}
       
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent 
+        className="max-w-2xl max-h-[90vh] overflow-y-auto"
+        onInteractOutside={(e) => {
+          // Prevent closing by clicking outside if uploading or showing progress
+          if (isUploading || showProgressBar) {
+            e.preventDefault();
+          }
+        }}
+        onEscapeKeyDown={(e) => {
+          // Prevent closing with Escape key if uploading or showing progress
+          if (isUploading || showProgressBar) {
+            e.preventDefault();
+          }
+        }}
+      >
         <DialogHeader>
           <DialogTitle className="text-green-600 text-xl font-semibold">
             Upload Resumes to Pool
@@ -423,7 +486,7 @@ const ResumePoolUpload: React.FC<ResumePoolUploadProps> = ({
           <div className="flex justify-end space-x-2">
             <Button
               variant="outline"
-              onClick={() => setIsDialogOpen(false)}
+              onClick={() => handleDialogOpenChange(false)}
               disabled={isUploading}
             >
               Cancel

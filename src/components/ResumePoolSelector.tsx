@@ -329,15 +329,38 @@ const ResumePoolSelector: React.FC<ResumePoolSelectorProps> = ({
   };
 
   const handleDialogClose = (open: boolean) => {
-    if (!open && !isProcessing && !showProgressBar) {
-      resetSelection();
+    if (!open) {
+      // If closing while progress bar is showing, clear the localStorage
+      if (showProgressBar) {
+        const storageKey = `screening_progress_${jobId}`;
+        localStorage.removeItem(storageKey);
+      }
+      
+      // Only reset selection if not processing or showing progress bar
+      if (!isProcessing && !showProgressBar) {
+        resetSelection();
+      }
     }
     onDialogOpenChange(open);
   };
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={handleDialogClose}>
-      <DialogContent className="sm:max-w-6xl max-h-[80vh] overflow-y-auto">
+      <DialogContent 
+        className="sm:max-w-6xl max-h-[80vh] overflow-y-auto"
+        onInteractOutside={(e) => {
+          // Prevent closing by clicking outside if processing or showing progress
+          if (isProcessing || showProgressBar) {
+            e.preventDefault();
+          }
+        }}
+        onEscapeKeyDown={(e) => {
+          // Prevent closing with Escape key if processing or showing progress
+          if (isProcessing || showProgressBar) {
+            e.preventDefault();
+          }
+        }}
+      >
         <DialogHeader>
           <DialogTitle className="text-xl text-blue-900">Select Resumes from Pool</DialogTitle>
           <DialogDescription>
