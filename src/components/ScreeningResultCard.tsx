@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router-dom';
 import { ScreeningResult } from '@/hooks/useScreeningResults';
 import ScreeningResultHeader from './ScreeningResultHeader';
 import ScreeningResultActions from './ScreeningResultActions';
-import ScreeningResultProgress from './ScreeningResultProgress';
 import ScreeningResultAnalysis from './ScreeningResultAnalysis';
 import InterviewSchedulingDialog from './InterviewSchedulingDialog';
 
@@ -112,8 +111,6 @@ const ScreeningResultCard: React.FC<ScreeningResultCardProps> = ({
             onScheduleInterview={() => setShowSchedulingDialog(true)}
           />
         </div>
-
-        <ScreeningResultProgress score={result.overall_fit || 0} />
       </CardHeader>
       <Collapsible open={isExpanded}>
         <CollapsibleContent>
