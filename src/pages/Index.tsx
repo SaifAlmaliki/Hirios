@@ -13,7 +13,7 @@ const Index = () => {
   // Redirect authenticated users directly to company dashboard
   React.useEffect(() => {
     if (!loading && user) {
-      navigate('/job-portal');
+      navigate('/resume-pool');
     }
   }, [user, loading, navigate]);
 

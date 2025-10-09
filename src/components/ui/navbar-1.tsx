@@ -16,7 +16,7 @@ interface Navbar1Props {
 }
 
 const Navbar1: React.FC<Navbar1Props> = ({
-  title = "Job Portal",
+  title = "Talent Pool",
   showBackButton = false,
   backButtonText = "Back",
   backButtonPath = "/job-portal",
@@ -56,7 +56,7 @@ const Navbar1: React.FC<Navbar1Props> = ({
   };
 
   const handleLogoClick = () => {
-    navigate('/job-portal');
+    navigate('/resume-pool');
   };
 
   // Get max width class

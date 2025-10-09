@@ -139,8 +139,8 @@ const Auth = () => {
         sessionStorage.removeItem('postLoginRedirectUrl');
         window.location.href = redirectUrl; // preserve query params
       } else {
-        console.log('[Auth] Navigating to /job-portal');
-        navigate('/job-portal');
+        console.log('[Auth] Navigating to /resume-pool');
+        navigate('/resume-pool');
       }
     }
   }, [authLoading, user, navigate]);
@@ -179,7 +179,7 @@ const Auth = () => {
           description: "Logged in successfully!",
         });
         console.log('[Auth] Navigate after sign-in');
-        navigate('/job-portal');
+        navigate('/resume-pool');
       }
     } catch (error) {
       console.error('[Auth] signIn threw error', error);
