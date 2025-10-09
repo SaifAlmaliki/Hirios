@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -30,6 +30,7 @@ import ResumeRow from '@/components/ResumeRow';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import Navbar from '@/components/Navbar';
+import ScreeningProgressBar from '@/components/ui/ScreeningProgressBar';
 
 const ResumePool = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -39,6 +40,9 @@ const ResumePool = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [resumeToDelete, setResumeToDelete] = useState<ResumePoolItem | null>(null);
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
+  const [showProgressBar, setShowProgressBar] = useState(false);
+  const [uploadedResumeCount, setUploadedResumeCount] = useState(0);
+  const [progressDuration, setProgressDuration] = useState(30);
 
   const { data: resumes = [], isLoading, refetch } = useResumePool();
   const deleteResumeMutation = useDeleteResumeFromPool();
@@ -49,6 +53,43 @@ const ResumePool = () => {
   // Get global status badges for all resumes across all jobs
   const resumeIds = resumes.map(r => r.id);
   const { data: globalStatusBadges = {} } = useGlobalResumePoolStatusBadges(resumeIds);
+
+  // Check if resume processing is in progress (using localStorage)
+  useEffect(() => {
+    const storageKey = 'resume_pool_upload_progress';
+    const progressData = localStorage.getItem(storageKey);
+    
+    if (progressData) {
+      try {
+        const { timestamp, count, duration = 30000 } = JSON.parse(progressData);
+        const elapsed = Date.now() - timestamp;
+        const remainingTime = duration - elapsed;
+        
+        if (remainingTime > 0) {
+          // Processing is still in progress
+          setShowProgressBar(true);
+          setUploadedResumeCount(count);
+          setProgressDuration(Math.ceil(remainingTime / 1000)); // Convert to seconds
+          
+          // Set timeout to hide progress bar after remaining time
+          const timeout = setTimeout(() => {
+            setShowProgressBar(false);
+            localStorage.removeItem(storageKey);
+            // Refresh the page to show new results
+            window.location.reload();
+          }, remainingTime);
+          
+          return () => clearTimeout(timeout);
+        } else {
+          // Progress bar period has expired
+          localStorage.removeItem(storageKey);
+        }
+      } catch (e) {
+        console.error('Error parsing progress data:', e);
+        localStorage.removeItem(storageKey);
+      }
+    }
+  }, []);
 
   // Filter and sort resumes
   const filteredAndSortedResumes = useMemo(() => {
@@ -197,6 +238,22 @@ const ResumePool = () => {
         <div className="container mx-auto px-4 pt-32 pb-8">
         <div className="max-w-7xl mx-auto">
           {/* Header - Removed title, description, and upload button */}
+
+          {/* Progress Bar - Show if processing is in progress */}
+          {showProgressBar && (
+            <div className="mb-8">
+              <ScreeningProgressBar 
+                totalResumes={uploadedResumeCount}
+                onComplete={() => {
+                  setShowProgressBar(false);
+                  localStorage.removeItem('resume_pool_upload_progress');
+                  window.location.reload();
+                }}
+                durationSeconds={progressDuration}
+                mode="extraction"
+              />
+            </div>
+          )}
 
           {/* Stats */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">

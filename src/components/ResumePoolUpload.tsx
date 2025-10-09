@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Upload, FileText, X, CheckCircle, AlertCircle, Loader2, Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useUploadResumeToPool } from '@/hooks/useResumePool';
+import ScreeningProgressBar from '@/components/ui/ScreeningProgressBar';
 
 interface UploadedFile {
   id: string;
@@ -36,29 +37,34 @@ const ResumePoolUpload: React.FC<ResumePoolUploadProps> = ({
   const [isUploading, setIsUploading] = useState(false);
   const [overallProgress, setOverallProgress] = useState(0);
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  const [showProgressBar, setShowProgressBar] = useState(false);
+  const [uploadedCount, setUploadedCount] = useState(0);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const uploadResumeMutation = useUploadResumeToPool();
 
-  const MAX_FILES = 10;
   const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
-  // Auto-close dialog when all uploads are completed or failed
+  // Show progress bar when all uploads are completed or failed
   useEffect(() => {
     if (uploadedFiles.length > 0 && uploadedFiles.every(f => f.status === 'completed' || f.status === 'failed')) {
       const completedCount = uploadedFiles.filter(f => f.status === 'completed').length;
       if (completedCount > 0) {
-        onUploadComplete?.();
-        setTimeout(() => {
-          setIsDialogOpen(false);
-          setUploadedFiles([]);
-          setPendingFiles([]);
-          setOverallProgress(0);
-        }, 2000);
+        // Show progress bar for AI processing
+        setShowProgressBar(true);
+        setUploadedCount(completedCount);
+        
+        // Save to localStorage for tracking (30 seconds for extraction)
+        const storageKey = 'resume_pool_upload_progress';
+        localStorage.setItem(storageKey, JSON.stringify({
+          timestamp: Date.now(),
+          count: completedCount,
+          duration: 30000 // 30 seconds in milliseconds
+        }));
       }
     }
-  }, [uploadedFiles, onUploadComplete, setIsDialogOpen]);
+  }, [uploadedFiles]);
 
   const handleFileSelect = useCallback((files: FileList | null) => {
     if (!files) return;
@@ -76,12 +82,6 @@ const ResumePoolUpload: React.FC<ResumePoolUploadProps> = ({
       // Validate file size
       if (file.size > MAX_FILE_SIZE) {
         errors.push(`${file.name}: File size must be less than 5MB`);
-        return;
-      }
-
-      // Check total file count
-      if (pendingFiles.length + uploadedFiles.length + newFiles.length >= MAX_FILES) {
-        errors.push(`Maximum ${MAX_FILES} files allowed`);
         return;
       }
 
@@ -232,6 +232,23 @@ const ResumePoolUpload: React.FC<ResumePoolUploadProps> = ({
   const failedCount = uploadedFiles.filter(f => f.status === 'failed').length;
   const totalFiles = uploadedFiles.length;
 
+  const handleProgressComplete = () => {
+    // Clear state and close dialog
+    localStorage.removeItem('resume_pool_upload_progress');
+    setShowProgressBar(false);
+    setUploadedFiles([]);
+    setPendingFiles([]);
+    setOverallProgress(0);
+    setUploadedCount(0);
+    setIsDialogOpen(false);
+    
+    // Refresh the page
+    if (onUploadComplete) {
+      onUploadComplete();
+    }
+    window.location.reload();
+  };
+
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       {showTrigger && (
@@ -254,12 +271,25 @@ const ResumePoolUpload: React.FC<ResumePoolUploadProps> = ({
         </DialogHeader>
 
         <div className="space-y-6">
+          {/* Progress Bar - Show after upload completes */}
+          {showProgressBar && (
+            <ScreeningProgressBar 
+              totalResumes={uploadedCount}
+              onComplete={handleProgressComplete}
+              durationSeconds={30}
+              mode="extraction"
+            />
+          )}
+
+          {/* Hide upload interface when showing progress bar */}
+          {!showProgressBar && (
+          <>
           {/* Upload Area */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <label className="text-sm font-medium">Upload Resumes</label>
               <span className="text-sm text-gray-500">
-                {pendingFiles.length + uploadedFiles.length}/{MAX_FILES} files (Max 5MB each)
+                {pendingFiles.length + uploadedFiles.length} file{pendingFiles.length + uploadedFiles.length !== 1 ? 's' : ''} (Max 5MB each)
               </span>
             </div>
 
@@ -416,6 +446,8 @@ const ResumePoolUpload: React.FC<ResumePoolUploadProps> = ({
               )}
             </Button>
           </div>
+          </>
+          )}
         </div>
       </DialogContent>
     </Dialog>

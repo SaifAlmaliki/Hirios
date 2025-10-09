@@ -26,6 +26,7 @@ import { format } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { sendResumeToWebhook, fileToBase64 } from '@/services/webhookService';
+import ScreeningProgressBar from '@/components/ui/ScreeningProgressBar';
 
 interface ResumePoolSelectorProps {
   jobId: string;
@@ -55,6 +56,8 @@ const ResumePoolSelector: React.FC<ResumePoolSelectorProps> = ({
   const [selectedResumes, setSelectedResumes] = useState<string[]>([]);
   const [processingResumes, setProcessingResumes] = useState<ProcessingResume[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [showProgressBar, setShowProgressBar] = useState(false);
+  const [processedResumeCount, setProcessedResumeCount] = useState(0);
   const { data: resumes = [], isLoading } = useResumePool();
   const { toast } = useToast();
   const { user } = useAuth();
@@ -248,6 +251,15 @@ const ResumePoolSelector: React.FC<ResumePoolSelectorProps> = ({
     })));
 
     setIsProcessing(true);
+    setShowProgressBar(true);
+    setProcessedResumeCount(selectedResumes.length);
+
+    // Save progress info to localStorage for the screening results page
+    const storageKey = `screening_progress_${jobId}`;
+    localStorage.setItem(storageKey, JSON.stringify({
+      timestamp: Date.now(),
+      count: selectedResumes.length
+    }));
 
     // Process resumes sequentially
     for (const resume of selectedResumeObjects) {
@@ -261,8 +273,8 @@ const ResumePoolSelector: React.FC<ResumePoolSelectorProps> = ({
 
     if (completedCount > 0) {
       toast({
-        title: "Processing completed",
-        description: `${completedCount} resume(s) processed successfully${failedCount > 0 ? `, ${failedCount} failed` : ''}.`,
+        title: "Processing started",
+        description: `${selectedResumes.length} resume(s) sent for AI screening. Results will appear in ~60 seconds.`,
       });
     }
 
@@ -274,7 +286,7 @@ const ResumePoolSelector: React.FC<ResumePoolSelectorProps> = ({
       });
     }
 
-    onSelectionComplete();
+    // Don't call onSelectionComplete here anymore, wait for progress bar to complete
   };
 
   const getStatusIcon = (status: string) => {
@@ -303,14 +315,21 @@ const ResumePoolSelector: React.FC<ResumePoolSelectorProps> = ({
     }
   };
 
+  const handleProgressComplete = () => {
+    // After 60 seconds, refresh the page to show new results
+    window.location.reload();
+  };
+
   const resetSelection = () => {
     setSelectedResumes([]);
     setProcessingResumes([]);
     setSearchTerm('');
+    setShowProgressBar(false);
+    setProcessedResumeCount(0);
   };
 
   const handleDialogClose = (open: boolean) => {
-    if (!open && !isProcessing) {
+    if (!open && !isProcessing && !showProgressBar) {
       resetSelection();
     }
     onDialogOpenChange(open);
@@ -327,7 +346,17 @@ const ResumePoolSelector: React.FC<ResumePoolSelectorProps> = ({
         </DialogHeader>
 
         <div className="space-y-6">
+          {/* Progress Bar - Show during screening */}
+          {showProgressBar && (
+            <ScreeningProgressBar 
+              totalResumes={processedResumeCount}
+              onComplete={handleProgressComplete}
+              durationSeconds={60}
+            />
+          )}
+
           {/* Search and Selection Controls */}
+          {!showProgressBar && (
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1">
               <div className="relative">
@@ -366,8 +395,10 @@ const ResumePoolSelector: React.FC<ResumePoolSelectorProps> = ({
               </Button>
             </div>
           </div>
+          )}
 
           {/* Resume List */}
+          {!showProgressBar && (
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">
@@ -516,8 +547,10 @@ const ResumePoolSelector: React.FC<ResumePoolSelectorProps> = ({
               )}
             </CardContent>
           </Card>
+          )}
 
           {/* Action Buttons */}
+          {!showProgressBar && (
           <div className="flex justify-end space-x-3 pt-4 border-t">
             <Button
               variant="outline"
@@ -527,6 +560,7 @@ const ResumePoolSelector: React.FC<ResumePoolSelectorProps> = ({
               {isProcessing ? 'Processing...' : 'Cancel'}
             </Button>
           </div>
+          )}
         </div>
       </DialogContent>
       

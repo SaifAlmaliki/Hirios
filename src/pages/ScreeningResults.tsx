@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -33,6 +33,7 @@ import { useCompanyJobs } from '@/hooks/useCompanyJobs';
 import ScreeningResultCard from '@/components/ScreeningResultCard';
 import Navbar from '@/components/Navbar';
 import ResumePoolSelector from '@/components/ResumePoolSelector';
+import ScreeningProgressBar from '@/components/ui/ScreeningProgressBar';
 
 import { VoiceInterviewService } from '@/services/voiceInterviewService';
 
@@ -63,6 +64,48 @@ const ScreeningResults = () => {
   
   // State for upload dialogs
   const [isResumePoolDialogOpen, setIsResumePoolDialogOpen] = useState(false);
+
+  // State for screening progress tracking
+  const [showProgressBar, setShowProgressBar] = useState(false);
+  const [processingResumeCount, setProcessingResumeCount] = useState(0);
+
+  // Check if screening is in progress for this job (using localStorage)
+  useEffect(() => {
+    if (jobId) {
+      const storageKey = `screening_progress_${jobId}`;
+      const progressData = localStorage.getItem(storageKey);
+      
+      if (progressData) {
+        try {
+          const { timestamp, count } = JSON.parse(progressData);
+          const elapsed = Date.now() - timestamp;
+          const remainingTime = 60000 - elapsed; // 60 seconds in ms
+          
+          if (remainingTime > 0) {
+            // Screening is still in progress
+            setShowProgressBar(true);
+            setProcessingResumeCount(count);
+            
+            // Set timeout to hide progress bar after remaining time
+            const timeout = setTimeout(() => {
+              setShowProgressBar(false);
+              localStorage.removeItem(storageKey);
+              // Refresh the page to show new results
+              window.location.reload();
+            }, remainingTime);
+            
+            return () => clearTimeout(timeout);
+          } else {
+            // Progress bar period has expired
+            localStorage.removeItem(storageKey);
+          }
+        } catch (e) {
+          console.error('Error parsing progress data:', e);
+          localStorage.removeItem(storageKey);
+        }
+      }
+    }
+  }, [jobId]);
 
   // Filter and sort results - must be before any conditional returns
   const filteredAndSortedResults = useMemo(() => {
@@ -208,8 +251,18 @@ const ScreeningResults = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 md:py-8 pt-32">
         <div className="space-y-6">
 
-
-
+          {/* Progress Bar - Show if screening is in progress */}
+          {showProgressBar && jobId && (
+            <ScreeningProgressBar 
+              totalResumes={processingResumeCount}
+              onComplete={() => {
+                setShowProgressBar(false);
+                localStorage.removeItem(`screening_progress_${jobId}`);
+                window.location.reload();
+              }}
+              durationSeconds={60}
+            />
+          )}
 
           {/* Combined Filters */}
           <Card className="mt-8">
