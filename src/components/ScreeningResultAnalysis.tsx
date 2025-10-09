@@ -96,8 +96,9 @@ const ScreeningResultAnalysis: React.FC<ScreeningResultAnalysisProps> = ({
     abbreviations.forEach((abbr, index) => {
       const placeholder = `__ABBR_${index}__`;
       abbreviationMap[placeholder] = abbr;
-      // Use case-insensitive replacement
-      const regex = new RegExp(abbr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+      // Use case-insensitive replacement with word boundaries for standalone abbreviations
+      const escapedAbbr = abbr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(`\\b${escapedAbbr}\\b`, 'gi');
       protectedContent = protectedContent.replace(regex, placeholder);
     });
     
