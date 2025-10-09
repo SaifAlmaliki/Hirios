@@ -19,14 +19,80 @@ const CompanySetup = () => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasProfile, setHasProfile] = useState(false);
+  const [companyData, setCompanyData] = useState({
+    company_name: '',
+    company_description: '',
+    company_website: '',
+    company_size: '',
+    industry: '',
+    address: '',
+    phone: '',
+    logo_url: '',
+  });
 
-  // Redirect if not authenticated - THIS MUST BE AFTER ALL HOOKS
+  // Redirect if not authenticated
   useEffect(() => {
     if (!loading && !user) {
       navigate('/');
       return;
     }
   }, [user, loading, navigate]);
+
+  // Check if company profile already exists
+  useEffect(() => {
+    if (!user) return;
+
+    const checkProfile = async () => {
+      const { data } = await supabase
+        .from('company_profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      
+      if (data) {
+        setHasProfile(true);
+        // Ensure all fields have string values, not null
+        setCompanyData({
+          company_name: data.company_name || '',
+          company_description: data.company_description || '',
+          company_website: data.company_website || '',
+          company_size: data.company_size || '',
+          industry: data.industry || '',
+          address: data.address || '',
+          phone: data.phone || '',
+          logo_url: data.logo_url || '',
+        });
+      } else {
+        // If no profile exists, create a basic one
+        const { data: newProfile, error } = await supabase
+          .from('company_profiles')
+          .insert([{
+            user_id: user.id,
+            company_name: 'My Company',
+            subscription_plan: 'free'
+          }])
+          .select()
+          .single();
+        
+        if (newProfile && !error) {
+          setHasProfile(true);
+          // Ensure all fields have string values, not null
+          setCompanyData({
+            company_name: newProfile.company_name || '',
+            company_description: newProfile.company_description || '',
+            company_website: newProfile.company_website || '',
+            company_size: newProfile.company_size || '',
+            industry: newProfile.industry || '',
+            address: newProfile.address || '',
+            phone: newProfile.phone || '',
+            logo_url: newProfile.logo_url || '',
+          });
+        }
+      }
+    };
+
+    checkProfile();
+  }, [user]);
 
   // Show loading state while auth is being determined
   if (loading) {
@@ -61,71 +127,6 @@ const CompanySetup = () => {
       </div>
     );
   }
-
-  const [companyData, setCompanyData] = useState({
-    company_name: '',
-    company_description: '',
-    company_website: '',
-    company_size: '',
-    industry: '',
-    address: '',
-    phone: '',
-    logo_url: '',
-  });
-
-  useEffect(() => {
-    // Check if company profile already exists
-    const checkProfile = async () => {
-      const { data } = await supabase
-        .from('company_profiles')
-        .select('*')
-        .eq('user_id', user!.id)
-        .maybeSingle();
-      
-      if (data) {
-        setHasProfile(true);
-        // Ensure all fields have string values, not null
-        setCompanyData({
-          company_name: data.company_name || '',
-          company_description: data.company_description || '',
-          company_website: data.company_website || '',
-          company_size: data.company_size || '',
-          industry: data.industry || '',
-          address: data.address || '',
-          phone: data.phone || '',
-          logo_url: data.logo_url || '',
-        });
-      } else {
-        // If no profile exists, create a basic one
-        const { data: newProfile, error } = await supabase
-          .from('company_profiles')
-          .insert([{
-            user_id: user!.id,
-            company_name: 'My Company',
-            subscription_plan: 'free'
-          }])
-          .select()
-          .single();
-        
-        if (newProfile && !error) {
-          setHasProfile(true);
-          // Ensure all fields have string values, not null
-          setCompanyData({
-            company_name: newProfile.company_name || '',
-            company_description: newProfile.company_description || '',
-            company_website: newProfile.company_website || '',
-            company_size: newProfile.company_size || '',
-            industry: newProfile.industry || '',
-            address: newProfile.address || '',
-            phone: newProfile.phone || '',
-            logo_url: newProfile.logo_url || '',
-          });
-        }
-      }
-    };
-
-    checkProfile();
-  }, [user, navigate]);
 
   const handleInputChange = (field: string, value: string) => {
     setCompanyData(prev => ({ ...prev, [field]: value }));
