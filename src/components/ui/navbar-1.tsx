@@ -126,7 +126,7 @@ const Navbar1: React.FC<Navbar1Props> = ({
                   className="flex items-center px-1.5 py-1 text-sm text-gray-900 hover:text-orange-600 transition-colors font-medium rounded-full hover:bg-orange-50"
                 >
                   <FileText className="h-4 w-4 mr-1" />
-                  <span className="hidden sm:inline">Resume Pool</span>
+                  <span className="hidden sm:inline">Talent Pool</span>
                 </button>
               </motion.div>
 
@@ -198,7 +198,7 @@ const Navbar1: React.FC<Navbar1Props> = ({
                   className="flex items-center px-2 py-1 text-sm text-gray-900 hover:text-orange-600 transition-colors font-medium rounded-full hover:bg-orange-50"
                 >
                   <FileText className="h-4 w-4 mr-1" />
-                  Resume Pool
+                  Talent Pool
                 </button>
               </motion.div>
 
@@ -335,7 +335,7 @@ const Navbar1: React.FC<Navbar1Props> = ({
                       className="flex items-center w-full text-base text-gray-900 font-medium py-3"
                     >
                       <FileText className="h-5 w-5 mr-3" />
-                      Resume Pool
+                      Talent Pool
                     </button>
                   </motion.div>
 
