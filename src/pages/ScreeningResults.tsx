@@ -7,6 +7,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Checkbox } from '@/components/ui/checkbox';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { 
   Filter, 
   Download, 
@@ -24,11 +35,12 @@ import {
   MapPin,
   Star,
   Brain,
+  Trash2,
 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { useScreeningResults, ScreeningResult } from '@/hooks/useScreeningResults';
+import { useScreeningResults, ScreeningResult, useBulkDeleteScreeningResults } from '@/hooks/useScreeningResults';
 import { useCompanyJobs } from '@/hooks/useCompanyJobs';
 import ScreeningResultCard from '@/components/ScreeningResultCard';
 import Navbar from '@/components/Navbar';
@@ -57,6 +69,9 @@ const ScreeningResults = () => {
   const [selectedJobId, setSelectedJobId] = useState<string>('all');
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   
+  // State for bulk selection and deletion
+  const [selectedResults, setSelectedResults] = useState<Set<string>>(new Set());
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   
   // State for voice interviews
   const [requestingInterview, setRequestingInterview] = useState<string | null>(null);
@@ -68,6 +83,9 @@ const ScreeningResults = () => {
   // State for screening progress tracking
   const [showProgressBar, setShowProgressBar] = useState(false);
   const [processingResumeCount, setProcessingResumeCount] = useState(0);
+
+  // Bulk delete mutation
+  const bulkDeleteMutation = useBulkDeleteScreeningResults();
 
   // Check if screening is in progress for this job (using localStorage)
   useEffect(() => {
@@ -215,6 +233,48 @@ const ScreeningResults = () => {
     });
   };
 
+  const handleSelectionChange = (id: string, selected: boolean) => {
+    setSelectedResults((prev) => {
+      const newSet = new Set(prev);
+      if (selected) {
+        newSet.add(id);
+      } else {
+        newSet.delete(id);
+      }
+      return newSet;
+    });
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      const allIds = new Set(filteredAndSortedResults.map(r => r.id));
+      setSelectedResults(allIds);
+    } else {
+      setSelectedResults(new Set());
+    }
+  };
+
+  const handleBulkDelete = () => {
+    const resultsToDelete = filteredAndSortedResults
+      .filter(r => selectedResults.has(r.id))
+      .map(r => ({
+        id: r.id,
+        resume_pool_id: r.resume_pool_id,
+        job_id: r.job_id
+      }));
+
+    bulkDeleteMutation.mutate(resultsToDelete, {
+      onSuccess: () => {
+        setSelectedResults(new Set());
+        setShowDeleteDialog(false);
+      }
+    });
+  };
+
+  const isAllSelected = filteredAndSortedResults.length > 0 && 
+    filteredAndSortedResults.every(r => selectedResults.has(r.id));
+  const isSomeSelected = selectedResults.size > 0 && !isAllSelected;
+
 
   if (isLoading) {
     return (
@@ -342,14 +402,39 @@ const ScreeningResults = () => {
           {/* Results Table */}
           <Card>
             <CardHeader>
-              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-                <CardTitle className="text-lg">
-                  Screening Results ({filteredAndSortedResults.length})
-                </CardTitle>
-                {jobId && currentJob && (
-                  <div className="flex flex-col sm:text-right space-y-2">
-                    <p className="text-sm font-medium text-gray-900">{currentJob.title}</p>
-                    <div className="flex justify-end">
+              <div className="flex flex-col space-y-4">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+                  <div className="flex items-center gap-3">
+                    <Checkbox
+                      checked={isAllSelected}
+                      onCheckedChange={handleSelectAll}
+                      aria-label="Select all results"
+                      className="data-[state=indeterminate]:bg-blue-600"
+                      {...(isSomeSelected ? { 'data-state': 'indeterminate' as any } : {})}
+                    />
+                    <CardTitle className="text-lg">
+                      Screening Results ({filteredAndSortedResults.length})
+                      {selectedResults.size > 0 && (
+                        <span className="ml-2 text-sm font-normal text-blue-600">
+                          ({selectedResults.size} selected)
+                        </span>
+                      )}
+                    </CardTitle>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {selectedResults.size > 0 && (
+                      <Button
+                        onClick={() => setShowDeleteDialog(true)}
+                        variant="destructive"
+                        size="sm"
+                        disabled={bulkDeleteMutation.isPending}
+                        className="flex items-center gap-2"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        {bulkDeleteMutation.isPending ? 'Deleting...' : `Delete (${selectedResults.size})`}
+                      </Button>
+                    )}
+                    {jobId && currentJob && (
                       <Button
                         onClick={() => setIsResumePoolDialogOpen(true)}
                         className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 h-8 text-sm w-auto"
@@ -358,7 +443,12 @@ const ScreeningResults = () => {
                         <span className="hidden xs:inline">From Pool</span>
                         <span className="xs:hidden">Pool</span>
                       </Button>
-                    </div>
+                    )}
+                  </div>
+                </div>
+                {jobId && currentJob && (
+                  <div className="text-sm font-medium text-gray-900 sm:hidden">
+                    {currentJob.title}
                   </div>
                 )}
               </div>
@@ -389,6 +479,9 @@ const ScreeningResults = () => {
                       onRequestVoiceScreening={handleRequestVoiceScreening}
                       expandedRows={expandedRows}
                       onToggleExpansion={toggleRowExpansion}
+                      showCheckbox={true}
+                      isSelected={selectedResults.has(result.id)}
+                      onSelectionChange={handleSelectionChange}
                     />
                   ))}
                 </div>
@@ -398,6 +491,29 @@ const ScreeningResults = () => {
 
         </div>
       </div>
+
+      {/* Bulk Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Screening Results</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete {selectedResults.size} screening result{selectedResults.size !== 1 ? 's' : ''}? 
+              This action cannot be undone. This will also remove any associated candidate status and comments.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={bulkDeleteMutation.isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleBulkDelete}
+              disabled={bulkDeleteMutation.isPending}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {bulkDeleteMutation.isPending ? 'Deleting...' : 'Delete'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Upload Resumes Dialog - only show for job-specific pages */}
       {jobId && currentJob && (

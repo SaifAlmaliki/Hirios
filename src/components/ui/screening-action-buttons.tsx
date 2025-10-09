@@ -1,5 +1,5 @@
 import React from "react"
-import { FileText, Mic, ExternalLink, Star, Eye, ChevronDown, ChevronUp, UserX, CalendarClock } from "lucide-react"
+import { FileText, Mic, ExternalLink, Star, Eye, ChevronDown, ChevronUp, UserX, CalendarClock, Trash2 } from "lucide-react"
 import { ActionButton } from "./action-button"
 import { cn } from "@/lib/utils"
 
@@ -218,6 +218,34 @@ export const ScheduleInterviewButton: React.FC<ScheduleInterviewButtonProps> = (
         onClick={onClick}
         text="Schedule"
         shortText="Schedule"
+        className={className}
+      />
+    </div>
+  )
+}
+
+// Delete Button Component
+interface DeleteButtonProps {
+  isPending: boolean
+  onClick: () => void
+  className?: string
+}
+
+export const DeleteButton: React.FC<DeleteButtonProps> = ({
+  isPending,
+  onClick,
+  className
+}) => {
+  return (
+    <div className="w-20 xs:w-24 sm:w-28">
+      <ActionButton
+        variant="reject"
+        icon={Trash2}
+        onClick={onClick}
+        loading={isPending}
+        text={isPending ? "Deleting..." : "Delete"}
+        shortText={isPending ? "..." : "Delete"}
+        disabled={isPending}
         className={className}
       />
     </div>

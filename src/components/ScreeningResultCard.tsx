@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useNavigate } from 'react-router-dom';
 import { ScreeningResult } from '@/hooks/useScreeningResults';
 import ScreeningResultHeader from './ScreeningResultHeader';
@@ -15,6 +16,9 @@ interface ScreeningResultCardProps {
   onRequestVoiceScreening: (result: ScreeningResult) => void;
   expandedRows: Set<string>;
   onToggleExpansion: (id: string) => void;
+  isSelected?: boolean;
+  onSelectionChange?: (id: string, selected: boolean) => void;
+  showCheckbox?: boolean;
 }
 
 const ScreeningResultCard: React.FC<ScreeningResultCardProps> = ({
@@ -22,7 +26,10 @@ const ScreeningResultCard: React.FC<ScreeningResultCardProps> = ({
   requestingInterview,
   onRequestVoiceScreening,
   expandedRows,
-  onToggleExpansion
+  onToggleExpansion,
+  isSelected = false,
+  onSelectionChange,
+  showCheckbox = false
 }) => {
   const [showSchedulingDialog, setShowSchedulingDialog] = useState(false);
   const isExpanded = expandedRows.has(result.id);
@@ -32,10 +39,16 @@ const ScreeningResultCard: React.FC<ScreeningResultCardProps> = ({
   const handleCardClick = (e: React.MouseEvent) => {
     // Don't navigate if clicking on buttons or interactive elements
     const target = e.target as HTMLElement;
-    if (target.closest('button') || target.closest('[role="button"]')) {
+    if (target.closest('button') || target.closest('[role="button"]') || target.closest('[data-checkbox]')) {
       return;
     }
     navigate(`/screening-results/${result.id}`);
+  };
+
+  const handleCheckboxChange = (checked: boolean) => {
+    if (onSelectionChange) {
+      onSelectionChange(result.id, checked);
+    }
   };
 
   return (
@@ -53,18 +66,31 @@ const ScreeningResultCard: React.FC<ScreeningResultCardProps> = ({
       <CardHeader className="pb-6">
         {/* Mobile-first responsive layout */}
         <div className="flex flex-col space-y-4 lg:flex-row lg:space-y-0 lg:justify-between lg:items-start lg:gap-6">
-          <ScreeningResultHeader
-            firstName={result.first_name}
-            lastName={result.last_name}
-            email={result.email}
-            jobTitle={result.job?.title}
-            createdAt={result.created_at}
-            phone={result.phone}
-            homeAddress={result.home_address}
-            overallFit={result.overall_fit || 0}
-            skills={result.skills}
-            status={result.status}
-          />
+          <div className="flex items-start gap-3 flex-1">
+            {showCheckbox && onSelectionChange && (
+              <div className="pt-1" data-checkbox onClick={(e) => e.stopPropagation()}>
+                <Checkbox
+                  checked={isSelected}
+                  onCheckedChange={handleCheckboxChange}
+                  aria-label={`Select ${result.first_name} ${result.last_name}`}
+                />
+              </div>
+            )}
+            <div className="flex-1">
+              <ScreeningResultHeader
+                firstName={result.first_name}
+                lastName={result.last_name}
+                email={result.email}
+                jobTitle={result.job?.title}
+                createdAt={result.created_at}
+                phone={result.phone}
+                homeAddress={result.home_address}
+                overallFit={result.overall_fit || 0}
+                skills={result.skills}
+                status={result.status}
+              />
+            </div>
+          </div>
 
           <ScreeningResultActions
             resultId={result.id}

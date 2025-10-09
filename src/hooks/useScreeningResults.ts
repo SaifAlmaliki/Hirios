@@ -367,3 +367,99 @@ export const useRejectCandidate = () => {
     },
   });
 };
+
+export const useBulkDeleteScreeningResults = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (
+      screeningResults: Array<{
+        id: string;
+        resume_pool_id?: string;
+        job_id?: string;
+      }>
+    ) => {
+      console.log('🗑️ Starting bulk screening results deletion:', screeningResults.length, 'items');
+
+      let successCount = 0;
+      let errorCount = 0;
+
+      for (const result of screeningResults) {
+        try {
+          // Step 1: Delete candidate comments for this screening result
+          if (result.job_id && result.resume_pool_id) {
+            console.log('🧹 Deleting candidate comments for:', result.id);
+            await supabase
+              .from('candidate_comments')
+              .delete()
+              .eq('resume_pool_id', result.resume_pool_id)
+              .eq('job_id', result.job_id);
+
+            // Step 2: Delete candidate status for this screening result
+            console.log('🧹 Deleting candidate status for:', result.id);
+            await supabase
+              .from('candidate_status')
+              .delete()
+              .eq('resume_pool_id', result.resume_pool_id)
+              .eq('job_id', result.job_id);
+          }
+
+          // Step 3: Delete the screening result itself
+          console.log('🗑️ Deleting screening result:', result.id);
+          const { error: deleteError } = await supabase
+            .from('screening_results')
+            .delete()
+            .eq('id', result.id);
+
+          if (deleteError) {
+            console.error('❌ Failed to delete screening result:', result.id, deleteError);
+            errorCount++;
+          } else {
+            console.log('✅ Screening result deleted successfully:', result.id);
+            successCount++;
+          }
+        } catch (error) {
+          console.error('❌ Error deleting screening result:', result.id, error);
+          errorCount++;
+        }
+      }
+
+      console.log(`✅ Bulk deletion complete: ${successCount} succeeded, ${errorCount} failed`);
+      
+      return { successCount, errorCount, total: screeningResults.length };
+    },
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: ['screening_results'] });
+      queryClient.invalidateQueries({ queryKey: ['candidate_status'] });
+      queryClient.invalidateQueries({ queryKey: ['candidate_comments'] });
+      
+      if (result.errorCount === 0) {
+        toast({
+          title: "Screening Results Deleted",
+          description: `Successfully deleted ${result.successCount} screening result${result.successCount !== 1 ? 's' : ''}.`,
+        });
+      } else if (result.successCount > 0) {
+        toast({
+          title: "Partial Success",
+          description: `Deleted ${result.successCount} of ${result.total} screening results. ${result.errorCount} failed.`,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Deletion Failed",
+          description: `Failed to delete screening results. Please try again.`,
+          variant: "destructive",
+        });
+      }
+    },
+    onError: (error) => {
+      console.error('Failed to delete screening results:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete screening results. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+};
