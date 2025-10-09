@@ -93,7 +93,7 @@ const ResumePool = () => {
 
   // Filter and sort resumes
   const filteredAndSortedResumes = useMemo(() => {
-    let filtered = resumes.filter(resume => {
+    const filtered = resumes.filter(resume => {
       const searchLower = searchTerm.toLowerCase();
       return (
         resume.original_filename.toLowerCase().includes(searchLower) ||
