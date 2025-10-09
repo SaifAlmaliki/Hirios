@@ -504,14 +504,21 @@ const Auth = () => {
                           
                           <div className="space-y-2">
                             <Label htmlFor="industry" className="text-sm font-medium text-gray-700">Industry</Label>
-                            <Input
+                            <select
                               id="industry"
-                              type="text"
                               value={companyData.industry}
                               onChange={(e) => handleCompanyDataChange('industry', e.target.value)}
-                              placeholder="e.g., Technology, Healthcare"
-                              className="h-10"
-                            />
+                              className="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            >
+                              <option value="">Select industry</option>
+                              <option value="technology">Technology</option>
+                              <option value="healthcare">Healthcare</option>
+                              <option value="finance">Finance</option>
+                              <option value="education">Education</option>
+                              <option value="retail">Retail</option>
+                              <option value="manufacturing">Manufacturing</option>
+                              <option value="other">Other</option>
+                            </select>
                           </div>
                         </div>
                         
