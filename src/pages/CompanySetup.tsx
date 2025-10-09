@@ -97,7 +97,7 @@ const CompanySetup = () => {
   // Show loading state while auth is being determined
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
         <Navbar title="Company Setup" />
         <div className="flex items-center justify-center pt-32">
           <div className="text-center">
@@ -112,7 +112,7 @@ const CompanySetup = () => {
   // Security check: Only allow companies to access this page
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
         <Navbar title="Company Setup" />
         <div className="flex items-center justify-center pt-32">
           <div className="text-center">
@@ -176,7 +176,7 @@ const CompanySetup = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       <Navbar title="Company Setup" />
       <div className="max-w-7xl mx-auto py-12 px-4 pt-32">
         <Card className="shadow-xl">
