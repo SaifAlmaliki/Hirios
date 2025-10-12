@@ -1,6 +1,6 @@
 import { Stars } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { FiArrowRight } from "react-icons/fi";
 import { Brain, BarChart3 } from "lucide-react";
 import {
@@ -12,6 +12,113 @@ import {
 import { useNavigate } from "react-router-dom";
 
 const COLORS_TOP = ["#3B82F6", "#1E40AF", "#8B5CF6", "#7C3AED"];
+
+// Check if WebGL is available
+const checkWebGLSupport = (): boolean => {
+  try {
+    const canvas = document.createElement('canvas');
+    return !!(
+      window.WebGLRenderingContext &&
+      (canvas.getContext('webgl') || canvas.getContext('experimental-webgl'))
+    );
+  } catch (e) {
+    return false;
+  }
+};
+
+// Fallback animated stars using CSS
+const CSSStarField = () => {
+  return (
+    <div className="absolute inset-0 overflow-hidden">
+      <div className="stars"></div>
+      <div className="stars2"></div>
+      <div className="stars3"></div>
+      <style>{`
+        @keyframes animStar {
+          from {
+            transform: translateY(0px);
+          }
+          to {
+            transform: translateY(-2000px);
+          }
+        }
+        .stars, .stars2, .stars3 {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          width: 100%;
+          height: 100%;
+          background: transparent;
+        }
+        .stars {
+          background-image: 
+            radial-gradient(2px 2px at 20px 30px, #eee, rgba(0,0,0,0)),
+            radial-gradient(2px 2px at 60px 70px, #fff, rgba(0,0,0,0)),
+            radial-gradient(1px 1px at 50px 50px, #fff, rgba(0,0,0,0)),
+            radial-gradient(1px 1px at 130px 80px, #fff, rgba(0,0,0,0)),
+            radial-gradient(2px 2px at 90px 10px, #fff, rgba(0,0,0,0));
+          background-repeat: repeat;
+          background-size: 200px 200px;
+          animation: animStar 100s linear infinite;
+          opacity: 0.4;
+        }
+        .stars2 {
+          background-image: 
+            radial-gradient(1px 1px at 100px 150px, #fff, rgba(0,0,0,0)),
+            radial-gradient(1px 1px at 150px 20px, #fff, rgba(0,0,0,0)),
+            radial-gradient(1px 1px at 40px 80px, #fff, rgba(0,0,0,0));
+          background-repeat: repeat;
+          background-size: 250px 250px;
+          animation: animStar 150s linear infinite;
+          opacity: 0.3;
+        }
+        .stars3 {
+          background-image: 
+            radial-gradient(1px 1px at 170px 50px, #fff, rgba(0,0,0,0)),
+            radial-gradient(2px 2px at 80px 180px, #fff, rgba(0,0,0,0)),
+            radial-gradient(1px 1px at 190px 140px, #fff, rgba(0,0,0,0));
+          background-repeat: repeat;
+          background-size: 300px 300px;
+          animation: animStar 200s linear infinite;
+          opacity: 0.2;
+        }
+      `}</style>
+    </div>
+  );
+};
+
+// Safe Canvas wrapper with error boundary
+const SafeCanvas = () => {
+  const [hasError, setHasError] = useState(false);
+
+  useEffect(() => {
+    // Reset error state when component mounts
+    setHasError(false);
+  }, []);
+
+  if (hasError || !checkWebGLSupport()) {
+    return <CSSStarField />;
+  }
+
+  try {
+    return (
+      <Canvas
+        onCreated={() => {
+          // Canvas created successfully
+        }}
+        onError={() => {
+          setHasError(true);
+        }}
+      >
+        <Stars radius={50} count={2500} factor={4} fade speed={2} />
+      </Canvas>
+    );
+  } catch (error) {
+    return <CSSStarField />;
+  }
+};
 
 export const AuroraHero = () => {
   const navigate = useNavigate();
@@ -123,9 +230,7 @@ export const AuroraHero = () => {
       </div>
 
       <div className="absolute inset-0 z-0">
-        <Canvas>
-          <Stars radius={50} count={2500} factor={4} fade speed={2} />
-        </Canvas>
+        <SafeCanvas />
       </div>
     </motion.section>
   );
