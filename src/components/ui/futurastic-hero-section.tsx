@@ -127,7 +127,7 @@ export const AuroraHero = () => {
 
   useEffect(() => {
     // Check WebGL support on mount
-    setWebGLSupported(isWebGLSupported());
+    setWebGLSupported(checkWebGLSupport());
     
     animate(color, COLORS_TOP, {
       ease: "easeInOut",

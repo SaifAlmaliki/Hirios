@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import SubscriptionGuard from "@/components/SubscriptionGuard";
 import * as Sentry from '@sentry/react';
 import Index from "./pages/Index";
 import HiriosLanding from "./pages/HiriosLanding";
@@ -70,20 +71,22 @@ const App = () => (
           {/* Routes that need AuthProvider context */}
           <Route path="/*" element={
             <AuthProvider>
-              <Routes>
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/auth/confirm" element={<AuthConfirm />} />
-                <Route path="/auth/reset-password" element={<ResetPassword />} />
-                <Route path="/job-portal" element={<JobPortal />} />
-                <Route path="/company-setup" element={<CompanySetup />} />
-                <Route path="/screening-results/:id" element={<ScreeningResultDetail />} />
-                <Route path="/screening-results/job/:jobId" element={<ScreeningResults />} />
-                <Route path="/interview/:screeningResultId/:applicationId" element={<VoiceInterview />} />
-                <Route path="/test-collaboration" element={<TestCollaboration />} />
-                <Route path="/button-demo" element={<ButtonAlignmentDemo />} />
-                <Route path="/resume-pool" element={<ResumePool />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
+              <SubscriptionGuard>
+                <Routes>
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/auth/confirm" element={<AuthConfirm />} />
+                  <Route path="/auth/reset-password" element={<ResetPassword />} />
+                  <Route path="/job-portal" element={<JobPortal />} />
+                  <Route path="/company-setup" element={<CompanySetup />} />
+                  <Route path="/screening-results/:id" element={<ScreeningResultDetail />} />
+                  <Route path="/screening-results/job/:jobId" element={<ScreeningResults />} />
+                  <Route path="/interview/:screeningResultId/:applicationId" element={<VoiceInterview />} />
+                  <Route path="/test-collaboration" element={<TestCollaboration />} />
+                  <Route path="/button-demo" element={<ButtonAlignmentDemo />} />
+                  <Route path="/resume-pool" element={<ResumePool />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </SubscriptionGuard>
             </AuthProvider>
           } />
         </Routes>

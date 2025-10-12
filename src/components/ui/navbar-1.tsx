@@ -3,9 +3,16 @@
 import * as React from "react"
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Menu, X, Building2, Settings, Brain, LogOut, FileText } from "lucide-react"
+import { Menu, X, Building2, Settings, Brain, LogOut, FileText, Clock } from "lucide-react"
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSubscriptionStatus } from '@/hooks/useSubscriptionStatus';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface Navbar1Props {
   title?: string;
@@ -25,6 +32,7 @@ const Navbar1: React.FC<Navbar1Props> = ({
   const [isOpen, setIsOpen] = useState(false)
   const { user, signOut, loading } = useAuth();
   const navigate = useNavigate();
+  const subscriptionStatus = useSubscriptionStatus();
 
   const toggleMenu = () => setIsOpen(!isOpen)
 
@@ -57,6 +65,49 @@ const Navbar1: React.FC<Navbar1Props> = ({
 
   const handleLogoClick = () => {
     navigate('/resume-pool');
+  };
+
+  // Subscription badge component
+  const SubscriptionBadge = () => {
+    if (!user || subscriptionStatus.loading) {
+      return null;
+    }
+
+    if (subscriptionStatus.daysRemaining === null) {
+      return null;
+    }
+
+    const isExpiringSoon = subscriptionStatus.daysRemaining <= 7;
+    const badgeColor = subscriptionStatus.plan === 'trial' 
+      ? (isExpiringSoon ? 'bg-red-100 text-red-700 border-red-300' : 'bg-yellow-100 text-yellow-700 border-yellow-300')
+      : (isExpiringSoon ? 'bg-orange-100 text-orange-700 border-orange-300' : 'bg-green-100 text-green-700 border-green-300');
+
+    return (
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className={`flex items-center px-2 py-1 rounded-full text-xs font-semibold border ${badgeColor} cursor-help`}
+            >
+              <Clock className="h-3 w-3 mr-1" />
+              {subscriptionStatus.daysRemaining} {subscriptionStatus.daysRemaining === 1 ? 'day' : 'days'} left
+            </motion.div>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p className="text-sm">
+              {subscriptionStatus.plan === 'trial' 
+                ? `Trial expires in ${subscriptionStatus.daysRemaining} ${subscriptionStatus.daysRemaining === 1 ? 'day' : 'days'}.` 
+                : `Subscription expires in ${subscriptionStatus.daysRemaining} ${subscriptionStatus.daysRemaining === 1 ? 'day' : 'days'}.`
+              }
+              <br />
+              Contact <strong>support@hirios.com</strong> to upgrade.
+            </p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
   };
 
   // Get max width class
@@ -115,6 +166,8 @@ const Navbar1: React.FC<Navbar1Props> = ({
         <nav className="hidden md:flex lg:hidden items-center space-x-1">
           {user ? (
             <>
+              <SubscriptionBadge />
+              
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -186,6 +239,8 @@ const Navbar1: React.FC<Navbar1Props> = ({
               <span className="text-sm text-gray-600 hidden xl:inline">
                 {user.email}
               </span>
+              
+              <SubscriptionBadge />
               
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
@@ -322,6 +377,9 @@ const Navbar1: React.FC<Navbar1Props> = ({
                     className="text-center pb-4 border-b border-gray-200"
                   >
                     <p className="text-sm text-gray-600 mb-3">{user.email}</p>
+                    <div className="flex justify-center">
+                      <SubscriptionBadge />
+                    </div>
                   </motion.div>
 
                   <motion.div
