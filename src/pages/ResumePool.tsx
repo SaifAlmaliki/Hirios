@@ -6,11 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { 
   Search, 
-  Download, 
   Trash2, 
   FileText, 
-  Calendar,
-  HardDrive,
   RefreshCw
 } from 'lucide-react';
 import {
@@ -28,7 +25,6 @@ import { useGlobalResumePoolStatusBadges } from '@/hooks/useCandidateStatus';
 import ResumePoolUpload from '@/components/ResumePoolUpload';
 import ResumeRow from '@/components/ResumeRow';
 import { useToast } from '@/hooks/use-toast';
-import { format } from 'date-fns';
 import Navbar from '@/components/Navbar';
 import ScreeningProgressBar from '@/components/ui/ScreeningProgressBar';
 
@@ -128,19 +124,6 @@ const ResumePool = () => {
     return filtered;
   }, [resumes, searchTerm, sortBy, sortOrder]);
 
-  const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  };
-
-  // Calculate total size from file_size field
-  const calculateTotalSize = () => {
-    return resumes.reduce((sum, r) => sum + (r.file_size || 0), 0);
-  };
-
   const handleSelectResume = (resumeId: string, checked: boolean) => {
     if (checked) {
       setSelectedResumes(prev => [...prev, resumeId]);
@@ -196,16 +179,6 @@ const ResumePool = () => {
     });
   };
 
-  const handleBulkDownload = () => {
-    const selectedResumeData = filteredAndSortedResumes.filter(r => selectedResumes.includes(r.id));
-    selectedResumeData.forEach(resume => {
-      downloadResumeMutation.mutate({
-        storagePath: resume.storage_path,
-        filename: resume.original_filename
-      });
-    });
-  };
-
   const handleSort = (field: 'name' | 'date' | 'size') => {
     if (sortBy === field) {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
@@ -235,7 +208,7 @@ const ResumePool = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       <Navbar title="Talent Pool" />
-        <div className="container mx-auto px-4 pt-32 pb-8">
+        <div className="container mx-auto px-4 pt-20 pb-8">
         <div className="max-w-7xl mx-auto">
           {/* Header - Removed title, description, and upload button */}
 
@@ -254,47 +227,6 @@ const ResumePool = () => {
               />
             </div>
           )}
-
-          {/* Stats */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
-            <Card>
-              <CardContent className="p-4 sm:p-6">
-                <div className="flex items-center">
-                  <FileText className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600 flex-shrink-0" />
-                  <div className="ml-3 sm:ml-4 min-w-0">
-                    <p className="text-xs sm:text-sm font-medium text-gray-600">Total Resumes</p>
-                    <p className="text-lg sm:text-2xl font-bold text-gray-900">{resumes.length}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4 sm:p-6">
-                <div className="flex items-center">
-                  <HardDrive className="h-6 w-6 sm:h-8 sm:w-8 text-green-600 flex-shrink-0" />
-                  <div className="ml-3 sm:ml-4 min-w-0">
-                    <p className="text-xs sm:text-sm font-medium text-gray-600">Total Size</p>
-                    <p className="text-lg sm:text-2xl font-bold text-gray-900 truncate">
-                      {formatFileSize(calculateTotalSize())}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="sm:col-span-2 lg:col-span-1">
-              <CardContent className="p-4 sm:p-6">
-                <div className="flex items-center">
-                  <Calendar className="h-6 w-6 sm:h-8 sm:w-8 text-purple-600 flex-shrink-0" />
-                  <div className="ml-3 sm:ml-4 min-w-0">
-                    <p className="text-xs sm:text-sm font-medium text-gray-600">Latest Upload</p>
-                    <p className="text-xs sm:text-sm font-bold text-gray-900 truncate">
-                      {resumes.length > 0 ? format(new Date(resumes[0].created_at), 'MMM dd, yyyy') : 'None'}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
 
           {/* Search and Filters */}
           <Card className="mb-6">
@@ -341,70 +273,45 @@ const ResumePool = () => {
             </CardContent>
           </Card>
 
-          {/* Bulk Actions */}
-          {selectedResumes.length > 0 && (
-            <Card className="mb-6">
-              <CardContent className="p-3 sm:p-4">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
-                  <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
-                    <span className="text-sm font-medium text-gray-700">
-                      {selectedResumes.length} resume{selectedResumes.length !== 1 ? 's' : ''} selected
-                    </span>
-                    <div className="flex flex-wrap gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={handleBulkDownload}
-                        className="text-xs sm:text-sm"
-                      >
-                        <Download className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                        <span className="hidden sm:inline">Download All</span>
-                        <span className="sm:hidden">Download</span>
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={handleBulkDelete}
-                        className="text-red-600 hover:text-red-700 text-xs sm:text-sm"
-                      >
-                        <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                        <span className="hidden sm:inline">Delete All</span>
-                        <span className="sm:hidden">Delete</span>
-                      </Button>
-                    </div>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setSelectedResumes([])}
-                    className="text-xs sm:text-sm self-start sm:self-auto"
-                  >
-                    Clear Selection
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
           {/* Resume List */}
           <Card>
             <CardHeader>
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <CardTitle className="text-lg sm:text-xl">Resumes ({filteredAndSortedResumes.length})</CardTitle>
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                  {filteredAndSortedResumes.length > 0 && (
-                    <div className="flex items-center space-x-2">
+              <div className="flex flex-col space-y-4">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+                  <div className="flex items-center gap-3">
+                    {filteredAndSortedResumes.length > 0 && (
                       <Checkbox
                         checked={allSelected}
                         ref={(el) => {
                           if (el) (el as any).indeterminate = someSelected;
                         }}
                         onCheckedChange={handleSelectAll}
+                        aria-label="Select all resumes"
                       />
-                      <span className="text-sm text-gray-600 whitespace-nowrap">Select All</span>
-                    </div>
-                  )}
-                  <ResumePoolUpload onUploadComplete={() => refetch()} showTrigger={true} />
+                    )}
+                    <CardTitle className="text-lg sm:text-xl">
+                      Resumes ({filteredAndSortedResumes.length})
+                      {selectedResumes.length > 0 && (
+                        <span className="ml-2 text-sm font-normal text-blue-600">
+                          ({selectedResumes.length} selected)
+                        </span>
+                      )}
+                    </CardTitle>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {selectedResumes.length > 0 && (
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={handleBulkDelete}
+                        className="flex items-center gap-2"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        Delete ({selectedResumes.length})
+                      </Button>
+                    )}
+                    <ResumePoolUpload onUploadComplete={() => refetch()} showTrigger={true} />
+                  </div>
                 </div>
               </div>
             </CardHeader>

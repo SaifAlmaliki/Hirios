@@ -77,7 +77,7 @@ const ScreeningResultAnalysis: React.FC<ScreeningResultAnalysisProps> = ({
 
   const parseContentToBullets = (content: string) => {
     // Common abbreviations that should not end sentences
-    const abbreviations = [
+    const abbreviationsWithPeriods = [
       'M.Sc.', 'B.Sc.', 'Ph.D.', 'M.D.', 'B.A.', 'M.A.', 'B.Eng.', 'M.Eng.',
       'B.Tech.', 'M.Tech.', 'B.Com.', 'M.Com.', 'B.B.A.', 'M.B.A.',
       'LL.B.', 'LL.M.', 'J.D.', 'D.D.S.', 'D.V.M.', 'D.O.', 'D.P.T.',
@@ -86,23 +86,47 @@ const ScreeningResultAnalysis: React.FC<ScreeningResultAnalysisProps> = ({
       'Inc.', 'Ltd.', 'Corp.', 'Co.', 'LLC.', 'LLP.', 'P.C.',
       'St.', 'Ave.', 'Blvd.', 'Rd.', 'Dr.', 'Prof.', 'Sr.', 'Jr.',
       'vs.', 'etc.', 'i.e.', 'e.g.', 'a.m.', 'p.m.', 'U.S.', 'U.K.',
-      'A.I.', 'M.L.', 'D.L.', 'C.V.', 'R&D', 'IT', 'HR', 'CEO', 'CTO', 'CFO'
+      'A.I.', 'M.L.', 'D.L.', 'C.V.'
+    ];
+    
+    // Abbreviations without periods need word boundaries
+    const abbreviationsWithoutPeriods = [
+      'R&D', 'IT', 'HR', 'CEO', 'CTO', 'CFO', 'COO', 'CMO', 'CIO', 'CHRO'
     ];
     
     // First, protect abbreviations by replacing them with placeholders
     let protectedContent = content;
     const abbreviationMap: { [key: string]: string } = {};
     
-    abbreviations.forEach((abbr, index) => {
+    // Sort by length (longest first) to handle overlapping matches
+    const sortedWithPeriods = [...abbreviationsWithPeriods].sort((a, b) => b.length - a.length);
+    const sortedWithoutPeriods = [...abbreviationsWithoutPeriods].sort((a, b) => b.length - a.length);
+    
+    let index = 0;
+    
+    // Handle abbreviations with periods (no word boundaries)
+    sortedWithPeriods.forEach((abbr) => {
       const placeholder = `__ABBR_${index}__`;
       abbreviationMap[placeholder] = abbr;
-      // Use case-insensitive replacement with word boundaries for standalone abbreviations
       const escapedAbbr = abbr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const regex = new RegExp(`\\b${escapedAbbr}\\b`, 'gi');
+      // No word boundaries for abbreviations with periods
+      const regex = new RegExp(escapedAbbr, 'gi');
       protectedContent = protectedContent.replace(regex, placeholder);
+      index++;
     });
     
-    // Now split on sentence boundaries
+    // Handle abbreviations without periods (use word boundaries)
+    sortedWithoutPeriods.forEach((abbr) => {
+      const placeholder = `__ABBR_${index}__`;
+      abbreviationMap[placeholder] = abbr;
+      const escapedAbbr = abbr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      // Use word boundaries for abbreviations without periods
+      const regex = new RegExp(`\\b${escapedAbbr}\\b`, 'gi');
+      protectedContent = protectedContent.replace(regex, placeholder);
+      index++;
+    });
+    
+    // Now split on sentence boundaries (period/!/? followed by space/newline)
     const sentences = protectedContent
       .split(/(?<=[.!?])\s+/)
       .map(s => s.trim())
