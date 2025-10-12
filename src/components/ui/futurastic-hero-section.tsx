@@ -1,6 +1,6 @@
 import { Stars } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { FiArrowRight } from "react-icons/fi";
 import { Brain, BarChart3 } from "lucide-react";
 import {
@@ -13,11 +13,28 @@ import { useNavigate } from "react-router-dom";
 
 const COLORS_TOP = ["#3B82F6", "#1E40AF", "#8B5CF6", "#7C3AED"];
 
+// Check if WebGL is supported
+const isWebGLSupported = () => {
+  try {
+    const canvas = document.createElement('canvas');
+    return !!(
+      window.WebGLRenderingContext &&
+      (canvas.getContext('webgl') || canvas.getContext('experimental-webgl'))
+    );
+  } catch (e) {
+    return false;
+  }
+};
+
 export const AuroraHero = () => {
   const navigate = useNavigate();
   const color = useMotionValue(COLORS_TOP[0]);
+  const [webGLSupported, setWebGLSupported] = useState(true);
 
   useEffect(() => {
+    // Check WebGL support on mount
+    setWebGLSupported(isWebGLSupported());
+    
     animate(color, COLORS_TOP, {
       ease: "easeInOut",
       duration: 10,
@@ -122,11 +139,23 @@ export const AuroraHero = () => {
         </div>
       </div>
 
-      <div className="absolute inset-0 z-0">
-        <Canvas>
-          <Stars radius={50} count={2500} factor={4} fade speed={2} />
-        </Canvas>
-      </div>
+      {/* Only render 3D stars if WebGL is supported */}
+      {webGLSupported && (
+        <div className="absolute inset-0 z-0">
+          <Canvas>
+            <Stars radius={50} count={2500} factor={4} fade speed={2} />
+          </Canvas>
+        </div>
+      )}
+      
+      {/* Fallback animated background if WebGL is not supported */}
+      {!webGLSupported && (
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-900/10 to-purple-900/20"></div>
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        </div>
+      )}
     </motion.section>
   );
 };

@@ -48,7 +48,7 @@ export class VoiceInterviewService {
       }
 
 
-      // Get screening result details for the webhook
+      // Get screening result details for email
       const { data: screeningResult, error: fetchError } = await supabase
         .from('screening_results')
         .select(`
@@ -59,7 +59,8 @@ export class VoiceInterviewService {
             description,
             requirements,
             responsibilities,
-            company
+            company,
+            user_id
           )
         `)
         .eq('id', screeningResultId)
@@ -72,36 +73,34 @@ export class VoiceInterviewService {
       // Generate interview link
       const interviewLink = VoiceInterviewService.generateInterviewLink(screeningResultId, screeningResult.application_id || '', true);
 
-      // Prepare webhook data
       const job = screeningResult.jobs as any;
-      const webhookData = {
-        screening_result_id: screeningResultId,
-        candidate_name: `${screeningResult.first_name} ${screeningResult.last_name}`,
-        candidate_email: screeningResult.email,
-        job_title: job?.title || 'Position',
-        company_name: job?.company || 'Unknown Company',
-        interview_link: interviewLink,
-        timestamp: new Date().toISOString()
-      };
+      
+      // Send email directly through platform
+      try {
+        const { sendEmailFromCurrentUser } = await import('@/services/emailService');
+        const { generateVoiceInterviewInviteEmail } = await import('@/services/emailTemplates');
 
-      console.log('📤 Webhook payload prepared:', webhookData);
-      console.log('🏢 Company name from job:', job?.company);
+        const emailData = {
+          candidate_name: `${screeningResult.first_name} ${screeningResult.last_name}`,
+          job_title: job?.title || 'Position',
+          company_name: job?.company || 'Unknown Company',
+          interview_link: interviewLink,
+        };
 
-      // Send webhook to n8n
-      const webhookUrl = import.meta.env.VITE_SCREENING_WEBHOOK_URL;
-      if (webhookUrl) {
-        try {
-          await fetch(webhookUrl, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(webhookData)
-          });
-        } catch (webhookError) {
-          console.error('Webhook error:', webhookError);
-          // Don't fail the whole process if webhook fails
-        }
+        const { subject, html, text } = generateVoiceInterviewInviteEmail(emailData);
+
+        await sendEmailFromCurrentUser({
+          to: screeningResult.email,
+          subject,
+          html,
+          text,
+        });
+
+        console.log('✅ Voice interview invitation email sent successfully');
+      } catch (emailError) {
+        console.error('❌ Email sending failed:', emailError);
+        // Don't fail the whole process if email fails
+        throw new Error('Failed to send interview invitation email');
       }
 
       // Update voice_screening_requested to true
