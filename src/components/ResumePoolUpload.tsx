@@ -8,6 +8,7 @@ import { Upload, FileText, X, CheckCircle, AlertCircle, Loader2, Plus } from 'lu
 import { useToast } from '@/hooks/use-toast';
 import { useUploadResumeToPool } from '@/hooks/useResumePool';
 import ScreeningProgressBar from '@/components/ui/ScreeningProgressBar';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface UploadedFile {
   id: string;
@@ -43,6 +44,7 @@ const ResumePoolUpload: React.FC<ResumePoolUploadProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const uploadResumeMutation = useUploadResumeToPool();
+  const queryClient = useQueryClient();
 
   const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
@@ -270,11 +272,11 @@ const ResumePoolUpload: React.FC<ResumePoolUploadProps> = ({
     setUploadedCount(0);
     setIsDialogOpen(false);
     
-    // Refresh the page
+    // Immediately invalidate cache to refresh data
+    queryClient.invalidateQueries({ queryKey: ['resumePool'] });
     if (onUploadComplete) {
       onUploadComplete();
     }
-    window.location.reload();
   };
 
   const handleDialogOpenChange = (open: boolean) => {

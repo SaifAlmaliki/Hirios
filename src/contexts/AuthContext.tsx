@@ -96,8 +96,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (session?.user) {
           // Check email verification status
           setIsEmailVerified(session.user.email_confirmed_at !== null);
-          // Check subscription status and start trial if needed
-          await checkSubscriptionStatus(session.user.id);
+          // Check subscription status and start trial if needed (don't await to avoid blocking)
+          checkSubscriptionStatus(session.user.id);
         } else {
           setIsEmailVerified(false);
           setSubscriptionActive(true);
@@ -117,15 +117,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (session?.user) {
         setIsEmailVerified(session.user.email_confirmed_at !== null);
-        // Check subscription status and start trial if needed
-        await checkSubscriptionStatus(session.user.id);
+        // Set loading to false immediately to prevent infinite loading
+        setLoading(false);
+        // Check subscription status and start trial if needed (don't await)
+        checkSubscriptionStatus(session.user.id);
       } else {
         setIsEmailVerified(false);
         setSubscriptionActive(true);
         setSubscriptionError(null);
+        setLoading(false);
       }
-      
-      setLoading(false);
     })();
 
     return () => subscription.unsubscribe();

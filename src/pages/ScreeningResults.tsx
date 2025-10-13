@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -55,9 +56,10 @@ const ScreeningResults = () => {
   const { jobId } = useParams<{ jobId?: string }>();
   const { user, loading, signOut } = useAuth();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   
   // Data fetching
-  const { data: screeningResults = [], isLoading, error } = useScreeningResults();
+  const { data: screeningResults = [], isLoading, error, refetch } = useScreeningResults();
   const { data: companyJobs = [], isLoading: jobsLoading } = useCompanyJobs();
 
   // Get specific job details if jobId is provided
@@ -108,8 +110,8 @@ const ScreeningResults = () => {
             const timeout = setTimeout(() => {
               setShowProgressBar(false);
               localStorage.removeItem(storageKey);
-              // Refresh the page to show new results
-              window.location.reload();
+              // Immediately invalidate cache to refresh data
+              queryClient.invalidateQueries({ queryKey: ['screening_results'] });
             }, remainingTime);
             
             return () => clearTimeout(timeout);
@@ -318,7 +320,8 @@ const ScreeningResults = () => {
               onComplete={() => {
                 setShowProgressBar(false);
                 localStorage.removeItem(`screening_progress_${jobId}`);
-                window.location.reload();
+                // Immediately invalidate cache to refresh data
+                queryClient.invalidateQueries({ queryKey: ['screening_results'] });
               }}
               durationSeconds={60}
             />
@@ -523,8 +526,8 @@ const ScreeningResults = () => {
           isDialogOpen={isResumePoolDialogOpen}
           onDialogOpenChange={setIsResumePoolDialogOpen}
           onSelectionComplete={() => {
-            // Refresh screening results after selection
-            window.location.reload();
+            // Immediately invalidate cache to refresh screening results
+            queryClient.invalidateQueries({ queryKey: ['screening_results'] });
           }}
         />
       )}

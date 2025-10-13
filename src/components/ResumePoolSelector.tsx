@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { useQueryClient } from '@tanstack/react-query';
 import { 
   Search, 
   FileText, 
@@ -58,9 +59,10 @@ const ResumePoolSelector: React.FC<ResumePoolSelectorProps> = ({
   const [isProcessing, setIsProcessing] = useState(false);
   const [showProgressBar, setShowProgressBar] = useState(false);
   const [processedResumeCount, setProcessedResumeCount] = useState(0);
-  const { data: resumes = [], isLoading } = useResumePool();
+  const { data: resumes = [], isLoading, refetch } = useResumePool();
   const { toast } = useToast();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   // Get global status badges for all resumes across all jobs
   const resumeIds = resumes.map(r => r.id);
@@ -316,8 +318,13 @@ const ResumePoolSelector: React.FC<ResumePoolSelectorProps> = ({
   };
 
   const handleProgressComplete = () => {
-    // After 60 seconds, refresh the page to show new results
-    window.location.reload();
+    // After processing completes, close dialog and trigger callback
+    setShowProgressBar(false);
+    onDialogOpenChange(false);
+    // Immediately invalidate cache to refresh data
+    queryClient.invalidateQueries({ queryKey: ['screening_results'] });
+    queryClient.invalidateQueries({ queryKey: ['resumePool'] });
+    onSelectionComplete();
   };
 
   const resetSelection = () => {

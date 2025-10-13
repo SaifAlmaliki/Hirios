@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useQueryClient } from '@tanstack/react-query';
 import { 
   Search, 
   Trash2, 
@@ -45,6 +46,7 @@ const ResumePool = () => {
   const bulkDeleteMutation = useBulkDeleteResumes();
   const downloadResumeMutation = useDownloadResume();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   // Get global status badges for all resumes across all jobs
   const resumeIds = resumes.map(r => r.id);
@@ -71,8 +73,8 @@ const ResumePool = () => {
           const timeout = setTimeout(() => {
             setShowProgressBar(false);
             localStorage.removeItem(storageKey);
-            // Refresh the page to show new results
-            window.location.reload();
+            // Immediately invalidate cache to refresh data
+            queryClient.invalidateQueries({ queryKey: ['resumePool'] });
           }, remainingTime);
           
           return () => clearTimeout(timeout);
@@ -220,7 +222,8 @@ const ResumePool = () => {
                 onComplete={() => {
                   setShowProgressBar(false);
                   localStorage.removeItem('resume_pool_upload_progress');
-                  window.location.reload();
+                  // Immediately invalidate cache to refresh data
+                  queryClient.invalidateQueries({ queryKey: ['resumePool'] });
                 }}
                 durationSeconds={progressDuration}
                 mode="extraction"
