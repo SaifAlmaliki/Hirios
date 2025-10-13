@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { CandidateStatus } from './useCandidateStatus';
-import { sendRejectCandidateWebhook, RejectCandidateWebhookData } from '@/services/webhookService';
+// Removed webhook imports - now using direct email sending
 
 export interface ScreeningResult {
   id: string;
@@ -328,23 +328,30 @@ export const useRejectCandidate = () => {
         throw updateError;
       }
 
-      // Prepare webhook data
-      const webhookData: RejectCandidateWebhookData = {
-        candidate_name: `${first_name} ${last_name}`,
-        candidate_email: email,
-        job_title: job_title,
-        company_name: company_name,
-        rejection_reason: rejection_reason || 'Not a good fit for the position',
-        rejected_at: new Date().toISOString(),
-        screening_result_id: id,
-        application_id: application_id
-      };
+      // Send rejection email directly through platform
+      try {
+        const { sendEmailFromCurrentUser } = await import('@/services/emailService');
+        const { generateRejectionEmail } = await import('@/services/emailTemplates');
 
-      // Send webhook to n8n
-      const webhookSuccess = await sendRejectCandidateWebhook(webhookData);
-      
-      if (!webhookSuccess) {
-        console.warn('Webhook failed but database was updated');
+        const emailData = {
+          candidate_name: `${first_name} ${last_name}`,
+          job_title: job_title,
+          company_name: company_name,
+        };
+
+        const { subject, html, text } = generateRejectionEmail(emailData);
+
+        await sendEmailFromCurrentUser({
+          to: email,
+          subject,
+          html,
+          text,
+        });
+
+        console.log('✅ Rejection email sent successfully');
+      } catch (emailError) {
+        console.error('❌ Email sending failed:', emailError);
+        console.warn('Rejection email failed but database was updated');
         // Don't throw error here - database update succeeded
       }
 

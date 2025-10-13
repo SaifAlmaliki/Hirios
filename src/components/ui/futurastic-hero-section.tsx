@@ -123,8 +123,12 @@ const SafeCanvas = () => {
 export const AuroraHero = () => {
   const navigate = useNavigate();
   const color = useMotionValue(COLORS_TOP[0]);
+  const [webGLSupported, setWebGLSupported] = useState(true);
 
   useEffect(() => {
+    // Check WebGL support on mount
+    setWebGLSupported(checkWebGLSupport());
+    
     animate(color, COLORS_TOP, {
       ease: "easeInOut",
       duration: 10,

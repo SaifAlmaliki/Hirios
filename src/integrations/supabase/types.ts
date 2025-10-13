@@ -181,7 +181,17 @@ export type Database = {
           last_job_count_reset: string | null
           logo_url: string | null
           phone: string | null
+          smtp_from_email: string | null
+          smtp_from_name: string | null
+          smtp_host: string | null
+          smtp_password: string | null
+          smtp_port: number | null
+          smtp_secure: boolean | null
+          smtp_user: string | null
+          subscription_expires_at: string | null
           subscription_plan: string | null
+          trial_expires_at: string | null
+          trial_started_at: string | null
           updated_at: string | null
           user_id: string | null
         }
@@ -198,7 +208,17 @@ export type Database = {
           last_job_count_reset?: string | null
           logo_url?: string | null
           phone?: string | null
+          smtp_from_email?: string | null
+          smtp_from_name?: string | null
+          smtp_host?: string | null
+          smtp_password?: string | null
+          smtp_port?: number | null
+          smtp_secure?: boolean | null
+          smtp_user?: string | null
+          subscription_expires_at?: string | null
           subscription_plan?: string | null
+          trial_expires_at?: string | null
+          trial_started_at?: string | null
           updated_at?: string | null
           user_id?: string | null
         }
@@ -215,7 +235,17 @@ export type Database = {
           last_job_count_reset?: string | null
           logo_url?: string | null
           phone?: string | null
+          smtp_from_email?: string | null
+          smtp_from_name?: string | null
+          smtp_host?: string | null
+          smtp_password?: string | null
+          smtp_port?: number | null
+          smtp_secure?: boolean | null
+          smtp_user?: string | null
+          subscription_expires_at?: string | null
           subscription_plan?: string | null
+          trial_expires_at?: string | null
+          trial_started_at?: string | null
           updated_at?: string | null
           user_id?: string | null
         }
@@ -800,6 +830,14 @@ export type Database = {
       binary_quantize: {
         Args: { "": string } | { "": unknown }
         Returns: unknown
+      }
+      is_subscription_active: {
+        Args: { p_user_id: string }
+        Returns: boolean
+      }
+      start_trial_if_needed: {
+        Args: { p_user_id: string }
+        Returns: undefined
       }
       check_expired_offers: {
         Args: Record<PropertyKey, never>

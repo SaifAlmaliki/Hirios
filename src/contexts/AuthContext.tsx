@@ -24,6 +24,8 @@ interface AuthContextType {
   resendConfirmation: (email: string) => Promise<{ error: any }>;
   updatePassword: (password: string) => Promise<{ error: any }>;
   isEmailVerified: boolean;
+  subscriptionActive: boolean;
+  subscriptionError: string | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -42,6 +44,46 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Always company for B2B platform
   const [loading, setLoading] = useState(true);
   const [isEmailVerified, setIsEmailVerified] = useState(false);
+  const [subscriptionActive, setSubscriptionActive] = useState(true);
+  const [subscriptionError, setSubscriptionError] = useState<string | null>(null);
+
+  // Check subscription status and start trial if needed
+  const checkSubscriptionStatus = async (userId: string) => {
+    try {
+      // Start trial if needed (on first login)
+      const { error: startTrialError } = await supabase.rpc('start_trial_if_needed', {
+        p_user_id: userId
+      });
+
+      if (startTrialError) {
+        console.error('[AuthContext] Error starting trial:', startTrialError);
+      }
+
+      // Check if subscription is active
+      const { data: isActive, error: checkError } = await supabase.rpc('is_subscription_active', {
+        p_user_id: userId
+      });
+
+      if (checkError) {
+        console.error('[AuthContext] Error checking subscription status:', checkError);
+        setSubscriptionActive(true); // Default to allow access on error
+        setSubscriptionError(null);
+        return;
+      }
+
+      if (!isActive) {
+        setSubscriptionActive(false);
+        setSubscriptionError('Your trial/subscription has expired. Please contact support@hirios.com to upgrade your account.');
+      } else {
+        setSubscriptionActive(true);
+        setSubscriptionError(null);
+      }
+    } catch (error) {
+      console.error('[AuthContext] Error in checkSubscriptionStatus:', error);
+      setSubscriptionActive(true); // Default to allow access on error
+      setSubscriptionError(null);
+    }
+  };
 
   useEffect(() => {
     // Set up auth state listener
@@ -54,8 +96,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (session?.user) {
           // Check email verification status
           setIsEmailVerified(session.user.email_confirmed_at !== null);
+          // Check subscription status and start trial if needed
+          await checkSubscriptionStatus(session.user.id);
         } else {
           setIsEmailVerified(false);
+          setSubscriptionActive(true);
+          setSubscriptionError(null);
         }
         
         setLoading(false);
@@ -71,8 +117,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (session?.user) {
         setIsEmailVerified(session.user.email_confirmed_at !== null);
+        // Check subscription status and start trial if needed
+        await checkSubscriptionStatus(session.user.id);
       } else {
         setIsEmailVerified(false);
+        setSubscriptionActive(true);
+        setSubscriptionError(null);
       }
       
       setLoading(false);
@@ -192,6 +242,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     resendConfirmation,
     updatePassword,
     isEmailVerified,
+    subscriptionActive,
+    subscriptionError,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

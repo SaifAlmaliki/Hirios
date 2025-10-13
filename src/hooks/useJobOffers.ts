@@ -311,59 +311,76 @@ export const useSendJobOffer = () => {
         throw error;
       }
 
-      // Trigger email webhook to n8n directly
+      // Send offer email directly through platform
       console.log('📧 Preparing to send offer email...');
-      const n8nWebhookUrl = import.meta.env.VITE_OFFER_EMAIL_WEBHOOK_URL;
       
-      if (!n8nWebhookUrl) {
-        throw new Error('N8N webhook URL not configured');
+      try {
+        const { sendEmailFromCurrentUser } = await import('@/services/emailService');
+        const { generateJobOfferEmail } = await import('@/services/emailTemplates');
+
+        // Prepare email data
+        const emailData = {
+          candidate_name: `${data.resume_pool.first_name} ${data.resume_pool.last_name}`,
+          job_title: data.job.title,
+          company_name: data.job.company,
+          salary_amount: data.salary_amount,
+          salary_currency: data.salary_currency,
+          bonus_amount: data.bonus_amount || 0,
+          bonus_description: data.bonus_description || '',
+          benefits: data.benefits,
+          reports_to: data.reports_to,
+          insurance_details: data.insurance_details,
+          offer_date: data.offer_date,
+          expiry_date: data.expiry_date,
+          start_date: data.start_date,
+          end_date: data.end_date,
+          offer_link: `${import.meta.env.VITE_SITE_URL || window.location.origin}/download-offer/${data.id}`,
+          pdf_url: data.pdf_file_url,
+          recruiter_email: import.meta.env.VITE_RECRUITER_EMAIL || 'hr@company.com',
+        };
+
+        const { subject, html, text } = generateJobOfferEmail(emailData);
+
+        // Prepare attachments array
+        const attachments: any[] = [];
+        
+        // Fetch PDF from Supabase storage and attach it
+        if (data.pdf_file_url) {
+          try {
+            const response = await fetch(data.pdf_file_url);
+            if (response.ok) {
+              const pdfBlob = await response.blob();
+              const pdfBuffer = await pdfBlob.arrayBuffer();
+              
+              attachments.push({
+                filename: `Job_Offer_${data.resume_pool.first_name}_${data.resume_pool.last_name}.pdf`,
+                content: Buffer.from(pdfBuffer),
+                contentType: 'application/pdf',
+              });
+              
+              console.log('✅ PDF attachment prepared');
+            }
+          } catch (pdfError) {
+            console.warn('⚠️ Failed to fetch PDF for attachment:', pdfError);
+            // Continue without attachment if PDF fetch fails
+          }
+        }
+
+        // Send email with PDF attachment
+        await sendEmailFromCurrentUser({
+          to: data.resume_pool.email,
+          cc: data.email_cc_addresses || [],
+          subject,
+          html,
+          text,
+          attachments: attachments.length > 0 ? attachments : undefined,
+        });
+
+        console.log('✅ Job offer email sent successfully with PDF attachment');
+      } catch (emailError) {
+        console.error('❌ Email sending failed:', emailError);
+        throw new Error('Failed to send job offer email');
       }
-
-      const webhookData = {
-        candidate_name: `${data.resume_pool.first_name} ${data.resume_pool.last_name}`,
-        candidate_email: data.resume_pool.email,
-        job_title: data.job.title,
-        company_name: data.job.company,
-        salary_amount: data.salary_amount,
-        salary_currency: data.salary_currency,
-        bonus_amount: data.bonus_amount,
-        bonus_description: data.bonus_description,
-        benefits: data.benefits,
-        reports_to: data.reports_to,
-        insurance_details: data.insurance_details,
-        offer_date: data.offer_date,
-        expiry_date: data.expiry_date,
-        start_date: data.start_date,
-        end_date: data.end_date,
-        offer_link: `${import.meta.env.VITE_SITE_URL || 'https://hirios.com'}/download-offer/${data.id}`,
-        pdf_url: data.pdf_file_url,
-        recruiter_email: import.meta.env.VITE_RECRUITER_EMAIL || 'hr@company.com',
-        cc_emails: data.email_cc_addresses || [],
-      };
-
-      console.log('📤 Webhook payload prepared:', webhookData);
-      console.log('🔗 N8N Webhook URL:', n8nWebhookUrl);
-      console.log('🌐 Offer Link Generated:', webhookData.offer_link);
-      console.log('🔧 Environment Variables:', {
-        VITE_SITE_URL: import.meta.env.VITE_SITE_URL,
-        offerId: data.id
-      });
-
-      const emailResponse = await fetch(n8nWebhookUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(webhookData),
-      });
-
-      if (!emailResponse.ok) {
-        const errorText = await emailResponse.text();
-        console.error('❌ N8N webhook error:', errorText);
-        throw new Error('Failed to send offer email via webhook');
-      }
-
-      console.log('✅ Offer email sent successfully via N8N webhook');
 
       return data;
     },
