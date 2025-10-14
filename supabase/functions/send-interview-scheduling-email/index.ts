@@ -1,4 +1,7 @@
+// @deno-types="npm:@types/nodemailer@6.4.14"
+import nodemailer from "npm:nodemailer@6.9.8";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.50.3";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -22,6 +25,7 @@ serve(async (req) => {
       votingLink,
       interviewDuration,
       timeSlots,
+      companyId, // Add companyId to get SMTP config
     } = await req.json();
 
     // Format time slots for display
@@ -125,41 +129,27 @@ Note: You can select multiple time slots. The system will find the best time tha
 This invitation was sent from Hirios Job Portal
     `;
 
-    // Send email using Resend
+    // Get SMTP configuration from company profile
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
     console.log('📧 Sending interview scheduling email to:', to);
-    
-    // Use Resend test domain for development, or your verified domain for production
-    const fromEmail = Deno.env.get('FROM_EMAIL') || 'onboarding@resend.dev';
-    
-    const emailPayload = {
-      from: `Hirios <${fromEmail}>`,
-      to: [to],
-      subject,
-      html: htmlContent,
-      text: textContent,
-    };
+    console.log('🏢 Company ID:', companyId);
 
-    console.log('📤 Email payload:', JSON.stringify(emailPayload, null, 2));
+    // Fetch company SMTP configuration
+    const { data: companyData, error: companyError } = await supabase
+      .from('company_profiles')
+      .select('smtp_host, smtp_port, smtp_user, smtp_password, smtp_from_email, smtp_from_name, smtp_secure')
+      .eq('id', companyId)
+      .single();
 
-    const resendResponse = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${Deno.env.get('RESEND_API_KEY')}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(emailPayload),
-    });
-
-    console.log('📊 Resend response status:', resendResponse.status);
-
-    if (!resendResponse.ok) {
-      const errorData = await resendResponse.text();
-      console.error('❌ Resend error details:', errorData);
+    if (companyError || !companyData) {
+      console.error('❌ Failed to fetch company SMTP config:', companyError);
       return new Response(
         JSON.stringify({
-          error: 'Failed to send email via Resend',
-          details: errorData,
-          status: resendResponse.status,
+          error: 'Company SMTP configuration not found',
+          details: companyError?.message,
         }),
         {
           status: 500,
@@ -168,23 +158,101 @@ This invitation was sent from Hirios Job Portal
       );
     }
 
-    const responseData = await resendResponse.json();
-    console.log('✅ Resend success response:', responseData);
+    // Validate SMTP configuration
+    if (!companyData.smtp_host || !companyData.smtp_user || !companyData.smtp_password || !companyData.smtp_from_email) {
+      console.error('❌ Incomplete SMTP configuration');
+      return new Response(
+        JSON.stringify({
+          error: 'Incomplete SMTP configuration',
+          message: 'Please configure SMTP settings in Company Setup',
+        }),
+        {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
+    }
+
+    // Determine connection settings
+    const useSecure = companyData.smtp_port === 465;
+    const useSTARTTLS = companyData.smtp_port === 587;
+
+    // Create nodemailer transporter
+    const transportConfig: any = {
+      host: companyData.smtp_host,
+      port: companyData.smtp_port,
+      secure: useSecure,
+      auth: {
+        user: companyData.smtp_user,
+        pass: companyData.smtp_password,
+      },
+    };
+
+    // Add STARTTLS for port 587
+    if (useSTARTTLS) {
+      transportConfig.requireTLS = true;
+      transportConfig.tls = {
+        rejectUnauthorized: false,
+      };
+    }
+
+    const transporter = nodemailer.createTransporter(transportConfig);
+
+    // Send email using SMTP
+    const mailOptions = {
+      from: companyData.smtp_from_name 
+        ? `${companyData.smtp_from_name} <${companyData.smtp_from_email}>`
+        : companyData.smtp_from_email,
+      to: to,
+      subject,
+      html: htmlContent,
+      text: textContent,
+    };
+
+    console.log('📤 Sending email via SMTP...');
+    const info = await transporter.sendMail(mailOptions);
+    console.log('✅ Email sent successfully. Message ID:', info.messageId);
 
     return new Response(
       JSON.stringify({
         success: true,
-        message: 'Interview scheduling email sent successfully',
+        message: 'Interview scheduling email sent successfully via SMTP',
+        messageId: info.messageId,
       }),
       {
         status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
     );
-  } catch (error) {
-    console.error('Unexpected error:', error);
+  } catch (error: any) {
+    console.error('❌ Email send failed:', error);
+    console.error('Error details:', {
+      code: error.code,
+      command: error.command,
+      response: error.response,
+      responseCode: error.responseCode,
+    });
+    
+    let errorMessage = 'Failed to send email. ';
+    
+    if (error.code === 'EAUTH' || error.responseCode === 535) {
+      errorMessage += 'Authentication failed. Check your SMTP username and password.';
+    } else if (error.code === 'ECONNREFUSED') {
+      errorMessage += 'Connection refused. Check your SMTP host and port.';
+    } else if (error.code === 'ETIMEDOUT' || error.code === 'ESOCKET') {
+      errorMessage += 'Connection timeout. Check your SMTP host and firewall settings.';
+    } else if (error.message?.includes('TLS') || error.message?.includes('SSL')) {
+      errorMessage += 'TLS/SSL error. Try using port 587 with STARTTLS.';
+    } else {
+      errorMessage += error.message || 'Unknown error occurred.';
+    }
+    
     return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
+      JSON.stringify({
+        error: 'Failed to send email via SMTP',
+        message: errorMessage,
+        details: error.message,
+      }),
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

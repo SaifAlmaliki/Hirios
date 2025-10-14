@@ -2,25 +2,16 @@
 
 ## Overview
 
-The Hirios platform now sends emails directly without requiring n8n webhooks. Each company can configure their own email provider and credentials.
+The Hirios platform sends emails directly using SMTP (Simple Mail Transfer Protocol). Each company configures their own SMTP server credentials for sending candidate communications.
 
-## Supported Email Providers
+## Supported SMTP Providers
 
-### 1. **Resend** (Recommended)
-- Easy to set up
-- Great deliverability
-- Generous free tier
-- Best for production use
-
-### 2. **SendGrid**
-- Enterprise-grade email service
-- Advanced analytics
-- Good for high-volume sending
-
-### 3. **Custom SMTP**
-- Use any SMTP server (Gmail, Outlook, etc.)
+### **Any SMTP Server**
+- Gmail, Outlook, Yahoo
+- Namecheap, Zoho, GoDaddy
+- Custom business email servers
 - Full control over email infrastructure
-- Requires SMTP credentials
+- Works with any email provider that supports SMTP
 
 ---
 
@@ -45,333 +36,192 @@ Or manually apply the migration file:
 
 1. Navigate to **Company Setup** page: `http://localhost:8080/company-setup`
 2. Scroll down to the **Email Configuration** section
-3. Choose your email provider and configure it
+3. Enter your SMTP settings
 
 ---
 
-## Provider-Specific Configuration
+## SMTP Configuration
 
-### Resend Configuration
+### Common SMTP Settings
 
-1. **Sign up for Resend**: https://resend.com/signup
-2. **Get your API Key**: https://resend.com/api-keys
-3. **Verify your domain** (or use the test domain for development)
-4. In Company Setup, select **Resend** tab and enter:
-   - **Resend API Key**: `re_...` (from step 2)
-   - **From Email**: `jobs@yourdomain.com` (must be verified in Resend)
-   - **From Name**: `Company HR Team` (optional)
+| Provider | SMTP Host | Port | Security |
+|----------|-----------|------|----------|
+| **Gmail** | smtp.gmail.com | 587 | TLS |
+| **Outlook** | smtp.office365.com | 587 | TLS |
+| **Yahoo** | smtp.mail.yahoo.com | 587 | TLS |
+| **Namecheap** | mail.privateemail.com | 587 | TLS |
+| **Zoho** | smtp.zoho.com | 587 | TLS |
+| **GoDaddy** | smtpout.secureserver.net | 587 | TLS |
 
-**Example:**
-```
-Resend API Key: re_123abc456def
-From Email: jobs@hirios.com
-From Name: Hirios Hiring Team
-```
+### Configuration Steps
 
-### SendGrid Configuration
+1. **Get SMTP credentials** from your email provider
+2. **Navigate to Company Setup**: `http://localhost:8080/company-setup`
+3. **Scroll to Email Configuration** section
+4. **Enter your SMTP settings**:
+   - **SMTP Host**: Your email provider's SMTP server
+   - **SMTP Port**: Usually 587 (TLS) or 465 (SSL)
+   - **SMTP Username**: Your email address
+   - **SMTP Password**: Your email password
+   - **From Email**: Email address shown to candidates
+   - **From Name**: Name shown to candidates (optional)
+5. **Test your configuration** using the "Test Connection" button
+6. **Send a test email** to verify everything works
 
-1. **Sign up for SendGrid**: https://signup.sendgrid.com/
-2. **Create an API Key**: https://app.sendgrid.com/settings/api_keys
-3. **Verify your sender identity**: https://app.sendgrid.com/settings/sender_auth
-4. In Company Setup, select **SendGrid** tab and enter:
-   - **SendGrid API Key**: `SG.` (from step 2)
-   - **From Email**: `jobs@yourdomain.com` (must be verified)
-   - **From Name**: `Company HR Team` (optional)
+---
 
-**Example:**
-```
-SendGrid API Key: SG.abcdef123456
-From Email: jobs@hirios.com
-From Name: Hirios Hiring Team
-```
+## Provider-Specific Examples
 
-### Custom SMTP Configuration
-
-You can use any SMTP server (Gmail, Outlook, Office 365, etc.)
-
-#### Gmail Example:
+### Gmail Configuration
 
 1. **Enable 2-Factor Authentication** on your Google account
 2. **Create an App Password**: https://myaccount.google.com/apppasswords
-3. In Company Setup, select **Custom SMTP** tab and enter:
+3. **Configure in Company Setup**:
    - **SMTP Host**: `smtp.gmail.com`
    - **SMTP Port**: `587`
    - **SMTP Username**: `your-email@gmail.com`
-   - **SMTP Password**: `your-app-password` (16-character password from step 2)
+   - **SMTP Password**: `your-app-password` (not your regular password)
    - **From Email**: `your-email@gmail.com`
-   - **From Name**: `Company HR Team`
-   - **Use secure connection**: ✓ (checked)
+   - **From Name**: `Your Company Name`
 
-**Example:**
-```
-SMTP Host: smtp.gmail.com
-SMTP Port: 587
-SMTP Username: hr@company.com
-SMTP Password: abcd efgh ijkl mnop
-From Email: hr@company.com
-From Name: Company Hiring Team
-Use secure connection: ✓
-```
+### Outlook/Office 365 Configuration
 
-#### Microsoft 365 / Outlook Example:
+1. **Use your Office 365 credentials**
+2. **Configure in Company Setup**:
+   - **SMTP Host**: `smtp.office365.com`
+   - **SMTP Port**: `587`
+   - **SMTP Username**: `your-email@company.com`
+   - **SMTP Password**: `your-office-password`
+   - **From Email**: `your-email@company.com`
+   - **From Name**: `Your Company Name`
 
-```
-SMTP Host: smtp.office365.com
-SMTP Port: 587
-SMTP Username: hr@company.com
-SMTP Password: your-password
-From Email: hr@company.com
-From Name: Company Hiring Team
-Use secure connection: ✓
-```
+### Namecheap Configuration
 
-#### Other SMTP Providers:
-
-Refer to your email provider's documentation for SMTP settings.
+1. **Get SMTP settings** from Namecheap cPanel
+2. **Configure in Company Setup**:
+   - **SMTP Host**: `mail.privateemail.com`
+   - **SMTP Port**: `587`
+   - **SMTP Username**: `your-email@yourdomain.com`
+   - **SMTP Password**: `your-email-password`
+   - **From Email**: `your-email@yourdomain.com`
+   - **From Name**: `Your Company Name`
 
 ---
 
-## Email Types
+## Testing Your Configuration
 
-The platform sends three types of emails:
+### Test Connection
+1. Click **"Test Connection"** button in Company Setup
+2. This validates your SMTP settings without sending an email
+3. Look for success message: "SMTP connection successful!"
 
-### 1. Voice Interview Invitation
-**Sent when**: Recruiter clicks "Invite" button on screening results
-**Recipient**: Candidate
-**Contains**: Link to start AI voice interview
-
-### 2. Rejection Email
-**Sent when**: Recruiter clicks "Reject" button on screening results
-**Recipient**: Candidate
-**Contains**: Polite rejection message
-
-### 3. Job Offer Email
-**Sent when**: Recruiter creates and sends a job offer
-**Recipient**: Candidate (with CC support)
-**Contains**: 
-- Complete offer details
-- Link to download offer
-- PDF attachment of offer letter
-
----
-
-## Testing Email Configuration
-
-### Test 1: Voice Interview Invitation
-
-1. Go to: `http://localhost:8080/screening-results/job/[job-id]`
-2. Find a candidate
-3. Click the **Invite** button
-4. Confirm the dialog
-5. Check the candidate's email inbox
-
-**Expected**: Candidate receives email with interview link
-
-### Test 2: Rejection Email
-
-1. Go to: `http://localhost:8080/screening-results/job/[job-id]`
-2. Find a candidate
-3. Click the **Reject** button
-4. Confirm the dialog
-5. Check the candidate's email inbox
-
-**Expected**: Candidate receives rejection email
-
-### Test 3: Job Offer Email
-
-1. Mark a candidate as "Accepted" status
-2. Click "Create Offer" in the status manager
-3. Fill out the job offer form
-4. Click "Send Offer"
-5. Check the candidate's email inbox
-
-**Expected**: Candidate receives:
-- Email with offer details
-- PDF attachment of offer letter
-- Link to download offer
+### Send Test Email
+1. Enter a test email address (optional - defaults to your From Email)
+2. Click **"Send Test Email"** button
+3. Check your inbox for the test email
+4. Verify the email looks professional and is delivered properly
 
 ---
 
 ## Troubleshooting
 
-### Email Not Sending
+### Common Issues
 
-1. **Check Configuration**: Ensure all required fields are filled in Company Setup
-2. **Check Console Logs**: Open browser DevTools → Console for error messages
-3. **Verify Email Provider**:
-   - Resend: Check API key is valid and domain is verified
-   - SendGrid: Check API key has "Mail Send" permission
-   - SMTP: Test credentials with an email client first
+#### "Authentication failed"
+- **Gmail**: Make sure you're using an App Password, not your regular password
+- **Other providers**: Double-check username and password
+- **2FA**: Ensure 2-Factor Authentication is enabled for Gmail
 
-### Common Errors
+#### "Connection refused"
+- Check your SMTP host and port settings
+- Try port 587 instead of 465 (or vice versa)
+- Verify your email provider supports SMTP
 
-#### "Email configuration not found"
-**Solution**: Complete Company Setup → Email Configuration section
+#### "Connection timeout"
+- Check your firewall settings
+- Ensure your network allows SMTP connections
+- Try a different port (587 vs 465)
 
-#### "Resend API error: 403"
-**Solution**: Verify your domain in Resend or use their test domain
+#### "TLS/SSL error"
+- Try port 587 with STARTTLS
+- Ensure your email provider supports TLS
+- Check if your provider requires SSL on port 465
 
-#### "SMTP connection failed"
-**Solution**: 
-- Check SMTP credentials are correct
-- Verify firewall isn't blocking SMTP ports
-- For Gmail: Use App Password, not regular password
+### Email Deliverability
 
-#### "From email not configured"
-**Solution**: Set the "From Email" field in Company Setup
+#### Improve Email Reputation
+1. **Use a professional domain** (not Gmail for business)
+2. **Set up SPF records** in your DNS
+3. **Configure DKIM** with your email provider
+4. **Set up DMARC** policy
+5. **Use consistent "From" addresses**
 
-### Gmail Specific Issues
-
-If using Gmail with "Less secure app access":
-1. This is deprecated - use App Passwords instead
-2. Enable 2FA on your Google account
-3. Generate App Password: https://myaccount.google.com/apppasswords
-4. Use the 16-character app password in SMTP Password field
-
----
-
-## Security Notes
-
-1. **API Keys/Passwords are stored in the database**
-   - Consider encrypting sensitive fields in production
-   - Use environment variables for additional security
-
-2. **SMTP Port Selection**:
-   - Port 587: TLS (recommended)
-   - Port 465: SSL (older, but still secure)
-   - Port 25: Unencrypted (NOT recommended)
-
-3. **Email Verification**:
-   - Always verify your sender domain
-   - Use proper SPF, DKIM, and DMARC records
-   - This prevents emails from going to spam
+#### Test Email Score
+- Use services like [mail-tester.com](https://mail-tester.com)
+- Check your domain reputation
+- Monitor bounce rates and spam complaints
 
 ---
 
-## Migration from n8n
+## Security Best Practices
 
-### What Changed:
+### SMTP Credentials
+- **Never share** your SMTP credentials
+- **Use strong passwords** for email accounts
+- **Enable 2FA** on email accounts when possible
+- **Rotate passwords** regularly
 
-**Before:**
-- Emails sent via n8n webhooks
-- Required separate n8n workflow setup
-- Environment variables: `VITE_SCREENING_WEBHOOK_URL`, `VITE_REJECT_EMAIL_WEBHOOK_URL`, `VITE_OFFER_EMAIL_WEBHOOK_URL`
-
-**After:**
-- Emails sent directly from platform
-- Each company configures their own provider
-- No n8n dependency for candidate emails
-
-### Old Webhook Environment Variables (No Longer Needed):
-```bash
-# These can be removed from .env
-VITE_SCREENING_WEBHOOK_URL=...
-VITE_REJECT_EMAIL_WEBHOOK_URL=...
-VITE_OFFER_EMAIL_WEBHOOK_URL=...
-```
-
-### Interview Scheduling Emails:
-Note: Interview scheduling emails still use Supabase Edge Functions (separate system)
+### Email Content
+- **Avoid spam trigger words** in subject lines
+- **Include unsubscribe links** in marketing emails
+- **Use professional language** and formatting
+- **Test emails** before sending to candidates
 
 ---
 
-## Production Checklist
+## Production Deployment
 
-- [ ] Database migration applied
-- [ ] Email provider selected and configured
-- [ ] Sender domain verified (for Resend/SendGrid)
-- [ ] Test emails sent successfully for all 3 types
-- [ ] From email matches company brand
-- [ ] SPF/DKIM/DMARC records configured
-- [ ] Remove old n8n webhook environment variables
-- [ ] Monitor email delivery rates
-- [ ] Set up email bounce handling (if needed)
+### Domain Setup
+1. **Use your company domain** for email addresses
+2. **Configure DNS records** (SPF, DKIM, DMARC)
+3. **Set up proper email authentication**
+4. **Monitor email deliverability**
+
+### Monitoring
+- **Track email delivery rates**
+- **Monitor bounce rates**
+- **Check spam folder placement**
+- **Review email logs** for errors
 
 ---
 
 ## Support
 
-For issues or questions:
-1. Check browser console for detailed error messages
-2. Verify email configuration in Company Setup
-3. Test with a simple SMTP provider first (like Gmail)
-4. Review the troubleshooting section above
+If you need help with email configuration:
+
+1. **Check the troubleshooting section** above
+2. **Test with a simple provider** (Gmail) first
+3. **Verify your SMTP settings** with your email provider
+4. **Contact support** if issues persist
 
 ---
 
-## Technical Details
+## Quick Reference
 
-### Files Modified:
-- `src/services/emailService.ts` - Core email sending logic
-- `src/services/emailTemplates.ts` - Email templates
-- `src/pages/CompanySetup.tsx` - UI for configuration
-- `src/hooks/useScreeningResults.ts` - Rejection emails
-- `src/hooks/useJobOffers.ts` - Offer emails
-- `src/services/voiceInterviewService.ts` - Invitation emails
-- `supabase/migrations/20250213000000_add_smtp_config_to_company_profiles.sql` - Database schema
+### Required Fields
+- ✅ **SMTP Host** - Your email provider's server
+- ✅ **SMTP Port** - Usually 587 or 465
+- ✅ **SMTP Username** - Your email address
+- ✅ **SMTP Password** - Your email password
+- ✅ **From Email** - Email shown to candidates
 
-### Dependencies Added:
-- `nodemailer` - SMTP email sending
-- `@types/nodemailer` - TypeScript types
-- `resend` - Resend SDK (already installed)
+### Optional Fields
+- **From Name** - Name shown to candidates
+- **Secure Connection** - Use TLS/SSL (recommended)
 
----
+### Test Your Setup
+1. **Test Connection** - Validates SMTP settings
+2. **Send Test Email** - Verifies email delivery
+3. **Check Inbox** - Confirm email received
 
-## Quick Start for Development
-
-1. **Install dependencies:**
-   ```bash
-   npm install
-   ```
-
-2. **Apply migration:**
-   ```bash
-   npx supabase migration up
-   ```
-
-3. **Use Resend test mode:**
-   - Get free API key: https://resend.com
-   - Use test domain: `onboarding@resend.dev`
-   - Emails will be delivered to your Resend dashboard
-
-4. **Configure in Company Setup:**
-   ```
-   Provider: Resend
-   API Key: re_your_key
-   From Email: onboarding@resend.dev
-   From Name: Test Company
-   ```
-
-5. **Test:**
-   - Send test invite/reject/offer
-   - Check Resend dashboard for delivered emails
-
----
-
-## Advanced Configuration
-
-### Custom Email Templates
-
-Email templates are in `src/services/emailTemplates.ts`. You can customize:
-- HTML structure
-- Styling
-- Content
-- Plain text versions
-
-### Adding New Email Types
-
-1. Create template function in `emailTemplates.ts`
-2. Import and use in your component/hook
-3. Call `sendEmailFromCurrentUser()` with template output
-
-### Email Tracking
-
-To add tracking:
-1. Use SendGrid (has built-in tracking)
-2. Or add tracking pixels to HTML templates
-3. Or use third-party email tracking service
-
----
-
-End of Email Configuration Guide
-
+That's it! Your platform can now send emails directly using your SMTP server.

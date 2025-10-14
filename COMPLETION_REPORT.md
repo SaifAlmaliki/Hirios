@@ -10,7 +10,7 @@ All tasks have been successfully completed. Your platform can now send emails di
 
 ### ✅ Core Functionality
 1. **Email Service** (`src/services/emailService.ts`)
-   - Universal email sending for Resend, SendGrid, and SMTP
+   - SMTP email sending for any email provider
    - Attachment support (for PDF job offers)
    - CC/BCC support
    - Automatic company config fetching
@@ -73,13 +73,15 @@ Or manually run the SQL from:
 ### 2. Configure Email Provider
 
 **Quick Test (5 minutes):**
-1. Sign up: https://resend.com
-2. Get API key: https://resend.com/api-keys
+1. Use Gmail with App Password (easiest)
+2. Enable 2FA and create App Password
 3. Go to: http://localhost:8080/company-setup
 4. Configure:
-   - Provider: Resend
-   - API Key: `re_...`
-   - From Email: `onboarding@resend.dev`
+   - SMTP Host: `smtp.gmail.com`
+   - SMTP Port: `587`
+   - SMTP Username: `your-email@gmail.com`
+   - SMTP Password: `your-app-password`
+   - From Email: `your-email@gmail.com`
    - From Name: Your Company
 
 ### 3. Test Email Sending

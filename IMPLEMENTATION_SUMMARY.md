@@ -11,17 +11,15 @@ All email sending functionality has been migrated from n8n webhooks to direct pl
 ### 1. Database Changes
 - **Migration File**: `supabase/migrations/20250213000000_add_smtp_config_to_company_profiles.sql`
 - **New Columns in `company_profiles` table**:
-  - `email_provider` - 'resend', 'smtp', or 'sendgrid'
-  - `resend_api_key` - API key for Resend
-  - `sendgrid_api_key` - API key for SendGrid
+  - `smtp_host`, `smtp_port`, `smtp_user`, `smtp_password` - SMTP configuration
   - `smtp_host`, `smtp_port`, `smtp_user`, `smtp_password` - Custom SMTP config
   - `smtp_from_email`, `smtp_from_name` - Sender information
   - `smtp_secure` - Use TLS/SSL
 
 ### 2. New Services
 - **`src/services/emailService.ts`**
-  - Universal email sending service
-  - Supports Resend, SendGrid, and SMTP
+  - SMTP email sending service
+  - Supports any SMTP server (Gmail, Outlook, Namecheap, etc.)
   - Handles attachments, CC/BCC
   - Auto-fetches company configuration
 
@@ -65,8 +63,7 @@ All email sending functionality has been migrated from n8n webhooks to direct pl
 ```json
 {
   "nodemailer": "^6.9.x",
-  "@types/nodemailer": "^6.4.x",
-  "resend": "^3.x.x"
+  "@types/nodemailer": "^6.4.x"
 }
 ```
 
@@ -88,13 +85,15 @@ Or manually run the SQL from:
 Navigate to: `http://localhost:8080/company-setup`
 
 **For Quick Testing (Recommended):**
-1. Sign up for Resend: https://resend.com
-2. Get API key: https://resend.com/api-keys
-3. Use test domain: `onboarding@resend.dev`
+1. Use Gmail with App Password
+2. Enable 2-Factor Authentication on Gmail
+3. Create App Password: https://myaccount.google.com/apppasswords
 4. Configure in Company Setup:
-   - Provider: Resend
-   - API Key: `re_...`
-   - From Email: `onboarding@resend.dev`
+   - SMTP Host: `smtp.gmail.com`
+   - SMTP Port: `587`
+   - SMTP Username: `your-email@gmail.com`
+   - SMTP Password: `your-app-password`
+   - From Email: `your-email@gmail.com`
    - From Name: Your Company Name
 
 **For Production:**

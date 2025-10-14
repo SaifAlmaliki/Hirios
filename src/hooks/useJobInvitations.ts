@@ -251,7 +251,9 @@ const sendInvitationEmail = async (invitation: JobInvitation) => {
       .select(`
         title,
         company,
+        company_profile_id,
         company_profiles!inner (
+          id,
           company_name
         )
       `)
@@ -278,7 +280,7 @@ const sendInvitationEmail = async (invitation: JobInvitation) => {
     // Create invitation link
     const invitationLink = `${window.location.origin}/invite/${invitation.token}`;
 
-    // Send email using Supabase Edge Function with Resend
+    // Send email using Supabase Edge Function with SMTP
     console.log('🚀 Attempting to call Edge Function...');
     try {
       const emailResponse = await supabase.functions.invoke('send-invitation-email', {
@@ -289,6 +291,7 @@ const sendInvitationEmail = async (invitation: JobInvitation) => {
           inviterCompany: inviter.company_name,
           invitationLink,
           expiresAt: invitation.expires_at,
+          companyId: job.company_profile_id, // Add company ID for SMTP config
         },
       });
 

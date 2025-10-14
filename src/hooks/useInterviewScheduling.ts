@@ -206,6 +206,7 @@ export const useCreateInterviewSchedule = () => {
                 votingLink,
                 interviewDuration: data.interview_duration_minutes,
                 timeSlots: insertedSlots,
+                companyId: companyProfile?.id, // Add company ID for SMTP config
               },
             });
             
