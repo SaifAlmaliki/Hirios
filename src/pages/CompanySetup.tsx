@@ -13,36 +13,50 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import Navbar from '@/components/Navbar';
 import { testCurrentUserSMTPConnection } from '@/services/emailService';
+import { LogoUpload } from '@/components/LogoUpload';
 
 const CompanySetup = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isTesting, setIsTesting] = useState(false);
   const [hasProfile, setHasProfile] = useState(false);
   const [testEmailAddress, setTestEmailAddress] = useState('');
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [isAutoSaving, setIsAutoSaving] = useState(false);
+  const [hasLocalStorageData, setHasLocalStorageData] = useState(false);
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const [companyData, setCompanyData] = useState({
-    company_name: '',
-    company_description: '',
-    company_website: '',
-    company_size: '',
-    industry: '',
-    address: '',
-    phone: '',
-    logo_url: '',
-    // SMTP Email configuration
-    smtp_host: '',
-    smtp_port: 587,
-    smtp_user: '',
-    smtp_password: '',
-    smtp_from_email: '',
-    smtp_from_name: '',
-    smtp_secure: true,
+  // Initialize company data with localStorage fallback
+  const [companyData, setCompanyData] = useState(() => {
+    const savedData = localStorage.getItem('company-setup-draft');
+    if (savedData) {
+      try {
+        const parsed = JSON.parse(savedData);
+        setHasLocalStorageData(true);
+        return parsed;
+      } catch (error) {
+        console.error('Failed to parse saved company data:', error);
+      }
+    }
+    return {
+      company_name: '',
+      company_description: '',
+      company_website: '',
+      company_size: '',
+      industry: '',
+      address: '',
+      phone: '',
+      logo_url: '',
+      // SMTP Email configuration
+      smtp_host: '',
+      smtp_port: 587,
+      smtp_user: '',
+      smtp_password: '',
+      smtp_from_email: '',
+      smtp_from_name: '',
+      smtp_secure: true,
+    };
   });
 
   // Redirect if not authenticated
@@ -58,6 +72,11 @@ const CompanySetup = () => {
     if (!user) return;
 
     const checkProfile = async () => {
+      // Check if we have localStorage data that should be preserved
+      if (hasLocalStorageData) {
+        return;
+      }
+
       const { data } = await supabase
         .from('company_profiles')
         .select('*')
@@ -66,25 +85,27 @@ const CompanySetup = () => {
       
       if (data) {
         setHasProfile(true);
-        // Ensure all fields have string values, not null
-        setCompanyData({
-          company_name: data.company_name || '',
-          company_description: data.company_description || '',
-          company_website: data.company_website || '',
-          company_size: data.company_size || '',
-          industry: data.industry || '',
-          address: data.address || '',
-          phone: data.phone || '',
-          logo_url: data.logo_url || '',
-          // SMTP Email configuration
-          smtp_host: data.smtp_host || '',
-          smtp_port: data.smtp_port || 587,
-          smtp_user: data.smtp_user || '',
-          smtp_password: data.smtp_password || '',
-          smtp_from_email: data.smtp_from_email || '',
-          smtp_from_name: data.smtp_from_name || '',
-          smtp_secure: data.smtp_secure !== false,
-        });
+        // Only update if we don't have unsaved changes
+        if (!hasUnsavedChanges) {
+          setCompanyData({
+            company_name: data.company_name || '',
+            company_description: data.company_description || '',
+            company_website: data.company_website || '',
+            company_size: data.company_size || '',
+            industry: data.industry || '',
+            address: data.address || '',
+            phone: data.phone || '',
+            logo_url: data.logo_url || '',
+            // SMTP Email configuration
+            smtp_host: data.smtp_host || '',
+            smtp_port: data.smtp_port || 587,
+            smtp_user: data.smtp_user || '',
+            smtp_password: data.smtp_password || '',
+            smtp_from_email: data.smtp_from_email || '',
+            smtp_from_name: data.smtp_from_name || '',
+            smtp_secure: data.smtp_secure !== false,
+          });
+        }
       } else {
         // If no profile exists, create a basic one
         const { data: newProfile, error } = await supabase
@@ -92,7 +113,7 @@ const CompanySetup = () => {
           .insert([{
             user_id: user.id,
             company_name: 'My Company',
-            subscription_plan: 'free'
+            subscription_plan: 'trial'
           }])
           .select()
           .single();
@@ -123,7 +144,7 @@ const CompanySetup = () => {
     };
 
     checkProfile();
-  }, [user]);
+  }, [user, hasLocalStorageData]);
 
   // Show loading state while auth is being determined
   if (loading) {
@@ -160,8 +181,50 @@ const CompanySetup = () => {
   }
 
   const handleInputChange = (field: string, value: string) => {
-    setCompanyData(prev => ({ ...prev, [field]: value }));
+    const newData = { ...companyData, [field]: value };
+    setCompanyData(newData);
     setHasUnsavedChanges(true);
+    
+    // Save to localStorage immediately
+    localStorage.setItem('company-setup-draft', JSON.stringify(newData));
+    
+    // Clear existing timeout
+    if (autoSaveTimeoutRef.current) {
+      clearTimeout(autoSaveTimeoutRef.current);
+    }
+    
+    // Set new timeout for auto-save (5 seconds)
+    autoSaveTimeoutRef.current = setTimeout(() => {
+      autoSaveProfile();
+    }, 5000);
+  };
+
+  const handleLogoUploaded = (logoUrl: string) => {
+    const newData = { ...companyData, logo_url: logoUrl };
+    setCompanyData(newData);
+    setHasUnsavedChanges(true);
+    
+    // Save to localStorage immediately
+    localStorage.setItem('company-setup-draft', JSON.stringify(newData));
+    
+    // Clear existing timeout
+    if (autoSaveTimeoutRef.current) {
+      clearTimeout(autoSaveTimeoutRef.current);
+    }
+    
+    // Set new timeout for auto-save (5 seconds)
+    autoSaveTimeoutRef.current = setTimeout(() => {
+      autoSaveProfile();
+    }, 5000);
+  };
+
+  const handleLogoRemoved = () => {
+    const newData = { ...companyData, logo_url: '' };
+    setCompanyData(newData);
+    setHasUnsavedChanges(true);
+    
+    // Save to localStorage immediately
+    localStorage.setItem('company-setup-draft', JSON.stringify(newData));
     
     // Clear existing timeout
     if (autoSaveTimeoutRef.current) {
@@ -211,7 +274,9 @@ const CompanySetup = () => {
       } else {
         setHasUnsavedChanges(false);
         setLastSaved(new Date());
-        console.log('✅ Auto-saved successfully');
+        setHasLocalStorageData(false);
+        // Clear localStorage draft since data is now saved to database
+        localStorage.removeItem('company-setup-draft');
       }
     } catch (error) {
       console.error('Auto-save error:', error);
@@ -228,6 +293,39 @@ const CompanySetup = () => {
       }
     };
   }, []);
+
+  // Handle tab visibility changes to restore data
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        const savedData = localStorage.getItem('company-setup-draft');
+        if (savedData) {
+          try {
+            const parsed = JSON.parse(savedData);
+            setCompanyData(parsed);
+            setHasUnsavedChanges(true);
+          } catch (error) {
+            console.error('Failed to restore data:', error);
+          }
+        }
+      } else {
+        localStorage.setItem('company-setup-draft', JSON.stringify(companyData));
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [companyData]);
+
+  // Save to localStorage whenever companyData changes
+  useEffect(() => {
+    if (companyData && Object.keys(companyData).length > 0) {
+      localStorage.setItem('company-setup-draft', JSON.stringify(companyData));
+    }
+  }, [companyData]);
 
   // Warn user before navigating away with unsaved changes
   useEffect(() => {
@@ -246,56 +344,17 @@ const CompanySetup = () => {
     };
   }, [hasUnsavedChanges]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    try {
-      if (hasProfile) {
-        // Update existing profile
-        const { error } = await supabase
-          .from('company_profiles')
-          .update(companyData)
-          .eq('user_id', user!.id);
-
-        if (error) throw error;
-      } else {
-        // Create new profile
-        const { error } = await supabase
-          .from('company_profiles')
-          .insert([{ ...companyData, user_id: user!.id }]);
-
-        if (error) throw error;
-      }
-
-      setHasUnsavedChanges(false);
-      setLastSaved(new Date());
-      
-      toast({
-        title: "Success",
-        description: "Company profile saved successfully!",
-      });
-
-      navigate('/job-portal');
-    } catch (error: unknown) {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to save company profile",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   const handleJobPortal = async () => {
     // Save any unsaved changes before navigating
     if (hasUnsavedChanges) {
-      console.log('💾 Saving changes before navigation...');
       await autoSaveProfile();
       // Wait a moment for the save to complete
       await new Promise(resolve => setTimeout(resolve, 500));
     }
+    // Clear localStorage draft since we're navigating away
+    localStorage.removeItem('company-setup-draft');
+    setHasLocalStorageData(false);
     navigate('/job-portal');
   };
 
@@ -305,7 +364,6 @@ const CompanySetup = () => {
     try {
       // If there are unsaved changes, save them first
       if (hasUnsavedChanges && hasProfile) {
-        console.log('💾 Saving changes before testing...');
         await autoSaveProfile();
         // Wait a moment for the save to complete
         await new Promise(resolve => setTimeout(resolve, 500));
@@ -349,7 +407,6 @@ const CompanySetup = () => {
 
     // If there are unsaved changes, save them first
     if (hasUnsavedChanges && hasProfile) {
-      console.log('💾 Saving changes before sending test email...');
       await autoSaveProfile();
       // Wait a moment for the save to complete
       await new Promise(resolve => setTimeout(resolve, 500));
@@ -447,7 +504,7 @@ const CompanySetup = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="company_name">Company Name *</Label>
@@ -538,6 +595,24 @@ const CompanySetup = () => {
                     placeholder="Company phone number"
                   />
                 </div>
+              </div>
+
+              {/* Company Logo Upload Section */}
+              <div className="border-t pt-6 mt-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <Building2 className="h-5 w-5 text-blue-600" />
+                  <h3 className="text-lg font-semibold text-gray-900">Company Logo</h3>
+                </div>
+                <p className="text-sm text-gray-600 mb-4">
+                  Upload your company logo to personalize the platform. The logo will appear in the navigation bar and on job offers.
+                </p>
+                
+                <LogoUpload
+                  currentLogoUrl={companyData.logo_url}
+                  onLogoUploaded={handleLogoUploaded}
+                  onLogoRemoved={handleLogoRemoved}
+                  disabled={isTesting}
+                />
               </div>
 
               {/* SMTP Email Configuration Section */}
@@ -718,52 +793,24 @@ const CompanySetup = () => {
                     </div>
                     
                     <p className="text-xs text-gray-500">
-                      Test connection validates SMTP settings without sending email. Changes are auto-saved.
+                      Test connection validates SMTP settings without sending email. All changes are automatically saved every 5 seconds.
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button type="submit" className="flex-1" disabled={isSubmitting}>
-                  {isSubmitting ? 'Saving...' : hasProfile ? 'Update Profile' : 'Save Profile'}
-                </Button>
-                
-                {hasUnsavedChanges && (
-                  <Button 
-                    type="button" 
-                    variant="secondary" 
-                    onClick={async () => {
-                      await autoSaveProfile();
-                    }}
-                    disabled={isAutoSaving}
-                    className="flex-1"
-                  >
-                    {isAutoSaving ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
-                        Saving...
-                      </>
-                    ) : (
-                      <>
-                        <Save className="h-4 w-4 mr-2" />
-                        Save Now
-                      </>
-                    )}
-                  </Button>
-                )}
-                
+              <div className="flex justify-center">
                 <Button 
                   type="button" 
                   variant="outline" 
                   onClick={handleJobPortal}
-                  className="flex-1"
+                  className="px-8"
                 >
                   <CreditCard className="h-4 w-4 mr-2" />
                   Go to Dashboard
                 </Button>
               </div>
-            </form>
+            </div>
           </CardContent>
         </Card>
       </div>

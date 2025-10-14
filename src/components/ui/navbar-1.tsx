@@ -1,7 +1,7 @@
 "use client" 
 
 import * as React from "react"
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Menu, X, Building2, Settings, Brain, LogOut, FileText, Clock } from "lucide-react"
 import { useNavigate } from 'react-router-dom';
@@ -67,8 +67,9 @@ const Navbar1: React.FC<Navbar1Props> = ({
     navigate('/resume-pool');
   };
 
-  // Subscription badge component
-  const SubscriptionBadge = () => {
+
+  // Render subscription badge conditionally
+  const renderSubscriptionBadge = () => {
     if (!user || subscriptionStatus.loading) {
       return null;
     }
@@ -166,7 +167,7 @@ const Navbar1: React.FC<Navbar1Props> = ({
         <nav className="hidden md:flex lg:hidden items-center space-x-1">
           {user ? (
             <>
-              <SubscriptionBadge />
+              {renderSubscriptionBadge()}
               
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
@@ -240,7 +241,7 @@ const Navbar1: React.FC<Navbar1Props> = ({
                 {user.email}
               </span>
               
-              <SubscriptionBadge />
+              {renderSubscriptionBadge()}
               
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
@@ -378,7 +379,7 @@ const Navbar1: React.FC<Navbar1Props> = ({
                   >
                     <p className="text-sm text-gray-600 mb-3">{user.email}</p>
                     <div className="flex justify-center">
-                      <SubscriptionBadge />
+                      {renderSubscriptionBadge()}
                     </div>
                   </motion.div>
 
