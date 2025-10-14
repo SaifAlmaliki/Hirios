@@ -1,12 +1,12 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Building2, ArrowLeft, CreditCard, Mail } from 'lucide-react';
+import { Building2, ArrowLeft, CreditCard, Mail, Save, Clock } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -22,6 +22,10 @@ const CompanySetup = () => {
   const [isTesting, setIsTesting] = useState(false);
   const [hasProfile, setHasProfile] = useState(false);
   const [testEmailAddress, setTestEmailAddress] = useState('');
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [isAutoSaving, setIsAutoSaving] = useState(false);
+  const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [companyData, setCompanyData] = useState({
     company_name: '',
     company_description: '',
@@ -157,7 +161,90 @@ const CompanySetup = () => {
 
   const handleInputChange = (field: string, value: string) => {
     setCompanyData(prev => ({ ...prev, [field]: value }));
+    setHasUnsavedChanges(true);
+    
+    // Clear existing timeout
+    if (autoSaveTimeoutRef.current) {
+      clearTimeout(autoSaveTimeoutRef.current);
+    }
+    
+    // Set new timeout for auto-save (5 seconds)
+    autoSaveTimeoutRef.current = setTimeout(() => {
+      autoSaveProfile();
+    }, 5000);
   };
+
+  // Auto-save function
+  const autoSaveProfile = async () => {
+    if (!hasUnsavedChanges) return;
+    
+    setIsAutoSaving(true);
+    try {
+      let error;
+      
+      if (hasProfile) {
+        // Update existing profile
+        const { error: updateError } = await supabase
+          .from('company_profiles')
+          .update(companyData)
+          .eq('user_id', user!.id);
+        error = updateError;
+      } else {
+        // Create new profile if it doesn't exist
+        const { error: insertError } = await supabase
+          .from('company_profiles')
+          .insert([{ ...companyData, user_id: user!.id }]);
+        error = insertError;
+        
+        if (!error) {
+          setHasProfile(true);
+        }
+      }
+
+      if (error) {
+        console.error('Auto-save failed:', error);
+        toast({
+          title: "Auto-save failed",
+          description: "Changes not saved automatically. Please save manually.",
+          variant: "destructive",
+        });
+      } else {
+        setHasUnsavedChanges(false);
+        setLastSaved(new Date());
+        console.log('✅ Auto-saved successfully');
+      }
+    } catch (error) {
+      console.error('Auto-save error:', error);
+    } finally {
+      setIsAutoSaving(false);
+    }
+  };
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (autoSaveTimeoutRef.current) {
+        clearTimeout(autoSaveTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Warn user before navigating away with unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+        return 'You have unsaved changes. Are you sure you want to leave?';
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [hasUnsavedChanges]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -181,6 +268,9 @@ const CompanySetup = () => {
         if (error) throw error;
       }
 
+      setHasUnsavedChanges(false);
+      setLastSaved(new Date());
+      
       toast({
         title: "Success",
         description: "Company profile saved successfully!",
@@ -198,24 +288,29 @@ const CompanySetup = () => {
     }
   };
 
-  const handleJobPortal = () => {
+  const handleJobPortal = async () => {
+    // Save any unsaved changes before navigating
+    if (hasUnsavedChanges) {
+      console.log('💾 Saving changes before navigation...');
+      await autoSaveProfile();
+      // Wait a moment for the save to complete
+      await new Promise(resolve => setTimeout(resolve, 500));
+    }
     navigate('/job-portal');
   };
 
   const handleTestConnection = async () => {
-    // First, save the current settings
-    if (!hasProfile) {
-      toast({
-        title: "Please save your profile first",
-        description: "Save your company profile before testing SMTP connection.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     setIsTesting(true);
 
     try {
+      // If there are unsaved changes, save them first
+      if (hasUnsavedChanges && hasProfile) {
+        console.log('💾 Saving changes before testing...');
+        await autoSaveProfile();
+        // Wait a moment for the save to complete
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+
       // Test SMTP connection
       const result = await testCurrentUserSMTPConnection();
 
@@ -243,15 +338,6 @@ const CompanySetup = () => {
   };
 
   const handleSendTestEmail = async () => {
-    if (!hasProfile) {
-      toast({
-        title: "Please save your profile first",
-        description: "Save your company profile before sending test email.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     if (!companyData.smtp_from_email) {
       toast({
         title: "Missing email address",
@@ -259,6 +345,14 @@ const CompanySetup = () => {
         variant: "destructive",
       });
       return;
+    }
+
+    // If there are unsaved changes, save them first
+    if (hasUnsavedChanges && hasProfile) {
+      console.log('💾 Saving changes before sending test email...');
+      await autoSaveProfile();
+      // Wait a moment for the save to complete
+      await new Promise(resolve => setTimeout(resolve, 500));
     }
 
     // Determine recipient
@@ -329,6 +423,28 @@ const CompanySetup = () => {
             <CardDescription>
               Complete your company profile to start posting jobs
             </CardDescription>
+            
+            {/* Auto-save status indicator */}
+            <div className="flex items-center justify-center gap-2 text-sm text-gray-600 mt-2">
+              {isAutoSaving && (
+                <div className="flex items-center gap-1 text-blue-600">
+                  <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-blue-600"></div>
+                  <span>Auto-saving...</span>
+                </div>
+              )}
+              {!isAutoSaving && hasUnsavedChanges && (
+                <div className="flex items-center gap-1 text-amber-600 font-medium">
+                  <Clock className="h-3 w-3" />
+                  <span>⚠️ Unsaved changes - will auto-save in a few seconds</span>
+                </div>
+              )}
+              {!isAutoSaving && !hasUnsavedChanges && lastSaved && (
+                <div className="flex items-center gap-1 text-green-600">
+                  <Save className="h-3 w-3" />
+                  <span>Saved {lastSaved.toLocaleTimeString()}</span>
+                </div>
+              )}
+            </div>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -546,7 +662,7 @@ const CompanySetup = () => {
                         type="button"
                         variant="outline"
                         onClick={handleTestConnection}
-                        disabled={isTesting || !hasProfile || !companyData.smtp_host || !companyData.smtp_user || !companyData.smtp_password || !companyData.smtp_from_email}
+                        disabled={isTesting || !companyData.smtp_host || !companyData.smtp_user || !companyData.smtp_password || !companyData.smtp_from_email}
                         className="flex-1 sm:flex-none"
                       >
                         {isTesting ? (
@@ -580,7 +696,7 @@ const CompanySetup = () => {
                           type="button"
                           variant="default"
                           onClick={handleSendTestEmail}
-                          disabled={isTesting || !hasProfile || !companyData.smtp_host || !companyData.smtp_user || !companyData.smtp_password || !companyData.smtp_from_email}
+                          disabled={isTesting || !companyData.smtp_host || !companyData.smtp_user || !companyData.smtp_password || !companyData.smtp_from_email}
                           className="bg-green-600 hover:bg-green-700 whitespace-nowrap"
                         >
                           {isTesting ? (
@@ -602,7 +718,7 @@ const CompanySetup = () => {
                     </div>
                     
                     <p className="text-xs text-gray-500">
-                      {!hasProfile ? 'Save your profile first before testing' : 'Test connection validates SMTP settings without sending email.'}
+                      Test connection validates SMTP settings without sending email. Changes are auto-saved.
                     </p>
                   </div>
                 </div>
@@ -612,6 +728,30 @@ const CompanySetup = () => {
                 <Button type="submit" className="flex-1" disabled={isSubmitting}>
                   {isSubmitting ? 'Saving...' : hasProfile ? 'Update Profile' : 'Save Profile'}
                 </Button>
+                
+                {hasUnsavedChanges && (
+                  <Button 
+                    type="button" 
+                    variant="secondary" 
+                    onClick={async () => {
+                      await autoSaveProfile();
+                    }}
+                    disabled={isAutoSaving}
+                    className="flex-1"
+                  >
+                    {isAutoSaving ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
+                        Saving...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="h-4 w-4 mr-2" />
+                        Save Now
+                      </>
+                    )}
+                  </Button>
+                )}
                 
                 <Button 
                   type="button" 
