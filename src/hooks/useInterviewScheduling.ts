@@ -150,10 +150,10 @@ export const useCreateInterviewSchedule = () => {
 
       if (participantsError) throw participantsError;
 
-      // 5. Get company profile for recruiter name
+      // 5. Get company profile for recruiter name and ID for SMTP config
       const { data: companyProfile } = await supabase
         .from('company_profiles')
-        .select('company_name')
+        .select('id, company_name')
         .eq('user_id', user.id)
         .single();
 
@@ -180,6 +180,8 @@ export const useCreateInterviewSchedule = () => {
 
       // 8. Send emails to all participants
       console.log('📧 Sending emails to participants:', insertedParticipants.length);
+      console.log('🏢 Company ID for SMTP config:', companyProfile?.id);
+      console.log('🏢 Company Name:', companyProfile?.company_name);
       
       let successCount = 0;
       let failCount = 0;
@@ -212,12 +214,14 @@ export const useCreateInterviewSchedule = () => {
             
             if (emailResponse.error) {
               console.error(`❌ Email error for ${participant.email} (attempt ${attempt}):`, emailResponse.error);
+              console.error('📋 Error details:', emailResponse.data);
               if (attempt < 2) {
                 console.log('⏳ Retrying in 2 seconds...');
                 await new Promise(resolve => setTimeout(resolve, 2000));
               }
             } else {
               console.log('✅ Email sent successfully to:', participant.email);
+              console.log('📬 Response:', emailResponse.data);
               successCount++;
               emailSent = true;
               break;
