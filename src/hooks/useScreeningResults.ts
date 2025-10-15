@@ -290,6 +290,7 @@ export const useUpdateFavoriteStatus = () => {
 export const useRejectCandidate = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { user } = useAuth();
 
   return useMutation({
     mutationFn: async ({ 
@@ -328,6 +329,42 @@ export const useRejectCandidate = () => {
         throw updateError;
       }
 
+      // Update candidate status to rejected if we have the necessary data
+      if (application_id && updatedResult.job_id && user) {
+        try {
+          // Get the resume_pool_id from the application
+          const { data: application, error: appError } = await supabase
+            .from('applications')
+            .select('resume_pool_id')
+            .eq('id', application_id)
+            .single();
+
+          if (!appError && application?.resume_pool_id) {
+            // Update or create candidate status as rejected
+            const { error: statusError } = await supabase
+              .from('candidate_status')
+              .upsert({
+                resume_pool_id: application.resume_pool_id,
+                job_id: updatedResult.job_id,
+                status: 'rejected',
+                updated_by_user_id: user.id,
+              }, {
+                onConflict: 'resume_pool_id,job_id'
+              });
+
+            if (statusError) {
+              console.error('Error updating candidate status to rejected:', statusError);
+              // Don't throw error here - rejection email should still be sent
+            } else {
+              console.log('✅ Candidate status updated to rejected');
+            }
+          }
+        } catch (statusUpdateError) {
+          console.error('Error in candidate status update:', statusUpdateError);
+          // Don't throw error here - rejection email should still be sent
+        }
+      }
+
       // Send rejection email directly through platform
       try {
         const { sendEmailFromCurrentUser } = await import('@/services/emailService');
@@ -359,6 +396,10 @@ export const useRejectCandidate = () => {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['screening_results'] });
+      queryClient.invalidateQueries({ queryKey: ['candidate_status'] });
+      queryClient.invalidateQueries({ queryKey: ['candidate_status_history'] });
+      queryClient.invalidateQueries({ queryKey: ['resume_pool_status_badges'] });
+      queryClient.invalidateQueries({ queryKey: ['global_resume_pool_status_badges'] });
       toast({
         title: "Candidate Rejected",
         description: `Rejection email sent to ${data.first_name} ${data.last_name}`,
