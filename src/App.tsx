@@ -64,6 +64,7 @@ const App = () => (
           <Route path="/contact-us" element={<ContactUs />} />
           <Route path="/invite/:token" element={<InviteAccept />} />
           <Route path="/interview-vote/:voteToken" element={<InterviewVote />} />
+          <Route path="/interview/:screeningResultId/:applicationId" element={<VoiceInterview />} />
           <Route path="/offer-download/:id" element={<OfferDownload />} />
           <Route path="/download-offer/:id" element={<OfferDownload />} />
           <Route path="/test-route/:id" element={<TestRoute />} />
@@ -80,7 +81,6 @@ const App = () => (
                   <Route path="/company-setup" element={<CompanySetup />} />
                   <Route path="/screening-results/:id" element={<ScreeningResultDetail />} />
                   <Route path="/screening-results/job/:jobId" element={<ScreeningResults />} />
-                  <Route path="/interview/:screeningResultId/:applicationId" element={<VoiceInterview />} />
                   <Route path="/test-collaboration" element={<TestCollaboration />} />
                   <Route path="/button-demo" element={<ButtonAlignmentDemo />} />
                   <Route path="/resume-pool" element={<ResumePool />} />
