@@ -101,7 +101,7 @@ Test all three types:
 - All components compile
 - Production build successful
 
-**Note**: Nodemailer warnings are expected (browser compatibility). The SMTP functionality will work for Resend and SendGrid (API-based). For custom SMTP, recommend moving to Supabase Edge Function in production.
+**Note**: Nodemailer warnings are expected (browser compatibility). For custom SMTP, recommend moving to Supabase Edge Function in production.
 
 ---
 
@@ -131,8 +131,7 @@ Test all three types:
 ```json
 {
   "nodemailer": "^6.9.x",
-  "@types/nodemailer": "^6.4.x",
-  "resend": "^3.x.x"
+  "@types/nodemailer": "^6.4.x"
 }
 ```
 
@@ -142,8 +141,6 @@ Test all three types:
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Resend Integration | ✅ | API-based, recommended |
-| SendGrid Integration | ✅ | API-based, enterprise |
 | Custom SMTP | ✅ | Any SMTP server |
 | Voice Interview Email | ✅ | With interview link |
 | Rejection Email | ✅ | Professional template |
@@ -178,7 +175,6 @@ You can remove them from your `.env` file.
 ### 3. Production Considerations
 
 **Nodemailer in Browser:**
-- Works for API-based providers (Resend, SendGrid)
 - For production SMTP, consider moving email logic to Supabase Edge Function
 - Current implementation is suitable for MVP/testing
 
@@ -243,8 +239,8 @@ You can remove them from your `.env` file.
 **"Email configuration not found"**
 → Go to Company Setup and configure email
 
-**"Resend API error: 403"**
-→ Verify API key and domain in Resend dashboard
+**"SMTP connection failed"**
+→ Verify SMTP credentials and server settings
 
 **"SMTP connection failed"**
 → Check credentials, use Gmail App Password

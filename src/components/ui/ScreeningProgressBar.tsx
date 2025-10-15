@@ -18,6 +18,30 @@ const ScreeningProgressBar: React.FC<ScreeningProgressBarProps> = ({
 }) => {
   const [progress, setProgress] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState(durationSeconds);
+  const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
+
+  // Smart platform messages that rotate during screening
+  const smartMessages = mode === 'screening' ? [
+    "🧠 Our AI is analyzing candidate qualifications and experience...",
+    "🎯 Matching skills to your job requirements with precision...",
+    "📊 Evaluating cultural fit and potential for success...",
+    "⚡ Processing years of experience in seconds, not hours...",
+    "🔍 Identifying top performers from hundreds of candidates...",
+    "💡 Our AI reads between the lines to find hidden gems...",
+    "🚀 Transforming recruitment from weeks to minutes...",
+    "🎪 Finding the perfect match using advanced algorithms...",
+    "📈 Scoring candidates on multiple dimensions simultaneously...",
+    "🌟 Discovering talent that traditional screening might miss..."
+  ] : [
+    "🔍 Extracting skills and experience from resume text...",
+    "🏷️ Automatically tagging and categorizing information...",
+    "📝 Converting unstructured data into searchable insights...",
+    "⚡ Processing complex resume formats with AI precision...",
+    "🎯 Identifying key qualifications and achievements...",
+    "💾 Building your searchable talent database...",
+    "🔧 Normalizing data for consistent analysis...",
+    "📊 Creating structured profiles from unstructured resumes..."
+  ];
 
   useEffect(() => {
     const intervalDuration = 500; // Update every 500ms
@@ -44,6 +68,17 @@ const ScreeningProgressBar: React.FC<ScreeningProgressBarProps> = ({
 
     return () => clearInterval(interval);
   }, [durationSeconds, onComplete]);
+
+  // Rotate messages every 3 seconds
+  useEffect(() => {
+    const messageInterval = setInterval(() => {
+      setCurrentMessageIndex((prevIndex) => 
+        (prevIndex + 1) % smartMessages.length
+      );
+    }, 3000);
+
+    return () => clearInterval(messageInterval);
+  }, [smartMessages.length]);
 
   return (
     <Card className="border-blue-200 bg-blue-50">
@@ -84,8 +119,8 @@ const ScreeningProgressBar: React.FC<ScreeningProgressBarProps> = ({
               <span className="text-sm font-medium text-blue-700">
                 {Math.round(progress)}%
               </span>
-              <span className="text-xs text-blue-600">
-                Please wait while we analyze the resumes
+              <span className="text-xs text-blue-600 transition-opacity duration-500 ease-in-out">
+                {smartMessages[currentMessageIndex]}
               </span>
             </div>
           </div>

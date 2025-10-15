@@ -196,7 +196,7 @@ This invitation was sent from Hirios Job Portal
       };
     }
 
-    const transporter = nodemailer.createTransporter(transportConfig);
+    const transporter = nodemailer.createTransport(transportConfig);
 
     // Send email using SMTP
     const mailOptions = {

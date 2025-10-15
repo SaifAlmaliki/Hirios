@@ -275,11 +275,11 @@ All three email templates match your provided n8n templates:
 - Check firewall/network
 - Use Gmail App Password (not regular password)
 
-### "Resend API error"
+### "SMTP connection failed"
 **Solution**: 
-- Verify API key is correct
-- Verify domain in Resend dashboard
-- Use test domain for development
+- Verify SMTP credentials are correct
+- Check SMTP server settings and port
+- Use Gmail App Password for Gmail accounts
 
 ### Emails going to spam
 **Solution**:
@@ -307,7 +307,7 @@ Full documentation available in:
 6. **📧 Multiple Providers**: Choose what works best
 7. **📎 Attachments**: Built-in PDF support for offers
 8. **🐛 Better Debugging**: Console logs and error messages
-9. **🔒 Flexible**: SMTP, Resend, or SendGrid
+9. **🔒 Flexible**: Any SMTP server
 10. **🚀 Production Ready**: Professional email templates
 
 ---
@@ -334,7 +334,7 @@ If you encounter issues:
 1. **Check browser console** for detailed error messages
 2. **Review EMAIL_SETUP_GUIDE.md** for troubleshooting
 3. **Verify configuration** in Company Setup page
-4. **Test with simple provider** (Gmail/Resend) first
+4. **Test with simple provider** (Gmail) first
 5. **Check email provider dashboard** for delivery status
 
 ---

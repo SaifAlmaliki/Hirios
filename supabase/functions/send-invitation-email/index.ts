@@ -117,7 +117,7 @@ serve(async (req)=>{
       };
     }
 
-    const transporter = nodemailer.createTransporter(transportConfig);
+    const transporter = nodemailer.createTransport(transportConfig);
 
     const textContent = `
 Job Collaboration Invitation

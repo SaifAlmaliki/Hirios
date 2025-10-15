@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HIRIOS - AI-Powered Recruitment Platform</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        /* Apply Inter font family and a clean base background/text color */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fc; /* Light blue/gray background */
+            color: #1f2937; /* Dark gray text */
+        }
+        /* Custom styling for sleek cards */
+        .slide-card {
+            background-color: white;
+            padding: 2.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+            margin-bottom: 2rem;
+            border-top: 4px solid #4f46e5; /* Indigo accent border */
+        }
+        /* Custom styling for benefit checkmarks */
+        .benefit-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+        }
+        .benefit-icon {
+            color: #10b981; /* Emerald green for checks */
+            font-size: 1.25rem;
+            margin-right: 0.5rem;
+            line-height: 1;
+        }
+        /* Specific styling for the initial title/hero */
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1.1;
+            color: #1e3a8a; /* Dark blue */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="max-w-6xl mx-auto px-4 py-12 md:py-16">
+
+        <!-- Header / First Slide - Introduction -->
+        <header class="text-center mb-16">
+            <h1 class="hero-title">HIRIOS</h1>
+            <h2 class="text-xl md:text-3xl font-light tracking-wide text-indigo-600 mb-6 border-b-2 border-indigo-200 inline-block pb-1">AI-Powered Recruitment Platform</h2>
+
+            <p class="text-gray-600 max-w-2xl mx-auto mt-4 text-lg">
+                <span class="font-semibold text-indigo-600">OPENING STATEMENT:</span> "What if you could screen 100 candidates in the time it takes to review 10, conduct unlimited interviews 24/7, and never lose a qualified candidate again? That's exactly what Hirios delivers."
+            </p>
+        </header>
+
+        <!-- SLIDE 1: Smart Talent Pool Management -->
+        <section id="slide-1" class="slide-card">
+            <h3 class="text-3xl font-bold text-gray-800 mb-6">Smart Talent Pool - Your Centralized Resume Database</h3>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Left Column: Text Content -->
+                <div>
+                    <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                        <h4 class="text-xl font-semibold text-red-700 mb-3">The Problem</h4>
+                        <ul class="space-y-2 text-gray-600 list-disc list-inside ml-4">
+                            <li>Resumes scattered across emails, folders, and multiple job postings</li>
+                            <li>No unified system to search and retrieve past candidates</li>
+                            <li>Valuable candidates lost in disorganized filing systems</li>
+                            <li>Time wasted searching for the right resume when new positions open</li>
+                        </ul>
+                    </div>
+
+                    <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                        <h4 class="text-xl font-semibold text-green-700 mb-3">The Solution</h4>
+                        <p class="text-gray-700">Hirios provides a centralized, searchable talent pool where all resumes are automatically organized, <span class="font-bold">AI-processed</span>, and instantly accessible across your entire organization.</p>
+                    </div>
+
+                    <!-- Key Benefits moved to left column -->
+                    <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
+                        <h4 class="text-xl font-semibold text-indigo-600 mb-4">Key Benefits</h4>
+                        <div class="space-y-3">
+                            <div class="benefit-item"><span class="benefit-icon">✓</span> <span class="font-bold">Centralized Storage</span> - All resumes in one secure, organized database</div>
+                            <div class="benefit-item"><span class="benefit-icon">✓</span> <span class="font-bold">AI-Powered Search</span> - Find the perfect candidate using semantic search</div>
+                            <div class="benefit-item"><span class="benefit-icon">✓</span> <span class="font-bold">Zero Data Loss</span> - Never lose a qualified candidate again</div>
+                            <div class="benefit-item"><span class="benefit-icon">✓</span> <span class="font-bold">Instant Access</span> - Retrieve any resume in seconds, not hours</div>
+                            <div class="benefit-item"><span class="benefit-icon">✓</span> <span class="font-bold">Cross-Job Matching</span> - Reuse qualified candidates for multiple positions</div>
+                            <div class="benefit-item"><span class="benefit-icon">✓</span> <span class="font-bold">ROI Maximization</span> - Get more value from every resume you receive</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Screenshot -->
+                <div class="flex flex-col justify-center">
+                    <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-lg">
+                        <h4 class="text-lg font-semibold text-gray-700 mb-4 text-center">Talent Pool Dashboard</h4>
+                        <div class="bg-gray-100 border border-gray-300 rounded-lg overflow-hidden">
+                            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRjdGOUZDIi8+CjxyZWN0IHg9IjIwIiB5PSIyMCIgd2lkdGg9IjM2MCIgaGVpZ2h0PSI0MCIgcng9IjgiIGZpbGw9IndoaXRlIiBzdHJva2U9IiNFNUU3RUIiLz4KPHN2ZyB4PSIzMCIgeT0iMzAiIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIj4KPHBhdGggZD0iTTExIDIwQzE1Ljk3MDYgMjAgMjAgMTUuOTcwNiAyMCAxMVMxNS45NzA2IDIgMTEgMlMyIDYuMDI5NDQgMiAxMVM2LjAyOTQ0IDIwIDExIDIwWiIgc3Ryb2tlPSIjOUNBM0FGIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgo8cGF0aCBkPSJtMjIgMjIgLTUtNSIgc3Ryb2tlPSIjOUNBM0FGIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgo8L3N2Zz4KPHRleHQgeD0iNjAiIHk9IjQ1IiBmb250LWZhbWlseT0iSW50ZXIiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiM5Q0EzQUYiPlNlYXJjaCBieSBuYW1lLCBlbWFpbCwgc2tpbGxzLCBvciBjb250ZW50Li4uPC90ZXh0Pgo8cmVjdCB4PSIyMCIgeT0iODAiIHdpZHRoPSI4MCIgaGVpZ2h0PSIzMCIgcng9IjQiIGZpbGw9IndoaXRlIiBzdHJva2U9IiNFNUU3RUIiLz4KPHRleHQgeD0iMzAiIHk9IjEwMCIgZm9udC1mYW1pbHk9IkludGVyIiBmb250LXNpemU9IjEyIiBmaWxsPSIjNkI3MjgwIj5OYW1lPC90ZXh0Pgo8cmVjdCB4PSIxMTAiIHk9IjgwIiB3aWR0aD0iODAiIGhlaWdodD0iMzAiIHJ4PSI0IiBmaWxsPSIjNDY0NjY2IiBzdHJva2U9IiM0NjQ2NjYiLz4KPHRleHQgeD0iMTMwIiB5PSIxMDAiIGZvbnQtZmFtaWx5PSJJbnRlciIgZm9udC1zaXplPSIxMiIgZmlsbD0id2hpdGUiPkRhdGUg4pWMPC90ZXh0Pgo8cmVjdCB4PSIyMDAiIHk9IjgwIiB3aWR0aD0iODAiIGhlaWdodD0iMzAiIHJ4PSI0IiBmaWxsPSJ3aGl0ZSIgc3Ryb2tlPSIjRTVFN0VCIi8+Cjx0ZXh0IHg9IjIyMCIgeT0iMTAwIiBmb250LWZhbWlseT0iSW50ZXIiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiM2QjcyODAiPlNpemU8L3RleHQ+CjxyZWN0IHg9IjIwIiB5PSIxMzAiIHdpZHRoPSIzNjAiIGhlaWdodD0iNDAiIHJ4PSI4IiBmaWxsPSJ3aGl0ZSIgc3Ryb2tlPSIjRTVFN0VCIi8+Cjx0ZXh0IHg9IjQwIiB5PSIxNTAiIGZvbnQtZmFtaWx5PSJJbnRlciIgZm9udC1zaXplPSIxNCIgZm9udC13ZWlnaHQ9IjYwMCIgZmlsbD0iIzFmMjkzNyI+UmVzdW1lcyAoOSk8L3RleHQ+CjxyZWN0IHg9IjMwMCIgeT0iMTM1IiB3aWR0aD0iNzAiIGhlaWdodD0iMzAiIHJ4PSI2IiBmaWxsPSIjMTBCOTgxIi8+Cjx0ZXh0IHg9IjMyMCIgeT0iMTU1IiBmb250LWZhbWlseT0iSW50ZXIiIGZvbnQtc2l6ZT0iMTIiIGZvbnQtd2VpZ2h0PSI1MDAiIGZpbGw9IndoaXRlIj4rIFVwbG9hZDwvdGV4dD4KPHN2ZyB4PSIzNzAiIHk9IjE0MCIgd2lkdGg9IjEwIiBoZWlnaHQ9IjEwIiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9Im5vbmUiPgo8cGF0aCBkPSJNMTIgNlYxOE02IDEySDE4IiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgo8L3N2Zz4KPC9zdmc+" alt="Talent Pool Dashboard" class="w-full h-auto rounded-lg" />
+                        </div>
+                        <p class="text-sm text-gray-500 mt-3 text-center">Organized resumes with search functionality and AI-powered candidate management</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 2: AI-Powered Candidate Screening -->
+        <section id="slide-2" class="slide-card">
+            <h3 class="text-3xl font-bold text-gray-800 mb-6">Intelligent Screening - AI That Reads Between the Lines</h3>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+                <div>
+                    <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                        <h4 class="text-xl font-semibold text-red-700 mb-3">The Problem</h4>
+                        <ul class="space-y-2 text-gray-600 list-disc list-inside ml-4">
+                            <li>Recruiters spend 23 hours per week manually reviewing resumes</li>
+                            <li>Unconscious bias affects hiring decisions</li>
+                            <li>Inconsistent evaluation criteria across candidates</li>
+                            <li>High-quality candidates buried under high-volume applications</li>
+                            <li>Limited ability to assess cultural fit and potential beyond keywords</li>
+                        </ul>
+                    </div>
+
+                    <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                        <h4 class="text-xl font-semibold text-green-700 mb-3">The Solution</h4>
+                        <p class="text-gray-700">Hirios uses advanced <span class="font-bold">AI</span> to analyze every resume in-depth, providing comprehensive candidate scoring, strength/weakness analysis, and fit assessments in minutes—not days.</p>
+                    </div>
+                </div>
+
+                <!-- Key Benefits & Screenshot Placeholder -->
+                <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
+                    <h4 class="text-xl font-semibold text-indigo-600 mb-4">Key Benefits</h4>
+                    <div class="space-y-3">
+                        <div class="benefit-item"><span class="benefit-icon">✓</span> <span class="font-bold">90% Time Savings</span> - Screen 100 candidates in the time it takes to review 10 manually</div>
+                        <div class="benefit-item"><span class="benefit-icon">✓</span> <span class="font-bold">Unbiased Evaluation</span> - Consistent, objective scoring for every candidate</div>
+                        <div class="benefit-item"><span class="benefit-icon">✓</span> <span class="font-bold">Deep Insights</span> - Detailed analysis of strengths, weaknesses, and risk/reward factors</div>
+                        <div class="benefit-item"><span class="benefit-icon">✓</span> <span class="font-bold">Smart Rankings</span> - Candidates automatically sorted by overall fit score (0-100)</div>
+                        <div class="benefit-item"><span class="benefit-icon">✓</span> <span class="font-bold">Better Hiring Decisions</span> - Make data-driven choices backed by AI intelligence</div>
+                        <div class="benefit-item"><span class="benefit-icon">✓</span> <span class="font-bold">Reduced Cost-per-Hire</span> - Lower recruitment costs through automation and efficiency</div>
+                    </div>
+
+                    <div class="mt-6 border-t pt-4">
+                        <p class="text-sm font-medium text-gray-500 mb-2">Visual Mockup</p>
+                        <div class="h-32 bg-indigo-100 border border-indigo-300 rounded-lg flex items-center justify-center text-indigo-700 font-medium">
+                            Screening results dashboard with candidate cards showing fit scores and AI insights
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 3: AI Voice Interviews -->
+        <section id="slide-3" class="slide-card">
+            <h3 class="text-3xl font-bold text-gray-800 mb-6">24/7 AI Voice Interviews - Scale Your First-Round Interviews</h3>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+                <div>
+                    <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                        <h4 class="text-xl font-semibold text-red-700 mb-3">The Problem</h4>
+                        <ul class="space-y-2 text-gray-600 list-disc list-inside ml-4">
+                            <li>Coordinating initial phone screens across multiple time zones is a scheduling nightmare</li>
+                            <li>Recruiters bottlenecked conducting repetitive first-round interviews</li>
+                            <li>Can't interview candidates outside business hours</li>
+                            <li>High costs for preliminary screening calls</li>
+                            <li>Inconsistent interview questions and evaluation</li>
+                        </ul>
+                    </div>
+
+                    <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                        <h4 class="text-xl font-semibold text-green-700 mb-3">The Solution</h4>
+                        <p class="text-gray-700">Hirios integrates <span class="font-bold">AI-powered voice interviews</span> that conduct natural, conversational first-round interviews with candidates <span class="font-bold">24/7</span>, automatically analyzing responses and providing detailed transcripts and assessments.</p>
+                    </div>
+                </div>
+
+                <!-- Key Benefits & Screenshot Placeholder -->
+                <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
+                    <h4 class="text-xl font-semibold text-indigo-600 mb-4">Key Benefits</h4>
+                    <div class="space-y-3">
+                        <div class="benefit-item"><span class="benefit-icon">✓</span> <span class="font-bold">24/7 Availability</span> - Candidates interview at their convenience, any time zone</div>
+                        <div class="benefit-item"><span class="benefit-icon">✓</span> <span class="font-bold">Unlimited Scale</span> - Interview 100 candidates simultaneously without adding staff</div>
+                        <div class="benefit-item"><span class="benefit-icon">✓</span> <span class="font-bold">80% Cost Reduction</span> - Eliminate preliminary screening call expenses</div>
+                        <div class="benefit-item"><span class="benefit-icon">✓</span> <span class="font-bold">Consistent Evaluation</span> - Same high-quality questions for every candidate</div>
+                        <div class="benefit-item"><span class="benefit-icon">✓</span> <span class="font-bold">Instant Insights</span> - AI-generated interview summaries and recommendations</div>
+                        <div class="benefit-item"><span class="benefit-icon">✓</span> <span class="font-bold">Better Candidate Experience</span> - Flexible scheduling improves candidate satisfaction</div>
+                        <div class="benefit-item"><span class="benefit-icon">✓</span> <span class="font-bold">Focus on What Matters</span> - Recruiters spend time on final-round, high-value interviews only</div>
+                    </div>
+
+                    <div class="mt-6 border-t pt-4">
+                        <p class="text-sm font-medium text-gray-500 mb-2">Visual Mockup</p>
+                        <div class="h-32 bg-indigo-100 border border-indigo-300 rounded-lg flex items-center justify-center text-indigo-700 font-medium">
+                            Voice interview interface showing real-time conversation with candidate and AI analysis
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 4: Smart Interview Scheduling -->
+        <section id="slide-4" class="slide-card">
+            <h3 class="text-3xl font-bold text-gray-800 mb-6">Effortless Interview Coordination - From Chaos to Clicks</h3>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+                <div>
+                    <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                        <h4 class="text-xl font-semibold text-red-700 mb-3">The Problem</h4>
+                        <ul class="space-y-2 text-gray-600 list-disc list-inside ml-4">
+                            <li>Back-and-forth emails waste 3+ hours per interview scheduled</li>
+                            <li>Calendar conflicts cause delays and missed opportunities</li>
+                            <li>Candidates drop out due to slow, complicated scheduling</li>
+                            <li>No visibility into team availability</li>
+                            <li>Manual tracking of interview status creates errors</li>
+                        </ul>
+                    </div>
+
+                    <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                        <h4 class="text-xl font-semibold text-green-700 mb-3">The Solution</h4>
+                        <p class="text-gray-700">Hirios provides intelligent interview scheduling with <span class="font-bold">availability matrix</span>, automated calendar coordination, and <span class="font-bold">one-click invitation sending</span> directly from your company email server.</p>
+                    </div>
+                </div>
+
+                <!-- Key Benefits & Screenshot Placeholder -->
+                <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
+                    <h4 class="text-xl font-semibold text-indigo-600 mb-4">Key Benefits</h4>
+                    <div class="space-y-3">
+                        <div class="benefit-item"><span class="benefit-icon">✓</span> <span class="font-bold">3-Hour Time Savings</span> - Schedule interviews in clicks, not email chains</div>
+                        <div class="benefit-item"><span class="benefit-icon">✓</span> <span class="font-bold">Instant Invitations</span> - Send interview invites directly from your company email</div>
+                        <div class="benefit-item"><span class="benefit-icon">✓</span> <span class="font-bold">Visual Availability</span> - See team availability at a glance with matrix view</div>
+                        <div class="benefit-item"><span class="benefit-icon">✓</span> <span class="font-bold">Automated Reminders</span> - Reduce no-shows with automatic email notifications</div>
+                        <div class="benefit-item"><span class="benefit-icon">✓</span> <span class="font-bold">Seamless Integration</span> - Works with your existing email infrastructure</div>
+                        <div class="benefit-item"><span class="benefit-icon">✓</span> <span class="font-bold">Professional Communication</span> - Branded emails maintain your company image</div>
+                        <div class="benefit-item"><span class="benefit-icon">✓</span> <span class="font-bold">Faster Time-to-Hire</span> - Reduce scheduling delays from days to hours</div>
+                    </div>
+
+                    <div class="mt-6 border-t pt-4">
+                        <p class="text-sm font-medium text-gray-500 mb-2">Visual Mockup</p>
+                        <div class="h-32 bg-indigo-100 border border-indigo-300 rounded-lg flex items-center justify-center text-indigo-700 font-medium">
+                            Interview scheduling interface showing availability matrix and email integration
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 5: Automated Offer Management -->
+        <section id="slide-5" class="slide-card">
+            <h3 class="text-3xl font-bold text-gray-800 mb-6">Professional Offer Letters & One-Click Communication</h3>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+                <div>
+                    <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                        <h4 class="text-xl font-semibold text-red-700 mb-3">The Problem</h4>
+                        <ul class="space-y-2 text-gray-600 list-disc list-inside ml-4">
+                            <li>Creating offer letters manually is time-consuming and error-prone</li>
+                            <li>Inconsistent offer letter formatting across the organization</li>
+                            <li>Delayed communication damages candidate experience</li>
+                            <li>No streamlined way to send rejections professionally and promptly</li>
+                            <li>Tracking offer status requires manual follow-up</li>
+                        </ul>
+                    </div>
+
+                    <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                        <h4 class="text-xl font-semibold text-green-700 mb-3">The Solution</h4>
+                        <p class="text-gray-700">Hirios automates the entire offer process with professional PDF generation, <span class="font-bold">one-click acceptance/rejection emails</span> sent from your company mail server, and complete communication tracking.</p>
+                    </div>
+                </div>
+
+                <!-- Key Benefits & Screenshot Placeholder -->
+                <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
+                    <h4 class="text-xl font-semibold text-indigo-600 mb-4">Key Benefits</h4>
+                    <div class="space-y-3">
+                        <div class="benefit-item"><span class="benefit-icon">✓</span> <span class="font-bold">Instant Offer Letters</span> - Generate professional, branded PDF offers in seconds</div>
+                        <div class="benefit-item"><span class="benefit-icon">✓</span> <span class="font-bold">One-Click Communication</span> - Send offers, invitations, and rejections instantly from your email</div>
+                        <div class="benefit-item"><span class="benefit-icon">✓</span> <span class="font-bold">Professional Templates</span> - Consistent, legally-sound communication every time</div>
+                        <div class="benefit-item"><span class="benefit-icon">✓</span> <span class="font-bold">Complete Automation</span> - From screening to offer to rejection—all in one platform</div>
+                        <div class="benefit-item"><span class="benefit-icon">✓</span> <span class="font-bold">Email Integration</span> - Uses your company SMTP server for authentic, branded emails</div>
+                        <div class="benefit-item"><span class="benefit-icon">✓</span> <span class="font-bold">Audit Trail</span> - Track all communications and offers in one place</div>
+                        <div class="benefit-item"><span class="benefit-icon">✓</span> <span class="font-bold">Higher Acceptance Rates</span> - Speed and professionalism increase offer acceptance</div>
+                    </div>
+
+                    <div class="mt-6 border-t pt-4">
+                        <p class="text-sm font-medium text-gray-500 mb-2">Visual Mockup</p>
+                        <div class="h-32 bg-indigo-100 border border-indigo-300 rounded-lg flex items-center justify-center text-indigo-700 font-medium">
+                            Offer management wizard showing PDF preview and email composition
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 6: Flexible Deployment & Pricing -->
+        <section id="slide-6" class="slide-card">
+            <h3 class="text-3xl font-bold text-gray-800 mb-8 text-center">Choose Your Perfect Infrastructure - From Instant Start to Enterprise Customization</h3>
+
+            <!-- Pricing Tiers Grid -->
+            <div class="grid md:grid-cols-3 gap-6 mb-10">
+
+                <!-- Tier 1: SAAS PLATFORM -->
+                <div class="p-6 border-4 border-indigo-600 bg-white rounded-xl shadow-lg transform scale-105">
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="text-2xl font-extrabold text-indigo-600">🚀 SAAS PLATFORM</h4>
+                        <span class="text-sm font-semibold text-indigo-500 bg-indigo-100 px-3 py-1 rounded-full">Recommended</span>
+                    </div>
+                    <p class="text-4xl font-bold text-gray-900 mb-1">$399<span class="text-xl font-normal text-gray-500">/month (Annual)</span></p>
+                    <p class="text-sm text-gray-600 mb-6">Perfect for: Mid-size companies wanting instant AI recruitment</p>
+
+                    <ul class="space-y-3 text-sm text-gray-700">
+                        <li class="flex items-start"><span class="benefit-icon">✓</span> <span><span class="font-bold">Instant Deployment</span> - Start same day with 7-day free trial</span></li>
+                        <li class="flex items-start"><span class="benefit-icon">✓</span> <span><span class="font-bold">Shared Infrastructure</span> - Cost-effective, fully managed cloud platform</span></li>
+                        <li class="flex items-start"><span class="benefit-icon">✓</span> <span><span class="font-bold">Complete Data Isolation</span> - Your company data never exposed to others</span></li>
+                        <li class="flex items-start"><span class="benefit-icon">✓</span> <span><span class="font-bold">All Features Included</span> - Full access to AI screening, voice interviews, talent pool</span></li>
+                        <li class="flex items-start"><span class="benefit-icon">✓</span> <span>AWS-Powered Security</span></li>
+                    </ul>
+                </div>
+
+                <!-- Tier 2: DEDICATED INFRASTRUCTURE -->
+                <div class="p-6 bg-gray-50 border border-gray-200 rounded-xl shadow-md">
+                    <h4 class="text-2xl font-extrabold text-gray-800 mb-4">🏢 DEDICATED INFRASTRUCTURE</h4>
+                    <p class="text-4xl font-bold text-gray-900 mb-1">$499<span class="text-xl font-normal text-gray-500">/month (Annual)</span></p>
+                    <p class="text-sm text-gray-600 mb-6">Perfect for: Companies requiring data sovereignty and enhanced control</p>
+
+                    <ul class="space-y-3 text-sm text-gray-700">
+                        <li class="flex items-start"><span class="benefit-icon">✓</span> <span><span class="font-bold">Separate Database</span> - Your own isolated database instance</span></li>
+                        <li class="flex items-start"><span class="benefit-icon">✓</span> <span><span class="font-bold">Dedicated Storage</span> - Private storage buckets for complete data control</span></li>
+                        <li class="flex items-start"><span class="benefit-icon">✓</span> <span><span class="font-bold">Enhanced Security</span> and compliance options</span></li>
+                        <li class="flex items-start"><span class="benefit-icon">✓</span> <span><span class="font-bold">4-Week Provisioning</span> - Custom infrastructure setup and configuration</span></li>
+                        <li class="flex items-start"><span class="benefit-icon">✓</span> <span>All Features Included</span></li>
+                    </ul>
+                </div>
+
+                <!-- Tier 3: ENTERPRISE PACKAGE -->
+                <div class="p-6 bg-gray-50 border border-gray-200 rounded-xl shadow-md">
+                    <h4 class="text-2xl font-extrabold text-gray-800 mb-4">🏛️ ENTERPRISE PACKAGE</h4>
+                    <p class="text-4xl font-bold text-gray-900 mb-1">$699<span class="text-xl font-normal text-gray-500">/month (Annual)</span></p>
+                    <p class="text-sm text-gray-600 mb-6">Perfect for: Large corporations needing custom workflows and integrations</p>
+
+                    <ul class="space-y-3 text-sm text-gray-700">
+                        <li class="flex items-start"><span class="benefit-icon">✓</span> <span><span class="font-bold">Custom AI Models</span> - AI trained on your industry and company data</span></li>
+                        <li class="flex items-start"><span class="benefit-icon">✓</span> <span><span class="font-bold">White-Label Branding</span> - Platform branded with your company identity</span></li>
+                        <li class="flex items-start"><span class="benefit-icon">✓</span> <span><span class="font-bold">API Integrations</span> - Connect with existing HR systems and workflows</span></li>
+                        <li class="flex items-start"><span class="benefit-icon">✓</span> <span><span class="font-bold">Custom Workflows</span> - Tailored approval processes and business logic</span></li>
+                        <li class="flex items-start"><span class="benefit-icon">✓</span> <span><span class="font-bold">Advanced Analytics</span> and business intelligence</span></li>
+                        <li class="flex items-start"><span class="benefit-icon">✓</span> <span>4-8 Week Implementation</span></li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <!-- Universal Benefits -->
+            <div class="mt-8 pt-6 border-t border-gray-200">
+                <h4 class="text-2xl font-bold text-indigo-600 mb-4 text-center">Universal Benefits Across All Tiers</h4>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm font-medium text-gray-700">
+                    <div class="flex items-center space-x-2"><span class="benefit-icon">✓</span> <span>Cloud-Native Architecture (AWS/Supabase)</span></div>
+                    <div class="flex items-center space-x-2"><span class="benefit-icon">✓</span> <span>Enterprise Security (SOC 2, Encryption)</span></div>
+                    <div class="flex items-center space-x-2"><span class="benefit-icon">✓</span> <span>Complete Feature Access</span></div>
+                    <div class="flex items-center space-x-2"><span class="benefit-icon">✓</span> <span>7-Day Free Trial</span></div>
+                    <div class="flex items-center space-x-2"><span class="benefit-icon">✓</span> <span>Email Support (support@hirios.com)</span></div>
+                    <div class="flex items-center space-x-2"><span class="benefit-icon">✓</span> <span>Annual Billing Discount</span></div>
+                    <div class="flex items-center space-x-2"><span class="benefit-icon">✓</span> <span>No Hidden Costs</span></div>
+                </div>
+                <div class="mt-6 border-t pt-4">
+                    <p class="text-sm font-medium text-gray-500 mb-2">Visual Mockup</p>
+                    <div class="h-16 bg-indigo-100 border border-indigo-300 rounded-lg flex items-center justify-center text-indigo-700 font-medium">
+                        Pricing comparison table or deployment architecture diagram
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Closing Section & Key Statistics -->
+        <section class="slide-card bg-indigo-700 text-white mt-12 border-none">
+            <div class="text-center">
+                <h3 class="text-3xl font-bold mb-4">CLOSING STATEMENT</h3>
+                <p class="text-xl font-light max-w-4xl mx-auto">
+                    "Hirios transforms recruitment from a manual, time-consuming process into an intelligent, automated system that saves time, reduces costs, and helps you hire better candidates faster. <span class="font-bold">Ready to transform your hiring?</span>"
+                </p>
+            </div>
+            <div class="mt-8 pt-6 border-t border-indigo-500">
+                <h4 class="text-xl font-bold mb-4 text-center">Key Statistics</h4>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 text-center">
+                    <div class="p-3 bg-indigo-800 rounded-lg">
+                        <p class="text-3xl font-extrabold text-emerald-300">90%</p>
+                        <p class="text-sm">Time reduction in resume screening</p>
+                    </div>
+                    <div class="p-3 bg-indigo-800 rounded-lg">
+                        <p class="text-3xl font-extrabold text-emerald-300">80%</p>
+                        <p class="text-sm">Reduction in preliminary interview costs</p>
+                    </div>
+                    <div class="p-3 bg-indigo-800 rounded-lg">
+                        <p class="text-3xl font-extrabold text-emerald-300">3+</p>
+                        <p class="text-sm">Hours saved per interview scheduled</p>
+                    </div>
+                    <div class="p-3 bg-indigo-800 rounded-lg">
+                        <p class="text-3xl font-extrabold text-emerald-300">23</p>
+                        <p class="text-sm">Hours/week freed up from manual review</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Presentation Notes (Hidden/Collapsed on screen, visible if printed) -->
+        <div class="mt-12 p-6 bg-gray-100 rounded-xl border border-gray-300 print:block hidden-on-screen">
+            <h4 class="text-xl font-bold text-gray-700 mb-3">PRESENTATION NOTES</h4>
+            <div class="text-sm text-gray-600 space-y-2">
+                <p><span class="font-semibold">Target Audience:</span> HR Managers, Recruiters, Corporate Hiring Teams</p>
+                <p><span class="font-semibold">Tone:</span> Professional, Corporate, Problem-Solution Focused</p>
+                <p><span class="font-semibold">Slide Flow:</span> Talent Pool → AI Screening → AI Voice Interviews → Interview Scheduling → Offer Management → Deployment & Pricing</p>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
