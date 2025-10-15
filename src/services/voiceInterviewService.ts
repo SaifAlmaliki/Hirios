@@ -60,7 +60,7 @@ export class VoiceInterviewService {
             requirements,
             responsibilities,
             company,
-            user_id
+            company_profile_id
           )
         `)
         .eq('id', screeningResultId)
@@ -257,7 +257,7 @@ export class VoiceInterviewService {
 
   // Generate direct interview link
   static generateInterviewLink(screeningResultId: string, applicationId: string, autoStart: boolean = false): string {
-    const baseUrl = window.location.origin;
+    const baseUrl = (import.meta.env.VITE_SITE_URL || window.location.origin).replace(/\/$/, '');
     // Use applicationId if provided, otherwise use screeningResultId as fallback
     const finalApplicationId = applicationId && applicationId.trim() !== '' ? applicationId : screeningResultId;
     const path = `/interview/${screeningResultId}/${finalApplicationId}`;
