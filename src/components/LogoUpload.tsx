@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -26,6 +26,11 @@ export const LogoUpload: React.FC<LogoUploadProps> = ({
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+
+  // Update preview when currentLogoUrl prop changes (e.g., when loaded from database)
+  useEffect(() => {
+    setPreviewUrl(currentLogoUrl || null);
+  }, [currentLogoUrl]);
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -85,7 +90,7 @@ export const LogoUpload: React.FC<LogoUploadProps> = ({
 
       toast({
         title: "Logo Uploaded Successfully",
-        description: "Your company logo has been uploaded and will appear in the navbar.",
+        description: "Don't forget to click 'Save Company Information' to save your logo permanently.",
       });
 
     } catch (error: any) {

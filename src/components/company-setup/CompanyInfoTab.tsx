@@ -50,15 +50,28 @@ export const CompanyInfoTab: React.FC<CompanyInfoTabProps> = ({
         </div>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="company_description">Company Description</Label>
-        <Textarea
-          id="company_description"
-          value={companyData.company_description}
-          onChange={(e) => onInputChange('company_description', e.target.value)}
-          placeholder="Describe your company..."
-          rows={4}
-        />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Company Description */}
+        <div className="space-y-2">
+          <Label htmlFor="company_description">Company Description</Label>
+          <Textarea
+            id="company_description"
+            value={companyData.company_description}
+            onChange={(e) => onInputChange('company_description', e.target.value)}
+            placeholder="Describe your company..."
+            rows={8}
+          />
+        </div>
+
+        {/* Company Logo */}
+        <div className="space-y-2">
+          <LogoUpload
+            currentLogoUrl={companyData.logo_url}
+            onLogoUploaded={onLogoUploaded}
+            onLogoRemoved={onLogoRemoved}
+            disabled={isSaving}
+          />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -117,24 +130,6 @@ export const CompanyInfoTab: React.FC<CompanyInfoTabProps> = ({
             placeholder="Company phone number"
           />
         </div>
-      </div>
-
-      {/* Company Logo Upload Section */}
-      <div className="border-t pt-6 mt-6">
-        <div className="flex items-center gap-2 mb-4">
-          <Building2 className="h-5 w-5 text-blue-600" />
-          <h3 className="text-lg font-semibold text-gray-900">Company Logo</h3>
-        </div>
-        <p className="text-sm text-gray-600 mb-4">
-          Upload your company logo to personalize the platform. The logo will appear in the navigation bar and on job offers.
-        </p>
-        
-        <LogoUpload
-          currentLogoUrl={companyData.logo_url}
-          onLogoUploaded={onLogoUploaded}
-          onLogoRemoved={onLogoRemoved}
-          disabled={isSaving}
-        />
       </div>
 
       {/* Save Button */}

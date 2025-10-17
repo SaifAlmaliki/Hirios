@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -7,6 +8,7 @@ import { CompanyData, getDefaultCompanyData } from '@/types/companySetup';
 export const useCompanySetup = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   
   const [hasProfile, setHasProfile] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -170,6 +172,10 @@ export const useCompanySetup = () => {
 
   const saveCompanyInfo = useCallback(async () => {
     setIsSaving(true);
+    // Clear any pending localStorage saves
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
     try {
       const companyFields = {
         company_name: companyData.company_name,
@@ -212,7 +218,10 @@ export const useCompanySetup = () => {
         });
       } else {
         setHasUnsavedChanges(false);
+        setHasLocalStorageData(false);
         localStorage.removeItem('company-setup-draft');
+        // Invalidate company profile cache to update navbar logo immediately
+        queryClient.invalidateQueries({ queryKey: ['company-profile'] });
         toast({
           title: "✅ Saved Successfully",
           description: "Company information has been saved.",
@@ -228,7 +237,7 @@ export const useCompanySetup = () => {
     } finally {
       setIsSaving(false);
     }
-  }, [companyData, user, toast]);
+  }, [companyData, user, toast, queryClient]);
 
   const saveSMTPConfig = useCallback(async () => {
     setIsSaving(true);

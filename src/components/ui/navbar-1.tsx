@@ -7,6 +7,7 @@ import { Menu, X, Building2, Settings, Brain, LogOut, FileText, Clock } from "lu
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSubscriptionStatus } from '@/hooks/useSubscriptionStatus';
+import { useCompanyProfile } from '@/hooks/useCompanyProfile';
 import {
   Tooltip,
   TooltipContent,
@@ -33,6 +34,7 @@ const Navbar1: React.FC<Navbar1Props> = ({
   const { user, signOut, loading } = useAuth();
   const navigate = useNavigate();
   const subscriptionStatus = useSubscriptionStatus();
+  const { data: companyProfile } = useCompanyProfile();
 
   const toggleMenu = () => setIsOpen(!isOpen)
 
@@ -141,16 +143,24 @@ const Navbar1: React.FC<Navbar1Props> = ({
       <div className={`flex items-center justify-between px-4 py-2 bg-white rounded-full shadow-lg w-full ${getMaxWidthClass()} relative z-10`}>
         <div className="flex items-center">
           <motion.div
-            className="w-6 h-6 mr-2 sm:mr-4 cursor-pointer"
+            className="w-8 h-8 mr-2 sm:mr-4 cursor-pointer flex items-center justify-center"
             initial={{ scale: 0.8 }}
             animate={{ scale: 1 }}
-            whileHover={{ rotate: 10 }}
+            whileHover={{ scale: 1.1 }}
             transition={{ duration: 0.3 }}
             onClick={handleLogoClick}
           >
-            <div className="bg-blue-600 p-1 rounded-lg">
-              <Building2 className="h-4 w-4 text-white" />
-            </div>
+            {companyProfile?.logo_url ? (
+              <img 
+                src={companyProfile.logo_url} 
+                alt="Company Logo" 
+                className="w-8 h-8 rounded-full object-cover"
+              />
+            ) : (
+              <div className="bg-blue-600 p-1.5 rounded-full">
+                <Building2 className="h-5 w-5 text-white" />
+              </div>
+            )}
           </motion.div>
           <motion.h1 
             className="text-base sm:text-lg font-bold text-gray-900 cursor-pointer hover:text-blue-700"
