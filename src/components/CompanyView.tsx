@@ -130,7 +130,7 @@ const JobForm = React.memo(({
     </div>
     
     <div className="space-y-2">
-      <Label htmlFor="requirements" className="text-sm font-medium text-gray-700">Requirements (Optional)</Label>
+      <Label htmlFor="requirements" className="text-sm font-medium text-gray-700">Requirements *</Label>
       <Textarea
         id="requirements"
         name="requirements"
@@ -252,7 +252,7 @@ const CompanyView: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!jobData.title || !jobData.department || !jobData.location || !jobData.employment_type || !jobData.description || !jobData.responsibilities) {
+    if (!jobData.title || !jobData.department || !jobData.location || !jobData.employment_type || !jobData.description || !jobData.responsibilities || !jobData.requirements) {
       toast({
         title: "Error",
         description: "Please fill in all required fields.",
