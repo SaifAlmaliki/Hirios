@@ -91,7 +91,7 @@ export const useScreeningResults = () => {
 
       const jobIds = companyJobs.map(job => job.id);
 
-      // Then fetch screening results for those jobs
+      // Fetch screening results with candidate data from resume_pool
       const { data, error } = await supabase
         .from('screening_results')
         .select(`
@@ -102,6 +102,14 @@ export const useScreeningResults = () => {
             company,
             department,
             company_profile_id
+          ),
+          resume_pool:resume_pool_id (
+            first_name,
+            last_name,
+            email,
+            phone,
+            home_address,
+            skills
           )
         `)
         .in('job_id', jobIds)
@@ -155,9 +163,18 @@ export const useScreeningResults = () => {
               candidateStatus = statusData?.status || 'pending';
             }
 
+            // Flatten resume_pool data into the result object
             const processedResult = {
               ...result,
-              resume_pool_id: application?.resume_pool_id || null,
+              // Candidate data from resume_pool join
+              first_name: result.resume_pool?.first_name || '',
+              last_name: result.resume_pool?.last_name || '',
+              email: result.resume_pool?.email || '',
+              phone: result.resume_pool?.phone,
+              home_address: result.resume_pool?.home_address,
+              skills: result.resume_pool?.skills,
+              // Keep resume_pool_id
+              resume_pool_id: result.resume_pool_id || application?.resume_pool_id || null,
               status: candidateStatus || 'pending'
             };
             

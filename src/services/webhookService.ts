@@ -1,6 +1,7 @@
 
 interface ResumeWebhookData {
   application_id: string;
+  resume_pool_id?: string; // Add resume_pool_id for n8n
   resume_base64: string;
   resume_filename: string;
   job_id: string;
@@ -65,6 +66,7 @@ export const sendResumeToWebhook = async (data: ResumeWebhookData): Promise<bool
     console.log('📤 Sending resume webhook for:', data.resume_filename);
     console.log('📋 Webhook payload:', {
       application_id: data.application_id,
+      resume_pool_id: data.resume_pool_id, // Log resume_pool_id
       resume_filename: data.resume_filename,
       resume_base64_length: data.resume_base64.length,
       job_id: data.job_id,

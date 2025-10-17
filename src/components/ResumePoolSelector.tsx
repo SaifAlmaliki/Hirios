@@ -180,6 +180,7 @@ const ResumePoolSelector: React.FC<ResumePoolSelectorProps> = ({
       try {
         await sendResumeToWebhook({
           application_id: application.id,
+          resume_pool_id: resume.id, // Add resume_pool_id for n8n
           resume_base64: resumeBase64,
           resume_filename: resume.original_filename,
           job_id: jobId,
