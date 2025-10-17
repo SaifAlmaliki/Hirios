@@ -72,6 +72,7 @@ export interface OfferPDFData {
   company_name: string;
   company_address?: string;
   company_phone?: string;
+  company_logo_url?: string;
   salary_amount: number;
   salary_currency: string;
   bonus_amount?: number;

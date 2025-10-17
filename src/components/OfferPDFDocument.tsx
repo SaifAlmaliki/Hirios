@@ -1,5 +1,5 @@
 import React from 'react';
-import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
 import { OfferPDFData } from '@/types/jobOffers';
 
 // Define styles for the PDF - Professional, no color coding
@@ -13,27 +13,40 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 20,
+    borderBottom: '2 solid #2563eb',
+    paddingBottom: 12,
+  },
+  logoContainer: {
+    width: 60,
+    height: 60,
+    display: 'flex',
+    justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 30,
-    borderBottom: '2 solid #000000',
-    paddingBottom: 20,
   },
   logo: {
-    width: 80,
-    height: 80,
-    backgroundColor: '#f5f5f5',
-    borderRadius: 8,
-    border: '1 solid #d1d5db',
+    width: 55,
+    height: 55,
+    objectFit: 'contain',
+  },
+  logoPlaceholder: {
+    width: 55,
+    height: 55,
+    backgroundColor: '#f3f4f6',
+    borderRadius: 6,
+    border: '2 solid #e5e7eb',
   },
   companyInfo: {
     flexDirection: 'column',
     alignItems: 'flex-end',
   },
   companyName: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: 'bold',
-    color: '#000000',
-    marginBottom: 5,
+    color: '#1e40af',
+    marginBottom: 6,
+    letterSpacing: 0.5,
   },
   companyAddress: {
     fontSize: 10,
@@ -41,22 +54,23 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   title: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: 'bold',
-    color: '#000000',
+    color: '#1e293b',
     textAlign: 'center',
     marginBottom: 30,
+    letterSpacing: 1,
   },
   section: {
     marginBottom: 15,
   },
   sectionTitle: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: 'bold',
-    color: '#000000',
-    marginBottom: 8,
-    borderBottom: '1 solid #d1d5db',
-    paddingBottom: 3,
+    color: '#1e40af',
+    marginBottom: 10,
+    borderBottom: '2 solid #3b82f6',
+    paddingBottom: 5,
   },
   content: {
     fontSize: 11,
@@ -69,11 +83,11 @@ const styles = StyleSheet.create({
     color: '#000000',
   },
   salarySection: {
-    backgroundColor: '#f9fafb',
-    border: '1 solid #d1d5db',
-    padding: 12,
-    borderRadius: 4,
-    marginBottom: 15,
+    backgroundColor: '#eff6ff',
+    border: '2 solid #3b82f6',
+    padding: 16,
+    borderRadius: 6,
+    marginBottom: 20,
   },
   salaryItem: {
     fontSize: 11,
@@ -158,7 +172,13 @@ export const OfferPDFDocument: React.FC<OfferPDFDocumentProps> = ({ data }) => {
       <Page size="A4" style={styles.page}>
         {/* Header */}
         <View style={styles.header}>
-          <View style={styles.logo} />
+          <View style={styles.logoContainer}>
+            {data.company_logo_url ? (
+              <Image src={data.company_logo_url} style={styles.logo} />
+            ) : (
+              <View style={styles.logoPlaceholder} />
+            )}
+          </View>
           <View style={styles.companyInfo}>
             <Text style={styles.companyName}>{data.company_name || 'Company Name'}</Text>
             {data.company_address && data.company_address.trim() && data.company_address.trim().length > 0 && (

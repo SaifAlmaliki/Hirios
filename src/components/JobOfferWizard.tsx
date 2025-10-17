@@ -149,6 +149,7 @@ export const JobOfferWizard: React.FC<JobOfferWizardProps> = ({
         company_name: companyName,
         company_address: companyAddress || '',
         company_phone: companyPhone || '',
+        company_logo_url: logoUrl,
         salary_amount: formData.salary_amount,
         salary_currency: formData.salary_currency,
         bonus_amount: formData.bonus_amount || 0,
@@ -263,6 +264,7 @@ export const JobOfferWizard: React.FC<JobOfferWizardProps> = ({
         company_name: companyName,
         company_address: companyAddress,
         company_phone: companyPhone,
+        company_logo_url: logoUrl,
         salary_amount: formData.salary_amount,
         salary_currency: formData.salary_currency,
         bonus_amount: formData.bonus_amount,
@@ -462,7 +464,7 @@ export const JobOfferWizard: React.FC<JobOfferWizardProps> = ({
           </div>
         );
 
-      case 4:
+      case 4: {
         const expiryDate = new Date(Date.now() + formData.expiry_period_days * 24 * 60 * 60 * 1000);
         
         return (
@@ -534,6 +536,7 @@ export const JobOfferWizard: React.FC<JobOfferWizardProps> = ({
             </div>
           </div>
         );
+      }
 
       default:
         return null;
