@@ -174,29 +174,7 @@ const CompanyView: React.FC = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   
-  // Show loading state while auth is being determined
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-  
-  // Security check: Only allow companies to access this view
-  useEffect(() => {
-    if (!user && !loading) {
-      navigate('/');
-    }
-  }, [user, loading, navigate]);
-
-  if (!user) {
-    return null;
-  }
-
+  // All hooks must be called before any conditional returns
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
@@ -207,12 +185,6 @@ const CompanyView: React.FC = () => {
   const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set());
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [jobToDelete, setJobToDelete] = useState<{ id: string; title: string } | null>(null);
-  
-  // Use company-specific jobs hook instead of all jobs
-  const { data: jobs = [], isLoading: jobsLoading } = useCompanyJobs();
-  const { data: companyProfile } = useCompanyProfile();
-  const selectedJob = jobs.find(job => job.id === selectedJobId) || null;
-  
   const [jobData, setJobData] = useState({
     title: '',
     company: '',
@@ -224,12 +196,24 @@ const CompanyView: React.FC = () => {
     requirements: '',
     benefits: '',
   });
-
+  
+  // Use company-specific jobs hook instead of all jobs
+  const { data: jobs = [], isLoading: jobsLoading } = useCompanyJobs();
+  const { data: companyProfile } = useCompanyProfile();
   const { toast } = useToast();
   const createJobMutation = useCreateJob();
   const updateJobMutation = useUpdateJob();
   const deleteJobMutation = useDeleteJob();
-
+  
+  const selectedJob = jobs.find(job => job.id === selectedJobId) || null;
+  
+  // Security check: Only allow companies to access this view
+  useEffect(() => {
+    if (!user && !loading) {
+      navigate('/');
+    }
+  }, [user, loading, navigate]);
+  
   // Auto-populate company name when company profile is loaded
   React.useEffect(() => {
     if (companyProfile && !editingJob) {
@@ -239,6 +223,22 @@ const CompanyView: React.FC = () => {
       }));
     }
   }, [companyProfile, editingJob]);
+  
+  // Show loading state while auth is being determined
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -394,7 +394,7 @@ const CompanyView: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 pt-20">
+    <div className="space-y-4">
       {/* Header */}
       <div className="space-y-4">
         <div>
