@@ -67,7 +67,7 @@ const ContactUs = () => {
                     </div>
                     <div>
                       <h3 className="text-lg font-semibold text-white">Email</h3>
-                      <p className="text-gray-300">support@idraq.com</p>
+                      <p className="text-gray-300">support@hirios.com</p>
                       <p className="text-sm text-gray-400">General inquiries and support</p>
                     </div>
                   </div>
@@ -112,7 +112,7 @@ const ContactUs = () => {
                   <div className="mt-4 p-4 bg-blue-900/20 border border-blue-500/30 rounded-lg">
                     <p className="text-sm text-blue-300">
                       <strong>Emergency Support:</strong> For critical issues, email us at 
-                      <span className="text-blue-400"> support@idraq.com</span> and we'll respond within 2 hours.
+                      <span className="text-blue-400"> support@hirios.com</span> and we'll respond within 2 hours.
                     </p>
                   </div>
                 </CardContent>

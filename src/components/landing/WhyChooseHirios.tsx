@@ -8,7 +8,11 @@ import {
   Shield,
   Database,
   Tag,
-  TrendingUp
+  TrendingUp,
+  Mail,
+  Calendar,
+  FileText,
+  Search
 } from 'lucide-react';
 
 const WhyChooseHirios = () => {
@@ -26,7 +30,7 @@ const WhyChooseHirios = () => {
           <p className="text-xl text-gray-300">Everything you need for intelligent hiring</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <div className="text-center">
             <div className="bg-blue-600/20 p-4 rounded-full w-fit mx-auto mb-6 border border-blue-600/30">
               <Brain className="h-8 w-8 text-blue-400" />
@@ -104,6 +108,46 @@ const WhyChooseHirios = () => {
             <h3 className="text-lg font-semibold mb-3 text-white">Modern UI</h3>
             <p className="text-gray-300 text-sm">
               Beautiful Aurora backgrounds and glassmorphism design for enhanced user experience.
+            </p>
+          </div>
+
+          <div className="text-center">
+            <div className="bg-amber-600/20 p-4 rounded-full w-fit mx-auto mb-6 border border-amber-600/30">
+              <Mail className="h-8 w-8 text-amber-400" />
+            </div>
+            <h3 className="text-lg font-semibold mb-3 text-white">One-Click Email Integration</h3>
+            <p className="text-gray-300 text-sm">
+              Send interview invitations, offers, and rejections instantly from your company email server with one click.
+            </p>
+          </div>
+
+          <div className="text-center">
+            <div className="bg-teal-600/20 p-4 rounded-full w-fit mx-auto mb-6 border border-teal-600/30">
+              <Calendar className="h-8 w-8 text-teal-400" />
+            </div>
+            <h3 className="text-lg font-semibold mb-3 text-white">Smart Interview Scheduling</h3>
+            <p className="text-gray-300 text-sm">
+              Visual availability matrix with automated calendar coordination. Save 3+ hours per interview scheduled.
+            </p>
+          </div>
+
+          <div className="text-center">
+            <div className="bg-rose-600/20 p-4 rounded-full w-fit mx-auto mb-6 border border-rose-600/30">
+              <FileText className="h-8 w-8 text-rose-400" />
+            </div>
+            <h3 className="text-lg font-semibold mb-3 text-white">Automated Offer Management</h3>
+            <p className="text-gray-300 text-sm">
+              Generate professional PDF offer letters and send them with one-click communication directly from your email.
+            </p>
+          </div>
+
+          <div className="text-center">
+            <div className="bg-violet-600/20 p-4 rounded-full w-fit mx-auto mb-6 border border-violet-600/30">
+              <Search className="h-8 w-8 text-violet-400" />
+            </div>
+            <h3 className="text-lg font-semibold mb-3 text-white">Advanced Talent Search</h3>
+            <p className="text-gray-300 text-sm">
+              Semantic AI search across your entire resume database. Find perfect candidates instantly for any position.
             </p>
           </div>
         </div>

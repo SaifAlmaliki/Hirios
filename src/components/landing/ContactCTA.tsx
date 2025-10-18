@@ -59,8 +59,8 @@ const ContactCTA = () => {
               <h4 className="text-lg sm:text-xl font-semibold text-white mb-2 sm:mb-3">Contact Us for Demo & Pricing</h4>
               <div className="flex items-center justify-center text-blue-400 font-medium text-base sm:text-lg">
                 <span className="mr-2">📧</span>
-                <a href="mailto:info@idraq.com" className="hover:underline break-all">
-                  info@idraq.com
+                <a href="mailto:support@hirios.com" className="hover:underline break-all">
+                  support@hirios.com
                 </a>
               </div>
               <p className="text-sm sm:text-base text-gray-300 mt-2 sm:mt-3">
@@ -70,7 +70,7 @@ const ContactCTA = () => {
 
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
               <Button 
-                onClick={() => window.open('mailto:idraq.ai@gmail.com?subject=Hirios Demo Request&body=Hi, I\'m interested in learning more about Hirios and would like to schedule a demo for my organization.')}
+                onClick={() => window.open('mailto:support@hirios.com?subject=Hirios Demo Request&body=Hi, I\'m interested in learning more about Hirios and would like to schedule a demo for my organization.')}
                 size="lg"
                 className="bg-blue-600 hover:bg-blue-700 text-white px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg font-semibold hover:scale-105 transition-transform w-full sm:w-auto"
               >

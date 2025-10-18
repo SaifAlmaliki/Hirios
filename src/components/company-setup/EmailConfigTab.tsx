@@ -172,7 +172,7 @@ export const EmailConfigTab: React.FC<EmailConfigTabProps> = ({
               id="smtp_user"
               value={companyData.smtp_user}
               onChange={(e) => onInputChange('smtp_user', e.target.value)}
-              placeholder="recruitment@idraq.com"
+              placeholder="recruitment@yourcompany.com"
             />
             <p className="text-xs text-gray-500">Your email address</p>
           </div>
@@ -197,7 +197,7 @@ export const EmailConfigTab: React.FC<EmailConfigTabProps> = ({
               type="email"
               value={companyData.smtp_from_email}
               onChange={(e) => onInputChange('smtp_from_email', e.target.value)}
-              placeholder="recruitment@idraq.com"
+              placeholder="recruitment@yourcompany.com"
             />
             <p className="text-xs text-gray-500">Email address shown to candidates</p>
           </div>
@@ -207,7 +207,7 @@ export const EmailConfigTab: React.FC<EmailConfigTabProps> = ({
               id="smtp_from_name"
               value={companyData.smtp_from_name}
               onChange={(e) => onInputChange('smtp_from_name', e.target.value)}
-              placeholder="Idraq Hiring Team"
+              placeholder="Your Company Hiring Team"
             />
             <p className="text-xs text-gray-500">Name shown to candidates (optional)</p>
           </div>
