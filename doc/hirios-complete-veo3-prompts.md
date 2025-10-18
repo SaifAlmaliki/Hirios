@@ -1,87 +1,13 @@
-# Hirios Complete Veo3 AI Prompts - Copy & Paste Ready
+# Hirios Complete Veo3 AI Prompts - Copy & Paste Ready (Storytelling Mode with Arabic Voiceover)
 
-## PROMPT 1: AI-Powered Resume Screening
-```
-Create an 8-second professional corporate video (1080x1080, 30fps, 1:1 square aspect ratio) optimized for mobile viewing and social media platforms (Instagram, LinkedIn) with the following complete specifications:
+## SCENE 1: The Hidden Talent Crisis
+Create a compelling 8-second corporate storytelling video in 1080x1080 square format at 30fps, optimized for LinkedIn and Instagram, featuring a native Arabic male voiceover with authentic Middle Eastern accent, warm professional tone, speaking fluent Arabic, narrating this concise story: "السير الذاتية متناثرة في كل مكان. هيريوس يجمعها في قاعدة بيانات ذكية واحدة. ابحث بالذكاء الاصطناعي، ولا تفقد أي موهبة." The video shows a professional HR manager in his early 30s with Middle Eastern features, short dark hair, clean-shaven face, wearing a navy blue blazer with white shirt, modern corporate appearance, starting with chaos - scattered resume papers flying around a stressed office, then smoothly transitioning to the HR manager confidently using clean digital dashboards with organized candidate cards, smooth Arabic text overlays appearing in elegant Arabic calligraphy font, blue corporate color scheme with golden accents, cinematic lighting with dramatic shadows, professional camera movements, ending with Hirios logo and Arabic call-to-action "ابدأ مع هيريوس".
 
-SCRIPT WITH TIMING:
-0-2 seconds: Text overlay "Spending hours manually screening resumes?" appears on screen with fade-in effect
-2-4 seconds: Text overlay "Hirios AI analyzes and scores candidates instantly." appears with smooth transition
-4-6 seconds: Text overlay "Get detailed match insights in seconds, not hours." appears with fade-in effect
-6-8 seconds: Text overlay "Visit hirios.com for free consultancy" appears with call-to-action styling
+## SCENE 2: AI That Sees What Humans Miss
+Create an engaging 8-second corporate storytelling video in 1080x1080 square format at 30fps, optimized for LinkedIn and Instagram, featuring a native Arabic male voiceover with authentic Middle Eastern accent, warm professional tone, speaking fluent Arabic, narrating this concise story: "الذكاء الاصطناعي يحلل السير الذاتية ويعطي نقاط من 0-100. وفر 90% من الوقت واتخذ قرارات موضوعية." The video features a professional HR manager in his early 30s with Middle Eastern features, short dark hair, clean-shaven face, wearing a navy blue blazer with white shirt, modern corporate appearance, appearing confident and amazed, showing split-screen transitions from manual resume reading with tired expressions to dynamic AI dashboards with glowing score animations, Arabic text overlays with professional Arabic fonts, purple and white corporate theme, smooth zoom effects on data visualizations, cinematic lighting highlighting the transformation, ending with Hirios AI scoring interface.
 
-PERSON DESCRIPTION: Professional HR manager, 35-40 years old, confident and intelligent appearance, wearing a navy blue blazer with white shirt, short professional haircut, clean-shaven, warm but professional demeanor, expressive eyes, professional business attire, modern and approachable style.
+## SCENE 3: 24/7 Intelligent Conversations
+Create a dynamic 8-second corporate storytelling video in 1080x1080 square format at 30fps, optimized for LinkedIn and Instagram, featuring a native Arabic male voiceover with authentic Middle Eastern accent, warm professional tone, speaking fluent Arabic, narrating this concise story: "مقابلات صوتية ذكية 24/7 مع الذكاء الاصطناعي. وفر 80% من التكاليف وقابل مئات المرشحين في وقت واحد." The video shows a professional HR manager in his early 30s with Middle Eastern features, short dark hair, clean-shaven face, wearing a navy blue blazer with white shirt, modern corporate appearance, monitoring realistic AI voice interview interface with animated conversation bubbles in Arabic on dashboard, smooth transitions between time zones showing 24/7 availability, green and blue professional color scheme, dynamic sound wave visualizations, cinematic close-ups of the manager's satisfied reactions, ending with Hirios voice interview dashboard mockups.
 
-VISUAL SEQUENCE:
-0-2 seconds: Close-up of the described HR manager manually reading through stacks of paper resumes with stressed expression, mobile-optimized framing, professional lighting, blue color scheme, subtle shadows, engaging facial expressions
-2-4 seconds: Smooth transition to the same HR manager confidently reviewing AI-generated candidate scores on mobile device/tablet screen with satisfied smile, clean modern interface, professional dashboard, mobile-friendly UI
-4-6 seconds: Close-up of mobile screen showing detailed AI analysis with candidate rankings, match percentages, and insights, professional dashboard interface with data visualization optimized for mobile viewing
-6-8 seconds: Medium shot of organized, efficient workspace with the same HR manager and the Hirios logo prominently visible, professional corporate atmosphere, clean modern office, mobile-optimized composition
-
-EFFECTS: Smooth camera movement with mobile-friendly transitions, professional pan transitions, clean fade effects between scenes, engaging text animations with fade-in/fade-out, professional color grading with blues and whites, high-quality cinematic lighting optimized for mobile screens, corporate innovative atmosphere, smooth transitions emphasizing efficiency gain from manual to AI-powered screening, mobile-optimized visual flow.
-
-TEXT STYLING: Large, bold modern sans-serif font optimized for mobile readability, white text with strong shadows and outlines for visibility on mobile screens, center positioning for all text, smooth fade-in/fade-out animations, mobile-friendly text sizing, engaging typography that captures attention on small screens.
-```
-
-## PROMPT 2: Intelligent Resume Tagging
-```
-Create an 8-second professional corporate video (1080x1080, 30fps, 1:1 square aspect ratio) optimized for mobile viewing and social media platforms (Instagram, LinkedIn) with the following complete specifications:
-
-SCRIPT WITH TIMING:
-0-2 seconds: Text overlay "Manual skill tagging taking forever?" appears on screen with fade-in effect
-2-4 seconds: Text overlay "Hirios AI automatically extracts and tags skills." appears with smooth transition
-4-6 seconds: Text overlay "Save 5+ hours per week on manual labeling." appears with fade-in effect
-6-8 seconds: Text overlay "Visit hirios.com for free consultancy" appears with call-to-action styling
-
-PERSON DESCRIPTION: Professional HR manager, 35-40 years old, confident and intelligent appearance, wearing a navy blue blazer with white shirt, short professional haircut, clean-shaven, warm but professional demeanor, expressive eyes, professional business attire, modern and approachable style.
-
-VISUAL SEQUENCE:
-0-2 seconds: Close-up of the described HR manager's hands manually highlighting and tagging skills on paper resumes with frustrated expression, purple color scheme, mobile-optimized framing, engaging visual storytelling, professional office setting
-2-4 seconds: Smooth transition to the same HR manager using clean AI interface on mobile device/tablet screen showing automatic skill extraction and tagging in real-time, purple and white accents, professional dashboard optimized for mobile viewing
-4-6 seconds: Mobile-optimized split screen showing before (the HR manager doing manual tagging with clock showing hours) and after (AI tagging with time saved), professional interface with data visualization, engaging mobile-friendly layout
-6-8 seconds: Medium shot of efficient workspace with the same HR manager using organized digital interface on mobile device, Hirios logo prominently visible, professional corporate atmosphere, mobile-optimized composition
-
-EFFECTS: Smooth zoom-in effect on AI tagging interface optimized for mobile viewing, seamless transitions between manual and automated processes, clean fade effects, engaging text animations with fade-in/fade-out, professional color grading with purples and whites, high-quality cinematic lighting optimized for mobile screens, innovative tech-forward atmosphere, smooth transitions emphasizing time-saving aspect, mobile-optimized visual flow.
-
-TEXT STYLING: Large, bold modern sans-serif font optimized for mobile readability, white text with strong shadows and outlines for visibility on mobile screens, center positioning for all text, smooth fade-in/fade-out animations, mobile-friendly text sizing, engaging typography that captures attention on small screens.
-```
-
-## PROMPT 3: Talent Database & Journey Tracking
-```
-Create an 8-second professional corporate video (1080x1080, 30fps, 1:1 square aspect ratio) optimized for mobile viewing and social media platforms (Instagram, LinkedIn) with the following complete specifications:
-
-SCRIPT WITH TIMING:
-0-2 seconds: Text overlay "Losing track of candidates and their progress?" appears on screen with fade-in effect
-2-4 seconds: Text overlay "Hirios builds your talent database automatically." appears with smooth transition
-4-6 seconds: Text overlay "Track every candidate's journey with complete visibility." appears with fade-in effect
-6-8 seconds: Text overlay "Visit hirios.com for free consultancy" appears with call-to-action styling
-
-PERSON DESCRIPTION: Professional HR manager, 35-40 years old, confident and intelligent appearance, wearing a navy blue blazer with white shirt, short professional haircut, clean-shaven, warm but professional demeanor, expressive eyes, professional business attire, modern and approachable style.
-
-VISUAL SEQUENCE:
-0-2 seconds: Close-up of chaotic desk with scattered candidate files, sticky notes, and disorganized paperwork with the described HR manager looking stressed, orange color scheme, mobile-optimized framing, engaging visual storytelling, professional office setting
-2-4 seconds: Smooth transition to the same HR manager using organized digital dashboard on mobile device/tablet showing candidate journey tracking and talent database interface, orange and white color scheme, professional dashboard optimized for mobile viewing
-4-6 seconds: Close-up of mobile dashboard showing candidate journey stages, progress tracking, organized data visualization, professional interface with charts and graphs optimized for mobile screens
-6-8 seconds: Medium shot of clean, organized workspace with the same HR manager using digital dashboard on mobile device, Hirios logo prominently visible, professional corporate atmosphere, mobile-optimized composition
-
-EFFECTS: Smooth camera pan across organized digital interface optimized for mobile viewing, seamless transition from chaos to organization, clean fade effects, engaging text animations with fade-in/fade-out, professional color grading with oranges and whites, high-quality cinematic lighting optimized for mobile screens, innovative efficient atmosphere, smooth transitions emphasizing organization and visibility gained, mobile-optimized visual flow.
-
-TEXT STYLING: Large, bold modern sans-serif font optimized for mobile readability, white text with strong shadows and outlines for visibility on mobile screens, center positioning for all text, smooth fade-in/fade-out animations, mobile-friendly text sizing, engaging typography that captures attention on small screens.
-```
-
----
-
-## USAGE INSTRUCTIONS:
-1. Copy any of the above prompts completely
-2. Paste directly into Veo3 AI video generator
-3. Each prompt includes: script timing, visual sequence, effects, and text styling
-4. All specifications are included for professional corporate video output optimized for mobile and social media
-5. Ready to generate immediately without additional modifications
-
-## MOBILE & SOCIAL MEDIA OPTIMIZATIONS:
-- **Aspect Ratio:** 1:1 (1080x1080) - Perfect for Instagram, LinkedIn, and mobile viewing
-- **Text Size:** Large, bold fonts optimized for small screens
-- **Visual Focus:** Close-up shots and mobile-friendly framing
-- **Engagement:** Eye-catching transitions and animations designed for mobile attention spans
-- **Platform Ready:** Optimized for Instagram Stories, LinkedIn posts, and mobile-first viewing
-- **Professional:** Maintains corporate quality while being mobile-engaging
+## SCENE 4: From Chaos to Perfect Hire
+Create a powerful 8-second corporate storytelling video in 1080x1080 square format at 30fps, optimized for LinkedIn and Instagram, featuring a native Arabic male voiceover with authentic Middle Eastern accent, warm professional tone, speaking fluent Arabic, narrating this concise story: "جدولة ذكية، رسائل عرض احترافية، وإدارة كاملة للتوظيف. هيريوس يحول الفوضى إلى نظام مثالي." The video demonstrates a professional HR manager in his early 30s with Middle Eastern features, short dark hair, clean-shaven face, wearing a navy blue blazer with white shirt, modern corporate appearance, efficiently managing complete hiring workflow on unified dashboard, showing calendar integrations, email compositions, PDF offer generations, orange and white corporate theme, smooth workflow animations showing process efficiency, cinematic lighting with professional depth of field, ending with Hirios logo and final call-to-action in Arabic.
