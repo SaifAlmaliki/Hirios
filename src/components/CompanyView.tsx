@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Building, Eye, FileText, MapPin, Clock, Briefcase, Edit, Trash2, CheckCircle, ChevronDown } from 'lucide-react';
+import { Plus, Building, Eye, FileText, MapPin, Clock, Briefcase, Edit, Trash2, CheckCircle, ChevronDown, Link } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useCreateJob, useUpdateJob, useDeleteJob } from '../hooks/useJobs';
 import { useCompanyJobs } from '../hooks/useCompanyJobs';
@@ -356,6 +356,16 @@ const CompanyView: React.FC = () => {
     });
   };
 
+  const handleCopyApplicationLink = (jobId: string, jobTitle: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const applicationLink = `${window.location.origin}/apply/${jobId}`;
+    navigator.clipboard.writeText(applicationLink);
+    toast({
+      title: "Link copied!",
+      description: `Application link for "${jobTitle}" copied to clipboard.`,
+    });
+  };
+
 
 
   const formatEmploymentType = (type: string) => {
@@ -476,6 +486,15 @@ const CompanyView: React.FC = () => {
                             </div>
                           </div>
                           <div className="flex space-x-1 flex-shrink-0">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => handleCopyApplicationLink(job.id, job.title, e)}
+                              className="text-purple-600 hover:text-purple-800 hover:bg-purple-50 p-1"
+                              title="Copy application link"
+                            >
+                              <Link className="h-4 w-4" />
+                            </Button>
                             <Button
                               variant="ghost"
                               size="sm"

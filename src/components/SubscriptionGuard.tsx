@@ -9,7 +9,7 @@ interface SubscriptionGuardProps {
 }
 
 const SubscriptionGuard: React.FC<SubscriptionGuardProps> = ({ children }) => {
-  const { user, loading, subscriptionActive, subscriptionError } = useAuth();
+  const { user, loading, subscriptionActive, subscriptionError, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -91,7 +91,7 @@ const SubscriptionGuard: React.FC<SubscriptionGuardProps> = ({ children }) => {
             </a>
             
             <button
-              onClick={() => navigate('/auth')}
+              onClick={signOut}
               className="block w-full px-6 py-3 bg-gray-100 text-gray-700 rounded-full font-medium hover:bg-gray-200 transition-colors"
             >
               Sign Out
