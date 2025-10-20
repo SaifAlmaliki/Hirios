@@ -31,6 +31,7 @@ import { ButtonAlignmentDemo } from "./components/ui/button-alignment-demo";
 import { VoiceInterviewService } from "./services/voiceInterviewService";
 import OfferDownload from "./pages/OfferDownload";
 import TestRoute from "./pages/TestRoute";
+import PublicJobApplication from "./pages/PublicJobApplication";
 
 const queryClient = new QueryClient();
 
@@ -68,6 +69,7 @@ const App = () => (
           <Route path="/offer-download/:id" element={<OfferDownload />} />
           <Route path="/download-offer/:id" element={<OfferDownload />} />
           <Route path="/test-route/:id" element={<TestRoute />} />
+          <Route path="/apply/:jobId" element={<PublicJobApplication />} />
           
           {/* Routes that need AuthProvider context */}
           <Route path="/*" element={
