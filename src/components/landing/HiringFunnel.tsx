@@ -6,10 +6,7 @@ import {
   Mic, 
   Clock, 
   CheckCircle,
-  ArrowRight,
-  Database,
-  Tag,
-  TrendingUp
+  ArrowRight
 } from 'lucide-react';
 
 const HiringFunnel = () => {
@@ -100,48 +97,6 @@ const HiringFunnel = () => {
                   <p className="text-gray-300 text-sm">
                     Reduce screening time from days to minutes. Focus your energy on final interviews 
                     and strategic hiring decisions instead of initial candidate filtering.
-                  </p>
-                </div>
-              </div>
-
-              {/* Talent Database */}
-              <div className="flex items-start space-x-4 p-4 bg-gray-800/50 rounded-xl border border-gray-700/50">
-                <div className="bg-cyan-600/20 p-3 rounded-full flex-shrink-0">
-                  <Database className="h-6 w-6 text-cyan-400" />
-                </div>
-                <div>
-                  <h4 className="text-lg font-semibold text-white mb-2">Build Your Talent Database</h4>
-                  <p className="text-gray-300 text-sm">
-                    Never lose a good candidate again. Store all resumes in your talent database and search 
-                    by AI-extracted skills for future positions that might be a perfect fit.
-                  </p>
-                </div>
-              </div>
-
-              {/* Intelligent Tagging */}
-              <div className="flex items-start space-x-4 p-4 bg-gray-800/50 rounded-xl border border-gray-700/50">
-                <div className="bg-purple-600/20 p-3 rounded-full flex-shrink-0">
-                  <Tag className="h-6 w-6 text-purple-400" />
-                </div>
-                <div>
-                  <h4 className="text-lg font-semibold text-white mb-2">Intelligent Resume Tagging</h4>
-                  <p className="text-gray-300 text-sm">
-                    AI automatically understands and extracts skills from resumes. No more manual labeling - 
-                    save 5+ hours per week while getting more accurate skill categorization.
-                  </p>
-                </div>
-              </div>
-
-              {/* Journey Tracking */}
-              <div className="flex items-start space-x-4 p-4 bg-gray-800/50 rounded-xl border border-gray-700/50">
-                <div className="bg-orange-600/20 p-3 rounded-full flex-shrink-0">
-                  <TrendingUp className="h-6 w-6 text-orange-400" />
-                </div>
-                <div>
-                  <h4 className="text-lg font-semibold text-white mb-2">Complete Candidate Journey Tracking</h4>
-                  <p className="text-gray-300 text-sm">
-                    Track every candidate's progress from application to final decision. Get complete visibility 
-                    and organization for your entire hiring team with real-time status updates.
                   </p>
                 </div>
               </div>

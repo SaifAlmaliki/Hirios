@@ -5,7 +5,6 @@ import {
   HiringFunnel,
   HowItWorks,
   WhyChooseHirios,
-  CandidateBenefits,
   ContactCTA,
   FAQ,
   Footer
@@ -26,9 +25,6 @@ const HiriosLanding = () => {
 
       {/* Why Choose Hirios */}
       <WhyChooseHirios />
-
-      {/* What Companies Get for Each Candidate */}
-      <CandidateBenefits />
 
       {/* Contact CTA Section */}
       <ContactCTA />
