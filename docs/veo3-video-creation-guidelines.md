@@ -177,7 +177,9 @@ Feature: "هيريوس يجمع كل شيء في قاعدة بيانات ذكي�
 ## 📝 Template Structure
 
 ```
-Create a [adjective] [duration]-second corporate storytelling video in [format] at [fps], optimized for [platforms], featuring a native Arabic male voiceover with authentic Middle Eastern accent, warm professional tone, speaking fluent Arabic, narrating this concise story: "[Hook → Problem → Feature]." The video shows [character description], [scene description], [color scheme], [lighting requirements], [camera work]. Do not add any text, URLs, or logos to the video.
+Create a [adjective] [duration]-second corporate storytelling video in [format] at [fps], optimized for [platforms]. The video shows [character description], [scene description], [color scheme], [lighting requirements], [camera work]. Do not add any text, URLs, or logos to the video.
+
+VOICEOVER: Native Arabic male voiceover with authentic Middle Eastern accent, warm professional tone, speaking fluent Arabic, narrating this concise story: "[Hook → Problem → Feature]."
 ```
 
 ---
