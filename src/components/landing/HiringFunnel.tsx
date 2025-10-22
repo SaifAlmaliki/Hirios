@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from '@/hooks/useTranslation';
 import { Particles } from '@/components/ui/particles';
 import { 
   Brain, 
@@ -10,6 +11,8 @@ import {
 } from 'lucide-react';
 
 const HiringFunnel = () => {
+  const { t, tArray, isRTL } = useTranslation();
+  
   return (
     <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-900 to-gray-800 relative overflow-hidden">
       <Particles
@@ -23,12 +26,11 @@ const HiringFunnel = () => {
         {/* Header */}
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Transform Your 
-            <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent"> Hiring Process</span>
+            {t('hiringFunnel.title')} 
+            <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">{t('hiringFunnel.titleHighlight')}</span>
           </h2>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Stop spending hours on manual resume screening and initial interviews. 
-            Let Hirios AI handle the tedious work so you can focus on what matters most.
+            {t('hiringFunnel.subtitle')}
           </p>
         </div>
 
@@ -50,11 +52,10 @@ const HiringFunnel = () => {
           <div className="order-1 lg:order-2 space-y-8">
             <div>
               <h3 className="text-3xl font-bold text-white mb-4">
-                Offload the Tedious Work to AI
+                {t('hiringFunnel.offloadTitle')}
               </h3>
               <p className="text-lg text-gray-300 mb-6">
-                Traditional hiring involves countless hours of manual work. With Hirios, 
-                you can automate the most time-consuming parts of your hiring process.
+                {t('hiringFunnel.offloadDescription')}
               </p>
             </div>
 
@@ -65,10 +66,9 @@ const HiringFunnel = () => {
                   <FileText className="h-6 w-6 text-blue-400" />
                 </div>
                 <div>
-                  <h4 className="text-lg font-semibold text-white mb-2">Automated Resume Screening</h4>
+                  <h4 className="text-lg font-semibold text-white mb-2">{t('hiringFunnel.resumeScreening.title')}</h4>
                   <p className="text-gray-300 text-sm">
-                    Upload hundreds of resumes and let AI instantly analyze, score, and rank candidates 
-                    based on your job requirements. No more manual reading through each CV.
+                    {t('hiringFunnel.resumeScreening.description')}
                   </p>
                 </div>
               </div>
@@ -79,10 +79,9 @@ const HiringFunnel = () => {
                   <Mic className="h-6 w-6 text-purple-400" />
                 </div>
                 <div>
-                  <h4 className="text-lg font-semibold text-white mb-2">AI-Powered Voice Interviews</h4>
+                  <h4 className="text-lg font-semibold text-white mb-2">{t('hiringFunnel.voiceInterviews.title')}</h4>
                   <p className="text-gray-300 text-sm">
-                    Conduct first-round screening interviews automatically. Our AI asks relevant questions, 
-                    evaluates responses, and provides detailed insights on candidate fit.
+                    {t('hiringFunnel.voiceInterviews.description')}
                   </p>
                 </div>
               </div>
@@ -93,10 +92,9 @@ const HiringFunnel = () => {
                   <Clock className="h-6 w-6 text-green-400" />
                 </div>
                 <div>
-                  <h4 className="text-lg font-semibold text-white mb-2">Massive Time Savings</h4>
+                  <h4 className="text-lg font-semibold text-white mb-2">{t('hiringFunnel.timeSavings.title')}</h4>
                   <p className="text-gray-300 text-sm">
-                    Reduce screening time from days to minutes. Focus your energy on final interviews 
-                    and strategic hiring decisions instead of initial candidate filtering.
+                    {t('hiringFunnel.timeSavings.description')}
                   </p>
                 </div>
               </div>
@@ -107,59 +105,39 @@ const HiringFunnel = () => {
         {/* Before vs After Comparison - Full Width Below */}
         <div className="mt-16">
           <h4 className="text-2xl font-bold text-white mb-8 text-center">
-            Before vs. After Hirios
+            {t('hiringFunnel.comparison.title')}
           </h4>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
             {/* Before */}
             <div className="bg-red-900/20 border border-red-500/30 rounded-xl p-6">
               <h5 className="text-lg font-semibold text-red-400 mb-4 flex items-center">
-                <Clock className="h-5 w-5 mr-2" />
-                Traditional Process (Hours of Manual Work)
+                <Clock className={`h-5 w-5 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                {t('hiringFunnel.comparison.before.title')}
               </h5>
               <ul className="space-y-2 text-gray-300 text-sm">
-                <li className="flex items-center">
-                  <span className="w-2 h-2 bg-red-400 rounded-full mr-3 flex-shrink-0"></span>
-                  Manually read through 100+ resumes
-                </li>
-                <li className="flex items-center">
-                  <span className="w-2 h-2 bg-red-400 rounded-full mr-3 flex-shrink-0"></span>
-                  Schedule and conduct initial phone screens
-                </li>
-                <li className="flex items-center">
-                  <span className="w-2 h-2 bg-red-400 rounded-full mr-3 flex-shrink-0"></span>
-                  Take detailed notes on each candidate
-                </li>
-                <li className="flex items-center">
-                  <span className="w-2 h-2 bg-red-400 rounded-full mr-3 flex-shrink-0"></span>
-                  Manually compare and rank candidates
-                </li>
+                {tArray('hiringFunnel.comparison.before.items').map((item: unknown, index: number) => (
+                  <li key={index} className="flex items-center">
+                    <span className={`w-2 h-2 bg-red-400 rounded-full ${isRTL ? 'ml-3' : 'mr-3'} flex-shrink-0`}></span>
+                    {typeof item === 'string' ? item : ''}
+                  </li>
+                ))}
               </ul>
             </div>
 
             {/* After */}
             <div className="bg-green-900/20 border border-green-500/30 rounded-xl p-6">
               <h5 className="text-lg font-semibold text-green-400 mb-4 flex items-center">
-                <CheckCircle className="h-5 w-5 mr-2" />
-                With Hirios (AI Does the Heavy Lifting)
+                <CheckCircle className={`h-5 w-5 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                {t('hiringFunnel.comparison.after.title')}
               </h5>
               <ul className="space-y-2 text-gray-300 text-sm">
-                <li className="flex items-center">
-                  <span className="w-2 h-2 bg-green-400 rounded-full mr-3 flex-shrink-0"></span>
-                  Upload resumes and job description
-                </li>
-                <li className="flex items-center">
-                  <span className="w-2 h-2 bg-green-400 rounded-full mr-3 flex-shrink-0"></span>
-                  AI automatically screens and scores candidates
-                </li>
-                <li className="flex items-center">
-                  <span className="w-2 h-2 bg-green-400 rounded-full mr-3 flex-shrink-0"></span>
-                  AI conducts voice interviews with top candidates
-                </li>
-                <li className="flex items-center">
-                  <span className="w-2 h-2 bg-green-400 rounded-full mr-3 flex-shrink-0"></span>
-                  Get ranked results with detailed explanations
-                </li>
+                {tArray('hiringFunnel.comparison.after.items').map((item: unknown, index: number) => (
+                  <li key={index} className="flex items-center">
+                    <span className={`w-2 h-2 bg-green-400 rounded-full ${isRTL ? 'ml-3' : 'mr-3'} flex-shrink-0`}></span>
+                    {typeof item === 'string' ? item : ''}
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
@@ -168,10 +146,10 @@ const HiringFunnel = () => {
           <div className="text-center mt-8">
             <div className="bg-blue-600/20 border border-blue-500/30 rounded-xl p-6 max-w-md mx-auto">
               <h5 className="text-lg font-semibold text-blue-400 mb-2">
-                Result: 90% Time Reduction
+                {t('hiringFunnel.comparison.result.title')}
               </h5>
               <p className="text-gray-300 text-sm">
-                Focus on what matters most - making the final hiring decision
+                {t('hiringFunnel.comparison.result.description')}
               </p>
             </div>
           </div>

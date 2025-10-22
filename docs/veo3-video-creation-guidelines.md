@@ -176,11 +176,19 @@ Feature: "هيريوس يجمع كل شيء في قاعدة بيانات ذكي�
 
 ## 📝 Template Structure
 
+### Scene Prompt (For Veo3.1)
 ```
 Create a [adjective] [duration]-second corporate storytelling video in [format] at [fps], optimized for [platforms]. The video shows [character description], [scene description], [color scheme], [lighting requirements], [camera work]. Do not add any text, URLs, or logos to the video.
-
-VOICEOVER: Native Arabic male voiceover with authentic Middle Eastern accent, warm professional tone, speaking fluent Arabic, narrating this concise story: "[Hook → Problem → Feature]."
 ```
+
+### Script/Voiceover (For 11labs)
+```
+Native Arabic male voiceover with authentic Middle Eastern accent, warm professional tone, speaking fluent Arabic:
+
+"[Hook → Problem → Feature]"
+```
+
+**Note**: Generate the scene video with Veo3.1 and the voiceover with 11labs separately, then combine them using video editing tools.
 
 ---
 
@@ -206,6 +214,73 @@ VOICEOVER: Native Arabic male voiceover with authentic Middle Eastern accent, wa
 - 30fps frame rate
 - No text/URLs/logos
 - Platform optimization
+
+---
+
+## 🎬 Complete Scene Prompts & Scripts
+
+### Scene 1: The Hidden Talent Crisis
+
+#### 📹 Scene Prompt (For Veo3.1)
+```
+Create a professional 8-second corporate storytelling video in 1080x1080 square format at 30fps, optimized for LinkedIn and Instagram. The video shows a Middle Eastern HR manager in his early 30s with short dark hair, clean-shaven face, wearing a navy blue blazer with white shirt. The scene opens with chaos - scattered resume papers flying around a stressed office environment, then smoothly transitions to organized digital dashboards showing candidate cards and organized data. Use blue corporate colors with golden accents, cinematic lighting with professional depth of field, and smooth camera movements with zoom effects on data visualizations. Do not add any text, URLs, or logos to the video.
+```
+
+#### 🎙️ Script/Voiceover (For 11labs)
+```
+هل تعلم أن 70% من المواهب المتميزة تضيع في الفوضى؟ السير الذاتية متناثرة في كل مكان، والبحث يدوم ساعات. هيريوس يجمع كل شيء في قاعدة بيانات ذكية واحدة، مع بحث فوري عن أي مهارة أو خبرة.
+```
+
+---
+
+### Scene 2: AI That Sees What Humans Miss
+
+#### 📹 Scene Prompt (For Veo3.1)
+```
+Create a dynamic 8-second corporate storytelling video in 1080x1080 square format at 30fps, optimized for LinkedIn and Instagram. The video shows the same Middle Eastern HR manager (early 30s, short dark hair, clean-shaven, navy blue blazer with white shirt) manually reading resumes with tired expressions. The scene transitions with a split-screen effect to AI dashboards displaying glowing score animations (0-100 points) and data visualizations. Use purple and white corporate theme, cinematic lighting with dramatic shadows, and professional camera movements with zoom effects on the scoring animations. Do not add any text, URLs, or logos to the video.
+```
+
+#### 🎙️ Script/Voiceover (For 11labs)
+```
+قراءة مئات السير الذاتية يدوياً؟ مستحيل! الذكاء الاصطناعي في هيريوس يحلل كل سيرة ذاتية بدقة، يطابق المهارات، ويعطي درجة من 100 نقطة. اكتشف المواهب المخفية التي كنت ستفوتها.
+```
+
+---
+
+### Scene 3: 24/7 Intelligent Conversations
+
+#### 📹 Scene Prompt (For Veo3.1)
+```
+Create an engaging 8-second corporate storytelling video in 1080x1080 square format at 30fps, optimized for LinkedIn and Instagram. The video shows the same Middle Eastern HR manager (early 30s, short dark hair, clean-shaven, navy blue blazer with white shirt) dealing with traditional interview challenges. The scene smoothly transitions to an AI voice interview interface with animated conversation bubbles, sound waves, and time zone transitions showing 24/7 availability. Use green and blue professional colors, cinematic lighting highlighting the transformation, and smooth camera movements. Do not add any text, URLs, or logos to the video.
+```
+
+#### 🎙️ Script/Voiceover (For 11labs)
+```
+المقابلات تكلف وقتاً ومالاً؟ الذكاء الاصطناعي الصوتي في هيريوس يجري مقابلات احترافية 24/7، بأي لغة، ويوفر لك 80% من التكاليف. كل مرشح يحصل على فرصته، في أي وقت.
+```
+
+---
+
+### Scene 4: From Chaos to Perfect Hire
+
+#### 📹 Scene Prompt (For Veo3.1)
+```
+Create a compelling 8-second corporate storytelling video in 1080x1080 square format at 30fps, optimized for LinkedIn and Instagram. The video shows the same Middle Eastern HR manager (early 30s, short dark hair, clean-shaven, navy blue blazer with white shirt) surrounded by a disorganized hiring process. The scene transitions to a unified workflow management system with smooth animations showing calendar integrations, email compositions, and PDF generations. Use orange and white corporate theme, cinematic lighting with professional depth of field, and smooth workflow animations. The HR manager appears amazed and satisfied. Do not add any text, URLs, or logos to the video.
+```
+
+#### 🎙️ Script/Voiceover (For 11labs)
+```
+من الفوضى إلى التوظيف المثالي! هيريوس يدير كل شيء: جدولة المقابلات، إرسال العروض، وتوليد التقارير تلقائياً. وفر 70% من وقتك، وركز على اختيار الأفضل.
+```
+
+---
+
+## 🎬 Production Workflow
+
+1. **Generate Scene Videos**: Use the scene prompts above with Veo3.1 to create the visual content
+2. **Generate Voiceovers**: Use the scripts above with 11labs to create Arabic voiceovers
+3. **Combine in Editor**: Import both the video and audio into your editing tool (Adobe Premiere, Final Cut Pro, DaVinci Resolve, etc.)
+4. **Sync & Export**: Align the voiceover with the video scenes and export in 1080x1080 format
 
 ---
 

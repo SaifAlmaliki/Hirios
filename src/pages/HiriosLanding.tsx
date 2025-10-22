@@ -17,14 +17,14 @@ const HiriosLanding = () => {
       {/* Futurastic Hero Section */}
       <AuroraHero />
 
+      {/* Why Choose Hirios */}
+      <WhyChooseHirios />
+
       {/* Hiring Funnel Section */}
       <HiringFunnel />
 
       {/* How It Works */}
       <HowItWorks />
-
-      {/* Why Choose Hirios */}
-      <WhyChooseHirios />
 
       {/* Contact CTA Section */}
       <ContactCTA />

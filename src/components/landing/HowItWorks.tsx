@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from '@/hooks/useTranslation';
 import { Particles } from '@/components/ui/particles';
 import { 
   Building2, 
@@ -12,6 +13,8 @@ import {
 } from 'lucide-react';
 
 const HowItWorks = () => {
+  const { t } = useTranslation();
+  
   return (
     <section id="demo" className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-900 relative">
       <Particles
@@ -22,8 +25,8 @@ const HowItWorks = () => {
       />
       <div className="max-w-6xl mx-auto relative z-10">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-white mb-4">How It Works</h2>
-          <p className="text-xl text-gray-300">Simple workflow for smarter hiring decisions</p>
+          <h2 className="text-4xl font-bold text-white mb-4">{t('howItWorks.title')}</h2>
+          <p className="text-xl text-gray-300">{t('howItWorks.subtitle')}</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-12">
@@ -35,9 +38,9 @@ const HowItWorks = () => {
                 1
               </div>
             </div>
-            <h3 className="text-lg font-semibold mb-3 text-white">Define Job Requirements</h3>
+            <h3 className="text-lg font-semibold mb-3 text-white">{t('howItWorks.steps.step1.title')}</h3>
             <p className="text-gray-300 text-sm">
-              Fill out the job description, responsibilities, and requirements to create a comprehensive job profile.
+              {t('howItWorks.steps.step1.description')}
             </p>
           </div>
 
@@ -49,9 +52,9 @@ const HowItWorks = () => {
                 2
               </div>
             </div>
-            <h3 className="text-lg font-semibold mb-3 text-white">Upload & AI Processing</h3>
+            <h3 className="text-lg font-semibold mb-3 text-white">{t('howItWorks.steps.step2.title')}</h3>
             <p className="text-gray-300 text-sm">
-              Upload resumes from any source. AI automatically extracts skills, tags candidates, and stores them in your talent database.
+              {t('howItWorks.steps.step2.description')}
             </p>
           </div>
 
@@ -63,9 +66,9 @@ const HowItWorks = () => {
                 3
               </div>
             </div>
-            <h3 className="text-lg font-semibold mb-3 text-white">Smart Analysis & Scoring</h3>
+            <h3 className="text-lg font-semibold mb-3 text-white">{t('howItWorks.steps.step3.title')}</h3>
             <p className="text-gray-300 text-sm">
-              AI analyzes each resume against job requirements, scores candidates, and tracks their journey through your hiring process.
+              {t('howItWorks.steps.step3.description')}
             </p>
           </div>
 
@@ -77,9 +80,9 @@ const HowItWorks = () => {
                 4
               </div>
             </div>
-            <h3 className="text-lg font-semibold mb-3 text-white">Review & Decision</h3>
+            <h3 className="text-lg font-semibold mb-3 text-white">{t('howItWorks.steps.step4.title')}</h3>
             <p className="text-gray-300 text-sm">
-              Review AI insights, conduct interviews, and make decisions. All candidates remain in your talent database for future opportunities.
+              {t('howItWorks.steps.step4.description')}
             </p>
           </div>
         </div>

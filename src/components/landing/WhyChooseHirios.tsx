@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from '@/hooks/useTranslation';
 import { Particles } from '@/components/ui/particles';
 import { 
   Brain,
@@ -16,6 +17,8 @@ import {
 } from 'lucide-react';
 
 const WhyChooseHirios = () => {
+  const { t } = useTranslation();
+  
   return (
     <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-950 relative">
       <Particles
@@ -26,8 +29,8 @@ const WhyChooseHirios = () => {
       />
       <div className="max-w-6xl mx-auto relative z-10">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-white mb-4">Why Choose Hirios?</h2>
-          <p className="text-xl text-gray-300">Everything you need for intelligent hiring</p>
+          <h2 className="text-4xl font-bold text-white mb-4">{t('whyChoose.title')}</h2>
+          <p className="text-xl text-gray-300">{t('whyChoose.subtitle')}</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -35,9 +38,9 @@ const WhyChooseHirios = () => {
             <div className="bg-blue-600/20 p-4 rounded-full w-fit mx-auto mb-6 border border-blue-600/30">
               <Brain className="h-8 w-8 text-blue-400" />
             </div>
-            <h3 className="text-lg font-semibold mb-3 text-white">AI-Powered Screening</h3>
+            <h3 className="text-lg font-semibold mb-3 text-white">{t('whyChoose.features.aiScreening.title')}</h3>
             <p className="text-gray-300 text-sm">
-              Advanced AI analyzes resumes and provides detailed insights with match scores.
+              {t('whyChoose.features.aiScreening.description')}
             </p>
           </div>
 
@@ -45,9 +48,9 @@ const WhyChooseHirios = () => {
             <div className="bg-green-600/20 p-4 rounded-full w-fit mx-auto mb-6 border border-green-600/30">
               <Upload className="h-8 w-8 text-green-400" />
             </div>
-            <h3 className="text-lg font-semibold mb-3 text-white">Voice Interviews</h3>
+            <h3 className="text-lg font-semibold mb-3 text-white">{t('whyChoose.features.voiceInterviews.title')}</h3>
             <p className="text-gray-300 text-sm">
-              Conduct AI-powered voice interviews with candidates for deeper insights.
+              {t('whyChoose.features.voiceInterviews.description')}
             </p>
           </div>
 
@@ -55,9 +58,9 @@ const WhyChooseHirios = () => {
             <div className="bg-cyan-600/20 p-4 rounded-full w-fit mx-auto mb-6 border border-cyan-600/30">
               <Database className="h-8 w-8 text-cyan-400" />
             </div>
-            <h3 className="text-lg font-semibold mb-3 text-white">Talent Database</h3>
+            <h3 className="text-lg font-semibold mb-3 text-white">{t('whyChoose.features.talentDatabase.title')}</h3>
             <p className="text-gray-300 text-sm">
-              Build your talent database - never lose a good candidate. Search by AI-extracted skills for future positions.
+              {t('whyChoose.features.talentDatabase.description')}
             </p>
           </div>
 
@@ -65,9 +68,9 @@ const WhyChooseHirios = () => {
             <div className="bg-purple-600/20 p-4 rounded-full w-fit mx-auto mb-6 border border-purple-600/30">
               <Tag className="h-8 w-8 text-purple-400" />
             </div>
-            <h3 className="text-lg font-semibold mb-3 text-white">Intelligent Resume Tagging</h3>
+            <h3 className="text-lg font-semibold mb-3 text-white">{t('whyChoose.features.resumeTagging.title')}</h3>
             <p className="text-gray-300 text-sm">
-              AI automatically extracts and tags skills from resumes. Save 5+ hours per week on manual labeling.
+              {t('whyChoose.features.resumeTagging.description')}
             </p>
           </div>
 
@@ -75,9 +78,9 @@ const WhyChooseHirios = () => {
             <div className="bg-orange-600/20 p-4 rounded-full w-fit mx-auto mb-6 border border-orange-600/30">
               <TrendingUp className="h-8 w-8 text-orange-400" />
             </div>
-            <h3 className="text-lg font-semibold mb-3 text-white">Candidate Journey Tracking</h3>
+            <h3 className="text-lg font-semibold mb-3 text-white">{t('whyChoose.features.journeyTracking.title')}</h3>
             <p className="text-gray-300 text-sm">
-              Track every candidate's progress from application to decision. Complete visibility for your hiring team.
+              {t('whyChoose.features.journeyTracking.description')}
             </p>
           </div>
 
@@ -85,9 +88,9 @@ const WhyChooseHirios = () => {
             <div className="bg-indigo-600/20 p-4 rounded-full w-fit mx-auto mb-6 border border-indigo-600/30">
               <Target className="h-8 w-8 text-indigo-400" />
             </div>
-            <h3 className="text-lg font-semibold mb-3 text-white">Team Collaboration</h3>
+            <h3 className="text-lg font-semibold mb-3 text-white">{t('whyChoose.features.teamCollaboration.title')}</h3>
             <p className="text-gray-300 text-sm">
-              Invite hiring managers and recruiters to collaborate on screening results together.
+              {t('whyChoose.features.teamCollaboration.description')}
             </p>
           </div>
 
@@ -95,9 +98,9 @@ const WhyChooseHirios = () => {
             <div className="bg-emerald-600/20 p-4 rounded-full w-fit mx-auto mb-6 border border-emerald-600/30">
               <Clock className="h-8 w-8 text-emerald-400" />
             </div>
-            <h3 className="text-lg font-semibold mb-3 text-white">Time Saved</h3>
+            <h3 className="text-lg font-semibold mb-3 text-white">{t('whyChoose.features.timeSaved.title')}</h3>
             <p className="text-gray-300 text-sm">
-              Cut screening time by 80% and focus only on top candidates.
+              {t('whyChoose.features.timeSaved.description')}
             </p>
           </div>
 
@@ -105,9 +108,9 @@ const WhyChooseHirios = () => {
             <div className="bg-pink-600/20 p-4 rounded-full w-fit mx-auto mb-6 border border-pink-600/30">
               <Shield className="h-8 w-8 text-pink-400" />
             </div>
-            <h3 className="text-lg font-semibold mb-3 text-white">Modern UI</h3>
+            <h3 className="text-lg font-semibold mb-3 text-white">{t('whyChoose.features.modernUI.title')}</h3>
             <p className="text-gray-300 text-sm">
-              Beautiful Aurora backgrounds and glassmorphism design for enhanced user experience.
+              {t('whyChoose.features.modernUI.description')}
             </p>
           </div>
 
@@ -115,9 +118,9 @@ const WhyChooseHirios = () => {
             <div className="bg-amber-600/20 p-4 rounded-full w-fit mx-auto mb-6 border border-amber-600/30">
               <Mail className="h-8 w-8 text-amber-400" />
             </div>
-            <h3 className="text-lg font-semibold mb-3 text-white">One-Click Email Integration</h3>
+            <h3 className="text-lg font-semibold mb-3 text-white">{t('whyChoose.features.emailIntegration.title')}</h3>
             <p className="text-gray-300 text-sm">
-              Send interview invitations, offers, and rejections instantly from your company email server with one click.
+              {t('whyChoose.features.emailIntegration.description')}
             </p>
           </div>
 
@@ -125,9 +128,9 @@ const WhyChooseHirios = () => {
             <div className="bg-teal-600/20 p-4 rounded-full w-fit mx-auto mb-6 border border-teal-600/30">
               <Calendar className="h-8 w-8 text-teal-400" />
             </div>
-            <h3 className="text-lg font-semibold mb-3 text-white">Smart Interview Scheduling</h3>
+            <h3 className="text-lg font-semibold mb-3 text-white">{t('whyChoose.features.scheduling.title')}</h3>
             <p className="text-gray-300 text-sm">
-              Visual availability matrix with automated calendar coordination. Save 3+ hours per interview scheduled.
+              {t('whyChoose.features.scheduling.description')}
             </p>
           </div>
 
@@ -135,9 +138,9 @@ const WhyChooseHirios = () => {
             <div className="bg-rose-600/20 p-4 rounded-full w-fit mx-auto mb-6 border border-rose-600/30">
               <FileText className="h-8 w-8 text-rose-400" />
             </div>
-            <h3 className="text-lg font-semibold mb-3 text-white">Automated Offer Management</h3>
+            <h3 className="text-lg font-semibold mb-3 text-white">{t('whyChoose.features.offerManagement.title')}</h3>
             <p className="text-gray-300 text-sm">
-              Generate professional PDF offer letters and send them with one-click communication directly from your email.
+              {t('whyChoose.features.offerManagement.description')}
             </p>
           </div>
 
@@ -145,9 +148,9 @@ const WhyChooseHirios = () => {
             <div className="bg-violet-600/20 p-4 rounded-full w-fit mx-auto mb-6 border border-violet-600/30">
               <Search className="h-8 w-8 text-violet-400" />
             </div>
-            <h3 className="text-lg font-semibold mb-3 text-white">Advanced Talent Search</h3>
+            <h3 className="text-lg font-semibold mb-3 text-white">{t('whyChoose.features.talentSearch.title')}</h3>
             <p className="text-gray-300 text-sm">
-              Semantic AI search across your entire resume database. Find perfect candidates instantly for any position.
+              {t('whyChoose.features.talentSearch.description')}
             </p>
           </div>
         </div>

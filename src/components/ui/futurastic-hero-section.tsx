@@ -2,7 +2,8 @@ import { Stars } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import React, { useEffect, useState } from "react";
 import { FiArrowRight } from "react-icons/fi";
-import { Brain, BarChart3 } from "lucide-react";
+import { Brain, BarChart3, Languages } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation";
 import {
   useMotionTemplate,
   useMotionValue,
@@ -122,6 +123,7 @@ const SafeCanvas = () => {
 
 export const AuroraHero = () => {
   const navigate = useNavigate();
+  const { t, language, toggleLanguage, isRTL } = useTranslation();
   const color = useMotionValue(COLORS_TOP[0]);
   const [webGLSupported, setWebGLSupported] = useState(true);
 
@@ -148,19 +150,32 @@ export const AuroraHero = () => {
       }}
       className="relative grid min-h-screen place-content-center overflow-hidden bg-gray-950 px-4 py-24 text-gray-200"
     >
+      {/* Language Switcher */}
+      <div className={`absolute top-6 z-20 flex items-center gap-3 ${isRTL ? 'left-6' : 'right-6'}`}>
+        <motion.button
+          onClick={toggleLanguage}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="flex items-center gap-2 rounded-full bg-gray-800/80 backdrop-blur-sm px-4 py-2 text-sm font-medium text-white border border-gray-700/50 hover:bg-gray-700/80 transition-colors"
+        >
+          <Languages className="h-4 w-4" />
+          <span>{language === 'en' ? 'AR' : 'EN'}</span>
+        </motion.button>
+      </div>
+
       <div className="relative z-10 flex flex-col items-center">
         <span className="mb-1.5 inline-block rounded-full bg-blue-600/50 px-3 py-1.5 text-sm font-medium">
-          AI-Powered Hiring Platform
+          {t('hero.badge')}
         </span>
         <h1 className="max-w-4xl bg-gradient-to-br from-white to-gray-400 bg-clip-text text-center text-3xl font-bold leading-tight text-transparent sm:text-5xl sm:leading-tight md:text-7xl md:leading-tight">
-          Hire Smarter, Not Harder
+          {t('hero.title')}
           <br />
           <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-            AI-Powered Candidate Screening
+            {t('hero.subtitle')}
           </span>
         </h1>
         <p className="my-6 max-w-2xl text-center text-base leading-relaxed md:text-xl md:leading-relaxed text-gray-300">
-          Upload a job description and resumes—our AI analyzes fit, ranks candidates, and explains why. Build your talent database with intelligent skill tagging and track every candidate's journey. No more manual screening.
+          {t('hero.description')}
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
@@ -178,8 +193,8 @@ export const AuroraHero = () => {
             }}
             className="group relative flex w-fit items-center gap-1.5 rounded-full bg-blue-600/20 px-6 py-3 text-gray-50 transition-colors hover:bg-blue-600/30 font-semibold"
           >
-            Start Screening with AI
-            <FiArrowRight className="transition-transform group-hover:-rotate-45 group-active:-rotate-12" />
+            {t('hero.cta_primary')}
+            <FiArrowRight className={`transition-transform group-hover:-rotate-45 group-active:-rotate-12 ${isRTL ? 'rotate-180' : ''}`} />
           </motion.button>
           
           <motion.button
@@ -192,44 +207,9 @@ export const AuroraHero = () => {
             }}
             className="group relative flex w-fit items-center gap-1.5 rounded-full bg-gray-800/50 px-6 py-3 text-gray-50 transition-colors hover:bg-gray-800/70 font-semibold border border-gray-600/50"
           >
-            See How It Works
+            {t('hero.cta_secondary')}
             <BarChart3 className="transition-transform group-hover:scale-110" />
           </motion.button>
-        </div>
-
-        {/* Feature highlights */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-12 max-w-6xl">
-          <div className="text-center">
-            <div className="bg-blue-600/20 p-3 rounded-full w-fit mx-auto mb-3">
-              <Brain className="h-6 w-6 text-blue-400" />
-            </div>
-            <h3 className="text-sm font-semibold mb-2">Smart AI Analysis</h3>
-            <p className="text-xs text-gray-400">Advanced algorithms match candidates to job requirements</p>
-          </div>
-          
-          <div className="text-center">
-            <div className="bg-purple-600/20 p-3 rounded-full w-fit mx-auto mb-3">
-              <BarChart3 className="h-6 w-6 text-purple-400" />
-            </div>
-            <h3 className="text-sm font-semibold mb-2">Instant Scoring</h3>
-            <p className="text-xs text-gray-400">Get candidate scores and insights in seconds</p>
-          </div>
-          
-          <div className="text-center">
-            <div className="bg-cyan-600/20 p-3 rounded-full w-fit mx-auto mb-3">
-              <FiArrowRight className="h-6 w-6 text-cyan-400" />
-            </div>
-            <h3 className="text-sm font-semibold mb-2">Talent Database</h3>
-            <p className="text-xs text-gray-400">Never lose a good candidate - search by AI-extracted skills</p>
-          </div>
-          
-          <div className="text-center">
-            <div className="bg-green-600/20 p-3 rounded-full w-fit mx-auto mb-3">
-              <FiArrowRight className="h-6 w-6 text-green-400" />
-            </div>
-            <h3 className="text-sm font-semibold mb-2">Journey Tracking</h3>
-            <p className="text-xs text-gray-400">Track every candidate from application to decision</p>
-          </div>
         </div>
       </div>
 

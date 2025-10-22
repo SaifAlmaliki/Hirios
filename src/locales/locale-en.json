@@ -1,0 +1,219 @@
+{
+  "hero": {
+    "badge": "AI-Powered Hiring Platform",
+    "title": "Hire Smarter, Not Harder",
+    "subtitle": "AI-Powered Candidate Screening",
+    "description": "Upload a job description and resumes—our AI analyzes fit, ranks candidates, and explains why. Build your talent database with intelligent skill tagging and track every candidate's journey. No more manual screening.",
+    "cta_primary": "Start Screening with AI",
+    "cta_secondary": "See How It Works",
+    "features": {
+      "ai_analysis": {
+        "title": "Smart AI Analysis",
+        "description": "Advanced algorithms match candidates to job requirements"
+      },
+      "instant_scoring": {
+        "title": "Instant Scoring",
+        "description": "Get candidate scores and insights in seconds"
+      },
+      "talent_database": {
+        "title": "Talent Database",
+        "description": "Never lose a good candidate - search by AI-extracted skills"
+      },
+      "journey_tracking": {
+        "title": "Journey Tracking",
+        "description": "Track every candidate from application to decision"
+      }
+    }
+  },
+  "hiringFunnel": {
+    "title": "Transform Your",
+    "titleHighlight": "Hiring Process",
+    "subtitle": "Stop spending hours on manual resume screening and initial interviews. Let Hirios AI handle the tedious work so you can focus on what matters most.",
+    "offloadTitle": "Offload the Tedious Work to AI",
+    "offloadDescription": "Traditional hiring involves countless hours of manual work. With Hirios, you can automate the most time-consuming parts of your hiring process.",
+    "resumeScreening": {
+      "title": "Automated Resume Screening",
+      "description": "Upload hundreds of resumes and let AI instantly analyze, score, and rank candidates based on your job requirements. No more manual reading through each CV."
+    },
+    "voiceInterviews": {
+      "title": "AI-Powered Voice Interviews",
+      "description": "Conduct first-round screening interviews automatically. Our AI asks relevant questions, evaluates responses, and provides detailed insights on candidate fit."
+    },
+    "timeSavings": {
+      "title": "Massive Time Savings",
+      "description": "Reduce screening time from days to minutes. Focus your energy on final interviews and strategic hiring decisions instead of initial candidate filtering."
+    },
+    "comparison": {
+      "title": "Before vs. After Hirios",
+      "before": {
+        "title": "Traditional Process (Hours of Manual Work)",
+        "items": [
+          "Manually read through 100+ resumes",
+          "Schedule and conduct initial phone screens",
+          "Take detailed notes on each candidate",
+          "Manually compare and rank candidates"
+        ]
+      },
+      "after": {
+        "title": "With Hirios (AI Does the Heavy Lifting)",
+        "items": [
+          "Upload resumes and job description",
+          "AI automatically screens and scores candidates",
+          "AI conducts voice interviews with top candidates",
+          "Get ranked results with detailed explanations"
+        ]
+      },
+      "result": {
+        "title": "Result: 90% Time Reduction",
+        "description": "Focus on what matters most - making the final hiring decision"
+      }
+    }
+  },
+  "howItWorks": {
+    "title": "How It Works",
+    "subtitle": "Simple workflow for smarter hiring decisions",
+    "steps": {
+      "step1": {
+        "title": "Define Job Requirements",
+        "description": "Fill out the job description, responsibilities, and requirements to create a comprehensive job profile."
+      },
+      "step2": {
+        "title": "Upload & AI Processing",
+        "description": "Upload resumes from any source. AI automatically extracts skills, tags candidates, and stores them in your talent database."
+      },
+      "step3": {
+        "title": "Smart Analysis & Scoring",
+        "description": "AI analyzes each resume against job requirements, scores candidates, and tracks their journey through your hiring process."
+      },
+      "step4": {
+        "title": "Review & Decision",
+        "description": "Review AI insights, conduct interviews, and make decisions. All candidates remain in your talent database for future opportunities."
+      }
+    }
+  },
+  "whyChoose": {
+    "title": "Why Choose Hirios?",
+    "subtitle": "Everything you need for intelligent hiring",
+    "features": {
+      "aiScreening": {
+        "title": "AI-Powered Screening",
+        "description": "Advanced AI analyzes resumes and provides detailed insights with match scores."
+      },
+      "voiceInterviews": {
+        "title": "Voice Interviews",
+        "description": "Conduct AI-powered voice interviews with candidates for deeper insights."
+      },
+      "talentDatabase": {
+        "title": "Talent Database",
+        "description": "Build your talent database - never lose a good candidate. Search by AI-extracted skills for future positions."
+      },
+      "resumeTagging": {
+        "title": "Intelligent Resume Tagging",
+        "description": "AI automatically extracts and tags skills from resumes. Save 5+ hours per week on manual labeling."
+      },
+      "journeyTracking": {
+        "title": "Candidate Journey Tracking",
+        "description": "Track every candidate's progress from application to decision. Complete visibility for your hiring team."
+      },
+      "teamCollaboration": {
+        "title": "Team Collaboration",
+        "description": "Invite hiring managers and recruiters to collaborate on screening results together."
+      },
+      "timeSaved": {
+        "title": "Time Saved",
+        "description": "Cut screening time by 80% and focus only on top candidates."
+      },
+      "modernUI": {
+        "title": "Modern UI",
+        "description": "Beautiful Aurora backgrounds and glassmorphism design for enhanced user experience."
+      },
+      "emailIntegration": {
+        "title": "One-Click Email Integration",
+        "description": "Send interview invitations, offers, and rejections instantly from your company email server with one click."
+      },
+      "scheduling": {
+        "title": "Smart Interview Scheduling",
+        "description": "Visual availability matrix with automated calendar coordination. Save 3+ hours per interview scheduled."
+      },
+      "offerManagement": {
+        "title": "Automated Offer Management",
+        "description": "Generate professional PDF offer letters and send them with one-click communication directly from your email."
+      },
+      "talentSearch": {
+        "title": "Advanced Talent Search",
+        "description": "Semantic AI search across your entire resume database. Find perfect candidates instantly for any position."
+      }
+    }
+  },
+  "contactCTA": {
+    "title": "Ready to Transform Your Hiring?",
+    "subtitle": "Get a personalized demo and see how Hirios can revolutionize your recruitment process",
+    "enterpriseTitle": "Enterprise Solutions Available",
+    "enterpriseDescription": "Whether you're a startup or enterprise, we'll customize Hirios to fit your unique hiring needs. Get advanced features, dedicated support, and seamless integrations.",
+    "features": [
+      "Custom AI Training",
+      "ATS Integration",
+      "Dedicated Support"
+    ],
+    "contactTitle": "Contact Us for Demo & Pricing",
+    "contactEmail": "support@hirios.com",
+    "contactDescription": "We'll schedule a personalized demo and discuss custom pricing for your organization",
+    "requestDemo": "Request Demo",
+    "tryFree": "Try Free Version"
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Everything you need to know about Hirios",
+    "questions": [
+      {
+        "question": "How does the pricing work?",
+        "answer": "Hirios offers flexible pricing options perfect for B2B companies. Contact us for custom pricing based on your company's hiring needs and volume. We provide transparent, scalable pricing that grows with your business."
+      },
+      {
+        "question": "How does AI screening work?",
+        "answer": "Our AI agent deeply understands your job description, requirements, and responsibilities, then ranks uploaded resumes by relevance. It provides detailed justifications including strengths, weaknesses, and reasoning for each ranking. If you disagree with a ranking, you can always review the original resume for full transparency. All resumes are stored securely for reference."
+      },
+      {
+        "question": "What file formats and integrations do you support?",
+        "answer": "We support PDF resume uploads and are open to integrating with enterprise ATS systems like Workday and Greenhouse. You can bulk upload resumes from LinkedIn job posts with one simple step. Contact us to discuss volume limits and processing capabilities for your specific needs."
+      },
+      {
+        "question": "How accurate is the AI and can it handle different languages?",
+        "answer": "Our AI is highly accurate as it comprehensively analyzes job requirements against candidate qualifications. The LLM can easily handle multiple languages for both resume analysis and voice interviews. If the AI makes an assessment you disagree with, you have full access to review the original resume for complete transparency."
+      },
+      {
+        "question": "What are voice interviews and how do they work?",
+        "answer": "AI-powered voice interviews take about 10 minutes and collect key information like start date, motivation for the role, and past experience. The AI voice agent can be customized with enterprise-specific questions and supports multiple languages. Interview summaries are analyzed and saved to candidate profiles, giving hiring managers valuable insights before human interviews."
+      },
+      {
+        "question": "How is my data stored and secured?",
+        "answer": "All candidate resumes are stored in secure Supabase storage using AWS infrastructure. We're fully GDPR compliant and all hiring results and resumes can be exported as PDF. Data is retained for 3 years unless different requirements are specified by your enterprise. We follow industry best practices for data protection and privacy."
+      },
+      {
+        "question": "What kind of support do you provide?",
+        "answer": "We provide weekday support (9 AM - 5 PM, 5 days a week) for all users. While the system is self-explanatory and easy to use, we offer quick training sessions for recruiters. For enterprise clients, we can provide implementation assistance and custom onboarding to ensure smooth adoption."
+      },
+      {
+        "question": "Who is Hirios designed for?",
+        "answer": "Hirios is perfect for medium to large companies across all industries that spend significant time and resources screening resumes. Whether you're hiring for technical or non-technical roles, our AI helps you find the right candidates faster. The system works in any browser with no minimum or maximum limits - you only pay for what you use."
+      },
+      {
+        "question": "What do I need to get started?",
+        "answer": "Simply enter your job description, requirements, and responsibilities for the position you want to screen candidates for. Hirios handles the rest! The system runs on any browser and requires no special setup."
+      },
+      {
+        "question": "Can I export my data and results?",
+        "answer": "Yes! All hiring results and resumes can be exported as PDF files. You maintain full control over your data and can export candidate information, screening results, and interview summaries whenever needed. This ensures you have complete records for your hiring process."
+      }
+    ]
+  },
+  "footer": {
+    "brand": "Hirios",
+    "links": {
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service",
+      "contact": "Contact Us"
+    },
+    "copyright": "© 2025 Hirios. All rights reserved. AI-powered hiring made simple."
+  }
+}

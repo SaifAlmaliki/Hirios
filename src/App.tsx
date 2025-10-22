@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { LanguageProvider } from "@/contexts/LanguageContext";
 import SubscriptionGuard from "@/components/SubscriptionGuard";
 import * as Sentry from '@sentry/react';
 import Index from "./pages/Index";
@@ -58,7 +59,11 @@ const App = () => (
         <RouteCleanup />
         <Routes>
           {/* Public routes - no authentication required */}
-          <Route path="/" element={<HiriosLanding />} />
+          <Route path="/" element={
+            <LanguageProvider>
+              <HiriosLanding />
+            </LanguageProvider>
+          } />
           <Route path="/job-portal-old" element={<Index />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-of-service" element={<TermsOfService />} />
