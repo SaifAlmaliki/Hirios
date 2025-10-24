@@ -18,6 +18,7 @@ interface ScreeningResultCardProps {
   isSelected?: boolean;
   onSelectionChange?: (id: string, selected: boolean) => void;
   showCheckbox?: boolean;
+  onCandidateRejected?: () => void;
 }
 
 const ScreeningResultCard: React.FC<ScreeningResultCardProps> = ({
@@ -28,7 +29,8 @@ const ScreeningResultCard: React.FC<ScreeningResultCardProps> = ({
   onToggleExpansion,
   isSelected = false,
   onSelectionChange,
-  showCheckbox = false
+  showCheckbox = false,
+  onCandidateRejected
 }) => {
   const [showSchedulingDialog, setShowSchedulingDialog] = useState(false);
   const isExpanded = expandedRows.has(result.id);
@@ -109,6 +111,7 @@ const ScreeningResultCard: React.FC<ScreeningResultCardProps> = ({
             jobTitle={result.job?.title || ''}
             companyName={result.job?.company || ''}
             onScheduleInterview={() => setShowSchedulingDialog(true)}
+            onCandidateRejected={onCandidateRejected}
           />
         </div>
       </CardHeader>

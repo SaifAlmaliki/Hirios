@@ -43,6 +43,7 @@ interface ScreeningResultActionsProps {
   jobTitle?: string;         // Add job title for rejection
   companyName?: string;      // Add company name for rejection
   onScheduleInterview?: () => void; // Add callback for schedule interview
+  onCandidateRejected?: () => void; // Add callback for when candidate is rejected
 }
 
 const ScreeningResultActions: React.FC<ScreeningResultActionsProps> = ({
@@ -62,7 +63,8 @@ const ScreeningResultActions: React.FC<ScreeningResultActionsProps> = ({
   candidateEmail = '',
   jobTitle = '',
   companyName = '',
-  onScheduleInterview
+  onScheduleInterview,
+  onCandidateRejected
 }) => {
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -149,6 +151,13 @@ const ScreeningResultActions: React.FC<ScreeningResultActionsProps> = ({
       company_name: companyName,
       application_id: applicationId,
       rejection_reason: 'Not a good fit for the position'
+    }, {
+      onSuccess: () => {
+        // Call the callback to switch to rejected tab
+        if (onCandidateRejected) {
+          onCandidateRejected();
+        }
+      }
     });
 
     setShowRejectDialog(false);

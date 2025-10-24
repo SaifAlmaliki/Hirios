@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   AlertDialog,
@@ -70,6 +71,7 @@ const ScreeningResults = () => {
   const [scoreFilter, setScoreFilter] = useState('all');
   const [selectedJobId, setSelectedJobId] = useState<string>('all');
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+  const [activeTab, setActiveTab] = useState('screened');
   
   // State for bulk selection and deletion
   const [selectedResults, setSelectedResults] = useState<Set<string>>(new Set());
@@ -85,6 +87,14 @@ const ScreeningResults = () => {
   // State for screening progress tracking
   const [showProgressBar, setShowProgressBar] = useState(false);
   const [processingResumeCount, setProcessingResumeCount] = useState(0);
+
+  // Callback to handle when a candidate is rejected
+  const handleCandidateRejected = () => {
+    // Switch to rejected tab after a short delay to allow the mutation to complete
+    setTimeout(() => {
+      setActiveTab('rejected');
+    }, 1000);
+  };
 
   // Bulk delete mutation
   const bulkDeleteMutation = useBulkDeleteScreeningResults();
@@ -145,7 +155,12 @@ const ScreeningResults = () => {
         ? result.job_id === jobId 
         : selectedJobId === 'all' || result.job_id === selectedJobId;
 
-      return matchesSearch && matchesScore && matchesJob;
+      // Filter by rejection status based on active tab
+      const matchesRejectionStatus = activeTab === 'screened' 
+        ? !result.is_rejected 
+        : result.is_rejected;
+
+      return matchesSearch && matchesScore && matchesJob && matchesRejectionStatus;
     });
 
     // Sort results by score (highest first by default)
@@ -156,7 +171,26 @@ const ScreeningResults = () => {
     });
 
     return filtered;
-  }, [screeningResults, searchTerm, scoreFilter, selectedJobId, jobId]);
+  }, [screeningResults, searchTerm, scoreFilter, selectedJobId, jobId, activeTab]);
+
+  // Calculate counts for each tab
+  const tabCounts = useMemo(() => {
+    const screenedCount = screeningResults.filter(result => {
+      const matchesJob = jobId 
+        ? result.job_id === jobId 
+        : selectedJobId === 'all' || result.job_id === selectedJobId;
+      return !result.is_rejected && matchesJob;
+    }).length;
+
+    const rejectedCount = screeningResults.filter(result => {
+      const matchesJob = jobId 
+        ? result.job_id === jobId 
+        : selectedJobId === 'all' || result.job_id === selectedJobId;
+      return result.is_rejected && matchesJob;
+    }).length;
+
+    return { screenedCount, rejectedCount };
+  }, [screeningResults, jobId, selectedJobId]);
 
   // Redirect if not company user - THIS MUST BE AFTER ALL HOOKS
   React.useEffect(() => {
@@ -416,7 +450,7 @@ const ScreeningResults = () => {
                       {...(isSomeSelected ? { 'data-state': 'indeterminate' as any } : {})}
                     />
                     <CardTitle className="text-lg">
-                      Screening Results ({filteredAndSortedResults.length})
+                      {activeTab === 'screened' ? 'Screened' : 'Rejected'} Results ({filteredAndSortedResults.length})
                       {selectedResults.size > 0 && (
                         <span className="ml-2 text-sm font-normal text-blue-600">
                           ({selectedResults.size} selected)
@@ -457,38 +491,88 @@ const ScreeningResults = () => {
               </div>
             </CardHeader>
             <CardContent>
-              {filteredAndSortedResults.length === 0 ? (
-                <div className="text-center py-8">
-                  <Brain className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600">
-                    {jobId 
-                      ? `No screened resumes for ${currentJob?.title || 'this position'} yet.`
-                      : 'No screening results found matching your criteria.'
-                    }
-                  </p>
-                  {jobId && (
-                    <p className="text-sm text-gray-500 mt-2">
-                      Candidates will appear here once they apply and are screened for this position.
-                    </p>
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="screened">
+                    Screened ({tabCounts.screenedCount})
+                  </TabsTrigger>
+                  <TabsTrigger value="rejected">
+                    Rejected ({tabCounts.rejectedCount})
+                  </TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="screened" className="mt-4">
+                  {filteredAndSortedResults.length === 0 ? (
+                    <div className="text-center py-8">
+                      <Brain className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                      <p className="text-gray-600">
+                        {jobId 
+                          ? `No screened candidates for ${currentJob?.title || 'this position'} yet.`
+                          : 'No screened candidates found matching your criteria.'
+                        }
+                      </p>
+                      {jobId && (
+                        <p className="text-sm text-gray-500 mt-2">
+                          Candidates will appear here once they apply and are screened for this position.
+                        </p>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {filteredAndSortedResults.map((result) => (
+                        <ScreeningResultCard
+                          key={result.id}
+                          result={result}
+                          requestingInterview={requestingInterview}
+                          onRequestVoiceScreening={handleRequestVoiceScreening}
+                          expandedRows={expandedRows}
+                          onToggleExpansion={toggleRowExpansion}
+                          showCheckbox={true}
+                          isSelected={selectedResults.has(result.id)}
+                          onSelectionChange={handleSelectionChange}
+                          onCandidateRejected={handleCandidateRejected}
+                        />
+                      ))}
+                    </div>
                   )}
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {filteredAndSortedResults.map((result) => (
-                    <ScreeningResultCard
-                      key={result.id}
-                      result={result}
-                      requestingInterview={requestingInterview}
-                      onRequestVoiceScreening={handleRequestVoiceScreening}
-                      expandedRows={expandedRows}
-                      onToggleExpansion={toggleRowExpansion}
-                      showCheckbox={true}
-                      isSelected={selectedResults.has(result.id)}
-                      onSelectionChange={handleSelectionChange}
-                    />
-                  ))}
-                </div>
-              )}
+                </TabsContent>
+                
+                <TabsContent value="rejected" className="mt-4">
+                  {filteredAndSortedResults.length === 0 ? (
+                    <div className="text-center py-8">
+                      <Brain className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                      <p className="text-gray-600">
+                        {jobId 
+                          ? `No rejected candidates for ${currentJob?.title || 'this position'} yet.`
+                          : 'No rejected candidates found matching your criteria.'
+                        }
+                      </p>
+                      {jobId && (
+                        <p className="text-sm text-gray-500 mt-2">
+                          Rejected candidates will appear here once you reject them from the screened list.
+                        </p>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {filteredAndSortedResults.map((result) => (
+                        <ScreeningResultCard
+                          key={result.id}
+                          result={result}
+                          requestingInterview={requestingInterview}
+                          onRequestVoiceScreening={handleRequestVoiceScreening}
+                          expandedRows={expandedRows}
+                          onToggleExpansion={toggleRowExpansion}
+                          showCheckbox={true}
+                          isSelected={selectedResults.has(result.id)}
+                          onSelectionChange={handleSelectionChange}
+                          onCandidateRejected={handleCandidateRejected}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </TabsContent>
+              </Tabs>
             </CardContent>
           </Card>
 
