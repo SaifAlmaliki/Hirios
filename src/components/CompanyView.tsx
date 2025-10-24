@@ -8,14 +8,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Building, Eye, FileText, MapPin, Clock, Briefcase, Edit, Trash2, CheckCircle, ChevronDown, Link } from 'lucide-react';
+import { Plus, Building, FileText, MapPin, Clock, Briefcase, Edit, Trash2, CheckCircle, ChevronDown, Link } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useCreateJob, useUpdateJob, useDeleteJob } from '../hooks/useJobs';
 import { useCompanyJobs } from '../hooks/useCompanyJobs';
 import { useCompanyProfile } from '../hooks/useCompanyProfile';
 import { useNavigate } from 'react-router-dom';
 
-import JobApplicationsView from './JobApplicationsView';
 import JobCollaborationManager from './JobCollaborationManager';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -182,8 +181,6 @@ const CompanyView: React.FC = () => {
   // All hooks must be called before any conditional returns
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
-  const [isApplicationsViewOpen, setIsApplicationsViewOpen] = useState(false);
   const [isJobDetailViewOpen, setIsJobDetailViewOpen] = useState(false);
   const [editingJob, setEditingJob] = useState<any>(null);
   const [detailViewJob, setDetailViewJob] = useState<any>(null);
@@ -210,7 +207,6 @@ const CompanyView: React.FC = () => {
   const updateJobMutation = useUpdateJob();
   const deleteJobMutation = useDeleteJob();
   
-  const selectedJob = jobs.find(job => job.id === selectedJobId) || null;
   
   // Security check: Only allow companies to access this view
   useEffect(() => {
@@ -338,10 +334,6 @@ const CompanyView: React.FC = () => {
     }
   };
 
-  const handleViewApplications = (jobId: string) => {
-    setSelectedJobId(jobId);
-    setIsApplicationsViewOpen(true);
-  };
 
   const handleViewJobDetail = (job: any) => {
     // Navigate to screening results for this specific job
@@ -523,17 +515,6 @@ const CompanyView: React.FC = () => {
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleViewApplications(job.id);
-                              }}
-                              className="text-green-600 hover:text-green-800 hover:bg-green-50 p-1"
-                            >
-                              <Eye className="h-4 w-4" />
-                            </Button>
                             <CollapsibleTrigger asChild>
                               <Button
                                 variant="ghost"
@@ -651,15 +632,6 @@ const CompanyView: React.FC = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Job Applications View */}
-      <JobApplicationsView 
-        job={selectedJob}
-        isOpen={isApplicationsViewOpen}
-        onClose={() => {
-          setIsApplicationsViewOpen(false);
-          setSelectedJobId(null);
-        }}
-      />
 
       {/* Job Detail View Dialog */}
       <Dialog open={isJobDetailViewOpen} onOpenChange={setIsJobDetailViewOpen}>
@@ -768,17 +740,6 @@ const CompanyView: React.FC = () => {
 
               {/* Action Buttons */}
               <div className="flex justify-end space-x-3 border-t pt-4">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setIsJobDetailViewOpen(false);
-                    handleViewApplications(detailViewJob.id);
-                  }}
-                  className="flex items-center"
-                >
-                  <Eye className="h-4 w-4 mr-2" />
-                  View Applications
-                </Button>
                 <Button
                   onClick={() => {
                     setIsJobDetailViewOpen(false);
