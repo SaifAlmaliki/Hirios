@@ -196,7 +196,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signOut = async () => {
+    // Clear local state immediately to prevent flash
+    setUser(null);
+    setSession(null);
+    setIsEmailVerified(false);
+    setSubscriptionActive(true);
+    setSubscriptionError(null);
+    
+    // Sign out from Supabase
     await supabase.auth.signOut();
+    
+    // Redirect to landing page
     window.location.href = '/';
   };
 
