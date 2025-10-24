@@ -73,28 +73,14 @@ const PublicJobApplication = () => {
       if (profileData) {
         console.log('📷 Company profile data:', profileData);
         
-        // If logo_url exists, convert storage path to signed URL
+        // logo_url is already a public URL, no need to create signed URL
         if (profileData.logo_url) {
-          console.log('🔗 Converting logo path to signed URL:', profileData.logo_url);
-          
-          const { data: signedUrlData, error: urlError } = await supabase.storage
-            .from('company-logos')
-            .createSignedUrl(profileData.logo_url, 3600); // 1 hour expiry
-
-          if (urlError) {
-            console.error('❌ Error creating signed URL:', urlError);
-          } else {
-            console.log('✅ Signed URL created:', signedUrlData?.signedUrl);
-          }
-
-          setCompanyProfile({
-            ...profileData,
-            logo_url: signedUrlData?.signedUrl || null
-          });
+          console.log('🔗 Using existing logo URL:', profileData.logo_url);
         } else {
           console.log('ℹ️ No logo URL found for company');
-          setCompanyProfile(profileData);
         }
+        
+        setCompanyProfile(profileData);
       }
 
       setLoading(false);

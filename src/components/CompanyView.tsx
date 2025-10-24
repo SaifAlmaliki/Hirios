@@ -353,13 +353,37 @@ const CompanyView: React.FC = () => {
     });
   };
 
-  const handleCopyApplicationLink = (jobId: string, jobTitle: string, e: React.MouseEvent) => {
+  const handleCopyApplicationLink = (job: any, e: React.MouseEvent) => {
     e.stopPropagation();
-    const applicationLink = `${window.location.origin}/apply/${jobId}`;
-    navigator.clipboard.writeText(applicationLink);
+    const applicationLink = `${window.location.origin}/apply/${job.id}`;
+    
+    // Create a formatted job posting text
+    const jobPosting = `🚀 We're hiring!
+
+Position: ${job.title}
+Company: ${job.company}
+Location: ${job.location}
+Department: ${job.department}
+Type: ${formatEmploymentType(job.employment_type)}
+
+Job Description:
+${job.description}
+
+${job.responsibilities ? `Responsibilities:
+${job.responsibilities}` : ''}
+
+${job.requirements ? `Requirements:
+${job.requirements}` : ''}
+
+${job.benefits ? `Benefits:
+${job.benefits}` : ''}
+
+Apply here: ${applicationLink}`;
+
+    navigator.clipboard.writeText(jobPosting);
     toast({
-      title: "Link copied!",
-      description: `Application link for "${jobTitle}" copied to clipboard.`,
+      title: "Job posting copied!",
+      description: `Complete job posting for "${job.title}" copied to clipboard.`,
     });
   };
 
@@ -486,9 +510,9 @@ const CompanyView: React.FC = () => {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={(e) => handleCopyApplicationLink(job.id, job.title, e)}
+                              onClick={(e) => handleCopyApplicationLink(job, e)}
                               className="text-purple-600 hover:text-purple-800 hover:bg-purple-50 p-1"
-                              title="Copy application link"
+                              title="Copy job posting"
                             >
                               <Link className="h-4 w-4" />
                             </Button>

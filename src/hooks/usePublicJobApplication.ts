@@ -54,6 +54,7 @@ export const usePublicJobApplication = () => {
           storage_path: filePath,
           original_filename: resumeFile.name,
           file_size: resumeFile.size,
+          uploaded_by_user_id: null, // Explicitly set to null for anonymous users
           candidate_name: candidateName,
           upload_source: 'public_application',
           job_id: jobId
