@@ -102,10 +102,13 @@ const Navbar1: React.FC<Navbar1Props> = ({
             <p className="text-sm">
               {subscriptionStatus.plan === 'trial' 
                 ? `Trial expires in ${subscriptionStatus.daysRemaining} ${subscriptionStatus.daysRemaining === 1 ? 'day' : 'days'}.` 
-                : `Subscription expires in ${subscriptionStatus.daysRemaining} ${subscriptionStatus.daysRemaining === 1 ? 'day' : 'days'}.`
+                : `Your subscription expires in ${subscriptionStatus.daysRemaining} ${subscriptionStatus.daysRemaining === 1 ? 'day' : 'days'}.`
               }
               <br />
-              Contact <strong>support@hirios.com</strong> to upgrade.
+              {subscriptionStatus.plan === 'trial' 
+                ? <>Contact <strong>support@hirios.com</strong> to upgrade to a paid plan.</>
+                : <>Contact <strong>support@hirios.com</strong> to renew your subscription.</>
+              }
             </p>
           </TooltipContent>
         </Tooltip>
