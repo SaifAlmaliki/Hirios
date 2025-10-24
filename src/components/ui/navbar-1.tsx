@@ -4,7 +4,7 @@ import * as React from "react"
 import { useState, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Menu, X, Building2, Settings, Brain, LogOut, FileText, Clock } from "lucide-react"
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSubscriptionStatus } from '@/hooks/useSubscriptionStatus';
 import { useCompanyProfile } from '@/hooks/useCompanyProfile';
@@ -33,10 +33,29 @@ const Navbar1: React.FC<Navbar1Props> = ({
   const [isOpen, setIsOpen] = useState(false)
   const { user, signOut, loading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const subscriptionStatus = useSubscriptionStatus();
   const { data: companyProfile } = useCompanyProfile();
 
   const toggleMenu = () => setIsOpen(!isOpen)
+
+  // Determine active route based on current location
+  const getActiveRoute = () => {
+    const path = location.pathname;
+    
+    if (path.startsWith('/resume-pool')) {
+      return 'talent-pool';
+    } else if (path.startsWith('/screening-results') || path.startsWith('/job-portal')) {
+      return 'ai-screening';
+    } else if (path.startsWith('/company-setup')) {
+      return 'setup';
+    }
+    
+    // Default to talent-pool for root or unknown routes
+    return 'talent-pool';
+  };
+
+  const activeRoute = getActiveRoute();
 
   const handleSignOut = async () => {
     await signOut();
@@ -190,7 +209,11 @@ const Navbar1: React.FC<Navbar1Props> = ({
               >
                 <button
                   onClick={handleResumePool}
-                  className="flex items-center px-1.5 py-1 text-sm text-gray-900 hover:text-orange-600 transition-colors font-medium rounded-full hover:bg-orange-50"
+                  className={`flex items-center px-1.5 py-1 text-sm font-medium rounded-full transition-colors ${
+                    activeRoute === 'talent-pool' 
+                      ? 'text-blue-600 bg-blue-50' 
+                      : 'text-gray-900 hover:text-blue-600 hover:bg-blue-50'
+                  }`}
                 >
                   <FileText className="h-4 w-4 mr-1" />
                   <span className="hidden sm:inline">Talent Pool</span>
@@ -206,7 +229,11 @@ const Navbar1: React.FC<Navbar1Props> = ({
               >
                 <button
                   onClick={handleScreeningResults}
-                  className="flex items-center px-1.5 py-1 text-sm text-gray-900 hover:text-blue-600 transition-colors font-medium rounded-full hover:bg-blue-50"
+                  className={`flex items-center px-1.5 py-1 text-sm font-medium rounded-full transition-colors ${
+                    activeRoute === 'ai-screening' 
+                      ? 'text-blue-600 bg-blue-50' 
+                      : 'text-gray-900 hover:text-blue-600 hover:bg-blue-50'
+                  }`}
                 >
                   <Brain className="h-4 w-4 mr-1" />
                   <span className="hidden sm:inline">AI Screening</span>
@@ -264,7 +291,11 @@ const Navbar1: React.FC<Navbar1Props> = ({
               >
                 <button
                   onClick={handleResumePool}
-                  className="flex items-center px-2 py-1 text-sm text-gray-900 hover:text-orange-600 transition-colors font-medium rounded-full hover:bg-orange-50"
+                  className={`flex items-center px-2 py-1 text-sm font-medium rounded-full transition-colors ${
+                    activeRoute === 'talent-pool' 
+                      ? 'text-blue-600 bg-blue-50' 
+                      : 'text-gray-900 hover:text-blue-600 hover:bg-blue-50'
+                  }`}
                 >
                   <FileText className="h-4 w-4 mr-1" />
                   Talent Pool
@@ -280,7 +311,11 @@ const Navbar1: React.FC<Navbar1Props> = ({
               >
                 <button
                   onClick={handleScreeningResults}
-                  className="flex items-center px-2 py-1 text-sm text-gray-900 hover:text-blue-600 transition-colors font-medium rounded-full hover:bg-blue-50"
+                  className={`flex items-center px-2 py-1 text-sm font-medium rounded-full transition-colors ${
+                    activeRoute === 'ai-screening' 
+                      ? 'text-blue-600 bg-blue-50' 
+                      : 'text-gray-900 hover:text-blue-600 hover:bg-blue-50'
+                  }`}
                 >
                   <Brain className="h-4 w-4 mr-1" />
                   AI Screening
@@ -303,7 +338,11 @@ const Navbar1: React.FC<Navbar1Props> = ({
               >
                 <button
                   onClick={handleCompanySetup}
-                  className="flex items-center px-2 py-1 text-sm text-gray-900 hover:text-blue-600 transition-colors font-medium rounded-full hover:bg-blue-50"
+                  className={`flex items-center px-2 py-1 text-sm font-medium rounded-full transition-colors ${
+                    activeRoute === 'setup' 
+                      ? 'text-blue-600 bg-blue-50' 
+                      : 'text-gray-900 hover:text-blue-600 hover:bg-blue-50'
+                  }`}
                 >
                   <Settings className="h-4 w-4 mr-1" />
                   Setup
@@ -404,7 +443,11 @@ const Navbar1: React.FC<Navbar1Props> = ({
                   >
                     <button
                       onClick={handleResumePool}
-                      className="flex items-center w-full text-base text-gray-900 font-medium py-3"
+                      className={`flex items-center w-full text-base font-medium py-3 rounded-lg transition-colors ${
+                        activeRoute === 'talent-pool' 
+                          ? 'text-blue-600 bg-blue-50' 
+                          : 'text-gray-900 hover:bg-gray-50'
+                      }`}
                     >
                       <FileText className="h-5 w-5 mr-3" />
                       Talent Pool
@@ -420,7 +463,11 @@ const Navbar1: React.FC<Navbar1Props> = ({
                   >
                     <button
                       onClick={handleScreeningResults}
-                      className="flex items-center w-full text-base text-gray-900 font-medium py-3"
+                      className={`flex items-center w-full text-base font-medium py-3 rounded-lg transition-colors ${
+                        activeRoute === 'ai-screening' 
+                          ? 'text-blue-600 bg-blue-50' 
+                          : 'text-gray-900 hover:bg-gray-50'
+                      }`}
                     >
                       <Brain className="h-5 w-5 mr-3" />
                       AI Screening
@@ -443,7 +490,11 @@ const Navbar1: React.FC<Navbar1Props> = ({
                   >
                     <button
                       onClick={handleCompanySetup}
-                      className="flex items-center w-full text-base text-gray-900 font-medium py-3"
+                      className={`flex items-center w-full text-base font-medium py-3 rounded-lg transition-colors ${
+                        activeRoute === 'setup' 
+                          ? 'text-blue-600 bg-blue-50' 
+                          : 'text-gray-900 hover:bg-gray-50'
+                      }`}
                     >
                       <Settings className="h-5 w-5 mr-3" />
                       Setup
@@ -466,7 +517,7 @@ const Navbar1: React.FC<Navbar1Props> = ({
                   >
                     <button
                       onClick={handleSignOut}
-                      className="flex items-center w-full text-base text-red-600 font-medium py-3"
+                      className="flex items-center w-full text-base text-red-600 font-medium py-3 rounded-lg transition-colors hover:bg-red-50"
                     >
                       <LogOut className="h-5 w-5 mr-3" />
                       Sign Out
