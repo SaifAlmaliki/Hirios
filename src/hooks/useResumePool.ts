@@ -21,6 +21,7 @@ export type ResumePoolItem = {
   skills: string[] | null;
   created_at: string;
   updated_at: string;
+  upload_source: string;
 };
 
 export const useResumePool = () => {

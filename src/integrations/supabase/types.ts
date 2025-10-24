@@ -668,6 +668,7 @@ export type Database = {
           storage_path: string
           updated_at: string
           uploaded_by_user_id: string
+          upload_source: string
         }
         Insert: {
           company_profile_id: string
@@ -685,6 +686,7 @@ export type Database = {
           storage_path: string
           updated_at?: string
           uploaded_by_user_id: string
+          upload_source?: string
         }
         Update: {
           company_profile_id?: string
@@ -702,6 +704,7 @@ export type Database = {
           storage_path?: string
           updated_at?: string
           uploaded_by_user_id?: string
+          upload_source?: string
         }
         Relationships: [
           {

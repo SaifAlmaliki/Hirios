@@ -7,17 +7,11 @@ import {
   Calendar,
   HardDrive,
   Download,
-  MoreVertical,
+  Trash2,
   Mail,
   Phone,
   MapPin
 } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { ResumePoolItem } from '@/hooks/useResumePool';
 import { GlobalStatusBadge } from '@/components/ui/StatusBadge';
 import { GlobalCandidateStatus } from '@/hooks/useCandidateStatus';
@@ -153,37 +147,34 @@ const ResumeRow: React.FC<ResumeRowProps> = ({
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex items-center space-x-1 flex-shrink-0">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onDownload(resume)}
-            className="h-8 w-8 p-0 sm:h-9 sm:w-9 sm:p-2"
-            title="Download resume"
-          >
-            <Download className="h-3 w-3 sm:h-4 sm:w-4" />
-          </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-8 w-8 p-0 sm:h-9 sm:w-9 sm:p-2" title="More actions">
-                <MoreVertical className="h-3 w-3 sm:h-4 sm:w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => onDownload(resume)}>
-                <Download className="h-4 w-4 mr-2" />
-                Download
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => onDelete(resume)}
-                className="text-red-600"
-              >
-                <MoreVertical className="h-4 w-4 mr-2" />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        {/* Action Buttons and Upload Source */}
+        <div className="flex flex-col items-end space-y-1 flex-shrink-0">
+          {/* Upload Source */}
+          <div className="text-xs text-gray-500 text-right">
+            {resume.upload_source === 'resume_pool' ? 'Company Upload' : 'Direct Application'}
+          </div>
+          
+          {/* Action Buttons */}
+          <div className="flex items-center space-x-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onDownload(resume)}
+              className="h-8 w-8 p-0 sm:h-9 sm:w-9 sm:p-2"
+              title="Download resume"
+            >
+              <Download className="h-3 w-3 sm:h-4 sm:w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onDelete(resume)}
+              className="h-8 w-8 p-0 sm:h-9 sm:w-9 sm:p-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+              title="Delete resume"
+            >
+              <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
+            </Button>
+          </div>
         </div>
       </div>
     </div>

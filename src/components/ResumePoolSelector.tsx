@@ -554,6 +554,9 @@ const ResumePoolSelector: React.FC<ResumePoolSelectorProps> = ({
                                     Text Extracted
                                   </Badge>
                                 )}
+                                <span className="text-xs text-gray-500">
+                                  {resume.upload_source === 'resume_pool' ? 'Company Upload' : 'Direct Application'}
+                                </span>
                               </div>
 
                               {/* Processing Status */}
