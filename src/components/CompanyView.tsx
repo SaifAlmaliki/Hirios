@@ -54,10 +54,15 @@ const JobForm = React.memo(({
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor="company" className="text-sm font-medium text-gray-700">Company Name</Label>
-        <div className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-gray-700">
-          {jobData.company || 'Loading...'}
-        </div>
+        <Label htmlFor="company" className="text-sm font-medium text-gray-700">Company Name *</Label>
+        <Input
+          id="company"
+          name="company"
+          value={jobData.company}
+          onChange={onInputChange}
+          placeholder="Enter company name"
+          className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+        />
       </div>
     </div>
     
@@ -252,7 +257,7 @@ const CompanyView: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!jobData.title || !jobData.department || !jobData.location || !jobData.employment_type || !jobData.description || !jobData.responsibilities || !jobData.requirements) {
+    if (!jobData.title || !jobData.company || !jobData.department || !jobData.location || !jobData.employment_type || !jobData.description || !jobData.responsibilities || !jobData.requirements) {
       toast({
         title: "Error",
         description: "Please fill in all required fields.",
