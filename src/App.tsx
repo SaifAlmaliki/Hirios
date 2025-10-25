@@ -9,6 +9,8 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import SubscriptionGuard from "@/components/SubscriptionGuard";
 import * as Sentry from '@sentry/react';
+import { SpeedInsights } from "@vercel/speed-insights/react";
+import { Analytics } from "@vercel/analytics/react";
 import Index from "./pages/Index";
 import HiriosLanding from "./pages/HiriosLanding";
 import JobPortal from "./pages/JobPortal";
@@ -55,6 +57,8 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
+      <SpeedInsights />
+      <Analytics />
       <BrowserRouter>
         <RouteCleanup />
         <Routes>
