@@ -73,18 +73,18 @@ export default function JoinTeam() {
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-      // Store token in session storage and redirect to auth
-      sessionStorage.setItem("team_invitation_token", token || "");
-      navigate(`/auth?redirect=/join/${token}`);
+      // Store redirect URL in session storage and redirect to auth
+      sessionStorage.setItem("postLoginRedirectUrl", `/join/${token}`);
+      navigate(`/auth`);
       return;
     }
 
     // Check if user's email matches invitation
-    if (user.email !== invitation.invited_email) {
-      toast.error(`This invitation is for ${invitation.invited_email}. Please log in with that email.`);
+    if (user.email !== invitation?.invited_email) {
+      toast.error(`This invitation is for ${invitation?.invited_email}. Please log in with that email.`);
       await supabase.auth.signOut();
-      sessionStorage.setItem("team_invitation_token", token || "");
-      navigate(`/auth?redirect=/join/${token}`);
+      sessionStorage.setItem("postLoginRedirectUrl", `/join/${token}`);
+      navigate(`/auth`);
       return;
     }
 
