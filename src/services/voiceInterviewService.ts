@@ -48,7 +48,7 @@ export class VoiceInterviewService {
       }
 
 
-      // Get screening result details for email
+      // Get screening result details for email (with resume_pool join to get email)
       const { data: screeningResult, error: fetchError } = await supabase
         .from('screening_results')
         .select(`
@@ -61,6 +61,11 @@ export class VoiceInterviewService {
             responsibilities,
             company,
             company_profile_id
+          ),
+          resume_pool:resume_pool_id (
+            first_name,
+            last_name,
+            email
           )
         `)
         .eq('id', screeningResultId)
@@ -68,6 +73,12 @@ export class VoiceInterviewService {
 
       if (fetchError || !screeningResult) {
         throw new Error('Failed to fetch screening result details');
+      }
+
+      // Get candidate data from resume_pool
+      const resumePool = (screeningResult as any).resume_pool;
+      if (!resumePool || !resumePool.email) {
+        throw new Error('Candidate email not found');
       }
 
       // Generate interview link
@@ -81,7 +92,7 @@ export class VoiceInterviewService {
         const { generateVoiceInterviewInviteEmail } = await import('@/services/emailTemplates');
 
         const emailData = {
-          candidate_name: `${screeningResult.first_name} ${screeningResult.last_name}`,
+          candidate_name: `${resumePool.first_name} ${resumePool.last_name}`,
           job_title: job?.title || 'Position',
           company_name: job?.company || 'Unknown Company',
           interview_link: interviewLink,
@@ -90,7 +101,7 @@ export class VoiceInterviewService {
         const { subject, html, text } = generateVoiceInterviewInviteEmail(emailData);
 
         await sendEmailFromCurrentUser({
-          to: screeningResult.email,
+          to: resumePool.email,
           subject,
           html,
           text,
@@ -293,6 +304,12 @@ export class VoiceInterviewService {
             requirements,
             responsibilities,
             company
+          ),
+          resume_pool:resume_pool_id (
+            id,
+            first_name,
+            last_name,
+            resume_text
           )
         `)
         .eq('id', screeningResultId)
@@ -300,6 +317,13 @@ export class VoiceInterviewService {
 
       if (error || !result) {
         console.error('❌ Failed to fetch screening result:', error);
+        return null;
+      }
+
+      // Get candidate data from resume_pool
+      const resumePool = (result as any).resume_pool;
+      if (!resumePool) {
+        console.error('❌ Resume pool data not found');
         return null;
       }
 
@@ -311,44 +335,14 @@ export class VoiceInterviewService {
         return null;
       }
 
-      // Get resume data using the specific application ID
-      // After migration, resume data is accessed via: applications -> resume_pool_id -> resume_pool -> resume_text
-      const { data: application } = await supabase
-        .from('applications')
-        .select(`
-          id,
-          resume_pool_id,
-          resume_pool:resume_pool_id (
-            id,
-            resume_text
-          )
-        `)
-        .eq('id', targetApplicationId)
-        .single();
-
-      if (!application) {
-        console.error('❌ Failed to fetch application data for application ID:', targetApplicationId);
-        return null;
-      }
-
-      if (!application.resume_pool_id) {
-        console.error('❌ Application has no resume_pool_id:', application);
-        return null;
-      }
-
-      if (!(application as any).resume_pool) {
-        console.error('❌ Failed to fetch resume_pool data for resume_pool_id:', application.resume_pool_id);
-        return null;
-      }
-
       const job = result.jobs as any;
       
       const interviewData = {
         job_title: job?.title || 'Position',
-        full_name: `${result.first_name} ${result.last_name}`,
+        full_name: `${resumePool.first_name} ${resumePool.last_name}`,
         job_requirements: job?.requirements || '',
         job_description: `${job?.description || ''}\n\nKey Responsibilities:\n${job?.responsibilities || ''}`,
-        resume: (application as any)?.resume_pool?.resume_text || 'Resume content will be available after database configuration is completed.',
+        resume: resumePool.resume_text || 'Resume content will be available after database configuration is completed.',
         screening_result_id: screeningResultId,
         job_id: result.job_id,
         application_id: targetApplicationId,
@@ -358,7 +352,7 @@ export class VoiceInterviewService {
       console.log('✅ Interview data ready for:', interviewData.full_name);
       console.log('📋 Resume text length:', interviewData.resume.length);
       console.log('🔗 Application ID:', targetApplicationId);
-      console.log('📁 Resume Pool ID:', application.resume_pool_id);
+      console.log('📁 Resume Pool ID:', resumePool.id);
       return interviewData;
 
     } catch (error) {

@@ -155,12 +155,16 @@ const ScreeningResults = () => {
         ? result.job_id === jobId 
         : selectedJobId === 'all' || result.job_id === selectedJobId;
 
-      // Filter by rejection status based on active tab
-      const matchesRejectionStatus = activeTab === 'screened' 
-        ? !result.is_rejected 
-        : result.is_rejected;
+      let matchesTabStatus = false;
+      if (activeTab === 'screened') {
+        matchesTabStatus = !result.is_rejected;
+      } else if (activeTab === 'shortlisted') {
+        matchesTabStatus = result.is_favorite === true && !result.is_rejected;
+      } else if (activeTab === 'rejected') {
+        matchesTabStatus = result.is_rejected === true;
+      }
 
-      return matchesSearch && matchesScore && matchesJob && matchesRejectionStatus;
+      return matchesSearch && matchesScore && matchesJob && matchesTabStatus;
     });
 
     // Sort results by score (highest first by default)
@@ -182,6 +186,13 @@ const ScreeningResults = () => {
       return !result.is_rejected && matchesJob;
     }).length;
 
+    const shortlistedCount = screeningResults.filter(result => {
+      const matchesJob = jobId 
+        ? result.job_id === jobId 
+        : selectedJobId === 'all' || result.job_id === selectedJobId;
+      return result.is_favorite === true && !result.is_rejected && matchesJob;
+    }).length;
+
     const rejectedCount = screeningResults.filter(result => {
       const matchesJob = jobId 
         ? result.job_id === jobId 
@@ -189,7 +200,7 @@ const ScreeningResults = () => {
       return result.is_rejected && matchesJob;
     }).length;
 
-    return { screenedCount, rejectedCount };
+    return { screenedCount, shortlistedCount, rejectedCount };
   }, [screeningResults, jobId, selectedJobId]);
 
   // Redirect if not company user - THIS MUST BE AFTER ALL HOOKS
@@ -220,7 +231,10 @@ const ScreeningResults = () => {
           <div className="text-6xl mb-4">🚫</div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h1>
           <p className="text-gray-600 mb-4">This page is only available for company accounts.</p>
-          <Button onClick={() => navigate('/')}>
+          <Button 
+            onClick={() => navigate('/')}
+            className="mt-4"
+          >
             Go to Landing Page
           </Button>
         </div>
@@ -341,7 +355,7 @@ const ScreeningResults = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      <Navbar title={jobId ? "Screening Results" : "AI Screening Results"} />
+      <Navbar title="Screening Results" />
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 md:py-8 pt-32">
@@ -444,7 +458,7 @@ const ScreeningResults = () => {
                       {...(isSomeSelected ? { 'data-state': 'indeterminate' as any } : {})}
                     />
                     <CardTitle className="text-lg">
-                      {activeTab === 'screened' ? 'Screened' : 'Rejected'} Results ({filteredAndSortedResults.length})
+                      {activeTab === 'screened' ? 'Screened' : activeTab === 'shortlisted' ? 'Shortlisted' : 'Rejected'} Results ({filteredAndSortedResults.length})
                       {selectedResults.size > 0 && (
                         <span className="ml-2 text-sm font-normal text-blue-600">
                           ({selectedResults.size} selected)
@@ -453,6 +467,11 @@ const ScreeningResults = () => {
                     </CardTitle>
                   </div>
                   <div className="flex items-center gap-2">
+                    {jobId && currentJob && (
+                      <div className="text-sm font-medium text-gray-700 mr-2">
+                        {currentJob.title}
+                      </div>
+                    )}
                     {selectedResults.size > 0 && (
                       <Button
                         onClick={() => setShowDeleteDialog(true)}
@@ -477,18 +496,16 @@ const ScreeningResults = () => {
                     )}
                   </div>
                 </div>
-                {jobId && currentJob && (
-                  <div className="text-sm font-medium text-gray-900 sm:hidden">
-                    {currentJob.title}
-                  </div>
-                )}
               </div>
             </CardHeader>
             <CardContent>
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
+                <TabsList className="grid w-full grid-cols-3">
                   <TabsTrigger value="screened">
                     Screened ({tabCounts.screenedCount})
+                  </TabsTrigger>
+                  <TabsTrigger value="shortlisted">
+                    Shortlisted ({tabCounts.shortlistedCount})
                   </TabsTrigger>
                   <TabsTrigger value="rejected">
                     Rejected ({tabCounts.rejectedCount})
@@ -508,6 +525,42 @@ const ScreeningResults = () => {
                       {jobId && (
                         <p className="text-sm text-gray-500 mt-2">
                           Candidates will appear here once they apply and are screened for this position.
+                        </p>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {filteredAndSortedResults.map((result) => (
+                        <ScreeningResultCard
+                          key={result.id}
+                          result={result}
+                          requestingInterview={requestingInterview}
+                          onRequestVoiceScreening={handleRequestVoiceScreening}
+                          expandedRows={expandedRows}
+                          onToggleExpansion={toggleRowExpansion}
+                          showCheckbox={true}
+                          isSelected={selectedResults.has(result.id)}
+                          onSelectionChange={handleSelectionChange}
+                          onCandidateRejected={handleCandidateRejected}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </TabsContent>
+                
+                <TabsContent value="shortlisted" className="mt-4">
+                  {filteredAndSortedResults.length === 0 ? (
+                    <div className="text-center py-8">
+                      <Star className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                      <p className="text-gray-600">
+                        {jobId 
+                          ? `No shortlisted candidates for ${currentJob?.title || 'this position'} yet.`
+                          : 'No shortlisted candidates found matching your criteria.'
+                        }
+                      </p>
+                      {jobId && (
+                        <p className="text-sm text-gray-500 mt-2">
+                          Mark candidates as favorite to add them to the shortlist.
                         </p>
                       )}
                     </div>

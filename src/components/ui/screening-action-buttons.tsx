@@ -53,9 +53,9 @@ export const InviteButton: React.FC<InviteButtonProps> = ({
         onClick={onClick}
         loading={isRequestingInterview}
         active={isVoiceScreeningRequested}
-        text={isRequestingInterview ? "Sending..." : isVoiceScreeningRequested ? "Interview Sent" : "Invite"}
-        shortText={isRequestingInterview ? "..." : isVoiceScreeningRequested ? "Sent" : "Invite"}
-        disabled={isRequestingInterview || isVoiceScreeningRequested}
+        text={isRequestingInterview ? "Sending..." : isVoiceScreeningRequested ? "Resend" : "Invite"}
+        shortText={isRequestingInterview ? "..." : isVoiceScreeningRequested ? "Resend" : "Invite"}
+        disabled={isRequestingInterview}
         className={className}
       />
     </div>
