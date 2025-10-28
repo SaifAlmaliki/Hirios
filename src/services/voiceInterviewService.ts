@@ -322,8 +322,17 @@ export class VoiceInterviewService {
 
       // Get candidate data from resume_pool
       const resumePool = (result as any).resume_pool;
+      console.log('📦 Resume pool data:', resumePool);
+      console.log('📦 Full result:', result);
+      
       if (!resumePool) {
         console.error('❌ Resume pool data not found');
+        console.error('❌ Result object:', result);
+        return null;
+      }
+      
+      if (!resumePool.first_name || !resumePool.last_name) {
+        console.error('❌ Resume pool missing name data:', resumePool);
         return null;
       }
 
