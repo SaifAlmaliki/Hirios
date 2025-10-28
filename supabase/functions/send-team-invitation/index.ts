@@ -116,10 +116,17 @@ serve(async (req) => {
 
     if (invitationError) {
       console.error('Failed to create invitation:', invitationError);
+      
+      // Check if it's a duplicate invitation error
+      const isDuplicate = invitationError.code === '23505';
+      const errorMessage = isDuplicate 
+        ? `This email already has a pending invitation. Please ask them to check their inbox or delete the existing invitation first.`
+        : 'Failed to create invitation. Please try again.';
+      
       return new Response(
         JSON.stringify({
           success: false,
-          message: 'Failed to create invitation. This email may already be invited.',
+          message: errorMessage,
         }),
         {
           status: 400,
