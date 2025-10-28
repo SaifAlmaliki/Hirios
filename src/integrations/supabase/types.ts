@@ -175,12 +175,14 @@ export type Database = {
           company_size: string | null
           company_website: string | null
           created_at: string | null
+          email: string | null
           id: string
           industry: string | null
           jobs_posted_this_month: number | null
           last_job_count_reset: string | null
           logo_url: string | null
           phone: string | null
+          role: string
           smtp_from_email: string | null
           smtp_from_name: string | null
           smtp_host: string | null
@@ -202,12 +204,14 @@ export type Database = {
           company_size?: string | null
           company_website?: string | null
           created_at?: string | null
+          email?: string | null
           id?: string
           industry?: string | null
           jobs_posted_this_month?: number | null
           last_job_count_reset?: string | null
           logo_url?: string | null
           phone?: string | null
+          role?: string
           smtp_from_email?: string | null
           smtp_from_name?: string | null
           smtp_host?: string | null
@@ -229,12 +233,14 @@ export type Database = {
           company_size?: string | null
           company_website?: string | null
           created_at?: string | null
+          email?: string | null
           id?: string
           industry?: string | null
           jobs_posted_this_month?: number | null
           last_job_count_reset?: string | null
           logo_url?: string | null
           phone?: string | null
+          role?: string
           smtp_from_email?: string | null
           smtp_from_name?: string | null
           smtp_host?: string | null
@@ -821,12 +827,54 @@ export type Database = {
           },
         ]
       }
+      team_invitations: {
+        Row: {
+          company_profile_id: string
+          created_at: string
+          id: string
+          invited_by: string
+          invited_email: string
+          token: string
+          used: boolean
+        }
+        Insert: {
+          company_profile_id: string
+          created_at?: string
+          id?: string
+          invited_by: string
+          invited_email: string
+          token?: string
+          used?: boolean
+        }
+        Update: {
+          company_profile_id?: string
+          created_at?: string
+          id?: string
+          invited_by?: string
+          invited_email?: string
+          token?: string
+          used?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_invitations_company_profile_id_fkey"
+            columns: ["company_profile_id"]
+            isOneToOne: false
+            referencedRelation: "company_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
       accept_job_invitation: {
+        Args: { invitation_token: string }
+        Returns: Json
+      }
+      accept_team_invitation: {
         Args: { invitation_token: string }
         Returns: Json
       }

@@ -16,6 +16,8 @@ export interface CompanyProfile {
   subscription_plan?: string;
   jobs_posted_this_month?: number;
   last_job_count_reset?: string;
+  role: string;
+  email?: string;
   created_at: string;
   updated_at: string;
 }
