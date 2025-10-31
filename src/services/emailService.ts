@@ -69,14 +69,27 @@ export async function getCompanyEmailConfig(companyId: string): Promise<EmailCon
  * Get email configuration by user ID
  */
 export async function getCompanyEmailConfigByUserId(userId: string): Promise<EmailConfig | null> {
+  // Get user's company membership to find company_profile_id
+  const { data: membership, error: membershipError } = await supabase
+    .from('company_members')
+    .select('company_profile_id')
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  if (membershipError || !membership) {
+    console.error('Failed to fetch company membership by user ID:', membershipError);
+    return null;
+  }
+
+  // Get email config from company profile
   const { data, error } = await supabase
     .from('company_profiles')
     .select('smtp_host, smtp_port, smtp_user, smtp_password, smtp_from_email, smtp_from_name, smtp_secure')
-    .eq('user_id', userId)
+    .eq('id', membership.company_profile_id)
     .single();
 
   if (error || !data) {
-    console.error('Failed to fetch email config by user ID:', error);
+    console.error('Failed to fetch email config by company profile ID:', error);
     return null;
   }
 

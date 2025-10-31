@@ -35,6 +35,8 @@ import { VoiceInterviewService } from "./services/voiceInterviewService";
 import OfferDownload from "./pages/OfferDownload";
 import TestRoute from "./pages/TestRoute";
 import PublicJobApplication from "./pages/PublicJobApplication";
+import TeamManagement from "./pages/TeamManagement";
+import JoinTeam from "./pages/JoinTeam";
 
 const queryClient = new QueryClient();
 
@@ -79,6 +81,7 @@ const App = () => (
           <Route path="/download-offer/:id" element={<OfferDownload />} />
           <Route path="/test-route/:id" element={<TestRoute />} />
           <Route path="/apply/:jobId" element={<PublicJobApplication />} />
+          <Route path="/join/:token" element={<JoinTeam />} />
           
           {/* Routes that need AuthProvider context */}
           <Route path="/*" element={
@@ -95,6 +98,7 @@ const App = () => (
                   <Route path="/test-collaboration" element={<TestCollaboration />} />
                   <Route path="/button-demo" element={<ButtonAlignmentDemo />} />
                   <Route path="/resume-pool" element={<ResumePool />} />
+                  <Route path="/team-management" element={<TeamManagement />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </SubscriptionGuard>

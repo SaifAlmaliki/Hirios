@@ -87,12 +87,15 @@ const InviteAccept: React.FC = () => {
         return;
       }
 
-      // Get the inviter company details
-      const { data: inviterData, error: inviterError } = await supabase
-        .from('company_profiles')
-        .select('company_name')
+      // Get the inviter company details via membership
+      const { data: membership, error: membershipError } = await supabase
+        .from('company_members')
+        .select('company_profile_id, company_profiles(company_name)')
         .eq('user_id', invitationData.invited_by)
-        .single();
+        .maybeSingle();
+
+      const inviterData = membership?.company_profiles ? { company_name: membership.company_profiles.company_name } : null;
+      const inviterError = membershipError;
 
       if (inviterError) {
         console.error('❌ Error fetching inviter details:', inviterError);

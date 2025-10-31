@@ -150,12 +150,17 @@ export const useCreateInterviewSchedule = () => {
 
       if (participantsError) throw participantsError;
 
-      // 5. Get company profile for recruiter name and ID for SMTP config
-      const { data: companyProfile } = await supabase
-        .from('company_profiles')
-        .select('id, company_name')
+      // 5. Get company profile for recruiter name and ID for SMTP config via membership
+      const { data: membership } = await supabase
+        .from('company_members')
+        .select('company_profile_id, company_profiles(id, company_name)')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
+
+      const companyProfile = membership?.company_profiles ? {
+        id: membership.company_profiles.id,
+        company_name: membership.company_profiles.company_name
+      } : null;
 
       // 6. Get application details for candidate name
       const { data: application } = await supabase
@@ -259,11 +264,9 @@ export const useCreateInterviewSchedule = () => {
       for (const participant of data.participants) {
         try {
           // Check if user exists with this email
-          const { data: existingUser } = await supabase
-            .from('company_profiles')
-            .select('user_id')
-            .eq('user_id', user.id) // This is a placeholder - we'd need to query by email
-            .single();
+          // Note: This is a simplified check - we'd need to query auth.users by email
+          // For now, we'll skip this check as we can't easily query auth.users from client
+          const existingUser = null; // Placeholder - would need backend function to check by email
 
           if (existingUser) {
             await supabase

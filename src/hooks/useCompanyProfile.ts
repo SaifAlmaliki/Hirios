@@ -4,7 +4,6 @@ import { useAuth } from '@/contexts/AuthContext';
 
 export interface CompanyProfile {
   id: string;
-  user_id: string;
   company_name: string;
   company_description?: string;
   company_website?: string;
@@ -16,8 +15,16 @@ export interface CompanyProfile {
   subscription_plan?: string;
   jobs_posted_this_month?: number;
   last_job_count_reset?: string;
+  email?: string;
   created_at: string;
   updated_at: string;
+}
+
+export interface CompanyMembership {
+  company_profile_id: string;
+  user_id: string;
+  role: 'owner' | 'member';
+  created_at: string;
 }
 
 export const useCompanyProfile = () => {
@@ -34,24 +41,32 @@ export const useCompanyProfile = () => {
       console.log('🏢 Fetching company profile...');
       
       try {
-        const { data, error } = await supabase
-          .from('company_profiles')
-          .select('*')
+        // Get user's company membership to find their company_profile_id
+        // Use .limit(1) to handle duplicates (take first one)
+        const { data: memberships, error: membershipError } = await supabase
+          .from('company_members')
+          .select('company_profile_id, role, company_profiles(*)')
           .eq('user_id', user.id)
-          .maybeSingle();
+          .limit(1);
 
-        if (error) {
-          console.error('❌ Error fetching company profile:', error);
+        if (membershipError) {
+          console.error('❌ Error fetching company membership:', membershipError);
           return null;
         }
 
-        if (!data) {
+        if (!memberships || memberships.length === 0 || !memberships[0].company_profiles) {
           console.warn('⚠️ No company profile found for user');
           return null;
         }
+
+        // If there are duplicates, warn but use the first one
+        if (memberships.length > 1) {
+          console.warn('⚠️ Multiple company memberships found, using first one');
+        }
         
-        console.log('✅ Company profile loaded:', data.company_name);
-        return data as CompanyProfile;
+        const profile = memberships[0].company_profiles as CompanyProfile;
+        console.log('✅ Company profile loaded:', profile.company_name);
+        return profile;
       } catch (error) {
         console.error('❌ Unexpected error in useCompanyProfile:', error);
         return null;

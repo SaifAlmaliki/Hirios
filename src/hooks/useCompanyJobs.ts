@@ -18,20 +18,20 @@ export const useCompanyJobs = () => {
       console.log('🏢 Fetching company jobs...');
       
       try {
-        // Get company profile first
-        const { data: profile, error: profileError } = await supabase
-          .from('company_profiles')
-          .select('id')
+        // Get user's company membership to find their company_profile_id
+        const { data: membership, error: membershipError } = await supabase
+          .from('company_members')
+          .select('company_profile_id')
           .eq('user_id', user.id)
-          .maybeSingle(); // Use maybeSingle instead of single to handle no rows gracefully
+          .maybeSingle();
 
-        if (profileError) {
-          console.warn('⚠️ Error fetching company profile:', profileError.message);
+        if (membershipError) {
+          console.warn('⚠️ Error fetching company membership:', membershipError.message);
           return [];
         }
 
-        if (!profile) {
-          console.warn('⚠️ No company profile found for user - user may need to complete company setup');
+        if (!membership) {
+          console.warn('⚠️ No company membership found for user - user may need to complete company setup');
           return [];
         }
 
@@ -39,7 +39,7 @@ export const useCompanyJobs = () => {
         const { data, error } = await supabase
           .from('jobs')
           .select('*')
-          .eq('company_profile_id', profile.id)
+          .eq('company_profile_id', membership.company_profile_id)
           .order('created_at', { ascending: false });
         
         if (error) {

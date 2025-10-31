@@ -3,11 +3,12 @@
 import * as React from "react"
 import { useState, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Menu, X, Building2, Settings, Brain, LogOut, FileText, Clock } from "lucide-react"
+import { Menu, X, Building2, Settings, Brain, LogOut, FileText, Clock, Users } from "lucide-react"
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSubscriptionStatus } from '@/hooks/useSubscriptionStatus';
 import { useCompanyProfile } from '@/hooks/useCompanyProfile';
+import { useTeamManagement } from '@/hooks/useTeamManagement';
 import {
   Tooltip,
   TooltipContent,
@@ -32,6 +33,7 @@ const Navbar1: React.FC<Navbar1Props> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false)
   const { user, signOut, loading } = useAuth();
+  const { isOwner } = useTeamManagement();
   const navigate = useNavigate();
   const location = useLocation();
   const subscriptionStatus = useSubscriptionStatus();
@@ -49,6 +51,8 @@ const Navbar1: React.FC<Navbar1Props> = ({
       return 'ai-screening';
     } else if (path.startsWith('/company-setup')) {
       return 'setup';
+    } else if (path.startsWith('/team-management')) {
+      return 'team';
     }
     
     // Default to talent-pool for root or unknown routes
@@ -78,6 +82,10 @@ const Navbar1: React.FC<Navbar1Props> = ({
     setIsOpen(false);
   };
 
+  const handleTeamManagement = () => {
+    navigate('/team-management');
+    setIsOpen(false);
+  };
 
   const handleSignIn = () => {
     navigate('/auth');
@@ -322,13 +330,26 @@ const Navbar1: React.FC<Navbar1Props> = ({
                 </button>
               </motion.div>
 
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.15 }}
-                whileHover={{ scale: 1.05 }}
-              >
-              </motion.div>
+              {isOwner && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.175 }}
+                  whileHover={{ scale: 1.05 }}
+                >
+                  <button
+                    onClick={handleTeamManagement}
+                    className={`flex items-center px-2 py-1 text-sm font-medium rounded-full transition-colors ${
+                      activeRoute === 'team' 
+                        ? 'text-blue-600 bg-blue-50' 
+                        : 'text-gray-900 hover:text-blue-600 hover:bg-blue-50'
+                    }`}
+                  >
+                    <Users className="h-4 w-4 mr-1" />
+                    Team
+                  </button>
+                </motion.div>
+              )}
 
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
@@ -480,6 +501,19 @@ const Navbar1: React.FC<Navbar1Props> = ({
                     transition={{ delay: 0.35 }}
                     exit={{ opacity: 0, x: 20 }}
                   >
+                    {isOwner && (
+                      <button
+                        onClick={handleTeamManagement}
+                        className={`flex items-center w-full text-base font-medium py-3 rounded-lg transition-colors ${
+                          activeRoute === 'team' 
+                            ? 'text-blue-600 bg-blue-50' 
+                            : 'text-gray-900 hover:bg-gray-50'
+                        }`}
+                      >
+                        <Users className="h-5 w-5 mr-3" />
+                        Team
+                      </button>
+                    )}
                   </motion.div>
 
                   <motion.div
