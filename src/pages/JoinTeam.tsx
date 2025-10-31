@@ -1,10 +1,11 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, CheckCircle, XCircle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface AcceptInvitationResponse {
   success: boolean;
@@ -28,10 +29,12 @@ interface TeamInvitation {
 export default function JoinTeam() {
   const { token } = useParams<{ token: string }>();
   const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [invitation, setInvitation] = useState<TeamInvitation | null>(null);
   const [companyName, setCompanyName] = useState("");
   const [error, setError] = useState("");
+  const hasAttemptedAutoAccept = useRef(false);
 
   const fetchInvitation = useCallback(async () => {
     try {
@@ -78,10 +81,47 @@ export default function JoinTeam() {
     fetchInvitation();
   }, [token, fetchInvitation]);
 
+  // Auto-accept invitation if user is logged in and email matches
+  useEffect(() => {
+    const checkAndAccept = async () => {
+      // Don't run if still loading auth or invitation, or if we already attempted
+      if (authLoading || isLoading || !invitation || hasAttemptedAutoAccept.current) return;
+
+      // Wait a bit for auth state to settle if user just logged in
+      if (user && user.email === invitation.invited_email && !hasAttemptedAutoAccept.current) {
+        hasAttemptedAutoAccept.current = true;
+        
+        try {
+          setIsLoading(true);
+          const { data, error } = await supabase.rpc("accept_team_invitation", {
+            invitation_token: token,
+          });
+
+          if (error) throw error;
+
+          const response = data as unknown as AcceptInvitationResponse;
+
+          if (response && response.success) {
+            toast.success("Welcome to the team! 🎉");
+            navigate("/job-portal");
+          } else {
+            setError(response?.error || "Failed to accept invitation");
+            setIsLoading(false);
+          }
+        } catch (err: unknown) {
+          const errorMessage = err instanceof Error ? err.message : "Failed to accept invitation";
+          console.error("Error auto-accepting invitation:", err);
+          setError(errorMessage);
+          setIsLoading(false);
+        }
+      }
+    };
+
+    checkAndAccept();
+  }, [invitation, token, navigate, user, authLoading, isLoading]);
+
   const handleAcceptInvitation = async () => {
     // Check if user is logged in
-    const { data: { user } } = await supabase.auth.getUser();
-
     if (!user) {
       // Store redirect URL in session storage and redirect to auth
       sessionStorage.setItem("postLoginRedirectUrl", `/join/${token}`);
@@ -224,6 +264,13 @@ export default function JoinTeam() {
           <p className="text-xs text-center text-gray-500">
             By accepting, you'll be added to the {companyName} team
           </p>
+          
+          {!user && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-800">
+              <p className="font-medium mb-1">Don't have an account?</p>
+              <p>You can sign up with the email <strong>{invitation?.invited_email}</strong> to accept this invitation. No separate company setup needed!</p>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
