@@ -13,8 +13,9 @@ const SubscriptionGuard: React.FC<SubscriptionGuardProps> = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Allow access to auth pages even when subscription is expired
+  // Allow access to auth pages and invitation pages even when subscription is expired
   const isAuthPage = location.pathname.startsWith('/auth');
+  const isJoinPage = location.pathname.startsWith('/join/');
 
   // Show loading state
   if (loading) {
@@ -25,8 +26,9 @@ const SubscriptionGuard: React.FC<SubscriptionGuardProps> = ({ children }) => {
     );
   }
 
-  // If user is logged in but subscription is not active and not on auth page
-  if (user && !subscriptionActive && !isAuthPage) {
+  // If user is logged in but subscription is not active and not on auth/join page
+  // Note: Users accepting invitations might not have membership yet, so we allow join pages
+  if (user && !subscriptionActive && !isAuthPage && !isJoinPage) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50 p-4">
         <motion.div

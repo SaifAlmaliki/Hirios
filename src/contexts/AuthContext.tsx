@@ -50,6 +50,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Check subscription status and start trial if needed
   const checkSubscriptionStatus = async (userId: string) => {
     try {
+      // Check if user has a pending invitation (they might not have membership yet)
+      const { data: userData } = await supabase.auth.getUser();
+      if (userData?.user?.email) {
+        const { data: pendingInvitation } = await supabase
+          .from('team_invitations')
+          .select('id')
+          .eq('invited_email', userData.user.email)
+          .eq('used', false)
+          .limit(1)
+          .single();
+
+        // If user has pending invitation, allow access (they're in the invitation flow)
+        if (pendingInvitation) {
+          setSubscriptionActive(true);
+          setSubscriptionError(null);
+          return;
+        }
+      }
+
       // Start trial if needed (on first login)
       const { error: startTrialError } = await supabase.rpc('start_trial_if_needed', {
         p_user_id: userId
@@ -66,6 +85,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (checkError) {
         console.error('[AuthContext] Error checking subscription status:', checkError);
+        // If error is "no membership found", allow access (user might be accepting invitation)
+        if (checkError.message?.includes('membership') || checkError.code === 'PGRST116') {
+          setSubscriptionActive(true);
+          setSubscriptionError(null);
+          return;
+        }
         setSubscriptionActive(true); // Default to allow access on error
         setSubscriptionError(null);
         return;
