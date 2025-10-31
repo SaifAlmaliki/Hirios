@@ -26,25 +26,41 @@ CREATE INDEX IF NOT EXISTS idx_company_profiles_subscription_expires_at
   TABLESPACE pg_default;
 
 -- Function to start trial on first login
+-- Note: Uses company_members to find company profile (no user_id in company_profiles)
 CREATE OR REPLACE FUNCTION public.start_trial_if_needed(p_user_id uuid)
 RETURNS void
 LANGUAGE plpgsql
 SECURITY DEFINER
 AS $$
+DECLARE
+  v_company_profile_id uuid;
 BEGIN
+  -- Get the user's company profile ID from company_members
+  SELECT company_profile_id INTO v_company_profile_id
+  FROM public.company_members
+  WHERE user_id = p_user_id
+  LIMIT 1;
+
+  -- If no membership found, return (user might not have a company yet)
+  IF v_company_profile_id IS NULL THEN
+    RETURN;
+  END IF;
+
+  -- Update the company profile
   UPDATE public.company_profiles
   SET 
     trial_started_at = NOW(),
     trial_expires_at = NOW() + INTERVAL '7 days',
     subscription_plan = 'trial'
   WHERE 
-    user_id = p_user_id 
+    id = v_company_profile_id
     AND trial_started_at IS NULL
     AND subscription_plan = 'trial';
 END;
 $$;
 
 -- Function to check if subscription is active
+-- Note: Uses company_members to find company profile (no user_id in company_profiles)
 CREATE OR REPLACE FUNCTION public.is_subscription_active(p_user_id uuid)
 RETURNS boolean
 LANGUAGE plpgsql
@@ -52,14 +68,27 @@ SECURITY DEFINER
 AS $$
 DECLARE
   v_profile RECORD;
+  v_company_profile_id uuid;
 BEGIN
+  -- Get the user's company profile ID from company_members
+  SELECT company_profile_id INTO v_company_profile_id
+  FROM public.company_members
+  WHERE user_id = p_user_id
+  LIMIT 1;
+
+  -- If no membership found, return false
+  IF v_company_profile_id IS NULL THEN
+    RETURN false;
+  END IF;
+
+  -- Get subscription details
   SELECT 
     subscription_plan,
     trial_expires_at,
     subscription_expires_at
   INTO v_profile
   FROM public.company_profiles
-  WHERE user_id = p_user_id;
+  WHERE id = v_company_profile_id;
 
   IF NOT FOUND THEN
     RETURN false;
