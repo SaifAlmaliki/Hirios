@@ -125,19 +125,32 @@ export const useTeamManagement = () => {
         return [];
       }
 
+      // Query invitations - RLS will only return ones where invited_by = auth.uid()
+      // Then filter by company_profile_id in JavaScript
       const { data, error } = await supabase
         .from("team_invitations")
         .select("*")
-        .eq("company_profile_id", currentProfile.id)
         .eq("used", false)
         .order("created_at", { ascending: false });
 
       if (error) {
-        // Don't throw - return empty array on error to prevent blocking
+        // Log the error for debugging
+        console.error("[useTeamManagement] Error fetching pending invitations:", error);
+        // Check if it's a permission error
+        if (error.code === 'PGRST301' || error.code === '42501' || error.message?.includes('permission')) {
+          console.warn("[useTeamManagement] Permission denied - user may not be owner or RLS policy issue");
+        }
+        // Don't throw - return empty array on error to prevent blocking UI
         return [];
       }
       
-      return (data || []) as TeamInvitation[];
+      // Filter by company_profile_id in JavaScript after RLS has filtered by invited_by
+      const filtered = (data || []).filter(
+        (invitation) => invitation.company_profile_id === currentProfile.id
+      ) as TeamInvitation[];
+      
+      console.log("[useTeamManagement] Fetched invitations:", filtered);
+      return filtered;
     },
     // Only enable query when: profile loaded, profile has id, and user is owner
     enabled: !isLoadingProfile && !!currentProfile?.id && currentProfile?.role === "owner",
@@ -200,7 +213,9 @@ export const useTeamManagement = () => {
     },
     onSuccess: () => {
       toast.success("Invitation sent successfully!");
+      // Invalidate and refetch pending invitations immediately
       queryClient.invalidateQueries({ queryKey: ["pendingInvitations"] });
+      queryClient.refetchQueries({ queryKey: ["pendingInvitations"] });
     },
     onError: (error: Error) => {
       toast.error(error.message || "Failed to send invitation");
