@@ -165,7 +165,7 @@ Hirios offers three deployment tiers designed for different company sizes and re
 
 #### 🚀 SAAS PLATFORM - $399/month (Annual)
 **Perfect for: Mid-size companies wanting instant AI recruitment**
-• Instant Deployment - Start same day with 7-day free trial
+• Instant Deployment - Start same day with 14-day free trial
 • Shared Infrastructure - Cost-effective, fully managed cloud platform
 • Complete Data Isolation - Your company data never exposed to others
 • All Features Included - Full access to AI screening, voice interviews, talent pool
@@ -192,7 +192,7 @@ Hirios offers three deployment tiers designed for different company sizes and re
 ✓ **Cloud-Native Architecture** - Built on AWS/Supabase for infinite scalability
 ✓ **Enterprise Security** - SOC 2 compliance, data encryption, secure access controls
 ✓ **Complete Feature Access** - All AI recruitment features in every tier
-✓ **7-Day Free Trial** - Test the platform risk-free before committing
+✓ **14-Day Free Trial** - Test the platform risk-free before committing
 ✓ **Email Support** - Professional support at support@hirios.com
 ✓ **Annual Billing Discount** - Save with yearly subscriptions
 ✓ **No Hidden Costs** - Transparent pricing with all features included

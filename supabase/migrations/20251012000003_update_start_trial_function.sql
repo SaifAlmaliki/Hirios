@@ -19,5 +19,5 @@ END;
 $$;
 
 COMMENT ON FUNCTION public.start_trial_if_needed(uuid) IS 
-  'Starts 7-day trial on first login for trial users who haven''t started trial yet';
+  'Starts 14-day trial on first login for trial users who haven''t started trial yet';
 

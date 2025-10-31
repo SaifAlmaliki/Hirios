@@ -4,7 +4,7 @@ CREATE OR REPLACE FUNCTION "public"."create_company_profile_for_user"() RETURNS 
     AS $$
 BEGIN
   -- Create company profile for all new users (B2B platform)
-  -- New users start with 'trial' plan (7 days free)
+  -- New users start with 'trial' plan (14 days free)
   INSERT INTO public.company_profiles (
     user_id, 
     company_name, 

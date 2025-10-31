@@ -6,7 +6,7 @@ ALTER TABLE public.company_profiles
 
 -- Update subscription_plan to allow 'trial' and 'paid' values only
 COMMENT ON COLUMN public.company_profiles.subscription_plan IS 
-  'Subscription plan: trial (7 days free trial), paid (yearly subscription)';
+  'Subscription plan: trial (14 days free trial), paid (yearly subscription)';
 
 -- Update default subscription plan for new users to 'trial'
 ALTER TABLE public.company_profiles 
@@ -80,7 +80,7 @@ END;
 $$;
 
 COMMENT ON FUNCTION public.start_trial_if_needed(uuid) IS 
-  'Starts 7-day trial on first login for trial users';
+  'Starts 14-day trial on first login for trial users';
 
 COMMENT ON FUNCTION public.is_subscription_active(uuid) IS 
   'Checks if user subscription (trial or paid) is currently active';
