@@ -36,13 +36,15 @@ export const useCompanySetup = () => {
     if (!user) return;
 
     const checkProfile = async () => {
-      const { data } = await supabase
-        .from('company_profiles')
-        .select('*')
+      // Get user's company membership to find their company profile
+      const { data: membership } = await supabase
+        .from('company_members')
+        .select('company_profile_id, company_profiles(*)')
         .eq('user_id', user.id)
         .maybeSingle();
       
-      if (data) {
+      if (membership && membership.company_profiles) {
+        const data = membership.company_profiles as any;
         setHasProfile(true);
         // Only update companyData if we don't have localStorage data or unsaved changes
         if (!hasLocalStorageData && !hasUnsavedChanges) {
@@ -65,39 +67,10 @@ export const useCompanySetup = () => {
           });
         }
       } else {
-        // If no profile exists, create a basic one
-        const { data: newProfile, error } = await supabase
-          .from('company_profiles')
-          .insert([{
-            user_id: user.id,
-            company_name: 'My Company',
-            subscription_plan: 'trial'
-          }])
-          .select()
-          .single();
-        
-        if (newProfile && !error) {
-          setHasProfile(true);
-          if (!hasLocalStorageData) {
-            setCompanyData({
-              company_name: newProfile.company_name || '',
-              company_description: newProfile.company_description || '',
-              company_website: newProfile.company_website || '',
-              company_size: newProfile.company_size || '',
-              industry: newProfile.industry || '',
-              address: newProfile.address || '',
-              phone: newProfile.phone || '',
-              logo_url: newProfile.logo_url || '',
-              smtp_host: '',
-              smtp_port: 587,
-              smtp_user: '',
-              smtp_password: '',
-              smtp_from_email: '',
-              smtp_from_name: '',
-              smtp_secure: true,
-            });
-          }
-        }
+        // If no profile exists, the trigger should have created it
+        // But if for some reason it didn't, we'll let the user proceed
+        // The profile will be created when they save
+        setHasProfile(false);
       }
     };
 
@@ -188,27 +161,22 @@ export const useCompanySetup = () => {
         logo_url: companyData.logo_url,
       };
 
-      const { data: existingProfile } = await supabase
-        .from('company_profiles')
-        .select('id')
+      // Get user's company membership to find company_profile_id
+      const { data: membership } = await supabase
+        .from('company_members')
+        .select('company_profile_id')
         .eq('user_id', user!.id)
         .maybeSingle();
 
-      let error;
-      if (existingProfile) {
-        const { error: updateError } = await supabase
-          .from('company_profiles')
-          .update(companyFields)
-          .eq('user_id', user!.id);
-        error = updateError;
-        setHasProfile(true);
-      } else {
-        const { error: insertError } = await supabase
-          .from('company_profiles')
-          .insert([{ ...companyFields, user_id: user!.id }]);
-        error = insertError;
-        if (!error) setHasProfile(true);
+      if (!membership) {
+        throw new Error('Company membership not found. Please contact support.');
       }
+
+      // Update the company profile
+      const { error } = await supabase
+        .from('company_profiles')
+        .update(companyFields)
+        .eq('id', membership.company_profile_id);
 
       if (error) {
         toast({
@@ -252,27 +220,22 @@ export const useCompanySetup = () => {
         smtp_secure: companyData.smtp_secure,
       };
 
-      const { data: existingProfile } = await supabase
-        .from('company_profiles')
-        .select('id')
+      // Get user's company membership to find company_profile_id
+      const { data: membership } = await supabase
+        .from('company_members')
+        .select('company_profile_id')
         .eq('user_id', user!.id)
         .maybeSingle();
 
-      let error;
-      if (existingProfile) {
-        const { error: updateError } = await supabase
-          .from('company_profiles')
-          .update(smtpFields)
-          .eq('user_id', user!.id);
-        error = updateError;
-        setHasProfile(true);
-      } else {
-        const { error: insertError } = await supabase
-          .from('company_profiles')
-          .insert([{ ...smtpFields, user_id: user!.id, company_name: 'My Company' }]);
-        error = insertError;
-        if (!error) setHasProfile(true);
+      if (!membership) {
+        throw new Error('Company membership not found. Please contact support.');
       }
+
+      // Update the company profile
+      const { error } = await supabase
+        .from('company_profiles')
+        .update(smtpFields)
+        .eq('id', membership.company_profile_id);
 
       if (error) {
         toast({

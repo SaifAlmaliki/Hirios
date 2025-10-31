@@ -59,15 +59,18 @@ export const useJobCollaborators = (jobId: string) => {
       // Get company details for each collaborator
       const collaboratorsWithDetails = await Promise.all(
         data.map(async (collaborator) => {
-          const { data: companyData } = await supabase
-            .from('company_profiles')
-            .select('company_name')
+          // Get company profile via membership
+          const { data: membership } = await supabase
+            .from('company_members')
+            .select('company_profile_id, company_profiles(company_name)')
             .eq('user_id', collaborator.user_id)
-            .single();
+            .maybeSingle();
+
+          const companyName = membership?.company_profiles?.company_name || 'Unknown Company';
 
           return {
             ...collaborator,
-            company_profiles: companyData || { company_name: 'Unknown Company' }
+            company_profiles: { company_name: companyName }
           };
         })
       );
@@ -93,12 +96,7 @@ export const useInviteCollaborator = () => {
       // Check if user has permission to invite to this job
       const { data: job, error: jobError } = await supabase
         .from('jobs')
-        .select(`
-          *,
-          company_profiles!inner (
-            user_id
-          )
-        `)
+        .select('id, company_profile_id')
         .eq('id', jobId)
         .single();
 
@@ -106,7 +104,15 @@ export const useInviteCollaborator = () => {
         throw new Error('Job not found');
       }
 
-      if (job.company_profiles.user_id !== user.id) {
+      // Check if user is a member of the company that owns this job
+      const { data: membership } = await supabase
+        .from('company_members')
+        .select('company_profile_id')
+        .eq('user_id', user.id)
+        .eq('company_profile_id', job.company_profile_id)
+        .maybeSingle();
+
+      if (!membership) {
         throw new Error('You do not have permission to invite collaborators to this job');
       }
 
@@ -265,12 +271,15 @@ const sendInvitationEmail = async (invitation: JobInvitation) => {
       return;
     }
 
-    // Get inviter details
-    const { data: inviter, error: inviterError } = await supabase
-      .from('company_profiles')
-      .select('company_name')
+    // Get inviter details via membership
+    const { data: membership, error: membershipError } = await supabase
+      .from('company_members')
+      .select('company_profile_id, company_profiles(company_name)')
       .eq('user_id', invitation.invited_by)
-      .single();
+      .maybeSingle();
+
+    const inviter = membership?.company_profiles ? { company_name: membership.company_profiles.company_name } : null;
+    const inviterError = membershipError;
 
     if (inviterError || !inviter) {
       console.error('Error fetching inviter details for email:', inviterError);

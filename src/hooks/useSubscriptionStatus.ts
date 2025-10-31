@@ -34,10 +34,35 @@ export const useSubscriptionStatus = () => {
     }
 
     try {
+      // Get user's company membership to find company_profile_id
+      // Use .limit(1) to handle duplicates (take first one)
+      const { data: memberships, error: membershipError } = await supabase
+        .from('company_members')
+        .select('company_profile_id')
+        .eq('user_id', user.id)
+        .limit(1);
+
+      if (membershipError || !memberships || memberships.length === 0) {
+        console.error('[useSubscriptionStatus] Error fetching membership:', membershipError);
+        setStatus({
+          plan: 'trial',
+          isActive: true,
+          daysRemaining: null,
+          expiresAt: null,
+          loading: false,
+        });
+        return;
+      }
+
+      // If there are duplicates, warn but use the first one
+      if (memberships.length > 1) {
+        console.warn('[useSubscriptionStatus] Multiple company memberships found, using first one');
+      }
+
       const { data: profile, error } = await supabase
         .from('company_profiles')
         .select('subscription_plan, trial_started_at, trial_expires_at, subscription_expires_at')
-        .eq('user_id', user.id)
+        .eq('id', memberships[0].company_profile_id)
         .maybeSingle();
 
       if (error) {

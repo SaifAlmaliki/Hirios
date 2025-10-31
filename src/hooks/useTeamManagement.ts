@@ -8,23 +8,30 @@ export const useTeamManagement = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  // Get current user's company profile with role
-  const { data: currentProfile, isLoading: isLoadingProfile } = useQuery({
-    queryKey: ["currentCompanyProfile", user?.id],
+  // Get current user's company membership with profile
+  const { data: currentMembership, isLoading: isLoadingProfile } = useQuery({
+    queryKey: ["currentCompanyMembership", user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
 
       const { data, error } = await supabase
-        .from("company_profiles")
-        .select("*")
+        .from("company_members")
+        .select("company_profile_id, role, company_profiles(*)")
         .eq("user_id", user.id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
-      return data;
+      if (!data || !data.company_profiles) return null;
+      
+      return {
+        ...data.company_profiles,
+        role: data.role,
+      };
     },
     enabled: !!user?.id,
   });
+  
+  const currentProfile = currentMembership;
 
   // Get all team members for the company
   const { data: teamMembers, isLoading: isLoadingMembers } = useQuery({
@@ -32,21 +39,43 @@ export const useTeamManagement = () => {
     queryFn: async () => {
       if (!currentProfile?.id) return [];
 
-      // Get all company profiles with the same company_name
-      const { data: profiles, error: profilesError } = await supabase
-        .from("company_profiles")
-        .select("id, user_id, company_name, role, created_at, email")
-        .eq("company_name", currentProfile.company_name);
+      // Get all company members for this company profile
+      const { data: members, error: membersError } = await supabase
+        .from("company_members")
+        .select("user_id, role, created_at")
+        .eq("company_profile_id", currentProfile.id);
 
-      if (profilesError) throw profilesError;
-      if (!profiles) return [];
+      if (membersError) throw membersError;
+      if (!members) return [];
 
-      // Map profiles to team members with proper type casting
-      const membersWithEmails: TeamMember[] = profiles.map((profile) => ({
-        ...profile,
-        role: profile.role as 'owner' | 'member',
-        email: profile.email || "Unknown",
-      }));
+      // Get user emails - we'll need to fetch from auth or use admin API
+      // For now, we'll try to get emails from company_profiles.email if available
+      // or fetch user data if RLS allows
+      const memberIds = members.map(m => m.user_id);
+      
+      // Map members to team member format
+      // Note: Email fetching from auth.users may require admin privileges
+      // We'll set email as optional/unknown for now and can enhance later
+      const membersWithEmails: TeamMember[] = await Promise.all(
+        members.map(async (member) => {
+          // Try to get email from a user lookup if possible
+          // This is a simplified version - you may need to enhance based on your auth setup
+          let email = "Unknown";
+          
+          // If we can access user metadata or have email stored elsewhere, use that
+          // For now, we'll return with "Unknown" and can enhance this later
+          
+          return {
+            id: member.user_id,
+            user_id: member.user_id,
+            company_name: currentProfile.company_name || "",
+            company_profile_id: currentProfile.id,
+            role: member.role as 'owner' | 'member',
+            created_at: member.created_at,
+            email: email,
+          };
+        })
+      );
 
       return membersWithEmails;
     },
@@ -111,12 +140,12 @@ export const useTeamManagement = () => {
         throw new Error("Missing company profile");
       }
 
-      // Delete the company profile for this user
+      // Delete the company membership for this user
       const { error } = await supabase
-        .from("company_profiles")
+        .from("company_members")
         .delete()
         .eq("user_id", userId)
-        .eq("company_name", currentProfile.company_name);
+        .eq("company_profile_id", currentProfile.id);
 
       if (error) throw error;
     },

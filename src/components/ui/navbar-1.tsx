@@ -8,6 +8,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSubscriptionStatus } from '@/hooks/useSubscriptionStatus';
 import { useCompanyProfile } from '@/hooks/useCompanyProfile';
+import { useTeamManagement } from '@/hooks/useTeamManagement';
 import {
   Tooltip,
   TooltipContent,
@@ -32,6 +33,7 @@ const Navbar1: React.FC<Navbar1Props> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false)
   const { user, signOut, loading } = useAuth();
+  const { isOwner } = useTeamManagement();
   const navigate = useNavigate();
   const location = useLocation();
   const subscriptionStatus = useSubscriptionStatus();
@@ -328,7 +330,7 @@ const Navbar1: React.FC<Navbar1Props> = ({
                 </button>
               </motion.div>
 
-              {companyProfile?.role === 'owner' && (
+              {isOwner && (
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -499,6 +501,19 @@ const Navbar1: React.FC<Navbar1Props> = ({
                     transition={{ delay: 0.35 }}
                     exit={{ opacity: 0, x: 20 }}
                   >
+                    {isOwner && (
+                      <button
+                        onClick={handleTeamManagement}
+                        className={`flex items-center w-full text-base font-medium py-3 rounded-lg transition-colors ${
+                          activeRoute === 'team' 
+                            ? 'text-blue-600 bg-blue-50' 
+                            : 'text-gray-900 hover:bg-gray-50'
+                        }`}
+                      >
+                        <Users className="h-5 w-5 mr-3" />
+                        Team
+                      </button>
+                    )}
                   </motion.div>
 
                   <motion.div

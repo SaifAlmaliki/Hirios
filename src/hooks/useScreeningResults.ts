@@ -61,15 +61,15 @@ export const useScreeningResults = () => {
         throw new Error('AI screening is only available for Premium subscribers. Please upgrade your plan to access this feature.');
       }
 
-      // Get company profile first
-      const { data: profile, error: profileError } = await supabase
-        .from('company_profiles')
-        .select('id')
+      // Get user's company membership to find their company_profile_id
+      const { data: membership, error: membershipError } = await supabase
+        .from('company_members')
+        .select('company_profile_id')
         .eq('user_id', user.id)
         .single();
 
-      if (profileError || !profile) {
-        throw new Error('Company profile not found');
+      if (membershipError || !membership) {
+        throw new Error('Company membership not found');
       }
 
       // Fetch screening results with job information for this company
@@ -77,7 +77,7 @@ export const useScreeningResults = () => {
       const { data: companyJobs, error: jobsError } = await supabase
         .from('jobs')
         .select('id')
-        .eq('company_profile_id', profile.id);
+        .eq('company_profile_id', membership.company_profile_id);
 
       if (jobsError) {
         console.error('❌ Error fetching company jobs:', jobsError);

@@ -343,14 +343,14 @@ const CompanyResumeUpload: React.FC<CompanyResumeUploadProps> = ({
       return;
     }
 
-    // Get company profile ID
-    const { data: companyProfile } = await supabase
-      .from('company_profiles')
-      .select('id')
+    // Get company profile ID via membership
+    const { data: membership } = await supabase
+      .from('company_members')
+      .select('company_profile_id')
       .eq('user_id', user?.id)
-      .single();
+      .maybeSingle();
 
-    if (!companyProfile) {
+    if (!membership) {
       toast({
         title: "Company profile not found",
         description: "Please complete your company setup first.",
@@ -366,7 +366,7 @@ const CompanyResumeUpload: React.FC<CompanyResumeUploadProps> = ({
     for (let i = 0; i < uploadedFiles.length; i++) {
       const file = uploadedFiles[i];
       if (file.status === 'pending') {
-        await processFile(file, companyProfile.id, selectedJobId, job);
+        await processFile(file, membership.company_profile_id, selectedJobId, job);
         setOverallProgress(((i + 1) / uploadedFiles.length) * 100);
       }
     }
