@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTeamManagement } from "@/hooks/useTeamManagement";
+import { useAuth } from "@/contexts/AuthContext";
+import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,6 +30,7 @@ import { toast } from "sonner";
 
 export default function TeamManagement() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const {
     currentProfile,
     teamMembers,
@@ -62,7 +65,7 @@ export default function TeamManagement() {
   };
 
   const handleRemoveMember = (userId: string, memberEmail: string) => {
-    if (userId === currentProfile?.user_id) {
+    if (userId === user?.id) {
       toast.error("You cannot remove yourself");
       return;
     }
@@ -80,10 +83,13 @@ export default function TeamManagement() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading team data...</p>
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
+        <Navbar title="Team Management" />
+        <div className="flex items-center justify-center min-h-[calc(100vh-80px)]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading team data...</p>
+          </div>
         </div>
       </div>
     );
@@ -91,9 +97,11 @@ export default function TeamManagement() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <Navbar title="Team Management" />
+      
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-8 max-w-6xl">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <Button
             variant="ghost"
             onClick={() => navigate("/job-portal")}
@@ -103,19 +111,19 @@ export default function TeamManagement() {
             Back to Job Portal
           </Button>
           
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
                 Team Management
               </h1>
-              <p className="text-gray-600 mt-2">
+              <p className="text-gray-600 mt-1 sm:mt-2 text-sm sm:text-base">
                 Manage your HR team members and invitations
               </p>
             </div>
 
             <Dialog open={isInviteDialogOpen} onOpenChange={setIsInviteDialogOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
+                <Button className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
                   <UserPlus className="mr-2 h-4 w-4" />
                   Invite Team Member
                 </Button>
@@ -176,68 +184,125 @@ export default function TeamManagement() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Joined</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {teamMembers && teamMembers.length > 0 ? (
-                  teamMembers.map((member) => (
-                    <TableRow key={member.id}>
-                      <TableCell className="font-medium">
-                        {member.email}
-                        {member.user_id === currentProfile?.user_id && (
-                          <Badge variant="outline" className="ml-2">You</Badge>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={member.role === "owner" ? "default" : "secondary"}
-                          className={
-                            member.role === "owner"
-                              ? "bg-gradient-to-r from-purple-600 to-blue-600"
-                              : ""
-                          }
-                        >
-                          {member.role === "owner" ? (
-                            <Crown className="mr-1 h-3 w-3" />
-                          ) : (
-                            <User className="mr-1 h-3 w-3" />
+            {/* Mobile view - Card layout */}
+            <div className="block sm:hidden space-y-4">
+              {teamMembers && teamMembers.length > 0 ? (
+                teamMembers.map((member) => (
+                  <div key={member.id} className="border rounded-lg p-4 space-y-3">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-medium text-sm">{member.email}</span>
+                          {member.user_id === user?.id && (
+                            <Badge variant="outline" className="text-xs">You</Badge>
                           )}
-                          {member.role === "owner" ? "Owner" : "Member"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        {new Date(member.created_at).toLocaleDateString()}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {member.role !== "owner" && member.user_id !== currentProfile?.user_id && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleRemoveMember(member.user_id, member.email || "")}
-                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        </div>
+                        <div className="mt-2">
+                          <Badge
+                            variant={member.role === "owner" ? "default" : "secondary"}
+                            className={
+                              member.role === "owner"
+                                ? "bg-gradient-to-r from-purple-600 to-blue-600 text-xs"
+                                : "text-xs"
+                            }
                           >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        )}
+                            {member.role === "owner" ? (
+                              <Crown className="mr-1 h-3 w-3" />
+                            ) : (
+                              <User className="mr-1 h-3 w-3" />
+                            )}
+                            {member.role === "owner" ? "Owner" : "Member"}
+                          </Badge>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-2">
+                          Joined: {new Date(member.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                      {member.role !== "owner" && member.user_id !== user?.id && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleRemoveMember(member.user_id, member.email || "")}
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50 flex-shrink-0"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center text-gray-500 py-8">
+                  No team members yet
+                </div>
+              )}
+            </div>
+
+            {/* Desktop view - Table layout */}
+            <div className="hidden sm:block overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Role</TableHead>
+                    <TableHead>Joined</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {teamMembers && teamMembers.length > 0 ? (
+                    teamMembers.map((member) => (
+                      <TableRow key={member.id}>
+                        <TableCell className="font-medium">
+                          {member.email}
+                          {member.user_id === user?.id && (
+                            <Badge variant="outline" className="ml-2">You</Badge>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant={member.role === "owner" ? "default" : "secondary"}
+                            className={
+                              member.role === "owner"
+                                ? "bg-gradient-to-r from-purple-600 to-blue-600"
+                                : ""
+                            }
+                          >
+                            {member.role === "owner" ? (
+                              <Crown className="mr-1 h-3 w-3" />
+                            ) : (
+                              <User className="mr-1 h-3 w-3" />
+                            )}
+                            {member.role === "owner" ? "Owner" : "Member"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {new Date(member.created_at).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          {member.role !== "owner" && member.user_id !== user?.id && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleRemoveMember(member.user_id, member.email || "")}
+                              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={4} className="text-center text-gray-500 py-8">
+                        No team members yet
                       </TableCell>
                     </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={4} className="text-center text-gray-500 py-8">
-                      No team members yet
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           </CardContent>
         </Card>
 
@@ -254,39 +319,70 @@ export default function TeamManagement() {
           </CardHeader>
           <CardContent>
             {pendingInvitations && pendingInvitations.length > 0 ? (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Sent</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
+              <>
+                {/* Mobile view - Card layout */}
+                <div className="block sm:hidden space-y-4">
                   {pendingInvitations.map((invitation) => (
-                    <TableRow key={invitation.id}>
-                      <TableCell className="font-medium">
-                        {invitation.invited_email}
-                      </TableCell>
-                      <TableCell>
-                        {new Date(invitation.created_at).toLocaleDateString()}
-                      </TableCell>
-                      <TableCell className="text-right">
+                    <div key={invitation.id} className="border rounded-lg p-4">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <p className="font-medium text-sm">{invitation.invited_email}</p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            Sent: {new Date(invitation.created_at).toLocaleDateString()}
+                          </p>
+                        </div>
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() =>
                             handleDeleteInvitation(invitation.id, invitation.invited_email)
                           }
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50 flex-shrink-0"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
-                      </TableCell>
-                    </TableRow>
+                      </div>
+                    </div>
                   ))}
-                </TableBody>
-              </Table>
+                </div>
+
+                {/* Desktop view - Table layout */}
+                <div className="hidden sm:block overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Sent</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {pendingInvitations.map((invitation) => (
+                        <TableRow key={invitation.id}>
+                          <TableCell className="font-medium">
+                            {invitation.invited_email}
+                          </TableCell>
+                          <TableCell>
+                            {new Date(invitation.created_at).toLocaleDateString()}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() =>
+                                handleDeleteInvitation(invitation.id, invitation.invited_email)
+                              }
+                              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </>
             ) : (
               <div className="text-center text-gray-500 py-8">
                 No pending invitations
