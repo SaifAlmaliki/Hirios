@@ -11,11 +11,9 @@ export const useCompanyJobs = () => {
     queryKey: ['company-jobs', user?.id],
     queryFn: async () => {
       if (!user) {
-        console.log('🏢 No user, skipping company jobs fetch');
         return [];
       }
 
-      console.log('🏢 Fetching company jobs...');
       
       try {
         // Get user's company membership to find their company_profile_id
@@ -47,7 +45,6 @@ export const useCompanyJobs = () => {
           return [];
         }
         
-        console.log('✅ Company jobs loaded:', data?.length || 0, 'positions');
         return (data || []) as Job[];
       } catch (error) {
         console.error('❌ Unexpected error in useCompanyJobs:', error);

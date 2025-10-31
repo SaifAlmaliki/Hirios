@@ -4,9 +4,6 @@ import React from 'react';
 
 // Create a professional job offer PDF template
 export const generateOfferPDF = async (data: OfferPDFData): Promise<Blob> => {
-  // Debug: Log the data to see what might be empty
-  console.log('PDF Data:', data);
-  
   // Clean the data to ensure no empty strings
   const cleanData = {
     ...data,
@@ -28,14 +25,10 @@ export const generateOfferPDF = async (data: OfferPDFData): Promise<Blob> => {
     end_date: data.end_date?.trim() || undefined,
   };
   
-  console.log('Cleaned PDF Data:', cleanData);
-  
   try {
     const { OfferPDFDocument } = await import('@/components/OfferPDFDocument');
     const doc = React.createElement(OfferPDFDocument, { data: cleanData });
-    console.log('PDF Document created successfully');
     const blob = await pdf(doc as any).toBlob();
-    console.log('PDF Blob generated successfully, size:', blob.size);
     return blob;
   } catch (error) {
     console.error('Error generating PDF:', error);
@@ -54,8 +47,6 @@ export const uploadOfferPDF = async (
   // Use the same bucket structure as resumes: {companyId}/offers/{fileName}
   const bucketName = 'company_uploads';
   const filePath = `${companyId}/offers/${fileName}`;
-
-  console.log(`Uploading offer PDF to: ${bucketName}/${filePath}`);
 
   const { data, error } = await supabase.storage
     .from(bucketName)
@@ -86,7 +77,6 @@ export const uploadOfferPDF = async (
     throw urlError;
   }
 
-  console.log('PDF uploaded successfully:', urlData.signedUrl);
   return urlData.signedUrl;
 };
 
@@ -95,28 +85,16 @@ export const generateAndUploadOfferPDF = async (
   offerData: OfferPDFData,
   companyId: string
 ): Promise<{ filePath: string; fileUrl: string; pdfBlob: Blob }> => {
-  console.log('🎯 Starting offer PDF generation and upload process');
-  console.log('👤 Candidate:', offerData.candidate_name);
-  console.log('💼 Position:', offerData.job_title);
-  console.log('🏢 Company ID:', companyId);
-  
   // Generate PDF blob
-  console.log('📄 Generating PDF document...');
   const pdfBlob = await generateOfferPDF(offerData);
-  console.log('✅ PDF generated successfully, size:', pdfBlob.size, 'bytes');
   
   // Create filename
   const fileName = `offer_${offerData.candidate_name?.replace(/\s+/g, '_') || 'candidate'}_${offerData.job_title?.replace(/\s+/g, '_') || 'position'}_${new Date().toISOString().split('T')[0]}.pdf`;
   const filePath = `${companyId}/offers/${fileName}`;
   
-  console.log('📁 File path:', filePath);
-  
   try {
     // Upload to storage with proper company folder structure
-    console.log('☁️ Uploading to Supabase storage...');
     const fileUrl = await uploadOfferPDF(pdfBlob, fileName, companyId);
-    console.log('✅ Offer PDF uploaded successfully');
-    console.log('🔗 File URL:', fileUrl);
     
     return {
       filePath,
@@ -124,10 +102,9 @@ export const generateAndUploadOfferPDF = async (
       pdfBlob,
     };
   } catch (error) {
-    console.warn('⚠️ Storage upload failed, using base64 fallback:', error);
+    console.warn('Storage upload failed, using base64 fallback:', error);
     // Fallback to base64 if storage fails
     const fileUrl = `data:application/pdf;base64,${await blobToBase64(pdfBlob)}`;
-    console.log('🔄 Using base64 fallback URL');
     
     return {
       filePath,

@@ -89,7 +89,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
-        console.log('[AuthContext] onAuthStateChange triggered', { hasSession: !!session });
         setSession(session);
         setUser(session?.user ?? null);
 
@@ -110,7 +109,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Check for existing session
     (async () => {
-      console.log('[AuthContext] getSession start');
       const { data: { session } } = await supabase.auth.getSession();
       setSession(session);
       setUser(session?.user ?? null);
@@ -151,10 +149,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     // If user was created successfully, the database trigger will automatically create the company profile
-    if (authData.user) {
-      console.log('✅ User created successfully:', authData.user.id);
-      console.log('✅ Company profile will be created by database trigger');
-    }
     
     return { error: null };
   };

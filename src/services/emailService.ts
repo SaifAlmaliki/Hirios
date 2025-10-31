@@ -114,14 +114,6 @@ export async function getCompanyEmailConfigByUserId(userId: string): Promise<Ema
  * Send email via SMTP using Supabase Edge Function
  */
 async function sendViaSMTP(config: EmailConfig, payload: EmailPayload): Promise<boolean> {
-  console.log('📤 Sending email via Edge Function to:', payload.to);
-  console.log('📋 Email payload:', {
-    to: payload.to,
-    subject: payload.subject,
-    hasHtml: !!payload.html,
-    hasAttachments: !!payload.attachments?.length,
-  });
-
   const { data, error } = await supabase.functions.invoke('send-smtp-email', {
     body: {
       config,
@@ -130,19 +122,16 @@ async function sendViaSMTP(config: EmailConfig, payload: EmailPayload): Promise<
     },
   });
 
-  console.log('📦 Edge Function response:', { data, error });
-
   if (error) {
-    console.error('❌ Edge Function error:', error);
+    console.error('Edge Function error:', error);
     throw new Error(`Failed to send email: ${error.message || JSON.stringify(error)}`);
   }
 
   if (!data?.success) {
-    console.error('❌ Email sending failed:', data);
+    console.error('Email sending failed:', data);
     throw new Error(data?.message || data?.error || 'Failed to send email');
   }
 
-  console.log('✅ Email sent successfully via Edge Function');
   return true;
 }
 
@@ -153,7 +142,7 @@ export async function sendEmail(config: EmailConfig, payload: EmailPayload): Pro
   try {
     return await sendViaSMTP(config, payload);
   } catch (error) {
-    console.error('❌ Email sending failed:', error);
+    console.error('Email sending failed:', error);
     throw error;
   }
 }
@@ -184,14 +173,6 @@ export async function sendEmailFromCurrentUser(payload: EmailPayload): Promise<b
  */
 export async function testSMTPConnection(config: EmailConfig): Promise<{ success: boolean; message: string }> {
   try {
-    console.log('🧪 Testing SMTP connection via Edge Function...');
-    console.log('📋 Config being sent:', {
-      host: config.smtp_host,
-      port: config.smtp_port,
-      user: config.smtp_user,
-      secure: config.smtp_secure,
-    });
-
     const { data, error } = await supabase.functions.invoke('send-smtp-email', {
       body: {
         config,
@@ -199,11 +180,8 @@ export async function testSMTPConnection(config: EmailConfig): Promise<{ success
       },
     });
 
-    console.log('📦 Response data:', data);
-    console.log('🔍 Response error:', error);
-
     if (error) {
-      console.error('❌ Edge Function error:', error);
+      console.error('Edge Function error:', error);
       return {
         success: false,
         message: `Failed to test connection: ${error.message || JSON.stringify(error)}`,
@@ -222,7 +200,7 @@ export async function testSMTPConnection(config: EmailConfig): Promise<{ success
       message: data.message || 'Unknown response',
     };
   } catch (error: any) {
-    console.error('❌ Test connection error:', error);
+    console.error('Test connection error:', error);
     return {
       success: false,
       message: error.message || 'Failed to test SMTP connection',

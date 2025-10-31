@@ -34,11 +34,9 @@ export const useCompanyProfile = () => {
     queryKey: ['company-profile', user?.id],
     queryFn: async () => {
       if (!user) {
-        console.log('🏢 No user, skipping company profile fetch');
         return null;
       }
 
-      console.log('🏢 Fetching company profile...');
       
       try {
         // Get user's company membership to find their company_profile_id
@@ -65,7 +63,6 @@ export const useCompanyProfile = () => {
         }
         
         const profile = memberships[0].company_profiles as CompanyProfile;
-        console.log('✅ Company profile loaded:', profile.company_name);
         return profile;
       } catch (error) {
         console.error('❌ Unexpected error in useCompanyProfile:', error);

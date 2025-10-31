@@ -26,14 +26,11 @@ import ScreeningResults from "./pages/ScreeningResults";
 import ScreeningResultDetail from "./pages/ScreeningResultDetail";
 import VoiceInterview from "./pages/VoiceInterview";
 import InviteAccept from "./pages/InviteAccept";
-import TestCollaboration from "./pages/TestCollaboration";
 import ResumePool from "./pages/ResumePool";
 import InterviewVote from "./pages/InterviewVote";
 import NotFound from "./pages/NotFound";
-import { ButtonAlignmentDemo } from "./components/ui/button-alignment-demo";
 import { VoiceInterviewService } from "./services/voiceInterviewService";
 import OfferDownload from "./pages/OfferDownload";
-import TestRoute from "./pages/TestRoute";
 import PublicJobApplication from "./pages/PublicJobApplication";
 import TeamManagement from "./pages/TeamManagement";
 import JoinTeam from "./pages/JoinTeam";
@@ -79,7 +76,6 @@ const App = () => (
           <Route path="/interview/:screeningResultId/:applicationId" element={<VoiceInterview />} />
           <Route path="/offer-download/:id" element={<OfferDownload />} />
           <Route path="/download-offer/:id" element={<OfferDownload />} />
-          <Route path="/test-route/:id" element={<TestRoute />} />
           <Route path="/apply/:jobId" element={<PublicJobApplication />} />
           <Route path="/join/:token" element={<JoinTeam />} />
           
@@ -95,8 +91,6 @@ const App = () => (
                   <Route path="/company-setup" element={<CompanySetup />} />
                   <Route path="/screening-results/:id" element={<ScreeningResultDetail />} />
                   <Route path="/screening-results/job/:jobId" element={<ScreeningResults />} />
-                  <Route path="/test-collaboration" element={<TestCollaboration />} />
-                  <Route path="/button-demo" element={<ButtonAlignmentDemo />} />
                   <Route path="/resume-pool" element={<ResumePool />} />
                   <Route path="/team-management" element={<TeamManagement />} />
                   <Route path="*" element={<NotFound />} />

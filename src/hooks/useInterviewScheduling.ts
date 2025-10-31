@@ -107,19 +107,15 @@ export const useCreateInterviewSchedule = () => {
       if (scheduleError) throw scheduleError;
 
       // 2. Generate time slots from ranges
-      console.log('🎯 Creating time slots for', data.time_ranges.length, 'time ranges');
       const timeSlots: { start_time: string; end_time: string }[] = [];
       for (const range of data.time_ranges) {
-        console.log('📍 Processing range:', range);
         const slots = generateTimeSlots(
           range.start,
           range.end,
           data.interview_duration_minutes
         );
-        console.log(`  → Generated ${slots.length} slots for this range`);
         timeSlots.push(...slots);
       }
-      console.log(`✅ Total slots to insert: ${timeSlots.length}`);
 
       // 3. Insert time slots
       const { data: insertedSlots, error: slotsError } = await supabase
@@ -184,19 +180,12 @@ export const useCreateInterviewSchedule = () => {
         : 'Candidate';
 
       // 8. Send emails to all participants
-      console.log('📧 Sending emails to participants:', insertedParticipants.length);
-      console.log('🏢 Company ID for SMTP config:', companyProfile?.id);
-      console.log('🏢 Company Name:', companyProfile?.company_name);
-      
       let successCount = 0;
       let failCount = 0;
       
       for (let i = 0; i < insertedParticipants.length; i++) {
         const participant = insertedParticipants[i];
         const votingLink = `${window.location.origin}/interview-vote/${participant.vote_token}`;
-
-        console.log('📤 Sending email to:', participant.email);
-        console.log('🔗 Voting link:', votingLink);
 
         // Retry logic: try up to 2 times with 2-second delay
         let emailSent = false;
@@ -218,23 +207,18 @@ export const useCreateInterviewSchedule = () => {
             });
             
             if (emailResponse.error) {
-              console.error(`❌ Email error for ${participant.email} (attempt ${attempt}):`, emailResponse.error);
-              console.error('📋 Error details:', emailResponse.data);
+              console.error(`Email error for ${participant.email} (attempt ${attempt}):`, emailResponse.error);
               if (attempt < 2) {
-                console.log('⏳ Retrying in 2 seconds...');
                 await new Promise(resolve => setTimeout(resolve, 2000));
               }
             } else {
-              console.log('✅ Email sent successfully to:', participant.email);
-              console.log('📬 Response:', emailResponse.data);
               successCount++;
               emailSent = true;
               break;
             }
           } catch (emailError) {
-            console.error(`❌ Failed to send email to ${participant.email} (attempt ${attempt}):`, emailError);
+            console.error(`Failed to send email to ${participant.email} (attempt ${attempt}):`, emailError);
             if (attempt < 2) {
-              console.log('⏳ Retrying in 2 seconds...');
               await new Promise(resolve => setTimeout(resolve, 2000));
             }
           }
@@ -246,18 +230,15 @@ export const useCreateInterviewSchedule = () => {
         
         // Add a 2-second delay between participants to avoid rate limiting
         if (i < insertedParticipants.length - 1) {
-          console.log('⏳ Waiting 2 seconds before next participant...');
           await new Promise(resolve => setTimeout(resolve, 2000));
         }
       }
       
-      console.log(`📊 Email summary: ${successCount} sent, ${failCount} failed`);
-      
       // Show appropriate message based on results
       if (failCount > 0 && successCount === 0) {
-        console.warn('⚠️ All emails failed to send. Participants can still be notified manually.');
+        console.warn('All emails failed to send. Participants can still be notified manually.');
       } else if (failCount > 0) {
-        console.warn(`⚠️ Some emails failed (${failCount}/${insertedParticipants.length}). You may need to resend manually.`);
+        console.warn(`Some emails failed (${failCount}/${insertedParticipants.length}). You may need to resend manually.`);
       }
 
       // 9. Add participants as job collaborators
@@ -407,7 +388,9 @@ export const useConfirmInterviewSlot = () => {
 
       if (updateError) throw updateError;
 
-      // TODO: Send confirmation emails to all participants and candidate
+      // Note: Confirmation emails should be sent to all participants and candidate
+      // This can be implemented using the send-interview-scheduling-email edge function
+      // with a different template for confirmations
 
       return { success: true };
     },
@@ -440,12 +423,6 @@ function generateTimeSlots(
   const current = new Date(startTime.getTime());
   const end = new Date(endTime.getTime());
 
-  console.log('🕐 Generating slots:', {
-    start: current.toISOString(),
-    end: end.toISOString(),
-    duration: durationMinutes
-  });
-
   while (current < end) {
     const slotEnd = new Date(current.getTime() + durationMinutes * 60000);
     
@@ -459,7 +436,6 @@ function generateTimeSlots(
     current.setTime(current.getTime() + durationMinutes * 60000);
   }
 
-  console.log(`✅ Generated ${slots.length} slots`);
   return slots;
 }
 
