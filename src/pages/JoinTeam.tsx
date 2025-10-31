@@ -43,9 +43,19 @@ export default function JoinTeam() {
         .single();
 
       if (invitationError || !data) {
+        console.error("Invitation fetch error:", invitationError);
         setError("This invitation is invalid or has already been used");
         setIsLoading(false);
         return;
+      }
+
+      // Log for debugging if company_profiles is missing
+      if (!data.company_profiles) {
+        console.warn("Company profile not found for invitation:", {
+          token,
+          company_profile_id: data.company_profile_id,
+          invitation_id: data.id,
+        });
       }
 
       setInvitation(data as TeamInvitation);
