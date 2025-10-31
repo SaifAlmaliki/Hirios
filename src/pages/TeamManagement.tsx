@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Users, Mail, Trash2, UserPlus, Crown, User } from "lucide-react";
+import { Users, Mail, Trash2, UserPlus, Crown, User, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 
 export default function TeamManagement() {
@@ -45,6 +45,8 @@ export default function TeamManagement() {
 
   const [inviteEmail, setInviteEmail] = useState("");
   const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [invitationToDelete, setInvitationToDelete] = useState<{id: string, email: string} | null>(null);
 
   // Redirect if not owner
   if (!isLoading && !isOwner) {
@@ -76,8 +78,15 @@ export default function TeamManagement() {
   };
 
   const handleDeleteInvitation = (invitationId: string, email: string) => {
-    if (confirm(`Are you sure you want to delete the invitation for ${email}?`)) {
-      deleteInvitation(invitationId);
+    setInvitationToDelete({ id: invitationId, email });
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDeleteInvitation = () => {
+    if (invitationToDelete) {
+      deleteInvitation(invitationToDelete.id);
+      setIsDeleteDialogOpen(false);
+      setInvitationToDelete(null);
     }
   };
 
@@ -100,25 +109,15 @@ export default function TeamManagement() {
       <Navbar title="Team Management" />
       
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-8 max-w-6xl">
-        {/* Header */}
-        <div className="mb-6 sm:mb-8">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                Team Management
-              </h1>
-              <p className="text-gray-600 mt-1 sm:mt-2 text-sm sm:text-base">
-                Manage your HR team members and invitations
-              </p>
-            </div>
-
-            <Dialog open={isInviteDialogOpen} onOpenChange={setIsInviteDialogOpen}>
-              <DialogTrigger asChild>
-                <Button className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
-                  <UserPlus className="mr-2 h-4 w-4" />
-                  Invite Team Member
-                </Button>
-              </DialogTrigger>
+        {/* Invite Button */}
+        <div className="mb-6 sm:mb-8 flex justify-end">
+          <Dialog open={isInviteDialogOpen} onOpenChange={setIsInviteDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
+                <UserPlus className="mr-2 h-4 w-4" />
+                Invite Team Member
+              </Button>
+            </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Invite Team Member</DialogTitle>
@@ -160,7 +159,6 @@ export default function TeamManagement() {
                 </DialogFooter>
               </DialogContent>
             </Dialog>
-          </div>
         </div>
 
         {/* Team Members Card */}
@@ -382,6 +380,52 @@ export default function TeamManagement() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Delete Invitation Confirmation Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <div className="flex items-center gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
+                <AlertTriangle className="h-6 w-6 text-red-600" />
+              </div>
+              <div>
+                <DialogTitle className="text-xl">Delete Invitation</DialogTitle>
+                <DialogDescription className="mt-1">
+                  This action cannot be undone.
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-sm text-gray-600">
+              Are you sure you want to delete the invitation for{" "}
+              <span className="font-semibold text-gray-900">
+                {invitationToDelete?.email}
+              </span>
+              ? The recipient will no longer be able to accept this invitation.
+            </p>
+          </div>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsDeleteDialogOpen(false);
+                setInvitationToDelete(null);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={confirmDeleteInvitation}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Delete Invitation
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
