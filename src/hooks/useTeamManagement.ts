@@ -22,11 +22,14 @@ export const useTeamManagement = () => {
         .limit(1);
 
       if (error) throw error;
-      if (!memberships || memberships.length === 0 || !memberships[0].company_profiles) return null;
+      
+      if (!memberships || memberships.length === 0 || !memberships[0].company_profiles) {
+        return null;
+      }
       
       // If there are duplicates, warn but use the first one
       if (memberships.length > 1) {
-        console.warn("Multiple company memberships found, using first one");
+        console.warn("[useTeamManagement] Multiple company memberships found, using first one");
       }
       
       const membership = memberships[0];
@@ -37,6 +40,7 @@ export const useTeamManagement = () => {
       };
     },
     enabled: !!user?.id,
+    retry: 1,
   });
   
   const currentProfile = currentMembership;
@@ -99,8 +103,6 @@ export const useTeamManagement = () => {
         return [];
       }
 
-      console.log("[useTeamManagement] Fetching invitations for company:", currentProfile.id);
-
       const { data, error } = await supabase
         .from("team_invitations")
         .select("*")
@@ -109,18 +111,10 @@ export const useTeamManagement = () => {
         .order("created_at", { ascending: false });
 
       if (error) {
-        console.error("[useTeamManagement] Error fetching invitations:", error);
-        console.error("[useTeamManagement] Error details:", {
-          code: error.code,
-          message: error.message,
-          details: error.details,
-          hint: error.hint
-        });
         // Don't throw - return empty array on error to prevent blocking
         return [];
       }
       
-      console.log("[useTeamManagement] Successfully fetched invitations:", data?.length || 0);
       return (data || []) as TeamInvitation[];
     },
     // Only enable query when: profile loaded, profile has id, and user is owner
@@ -205,12 +199,14 @@ export const useTeamManagement = () => {
     },
   });
 
+  const isOwner = currentProfile?.role === "owner";
+
   return {
     currentProfile,
     teamMembers,
     pendingInvitations,
     isLoading: isLoadingProfile || isLoadingMembers || isLoadingInvitations,
-    isOwner: currentProfile?.role === "owner",
+    isOwner,
     sendInvitation: sendInvitationMutation.mutate,
     removeTeamMember: removeTeamMemberMutation.mutate,
     deleteInvitation: deleteInvitationMutation.mutate,
