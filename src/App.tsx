@@ -77,7 +77,11 @@ const App = () => (
           <Route path="/offer-download/:id" element={<OfferDownload />} />
           <Route path="/download-offer/:id" element={<OfferDownload />} />
           <Route path="/apply/:jobId" element={<PublicJobApplication />} />
-          <Route path="/join/:token" element={<JoinTeam />} />
+          <Route path="/join/:token" element={
+            <AuthProvider>
+              <JoinTeam />
+            </AuthProvider>
+          } />
           
           {/* Routes that need AuthProvider context */}
           <Route path="/*" element={
