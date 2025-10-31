@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Users, Mail, Trash2, UserPlus, ArrowLeft, Crown, User } from "lucide-react";
+import { Users, Mail, Trash2, UserPlus, Crown, User } from "lucide-react";
 import { toast } from "sonner";
 
 export default function TeamManagement() {
@@ -102,15 +102,6 @@ export default function TeamManagement() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-8 max-w-6xl">
         {/* Header */}
         <div className="mb-6 sm:mb-8">
-          <Button
-            variant="ghost"
-            onClick={() => navigate("/job-portal")}
-            className="mb-4"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Job Portal
-          </Button>
-          
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
