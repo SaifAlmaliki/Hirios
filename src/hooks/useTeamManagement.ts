@@ -66,16 +66,38 @@ export const useTeamManagement = () => {
       const memberIds = members.map(m => m.user_id);
       
       // Map members to team member format
-      // Note: Email fetching from auth.users may require admin privileges
-      // We'll set email as optional/unknown for now and can enhance later
+      // Get company profile email for owner, and try to get emails for other members
       const membersWithEmails: TeamMember[] = await Promise.all(
         members.map(async (member) => {
-          // Try to get email from a user lookup if possible
-          // This is a simplified version - you may need to enhance based on your auth setup
           let email = "Unknown";
           
-          // If we can access user metadata or have email stored elsewhere, use that
-          // For now, we'll return with "Unknown" and can enhance this later
+          // For owner, use the company profile email (which is the owner's email)
+          if (member.role === "owner") {
+            email = currentProfile.email || "Unknown";
+          } else {
+            // For other members, try to get email from auth.users via RPC
+            // Or check if there's a way to get it from the invitation
+            // For now, we'll try to use a database function or RPC call
+            try {
+              // Try to get email via RPC function if available
+              // If not available, we could also check team_invitations for the invited_email
+              const { data: invitationData } = await supabase
+                .from("team_invitations")
+                .select("invited_email")
+                .eq("company_profile_id", currentProfile.id)
+                .eq("used", true)
+                .limit(1);
+              
+              // This is a fallback - if member signed up via invitation, we might not have their email easily
+              // For members, we could enhance this by storing email in company_members or using a helper function
+              if (invitationData && invitationData.length > 0) {
+                email = invitationData[0].invited_email;
+              }
+            } catch (err) {
+              // If we can't get the email, keep as "Unknown"
+              console.warn(`Could not get email for member ${member.user_id}:`, err);
+            }
+          }
           
           return {
             id: member.user_id,
@@ -130,21 +152,51 @@ export const useTeamManagement = () => {
         throw new Error("Missing required data");
       }
 
+      // Check if SMTP is configured before attempting to send invitation
+      if (!currentProfile.smtp_host || !currentProfile.smtp_user || !currentProfile.smtp_password) {
+        throw new Error("SMTP not configured. Please configure email settings in Company Setup before sending invitations.");
+      }
+
       // Get inviter name from current user
       const { data: userData } = await supabase.auth.getUser();
       const inviterName = userData.user?.user_metadata?.full_name || userData.user?.email || "Team Admin";
 
-      const response = await supabase.functions.invoke("send-team-invitation", {
-        body: {
-          invitedEmail,
-          companyProfileId: currentProfile.id,
-          inviterName,
-          companyName: currentProfile.company_name,
-        },
-      });
+      try {
+        const response = await supabase.functions.invoke("send-team-invitation", {
+          body: {
+            invitedEmail,
+            companyProfileId: currentProfile.id,
+            inviterName,
+            companyName: currentProfile.company_name || "Your Company",
+          },
+        });
 
-      if (response.error) throw response.error;
-      return response.data;
+        // Handle errors from edge function
+        if (response.error) {
+          // Edge functions may return error with message in data or error object
+          const errorMessage = response.data?.message || 
+                               response.error.message || 
+                               "Failed to send invitation";
+          throw new Error(errorMessage);
+        }
+        
+        // Check if response data indicates failure (even with 200 status)
+        if (response.data && response.data.success === false) {
+          throw new Error(response.data.message || "Failed to send invitation");
+        }
+        
+        return response.data;
+      } catch (error: any) {
+        // Handle any unexpected errors
+        if (error instanceof Error) {
+          throw error;
+        }
+        // If it's a Supabase error, try to extract message
+        const errorMessage = error?.message || 
+                            error?.data?.message || 
+                            "Failed to send invitation. Please check your email configuration in Company Setup.";
+        throw new Error(errorMessage);
+      }
     },
     onSuccess: () => {
       toast.success("Invitation sent successfully!");
